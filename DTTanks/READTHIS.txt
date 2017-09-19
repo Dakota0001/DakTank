@@ -1,0 +1,5 @@
+Are you running a server? Are your projectiles moving slow instead of fast?
+
+Put this line in your server's SERVER.CFG
+
+lua_run local tbl = physenv.GetPerformanceSettings() tbl.MaxVelocity = 1000000 physenv.SetPerformanceSettings(tbl)

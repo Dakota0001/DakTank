@@ -1,0 +1,1 @@
+E2Helper.Descriptions["dakArmor"] = "Gives raw armor value of entity."
