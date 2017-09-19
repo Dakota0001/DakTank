@@ -1,3 +1,3 @@
-# DakTek
+# DakTank
 
-This is a battletech based combat mod.
+This is a WWII era tank mod.
