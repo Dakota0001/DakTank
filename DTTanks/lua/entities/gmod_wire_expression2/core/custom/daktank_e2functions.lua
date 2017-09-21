@@ -15,7 +15,7 @@ e2function number entity:dakArmor()
 	if this.IsDakTekFutureTech == 1 then
 		this.DakArmor = 1000
 	else
-		if SA == -1 then
+		if SA == -1 or SA == nil then
 			this.DakArmor = this:OBBMaxs().x/2
 			this.DakIsTread = 1
 		else
