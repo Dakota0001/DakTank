@@ -8,7 +8,6 @@ e2function number entity:dakArmor()
 	if this.DakArmor == nil then
 		DakTekTankEditionSetupNewEnt(this)
 	end
-	print(IsValid(this:GetPhysicsObject()))
 	local SA = -1
 	if IsValid(this:GetPhysicsObject()) then
 		SA = this:GetPhysicsObject():GetSurfaceArea()
