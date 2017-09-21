@@ -8,13 +8,15 @@ e2function number entity:dakArmor()
 	if this.DakArmor == nil then
 		DakTekTankEditionSetupNewEnt(this)
 	end
+	print(IsValid(this:GetPhysicsObject()))
+	local SA = -1
 	if IsValid(this:GetPhysicsObject()) then
-		local SA = this:GetPhysicsObject():GetSurfaceArea()
+		SA = this:GetPhysicsObject():GetSurfaceArea()
 	end
 	if this.IsDakTekFutureTech == 1 then
 		this.DakArmor = 1000
 	else
-		if SA == nil then
+		if SA == -1 then
 			this.DakArmor = this:OBBMaxs().x/2
 			this.DakIsTread = 1
 		else
