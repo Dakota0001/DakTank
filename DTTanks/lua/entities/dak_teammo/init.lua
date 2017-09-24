@@ -400,7 +400,8 @@ function ENT:Think()
 			if table.Count(Targets) > 0 then
 				for i = 1, #Targets do
 					if Targets[i]:IsValid() then
-						if not(hook.Run("DakTankDamageCheck", Targets[i], self.DakOwner)) then
+						if hook.Run("DakTankDamageCheck", Targets[i], self.DakOwner) ~= false then
+						else
 							table.insert(self.IgnoreList,Targets[i])
 						end
 						if not(Targets[i].DakHealth == nil) then
