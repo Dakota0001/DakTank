@@ -1145,6 +1145,7 @@ function TOOL:LeftClick( trace )
 		end
 		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
 			self.spawnedent:Spawn()
+			self.spawnedent.DakOwner = self:GetOwner()
 			self.spawnedent:GetPhysicsObject():EnableMotion( false )
 			self.spawnedent:SetPos(trace.HitPos+Vector(0,0,-self.spawnedent:OBBMins().z))
 
@@ -1210,6 +1211,7 @@ function TOOL:LeftClick( trace )
 		if (trace.Entity:GetClass() == "dak_gun") or (trace.Entity:GetClass() == "dak_tegun") or (trace.Entity:GetClass() == "dak_teautogun") or (trace.Entity:GetClass() == "dak_temachinegun") or (trace.Entity:GetClass() == "dak_laser") or (trace.Entity:GetClass() == "dak_xpulselaser") or (trace.Entity:GetClass() == "dak_launcher") or (trace.Entity:GetClass() == "dak_lams") then
 			if (self:GetClientInfo("SpawnEnt") == "dak_gun") or (self:GetClientInfo("SpawnEnt") == "dak_tegun") or (self:GetClientInfo("SpawnEnt") == "dak_temachinegun") or (self:GetClientInfo("SpawnEnt") == "dak_teautogun") or (self:GetClientInfo("SpawnEnt") == "dak_laser") or (self:GetClientInfo("SpawnEnt") == "dak_xpulselaser") or (self:GetClientInfo("SpawnEnt") == "dak_launcher") or (self:GetClientInfo("SpawnEnt") == "dak_lams") then
 			self.spawnedent:Spawn()
+			self.spawnedent.DakOwner = self:GetOwner()
 			self.spawnedent:GetPhysicsObject():EnableMotion( false )
 
 			if not(self.spawnedent:GetClass() == "dak_engine") and not(self.spawnedent:GetClass() == "dak_module") and not(self.spawnedent:GetClass() == "dak_ammo") and not(self.spawnedent:GetClass() == "dak_teammo") and not(self.spawnedent:GetClass() == "dak_heatsink") and not(self.spawnedent:GetClass() == "dak_hitboxcontroller") and not(self.spawnedent:GetClass() == "dak_masc") and not(self.spawnedent:GetClass() == "dak_supercharger") and not(self.spawnedent:GetClass() == "dak_motor") and not(self.spawnedent:GetClass() == "dak_temotor") and not(self.spawnedent:GetClass() == "dak_vtol") and not(self.spawnedent:GetClass() == "dak_fighter") and not(self.spawnedent:GetClass() == "dak_hoverdrive") and not(self.spawnedent:GetClass() == "dak_gyro") and not(self.spawnedent:GetClass() == "dak_quadgyro") and not(self.spawnedent:GetClass() == "dak_lams") and not(self.spawnedent:GetClass() == "dak_jumpjet") then

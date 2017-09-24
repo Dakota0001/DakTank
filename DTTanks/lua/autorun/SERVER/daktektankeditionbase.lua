@@ -65,4 +65,9 @@ if SERVER then
 			end
 		end
 	end
+
+	hook.Add( "DakTankDamageCheck", "DakTekTankEditionDamageCheck", function (Damaged,Damager)
+		return true
+	end )
+
 end

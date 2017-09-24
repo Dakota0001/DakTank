@@ -107,6 +107,12 @@ function ENT:Think()
 			end 
 		end
 
+		if Hit.Entity:IsValid() then
+			if not(hook.Run("DakTankDamageCheck", Hit.Entity, self.DakGun.DakOwner)) then
+				self:Remove()
+				return false
+			end
+		end
 		if Hit.Entity:IsValid() and not(Hit.Entity:IsPlayer()) and not(Hit.Entity:IsNPC()) and not(Hit.Entity:GetClass()=="dak_bot") then
 			if (self:CheckClip(Hit.Entity,Hit.HitPos)) or (Hit.Entity:GetPhysicsObject():GetMass()<=1 and not(Hit.Entity:IsVehicle()) and not(Hit.Entity.IsDakTekFutureTech==1)) then
 				self.LastHit = Hit.HitPos
@@ -387,6 +393,9 @@ function ENT:Think()
 				if table.Count(Targets) > 0 then
 					for i = 1, #Targets do
 						if Targets[i]:IsValid() then
+							if not(hook.Run("DakTankDamageCheck", Targets[i], self.DakGun.DakOwner)) then
+								table.insert(self.IgnoreList,Targets[i])
+							end
 							if not(Targets[i].DakHealth == nil) then
 								if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 then
 									if IsValid(Targets[i]:GetPhysicsObject()) then

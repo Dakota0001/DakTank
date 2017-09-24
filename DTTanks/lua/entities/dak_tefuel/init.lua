@@ -142,14 +142,34 @@ function ENT:Think()
 
 		self.DamageList = {}
 		self.RemoveList = {}
+		self.IgnoreList = {}
 		local Targets = ents.FindInSphere( self:GetPos(), 500 )
 		if table.Count(Targets) > 0 then
+			for i = 1, #Targets do
+				if Targets[i]:IsValid() then
+					if not(hook.Run("DakTankDamageCheck", Targets[i], self.DakOwner)) then
+						table.insert(self.IgnoreList,Targets[i])
+					end
+					if not(Targets[i].DakHealth == nil) then
+						if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 then
+							if IsValid(Targets[i]:GetPhysicsObject()) then
+								if Targets[i]:GetPhysicsObject():GetMass()<=1 then
+									table.insert(self.IgnoreList,Targets[i])
+								end
+							end
+							table.insert(self.IgnoreList,Targets[i])
+						end
+					end
+				end
+			end
+			table.insert(self.IgnoreList,self)
+
 			for i = 1, #Targets do
 				if Targets[i]:IsValid() or Targets[i]:IsPlayer() or Targets[i]:IsNPC() then
 					local trace = {}
 					trace.start = self:GetPos()
 					trace.endpos = Targets[i]:GetPos()
-					trace.filter = { self }
+					trace.filter = self.IgnoreList
 					local ExpTrace = util.TraceLine( trace )
 					if ExpTrace.Entity == Targets[i] then
 						if not(string.Explode("_",Targets[i]:GetClass(),false)[2] == "wire") and not(Targets[i]:IsVehicle()) and not(Targets[i]:GetClass() == "dak_salvage") and not(Targets[i]:GetClass() == "dak_tesalvage") and not(Targets[i]:GetClass() == "dak_turretcontrol") then
