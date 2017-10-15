@@ -99,7 +99,7 @@ function ENT:Think()
 				end
 			end
 			local Class = self.Inputs.Gun.Value:GetClass()
-			if not(Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegungun") then
+			if not(Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
 				if self.SentError2 == 0 then
 					self.SentError2 = 1
 					self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: You must wire the gun input to the gun entity, not an aimer prop." )
@@ -114,7 +114,7 @@ function ENT:Think()
 			self.DakTurret = self.Inputs.Turret.Value
 			self.DakCamHitPos = self.Inputs.CamHitPos.Value
 			self.DakCamAngle = self.Inputs.CamAngle.Value
-			if (self.DakGun:GetPhysicsObject():GetMass()<=1000) and (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegungun") then
+			if (self.DakGun:GetPhysicsObject():GetMass()<=1000) and (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
 				if self.DakActive > 0 then
 					local trace = {}
 					trace.start = self.DakCamHitPos
