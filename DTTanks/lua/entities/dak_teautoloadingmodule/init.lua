@@ -95,38 +95,9 @@ function ENT:Think()
 			self.DakMass = 1000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					--60% reload time
-					--base reloads: 4, 7, 9, 10, 13, 17
-					if self.DakGun.DakName == "50mm Autoloader" then
-						self.DakGun.DakClip = 10
-						self.DakGun.DakReloadTime = 24
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "75mm Autoloader" then
-						self.DakGun.DakClip = 8
-						self.DakGun.DakReloadTime = 34
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "100mm Autoloader" then
-						self.DakGun.DakClip = 6
-						self.DakGun.DakReloadTime = 33
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "120mm Autoloader" then
-						self.DakGun.DakClip = 5
-						self.DakGun.DakReloadTime = 30
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "152mm Autoloader" then
-						self.DakGun.DakClip = 4
-						self.DakGun.DakReloadTime = 31
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "200mm Autoloader" then
-						self.DakGun.DakClip = 3
-						self.DakGun.DakReloadTime = 31
-						self.DakGun.Loaded = 1
-					end
+					self.DakGun.DakClip = 600/self.DakGun.DakCaliber
+					self.DakGun.DakReloadTime = (self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100) * self.DakGun.DakClip
+					self.DakGun.Loaded = 1
 				end
 			end
 		end
@@ -134,38 +105,9 @@ function ENT:Think()
 			self.DakMass = 2000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					--50% reload time
-					--base reloads: 4, 7, 9, 10, 13, 17
-					if self.DakGun.DakName == "50mm Autoloader" then
-						self.DakGun.DakClip = 15
-						self.DakGun.DakReloadTime = 30
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "75mm Autoloader" then
-						self.DakGun.DakClip = 12
-						self.DakGun.DakReloadTime = 42
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "100mm Autoloader" then
-						self.DakGun.DakClip = 9
-						self.DakGun.DakReloadTime = 41
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "120mm Autoloader" then
-						self.DakGun.DakClip = 7
-						self.DakGun.DakReloadTime = 35
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "152mm Autoloader" then
-						self.DakGun.DakClip = 6
-						self.DakGun.DakReloadTime = 39
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "200mm Autoloader" then
-						self.DakGun.DakClip = 5
-						self.DakGun.DakReloadTime = 43
-						self.DakGun.Loaded = 1
-					end
+					self.DakGun.DakClip = 600/self.DakGun.DakCaliber*1.5
+					self.DakGun.DakReloadTime = (self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100) * self.DakGun.DakClip * 0.75
+					self.DakGun.Loaded = 1
 				end
 			end
 		end
@@ -173,38 +115,9 @@ function ENT:Think()
 			self.DakMass = 3000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					--40% reload time
-					--base reloads: 4, 7, 9, 10, 13, 17
-					if self.DakGun.DakName == "50mm Autoloader" then
-						self.DakGun.DakClip = 20
-						self.DakGun.DakReloadTime = 32
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "75mm Autoloader" then
-						self.DakGun.DakClip = 16
-						self.DakGun.DakReloadTime = 45
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "100mm Autoloader" then
-						self.DakGun.DakClip = 12
-						self.DakGun.DakReloadTime = 43
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "120mm Autoloader" then
-						self.DakGun.DakClip = 10
-						self.DakGun.DakReloadTime = 40
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "152mm Autoloader" then
-						self.DakGun.DakClip = 8
-						self.DakGun.DakReloadTime = 42
-						self.DakGun.Loaded = 1
-					end
-					if self.DakGun.DakName == "200mm Autoloader" then
-						self.DakGun.DakClip = 6
-						self.DakGun.DakReloadTime = 41
-						self.DakGun.Loaded = 1
-					end
+					self.DakGun.DakClip = 600/self.DakGun.DakCaliber*2
+					self.DakGun.DakReloadTime = (self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100) * self.DakGun.DakClip * 0.5
+					self.DakGun.Loaded = 1
 				end
 			end
 		end

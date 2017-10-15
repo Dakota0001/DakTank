@@ -77,344 +77,172 @@ end
 
 function ENT:Think()
 	if CurTime()>=self.SlowThinkTime+1 then
-		--HMGs
-		if self.DakName == "20mm Heavy Machine Gun" then
-			self.DakCooldown = 0.1
-			self.DakMaxHealth = 20
-			self.DakArmor = 80
-			self.DakMass = 200
-			self.DakAP = "20mmHMGAPAmmo"
-			self.DakHE = "20mmHMGHEAmmo"
-			self.DakFL = "20mmHMGFLAmmo"
+		if self.DakGunType == "Autoloader" then
+			self.DakName = self.DakCaliber.."mm Autoloader"
+			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)*0.2
+			self.DakMaxHealth = self.DakCaliber
+			self.DakArmor = self.DakCaliber*5
+			self.DakMass = math.Round((9000/((200/self.DakCaliber)*(200/self.DakCaliber))))
+
+			self.DakAP = math.Round(self.DakCaliber,2).."mmCAPAmmo"
+			self.DakHE = math.Round(self.DakCaliber,2).."mmCHEAmmo"
+			self.DakFL = math.Round(self.DakCaliber,2).."mmCFLAmmo"
+
+			self.BaseDakShellDamage = self.DakCaliber/10
+			self.BaseDakShellMass = self.DakCaliber
+			self.DakShellSplashDamage = self.DakCaliber/10*1.25
+			self.BaseDakShellPenetration = self.DakCaliber*2
+			self.DakShellExplosive = false
+			self.DakShellBlastRadius = self.DakCaliber/25*39
+
 			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/hmg20.wav"
+			self.DakFirePitch = 100
+			self.DakShellTrail = "dakshelltrail"
+			self.BaseDakShellVelocity = 41992
+			self.DakIsFlechette = false
+			self.DakPellets = 10
+
+			if self.DakCaliber <= 75 then
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
+				self.ReloadSound = "daktanks/dakreloadlight.wav"
+			end
+			if self.DakCaliber > 75 and self.DakCaliber < 120 then
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
+				self.ReloadSound = "daktanks/dakreloadmedium.wav"
+			end
+			if self.DakCaliber >= 120 then
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
+				self.ReloadSound = "daktanks/dakreloadheavy.wav"
+			end
+
+			if self.DakCaliber < 37 then
+				self.DakFireSound = "daktanks/c25.wav"
+			end
+			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
+				self.DakFireSound = "daktanks/c37.wav"
+			end
+			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
+				self.DakFireSound = "daktanks/c50.wav"
+			end
+			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
+				self.DakFireSound = "daktanks/c75.wav"
+			end
+			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
+				self.DakFireSound = "daktanks/c100.wav"
+			end
+			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
+				self.DakFireSound = "daktanks/c120.wav"
+			end
+			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
+				self.DakFireSound = "daktanks/c152.wav"
+			end
+			if self.DakCaliber >= 200 then
+				self.DakFireSound = "daktanks/c200.wav"
+			end
+			
+			self.IsAutoLoader = 1
+		end
+
+		if self.DakGunType == "HMG" then
+			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
+			self.DakCooldown = 0.1
+			self.DakMaxHealth = self.DakCaliber
+			self.DakArmor = self.DakCaliber*5
+			self.DakMass = math.Round((600/((40/self.DakCaliber)*(40/self.DakCaliber))))
+
+			self.DakAP = math.Round(self.DakCaliber,2).."mmHMGAPAmmo"
+			self.DakHE = math.Round(self.DakCaliber,2).."mmHMGHEAmmo"
+			self.DakFL = math.Round(self.DakCaliber,2).."mmHMGFLAmmo"
+
+			self.BaseDakShellDamage = self.DakCaliber/10
+			self.BaseDakShellMass = self.DakCaliber
+			self.DakShellSplashDamage = self.DakCaliber/10*1.25
+			self.BaseDakShellPenetration = self.DakCaliber*1.5
+			self.DakShellExplosive = false
+			self.DakShellBlastRadius = self.DakCaliber/25*39
+
+			self.DakFireEffect = "dakballisticfirelight"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakshelltrail"
 			self.BaseDakShellVelocity = 20996
-			self.BaseDakShellDamage = 2
-			self.BaseDakShellMass = 20
 			self.DakIsFlechette = false
 			self.DakPellets = 10
-			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 2
-			self.BaseDakShellPenetration = 30
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 31
-			self.DakClip = 35
 			self.DakReloadTime = 20
+			self.DakClip = math.Round(800/self.DakCaliber)
+
+
+			if self.DakCaliber <= 75 then
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
+			end
+			if self.DakCaliber > 75 and self.DakCaliber < 120 then
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
+			end
+			if self.DakCaliber >= 120 then
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
+			end
+
+			if self.DakCaliber < 30 then
+				self.DakFireSound = "daktanks/hmg20.wav"
+			end
+			if self.DakCaliber >= 30 and self.DakCaliber < 40 then
+				self.DakFireSound = "daktanks/hmg30.wav"
+			end
+			if self.DakCaliber >= 40 then
+				self.DakFireSound = "daktanks/hmg40.wav"
+			end
+			
 			self.Loaded=1
-			self.DakModel = "models/daktanks/hmg20mm.mdl"
 		end
-		if self.DakName == "30mm Heavy Machine Gun" then
+
+		if self.DakGunType == "Autocannon" then
+			self.DakName = self.DakCaliber.."mm Autocannon"
 			self.DakCooldown = 0.1
-			self.DakMaxHealth = 30
-			self.DakArmor = 120
-			self.DakMass = 400
-			self.DakAP = "30mmHMGAPAmmo"
-			self.DakHE = "30mmHMGHEAmmo"
-			self.DakFL = "30mmHMGFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/hmg30.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 20996
-			self.BaseDakShellDamage = 3
-			self.BaseDakShellMass = 30
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 3
-			self.BaseDakShellPenetration = 45
+			self.DakMaxHealth = self.DakCaliber
+			self.DakArmor = self.DakCaliber*5
+			self.DakMass = math.Round((2000/((50/self.DakCaliber)*(50/self.DakCaliber))))
+
+			self.DakAP = math.Round(self.DakCaliber,2).."mmACAPAmmo"
+			self.DakHE = math.Round(self.DakCaliber,2).."mmACHEAmmo"
+			self.DakFL = math.Round(self.DakCaliber,2).."mmACFLAmmo"
+
+			self.BaseDakShellDamage = self.DakCaliber/10
+			self.BaseDakShellMass = self.DakCaliber
+			self.DakShellSplashDamage = self.DakCaliber/10*1.25
+			self.BaseDakShellPenetration = self.DakCaliber*2
 			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 47
-			self.DakClip = 25
-			self.DakReloadTime = 20
-			self.Loaded=1
-			self.DakModel = "models/daktanks/hmg30mm.mdl"
-		end
-		if self.DakName == "40mm Heavy Machine Gun" then
-			self.DakCooldown = 0.1
-			self.DakMaxHealth = 40
-			self.DakArmor = 160
-			self.DakMass = 600
-			self.DakAP = "40mmHMGAPAmmo"
-			self.DakHE = "40mmHMGHEAmmo"
-			self.DakFL = "40mmHMGFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/hmg40.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 20996
-			self.BaseDakShellDamage = 4
-			self.BaseDakShellMass = 40
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 4
-			self.BaseDakShellPenetration = 60
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 63
-			self.DakClip = 20
-			self.DakReloadTime = 20
-			self.Loaded=1
-			self.DakModel = "models/daktanks/hmg40mm.mdl"
-		end
-		--AutoCannons
-		if self.DakName == "25mm Autocannon" then
-			self.DakCooldown = 0.1
-			self.DakMaxHealth = 25
-			self.DakArmor = 125
-			self.DakMass = 800
-			self.DakAP = "25mmCAPAmmo"
-			self.DakHE = "25mmCHEAmmo"
-			self.DakFL = "25mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/ac25.wav"
+			self.DakShellBlastRadius = self.DakCaliber/25*39
+
+			self.DakFireEffect = "dakballisticfirelight"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakshelltrail"
 			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 2.5
-			self.BaseDakShellMass = 25
 			self.DakIsFlechette = false
 			self.DakPellets = 10
-			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 2.5
-			self.BaseDakShellPenetration = 50
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 39
-			self.DakClip = 25
 			self.DakReloadTime = 25
+			self.DakClip = math.Round(600/self.DakCaliber)
+
+
+			if self.DakCaliber <= 75 then
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
+			end
+			if self.DakCaliber > 75 and self.DakCaliber < 120 then
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
+			end
+			if self.DakCaliber >= 120 then
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
+			end
+
+			if self.DakCaliber < 37 then
+				self.DakFireSound = "daktanks/ac25.wav"
+			end
+			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
+				self.DakFireSound = "daktanks/ac37.wav"
+			end
+			if self.DakCaliber >= 50 then
+				self.DakFireSound = "daktanks/ac50.wav"
+			end
+			
 			self.Loaded=1
-			self.DakModel = "models/daktanks/ac25mm.mdl"
-		end
-		if self.DakName == "37mm Autocannon" then
-			self.DakCooldown = 0.1
-			self.DakMaxHealth = 37
-			self.DakArmor = 185
-			self.DakMass = 1200
-			self.DakAP = "37mmCAPAmmo"
-			self.DakHE = "37mmCHEAmmo"
-			self.DakFL = "37mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/ac37.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 3.7
-			self.BaseDakShellMass = 37
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 3.7
-			self.BaseDakShellPenetration = 74
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 58
-			self.DakClip = 15
-			self.DakReloadTime = 25
-			self.Loaded=1
-			self.DakModel = "models/daktanks/ac37mm.mdl"
-		end
-		if self.DakName == "50mm Autocannon" then
-			self.DakCooldown = 0.1
-			self.DakMaxHealth = 50
-			self.DakArmor = 250
-			self.DakMass = 2000
-			self.DakAP = "50mmCAPAmmo"
-			self.DakHE = "50mmCHEAmmo"
-			self.DakFL = "50mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/ac50.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 5
-			self.BaseDakShellMass = 50
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 5
-			self.BaseDakShellPenetration = 100
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 79
-			self.DakClip = 10
-			self.DakReloadTime = 25
-			self.Loaded=1
-			self.DakModel = "models/daktanks/ac50mm.mdl"
-		end
-		--Autoloaders
-		if self.DakName == "50mm Autoloader" then
-			self.DakCooldown = 0.9
-			self.DakMaxHealth = 50
-			self.DakArmor = 250
-			self.DakMass = 500
-			self.DakAP = "50mmCAPAmmo"
-			self.DakHE = "50mmCHEAmmo"
-			self.DakFL = "50mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/c50.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 5
-			self.BaseDakShellMass = 50
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 5
-			self.BaseDakShellPenetration = 100
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 79
-			self.IsAutoLoader = 1
-			self.DakModel = "models/daktanks/al50mm.mdl"
-		end
-		if self.DakName == "75mm Autoloader" then
-			self.DakCooldown = 1.3
-			self.DakMaxHealth = 75
-			self.DakArmor = 375
-			self.DakMass = 1500
-			self.DakAP = "75mmCAPAmmo"
-			self.DakHE = "75mmCHEAmmo"
-			self.DakFL = "75mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/c75.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 7.5
-			self.BaseDakShellMass = 75
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			--self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 7.5
-			self.BaseDakShellPenetration = 150
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 118
-			self.IsAutoLoader = 1
-			self.DakModel = "models/daktanks/al75mm.mdl"
-		end
-		if self.DakName == "100mm Autoloader" then
-			self.DakCooldown = 1.7
-			self.DakMaxHealth = 100
-			self.DakArmor = 500
-			self.DakMass = 3000
-			self.DakAP = "100mmCAPAmmo"
-			self.DakHE = "100mmCHEAmmo"
-			self.DakFL = "100mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/c100.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 10
-			self.BaseDakShellMass = 100
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			--self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			self.DakShellSplashDamage = 10
-			self.BaseDakShellPenetration = 200
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 157
-			self.IsAutoLoader = 1
-			self.DakModel = "models/daktanks/al100mm.mdl"
-		end
-		if self.DakName == "120mm Autoloader" then
-			self.DakCooldown = 2.1
-			self.DakMaxHealth = 120
-			self.DakArmor = 600
-			self.DakMass = 5000
-			self.DakAP = "120mmCAPAmmo"
-			self.DakHE = "120mmCHEAmmo"
-			self.DakFL = "120mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/c120.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 12
-			self.BaseDakShellMass = 120
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			--self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 12
-			self.BaseDakShellPenetration = 240
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 189
-			self.IsAutoLoader = 1
-			self.DakModel = "models/daktanks/al120mm.mdl"
-		end
-		if self.DakName == "152mm Autoloader" then
-			self.DakCooldown = 2.6
-			self.DakMaxHealth = 152
-			self.DakArmor = 760
-			self.DakMass = 7000
-			self.DakAP = "152mmCAPAmmo"
-			self.DakHE = "152mmCHEAmmo"
-			self.DakFL = "152mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/c152.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 15.2
-			self.BaseDakShellMass = 152
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			--self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 15.2
-			self.BaseDakShellPenetration = 304
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 239
-			self.IsAutoLoader = 1
-			self.DakModel = "models/daktanks/al152mm.mdl"
-		end
-		if self.DakName == "200mm Autoloader" then
-			self.DakCooldown = 3.5
-			self.DakMaxHealth = 200
-			self.DakArmor = 1000
-			self.DakMass = 9000
-			self.DakAP = "200mmCAPAmmo"
-			self.DakHE = "200mmCHEAmmo"
-			self.DakFL = "200mmCFLAmmo"
-			self.DakFireEffect = "dakballisticfire"
-			self.DakFireSound = "daktanks/c200.wav"
-			self.DakFirePitch = 100
-			self.DakShellTrail = "dakshelltrail"
-			self.BaseDakShellVelocity = 41992
-			self.BaseDakShellDamage = 20
-			self.BaseDakShellMass = 200
-			self.DakIsFlechette = false
-			self.DakPellets = 10
-			--self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			--self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-			self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-			self.DakShellSplashDamage = 20
-			self.BaseDakShellPenetration = 400
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = 315
-			self.IsAutoLoader = 1
-			self.DakModel = "models/daktanks/al200mm.mdl"
 		end
 
 		if not(self.IsAutoLoader == 1) then
@@ -554,6 +382,13 @@ function ENT:DakTEAutoFire()
 						shell.DakCaliber = self.DakMaxHealth/10
 
 						shell.DakGun = self
+						if i==1 then
+							shell:SetNWString("FireSound",self.DakFireSound)
+							shell:SetNWInt("FirePitch",self.DakFirePitch)
+						else
+							shell:SetNWString("FireSound","")
+							shell:SetNWInt("FirePitch",self.DakFirePitch)
+						end
 						shell:Spawn()
 	 				end
 	 			else
@@ -577,6 +412,8 @@ function ENT:DakTEAutoFire()
 
 					shell.DakCaliber = self.DakMaxHealth
 
+					shell:SetNWString("FireSound",self.DakFireSound)
+					shell:SetNWInt("FirePitch",self.DakFirePitch)
 					shell.DakGun = self
 					shell:Spawn()
 				end
@@ -607,7 +444,7 @@ function ENT:DakTEAutoFire()
 				effectdata:SetEntity(self)
 				effectdata:SetScale( self.BaseDakShellDamage )
 				util.Effect( self.DakFireEffect, effectdata )
-				self:EmitSound( self.DakFireSound, 100, self.DakFirePitch, 1, 6)
+				--self:EmitSound( self.DakFireSound, 100, self.DakFirePitch, 1, 6)
 				self.timer = CurTime()
 				if(self:IsValid()) then
 					if(self:GetParent():IsValid()) then
@@ -744,30 +581,13 @@ function ENT:PreEntityCopy()
 	local entids = {}
 	info.CrewID = self.DakCrew:EntIndex()
 	info.DakName = self.DakName
-	info.DakCooldown = self.DakCooldown
 	info.DakMaxHealth = self.DakMaxHealth
 	info.DakHealth = self.DakHealth
-	info.DakAmmo = self.DakAmmo
-	info.DakMass = self.DakMass
 	info.DakModel = self.DakModel
-	info.DakAmmoType = self.DakAmmoType
-	info.DakFireEffect = self.DakFireEffect
-	info.DakFireSound = self.DakFireSound
-	info.DakFirePitch = self.DakFirePitch
-	info.DakIsFlechette = self.DakIsFlechette
-	info.DakPellets = self.DakPellets
 	info.DakOwner = self.DakOwner
 	info.DakColor = self:GetColor()
-    --shell definition
-	info.DakShellTrail = self.DakShellTrail
-	info.DakShellVelocity = self.DakShellVelocity
-	info.DakShellDamage = self.DakShellDamage
-	info.DakShellMass = self.DakShellMass
-	info.DakShellPenSounds = self.DakShellPenSounds
-	info.DakShellSplashDamage = self.DakShellSplashDamage
-	info.DakShellPenetration = self.DakShellPenetration
-	info.DakShellExplosive = self.DakShellExplosive
-	info.DakShellBlastRadius = self.DakShellBlastRadius
+	info.DakCaliber = self.DakCaliber
+	info.DakGunType = self.DakGunType
 
 	--Materials
 	info.DakMat0 = self:GetSubMaterial(0)
@@ -788,29 +608,11 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 			self.DakCrew = Crew
 		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
-		self.DakCooldown = Ent.EntityMods.DakTek.DakCooldown
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
-		self.DakAmmo = Ent.EntityMods.DakTek.DakAmmo
-		self.DakMass = Ent.EntityMods.DakTek.DakMass
 		self.DakModel = Ent.EntityMods.DakTek.DakModel
-		self.DakAmmoType = Ent.EntityMods.DakTek.DakAmmoType
-		self.DakFireEffect = Ent.EntityMods.DakTek.DakFireEffect
-		self.DakFireSound = Ent.EntityMods.DakTek.DakFireSound
-		self.DakFirePitch = Ent.EntityMods.DakTek.DakFirePitch
-		self.DakIsFlechette = Ent.EntityMods.DakTek.DakIsFlechette
-		self.DakPellets = Ent.EntityMods.DakTek.DakPellets
-        --shell definition
-		self.DakShellTrail = Ent.EntityMods.DakTek.DakShellTrail
-		self.DakShellVelocity = Ent.EntityMods.DakTek.DakShellVelocity
-		self.DakShellDamage = Ent.EntityMods.DakTek.DakShellDamage
-		self.DakShellGravity = Ent.EntityMods.DakTek.DakShellGravity
-		self.DakShellMass = Ent.EntityMods.DakTek.DakShellMass
-		self.DakShellPenSounds = Ent.EntityMods.DakTek.DakShellPenSounds
-		self.DakShellSplashDamage = Ent.EntityMods.DakTek.DakShellSplashDamage
-		self.DakShellPenetration = Ent.EntityMods.DakTek.DakShellPenetration
-		self.DakShellExplosive = Ent.EntityMods.DakTek.DakShellExplosive
-		self.DakShellBlastRadius = Ent.EntityMods.DakTek.DakShellBlastRadius
+		self.DakCaliber = Ent.EntityMods.DakTek.DakCaliber
+		self.DakGunType = Ent.EntityMods.DakTek.DakGunType
 		self.DakHealth = self.DakMaxHealth
 
 		self.DakOwner = Player

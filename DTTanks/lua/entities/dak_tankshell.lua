@@ -27,6 +27,24 @@ function ENT:Draw()
 
 end
 
+if (CLIENT) then
+	function ENT:Think()
+		if self.Triggered == nil then
+			if not(self:GetNWString("FireSound") == "") then
+				sound.Play( self:GetNWString("FireSound"), LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, self:GetNWInt("FirePitch"), math.Clamp(1500/LocalPlayer():GetPos():Distance(self:GetPos()),0,1) )
+				self.Triggered = 1
+			end
+		end
+	end
+	function ENT:OnRemove()
+		if self:GetNWBool("Explosive") then
+			--local ExpSounds = {"daktanks/dakexp1.wav","daktanks/dakexp2.wav","daktanks/dakexp3.wav","daktanks/dakexp4.wav"}
+			--print(self:GetNWFloat("ExpDamage")*350)
+			sound.Play( "daktanks/distexp1.wav", LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, 100, math.Clamp((self:GetNWFloat("ExpDamage")*350)/LocalPlayer():GetPos():Distance(self:GetPos()),0,1) )
+		end
+	end
+end
+
 if ( CLIENT ) then return end -- We do NOT want to execute anything below in this FILE on Cliet
 
 ENT.DakVelocity = 1
@@ -54,6 +72,8 @@ function ENT:Initialize()
 	self:SetNWString("Trail",self.DakTrail)
 	self:SetNWInt("Velocity",self.DakVelocity)
 	self:SetNWInt("Damage",self.DakDamage)
+	self:SetNWBool("Explosive",self.DakExplosive)
+	self:SetNWFloat("ExpDamage",self.DakSplashDamage)
 
 	local phys = self:GetPhysicsObject()
 	if phys:IsValid() then
@@ -393,7 +413,7 @@ function ENT:Think()
 									table.insert(self.IgnoreList,Targets[i])
 								end
 								if not(Targets[i].DakHealth == nil) then
-									if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 then
+									if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 or Targets[i]:GetClass() == "dak_tankshell" or Targets[i]:GetClass() == "env_spritetrail" then
 										if IsValid(Targets[i]:GetPhysicsObject()) then
 											if Targets[i]:GetPhysicsObject():GetMass()<=1 then
 												table.insert(self.IgnoreList,Targets[i])
@@ -410,9 +430,28 @@ function ENT:Think()
 							if Targets[i]:IsValid() or Targets[i]:IsPlayer() or Targets[i]:IsNPC() then
 								local trace = {}
 								trace.start = self.LastHit
-								trace.endpos = Targets[i]:LocalToWorld( Targets[i]:OBBCenter() )
+								trace.endpos = self.LastHit+(( Targets[i]:LocalToWorld( Targets[i]:OBBCenter() ) - self.LastHit ):Angle():Forward()*self.DakBlastRadius)						
 								trace.filter = self.IgnoreList
 								local ExpTrace = util.TraceHull( trace, self )
+								local hitstart = ents.Create( "prop_physics" )
+								--Ghetto Debug, shows start and end pos of explosion
+								--[[
+								if Targets[i]:GetClass() == "prop_physics" then
+									hitstart:SetModel("models/Combine_Helicopter/helicopter_bomb01.mdl")
+									local hitend = ents.Create( "prop_physics" )
+									hitend:SetModel("models/Combine_Helicopter/helicopter_bomb01.mdl")
+									hitstart:SetPos(self.LastHit)
+									hitend:SetPos(self.LastHit+(( Targets[i]:LocalToWorld( Targets[i]:OBBCenter() ) - self.LastHit ):Angle():Forward()*self.DakBlastRadius))
+									hitstart:Spawn()
+									hitend:Spawn()
+									hitstart:GetPhysicsObject():EnableMotion( false )
+									hitend:GetPhysicsObject():EnableMotion( false )
+									print(Targets[i])
+									print(self.LastHit)
+									print((Targets[i]:LocalToWorld( Targets[i]:OBBCenter() ) - self.LastHit ):Angle():Forward()*100)
+									print(ExpTrace.Entity)
+								end
+								]]--
 								if ExpTrace.Entity == Targets[i] then
 									if not(string.Explode("_",Targets[i]:GetClass(),false)[2] == "wire") and not(Targets[i]:GetClass() == self:GetClass()) and not(Targets[i]:IsVehicle()) and not(Targets[i]:GetClass() == "dak_salvage") and not(Targets[i]:GetClass() == "dak_tesalvage") and Targets[i]:GetPhysicsObject():GetMass()>1 and Targets[i].DakIsTread==nil and not(Targets[i]:GetClass() == "dak_turretcontrol") then
 										if (not(ExpTrace.Entity:IsPlayer())) and (not(ExpTrace.Entity:IsNPC())) then

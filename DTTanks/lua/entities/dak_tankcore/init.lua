@@ -327,7 +327,7 @@ function ENT:Think()
 		end
 	else
 		if not(self.DeathTime==nil) then
-			if self.DeathTime+20<CurTime() then
+			if self.DeathTime+30<CurTime() then
 				if IsValid(self) then
 					self:Remove()
 				end

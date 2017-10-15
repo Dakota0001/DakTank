@@ -112,6 +112,7 @@ function ENT:Think()
 		self.DakMass = 1250
 		self.DakSpeed = 1.675
 		self.DakModel = "models/daktanks/engine1.mdl"
+		self.Torque = 0.85
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Small Engine" then
@@ -120,6 +121,7 @@ function ENT:Think()
 		self.DakMass = 1875
 		self.DakSpeed = 2.68
 		self.DakModel = "models/daktanks/engine2.mdl"
+		self.Torque = 0.95
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Standard Engine" then
@@ -128,6 +130,7 @@ function ENT:Think()
 		self.DakMass = 2500
 		self.DakSpeed = 3.685
 		self.DakModel = "models/daktanks/engine3.mdl"
+		self.Torque = 1
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Large Engine" then
@@ -136,6 +139,7 @@ function ENT:Think()
 		self.DakMass = 3125
 		self.DakSpeed = 4.69
 		self.DakModel = "models/daktanks/engine4.mdl"
+		self.Torque = 1.15
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Huge Engine" then
@@ -144,6 +148,7 @@ function ENT:Think()
 		self.DakMass = 3750
 		self.DakSpeed = 5.695
 		self.DakModel = "models/daktanks/engine5.mdl"
+		self.Torque = 1.25
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Ultra Engine" then
@@ -152,6 +157,7 @@ function ENT:Think()
 		self.DakMass = 5000
 		self.DakSpeed = 6.7
 		self.DakModel = "models/daktanks/engine6.mdl"
+		self.Torque = 1.3
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 
@@ -239,19 +245,19 @@ function ENT:Think()
 					if self.Speed < self.TopSpeed and math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) and math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) then
 						if self.Perc > 0 then
 							if ForwardVal < 1 then
-								self.ExtraTorque = math.Clamp(self.TopSpeed/self.Speed,3,10)
+								self.ExtraTorque = math.Clamp(self.TopSpeed/self.Speed,1,10)
 							else
 								self.ExtraTorque = 10
 							end		
 						end
 						if self.Perc < 0 then
 							if ForwardVal > 1 then
-								self.ExtraTorque = math.Clamp(self.TopSpeed/self.Speed,3,10)
+								self.ExtraTorque = math.Clamp(self.TopSpeed/self.Speed,1,10)
 							else
 								self.ExtraTorque = 10
 							end		
 						end
-						local TorqueBoost = 5*self.ExtraTorque			
+						local TorqueBoost = 2.5*self.Torque*self.ExtraTorque			
 						self.RBoost = 1
 					 	self.LBoost = 1
 						if self.MoveRight==0 and self.MoveLeft==0 then

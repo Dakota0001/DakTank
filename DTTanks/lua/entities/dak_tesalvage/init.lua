@@ -40,6 +40,9 @@ function ENT:Initialize()
 	if self.launch == 1 then
 		self:GetPhysicsObject():ApplyForceCenter( VectorRand()*70*self:GetPhysicsObject():GetMass()*math.Rand(5,15))
 	end
+	if math.random(0,4) == 0 then
+		self:Ignite(25,1)
+	end
 
 end
 
@@ -49,7 +52,7 @@ function ENT:Think()
 	--self:GetPhysicsObject():SetMass(250)
 	self:SetCollisionGroup( COLLISION_GROUP_WORLD )
 
-	if self.SpawnTime+20 < CurTime() then
+	if self.SpawnTime+30 < CurTime() then
 		self:Remove()
 	end
 
