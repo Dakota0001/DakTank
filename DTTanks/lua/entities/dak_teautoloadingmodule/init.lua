@@ -95,8 +95,8 @@ function ENT:Think()
 			self.DakMass = 1000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakClip = 600/self.DakGun.DakCaliber
-					self.DakGun.DakReloadTime = (self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100) * self.DakGun.DakClip
+					self.DakGun.DakClip = math.Round(600/self.DakGun.DakCaliber)
+					self.DakGun.DakReloadTime = ((self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100)) * self.DakGun.DakClip
 					self.DakGun.Loaded = 1
 				end
 			end
@@ -105,8 +105,8 @@ function ENT:Think()
 			self.DakMass = 2000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakClip = 600/self.DakGun.DakCaliber*1.5
-					self.DakGun.DakReloadTime = (self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100) * self.DakGun.DakClip * 0.75
+					self.DakGun.DakClip = math.Round(600/self.DakGun.DakCaliber*1.5)
+					self.DakGun.DakReloadTime = ((self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100)) * self.DakGun.DakClip * 0.75
 					self.DakGun.Loaded = 1
 				end
 			end
@@ -115,8 +115,8 @@ function ENT:Think()
 			self.DakMass = 3000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakClip = 600/self.DakGun.DakCaliber*2
-					self.DakGun.DakReloadTime = (self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100) * self.DakGun.DakClip * 0.5
+					self.DakGun.DakClip = math.Round(600/self.DakGun.DakCaliber*2)
+					self.DakGun.DakReloadTime = ((self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100)) * self.DakGun.DakClip * 0.5
 					self.DakGun.Loaded = 1
 				end
 			end
