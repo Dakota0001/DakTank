@@ -212,7 +212,7 @@ function TOOL:LeftClick( trace )
 		--GUNS--
 		if self:GetClientInfo("SpawnSettings") == "Cannon" then
 			self.DakGunType = "Cannon"
-			self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),25,200)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Cannon"
 			if self.DakCaliber < 32 then
@@ -296,7 +296,7 @@ function TOOL:LeftClick( trace )
 		end
 		if self:GetClientInfo("SpawnSettings") == "Howitzer" then
 			self.DakGunType = "Howitzer"
-			self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),50,240)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Howitzer"
 			if self.DakCaliber < 58 then
@@ -380,7 +380,7 @@ function TOOL:LeftClick( trace )
 		end
 		if self:GetClientInfo("SpawnSettings") == "Mortar" then
 			self.DakGunType = "Mortar"
-			self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),40,280)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Mortar"
 			if self.DakCaliber < 48 then
@@ -479,7 +479,7 @@ function TOOL:LeftClick( trace )
 		end
 		if self:GetClientInfo("SpawnSettings") == "Autoloader" then
 			self.DakGunType = "Autoloader"
-			self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),75,200)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),75,200)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Autoloader"
 			if self.DakCaliber < 81 then
@@ -542,7 +542,7 @@ function TOOL:LeftClick( trace )
 		end
 		if self:GetClientInfo("SpawnSettings") == "MG" then
 			self.DakGunType = "MG"
-			self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),5,25)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Machine Gun"
 			if self.DakCaliber < 9 then
@@ -566,7 +566,7 @@ function TOOL:LeftClick( trace )
 		end
 		if self:GetClientInfo("SpawnSettings") == "HMG" then
 			self.DakGunType = "HMG"
-			self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),20,40)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
 			if self.DakCaliber < 24 then
@@ -590,7 +590,7 @@ function TOOL:LeftClick( trace )
 		end
 		if self:GetClientInfo("SpawnSettings") == "Autocannon" then
 			self.DakGunType = "Autocannon"
-			self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),20,60)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Autocannon"
 			if self.DakCaliber < 25 then
@@ -625,7 +625,7 @@ function TOOL:LeftClick( trace )
 				if self:GetClientInfo("SpawnSettings") == "SmallAPBox" then
 			self.DakIsHE = false
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),25,200)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 				self.DakName = self.DakCaliber.."mmCAPAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -633,7 +633,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmCAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),50,240)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 				self.DakName = self.DakCaliber.."mmHAPAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -641,7 +641,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmHAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),40,280)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMAPAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -649,7 +649,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmMAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),20,60)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 				self.DakName = self.DakCaliber.."mmACAPAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -657,7 +657,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmACAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),5,25)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 				self.DakName = self.DakCaliber.."mmMGAPAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -665,7 +665,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmMGAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),20,40)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 				self.DakName = self.DakCaliber.."mmHMGAPAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -676,7 +676,7 @@ function TOOL:LeftClick( trace )
 		if self:GetClientInfo("SpawnSettings") == "SmallHEBox" then
 			self.DakIsHE = true
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),25,200)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 				self.DakName = self.DakCaliber.."mmCHEAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -684,7 +684,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmCHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),50,240)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 				self.DakName = self.DakCaliber.."mmHHEAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -692,7 +692,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmHHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),40,280)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMHEAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -700,7 +700,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmMHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),20,60)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 				self.DakName = self.DakCaliber.."mmACHEAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -708,7 +708,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmACHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),5,25)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 				self.DakName = self.DakCaliber.."mmMGHEAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -716,7 +716,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmMGHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),20,40)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 				self.DakName = self.DakCaliber.."mmHMGHEAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -727,7 +727,7 @@ function TOOL:LeftClick( trace )
 		if self:GetClientInfo("SpawnSettings") == "SmallFLBox" then
 			self.DakIsHE = false
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),25,200)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 				self.DakName = self.DakCaliber.."mmCFLAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -735,7 +735,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmCFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),50,240)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 				self.DakName = self.DakCaliber.."mmHFLAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -743,7 +743,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmHFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),40,280)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMFLAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -751,7 +751,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmMFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),20,60)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 				self.DakName = self.DakCaliber.."mmACFLAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -759,7 +759,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmACFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),5,25)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 				self.DakName = self.DakCaliber.."mmMGFLAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -767,7 +767,7 @@ function TOOL:LeftClick( trace )
 				self.DakAmmoType = self.DakCaliber.."mmMGFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
-				self.DakCaliber = math.Clamp(math.Round(GetConVar("daktankspawner_DTTE_GunCaliber"):GetFloat(),2),20,40)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 				self.DakName = self.DakCaliber.."mmHMGFLAmmo"
 				self.DakIsExplosive = true
 				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
@@ -1251,7 +1251,6 @@ DermaNumSlider:SetValue(5)
 DermaNumSlider:SetMin( 0 )				// Set the minimum number you can slide to
 DermaNumSlider:SetMax( 10 )				// Set the maximum number you can slide to
 DermaNumSlider:SetDecimals( 2 )			// Decimal places - zero for whole number
-DermaNumSlider:SetConVar( "daktankspawner_DTTE_GunCaliber" ) // Changes the ConVar when you slide
 
 local AmmoBoxSelect = vgui.Create( "DComboBox", panel )
 AmmoBoxSelect:SetPos( 10, 385 )
@@ -1359,6 +1358,8 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		--DTTE_NodeList["HugeFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Huge FL Ammo" )
 
 	function DermaNumSlider:OnValueChanged( cal )
+		RunConsoleCommand("daktankspawner_DTTE_GunCaliber", cal)
+
 		if ctrl:GetSelectedItem():GetText() == "Cannons" then
 			DLabel:SetText( math.Round(cal,2).."mm Cannon\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((200/cal)*(200/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)),2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5),2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round((cal/10),2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*2*0.4),2).."mm\nDamage: "..math.Round((cal/10*0.5),2).."\nSplash Damage: "..math.Round((cal/10*1.25),2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 800 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*2*0.75),2).."mm\nDamage: "..math.Round((cal/10/10),2).."\nPellets: 10\nVelocity: 600 m/s\n\nDescription: Versatile and reliable guns with high penetration and velocity but high weight." )
 		end
