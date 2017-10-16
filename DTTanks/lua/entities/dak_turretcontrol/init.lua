@@ -18,23 +18,21 @@ function ENT:ApplyForce(entity, angle)
 	local left = entity:GetRight() * -1
 	local forward = entity:GetForward()
 
+	local forcemult = math.Clamp( ( phys:GetMass()/2.5 ),0,100) / (phys:GetMass()*(250/phys:GetMass()) )
 	if angle.pitch ~= 0 then
 		local pitch = up      * (angle.pitch * 0.5)
-
-
-
-		phys:ApplyForceOffset( forward*math.Clamp((phys:GetMass()/2.5),0,100)/phys:GetMass(), pitch )
-		phys:ApplyForceOffset( forward * -1*math.Clamp((phys:GetMass()/2.5),0,100)/phys:GetMass(), pitch * -1 )
+		phys:ApplyForceOffset( forward*forcemult, pitch )
+		phys:ApplyForceOffset( forward * -1*forcemult, pitch * -1 )
 	end
 	if angle.yaw ~= 0 then
 		local yaw   = forward * (angle.yaw * 0.5)
-		phys:ApplyForceOffset( left*math.Clamp((phys:GetMass()/2.5),0,100)/phys:GetMass(), yaw )
-		phys:ApplyForceOffset( left * -1*math.Clamp((phys:GetMass()/2.5),0,100)/phys:GetMass(), yaw * -1 )
+		phys:ApplyForceOffset( left*forcemult, yaw )
+		phys:ApplyForceOffset( left * -1*forcemult, yaw * -1 )
 	end
 	if angle.roll ~= 0 then
 		local roll  = left    * (angle.roll * 0.5)
-		phys:ApplyForceOffset( up*math.Clamp((phys:GetMass()/2.5),0,100)/phys:GetMass(), roll )
-		phys:ApplyForceOffset( up * -1*math.Clamp((phys:GetMass()/2.5),0,100)/phys:GetMass(), roll * -1 )
+		phys:ApplyForceOffset( up*forcemult, roll )
+		phys:ApplyForceOffset( up * -1*forcemult, roll * -1 )
 	end
 end
 
