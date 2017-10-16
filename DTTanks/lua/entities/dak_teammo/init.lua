@@ -39,16 +39,18 @@ end
 
 function ENT:Think()
 
-	self.DakCaliber = string.Split( self.DakName, "m" )[1]
-	if self.DakAmmoType == "Mortar" then
-		self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
-		if self.DakAmmo > self.DakMaxAmmo then
-			self.DakAmmo = self.DakMaxAmmo
-		end
-	else
-		self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-		if self.DakAmmo > self.DakMaxAmmo then
-			self.DakAmmo = self.DakMaxAmmo
+	if not(self.DakName == "Base Ammo") then
+		self.DakCaliber = tonumber(string.Split( self.DakName, "m" )[1])
+		if self.DakAmmoType == "Mortar" then
+			self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
+			if self.DakAmmo > self.DakMaxAmmo then
+				self.DakAmmo = self.DakMaxAmmo
+			end
+		else
+			self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
+			if self.DakAmmo > self.DakMaxAmmo then
+				self.DakAmmo = self.DakMaxAmmo
+			end
 		end
 	end
 
@@ -244,6 +246,7 @@ function ENT:Think()
 				end
 				for i = 1, #self.RemoveList do
 					self.salvage = ents.Create( "dak_tesalvage" )
+					if ( !IsValid( self.salvage ) ) then return end
 					self.salvage.DakModel = self.RemoveList[i]:GetModel()
 					self.salvage:SetPos( self.RemoveList[i]:GetPos())
 					self.salvage:SetAngles( self.RemoveList[i]:GetAngles())

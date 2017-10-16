@@ -146,7 +146,7 @@ function ENT:Think()
 		end
 		--SETUP HEALTHPOOL
 		if table.Count(self.HitBox) == 0 and not(self.Contraption==nil) then
-			if #self.Contraption>1 then
+			if #self.Contraption>=1 then
 				self.Remake = 0
 				self.DakPooled = 1
 				self.DakEngine = self
@@ -208,7 +208,7 @@ function ENT:Think()
 							self.HitBox[i].Controller = nil
 						end
 					end
-					if self.CurMass>0 then
+					if self.LastCurMass>0 then
 						if not(self.HitBox[i].DakHealth==nil) then
 							if self.HitBox[i].DakHealth < self.CurrentHealth then
 								self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.HitBox[i].DakHealth)
@@ -238,7 +238,6 @@ function ENT:Think()
 						self.CurrentHealth = self.CurrentHealth-self.DamageCycle
 					end
 				end
-
 				for i = 1, table.Count(self.HitBox) do
 					if self.CurrentHealth >= self.DakMaxHealth then
 						self.DakMaxHealth = self.CurMass*0.01
@@ -269,7 +268,7 @@ function ENT:Think()
 					]]--
 				end
 				self.DakHealth = self.CurrentHealth
-
+				
 				WireLib.TriggerOutput(self, "Health", self.DakHealth)
 				WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
 				if not(self.DakHealth == nil) then
@@ -277,12 +276,13 @@ function ENT:Think()
 						for i=1, #self.Contraption do
 							if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
 								self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
-								if self.Contraption[i].DakHealth == nil then
-									DakTekTankEditionSetupNewEnt(self.Contraption[i])
-								end
+								--if self.Contraption[i].DakHealth == nil then
+								--	DakTekTankEditionSetupNewEnt(self.Contraption[i])
+								--end
 								if not(self.Contraption[i] == self:GetParent():GetParent()) and not(self.Contraption[i] == self:GetParent()) and not(self.Contraption[i] == self) then
 									if math.random(1,6)>1 then
 									self.salvage = ents.Create( "dak_tesalvage" )
+									if ( !IsValid( self.salvage ) ) then return end
 									self.salvage.DakModel = self.Contraption[i]:GetModel()
 									self.salvage:SetPos( self.Contraption[i]:GetPos())
 									self.salvage:SetAngles( self.Contraption[i]:GetAngles())
@@ -291,6 +291,7 @@ function ENT:Think()
 									--self.salvage:PhysicsDestroy()
 									else
 										self.salvage = ents.Create( "dak_tesalvage" )
+										if ( !IsValid( self.salvage ) ) then return end
 										self.salvage.launch = 1
 										self.salvage.DakModel = self.Contraption[i]:GetModel()
 										self.salvage:SetPos( self.Contraption[i]:GetPos())

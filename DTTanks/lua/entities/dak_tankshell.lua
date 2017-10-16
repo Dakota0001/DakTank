@@ -433,10 +433,10 @@ function ENT:Think()
 								trace.endpos = self.LastHit+(( Targets[i]:LocalToWorld( Targets[i]:OBBCenter() ) - self.LastHit ):Angle():Forward()*self.DakBlastRadius)						
 								trace.filter = self.IgnoreList
 								local ExpTrace = util.TraceHull( trace, self )
-								local hitstart = ents.Create( "prop_physics" )
 								--Ghetto Debug, shows start and end pos of explosion
 								--[[
 								if Targets[i]:GetClass() == "prop_physics" then
+									local hitstart = ents.Create( "prop_physics" )
 									hitstart:SetModel("models/Combine_Helicopter/helicopter_bomb01.mdl")
 									local hitend = ents.Create( "prop_physics" )
 									hitend:SetModel("models/Combine_Helicopter/helicopter_bomb01.mdl")
