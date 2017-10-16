@@ -13,7 +13,6 @@ ENT.DakHealth = 10
 ENT.DakAmmoType = "Base"
 ENT.DakPooled=0
 
-
 function ENT:Initialize()
 
 	self:SetModel( "models/daktanks/Ammo.mdl" )
@@ -40,7 +39,7 @@ end
 
 function ENT:Think()
 
-	self.Caliber = string.Split( self.DakName, m )[1]
+	self.DakCaliber = string.Split( self.DakName, "m" )[1]
 	if self.DakAmmoType == "Mortar" then
 		self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
 		if self.DakAmmo > self.DakMaxAmmo then
