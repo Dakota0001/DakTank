@@ -644,8 +644,8 @@ function TOOL:LeftClick( trace )
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMAPAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
+				self.DakAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
+				self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
@@ -695,8 +695,8 @@ function TOOL:LeftClick( trace )
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMHEAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
+				self.DakAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
+				self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
@@ -746,8 +746,8 @@ function TOOL:LeftClick( trace )
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMFLAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
+				self.DakAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
+				self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
@@ -1367,7 +1367,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 			DLabel:SetText( math.Round(cal,2).."mm Autoloader\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((200/cal)*(200/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)*0.2),2).."\nSmall Clip Size: "..math.Round(600/cal).."\nMedium Clip Size: "..math.Round((600/cal)*1.5).."\nLarge Clip Size: "..math.Round((600/cal)*2).."\nSmall Clip Reload Time: "..math.Round((cal/13 + cal/100)*math.Round(600/cal),2).."\nMedium Clip Reload Time: "..math.Round(((cal/13 + cal/100)*math.Round((600/cal)*1.5)*0.75),2).."\nLarge Clip Reload Time: "..math.Round(((cal/13 + cal/100)*math.Round((600/cal)*2)*0.5),2).."\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round((cal/10),2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*2*0.4),2).."mm\nDamage: "..math.Round((cal/10*0.5),2).."\nSplash Damage: "..math.Round((cal/10*1.25),2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 800 m/s\n\nDescription: Cannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip." )
 		end
 		if ctrl:GetSelectedItem():GetText() == "Howitzers" then
-			DLabel:SetText( math.Round(cal,2).."mm Howitzer\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((240/cal)*(240/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)),2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5),2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*1.5),2).."mm\nDamage: "..math.Round((cal/5),2).."\nVelocity: 600 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*1.5*0.4),2).."mm\nDamage: "..math.Round((cal/5*0.5),2).."\nSplash Damage: "..math.Round((cal/5*1.5),2).."\nBlast Radius: "..math.Round((cal/12.5),2).."m\nVelocity: 600 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*1.5*0.75),2).."mm\nDamage: "..math.Round((cal/5/10),2).."\nPellets: 10\nVelocity: 450 m/s\n\nDescription: Powerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius." )
+			DLabel:SetText( math.Round(cal,2).."mm Howitzer\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((240/cal)*(240/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100))*1.5,2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5)*1.5,2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*1.5),2).."mm\nDamage: "..math.Round((cal/5),2).."\nVelocity: 600 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*1.5*0.4),2).."mm\nDamage: "..math.Round((cal/5*0.5),2).."\nSplash Damage: "..math.Round((cal/5*1.5),2).."\nBlast Radius: "..math.Round((cal/12.5),2).."m\nVelocity: 600 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*1.5*0.75),2).."mm\nDamage: "..math.Round((cal/5/10),2).."\nPellets: 10\nVelocity: 450 m/s\n\nDescription: Powerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius." )
 		end
 		if ctrl:GetSelectedItem():GetText() == "Mortars" then
 			DLabel:SetText( math.Round(cal,2).."mm Mortar\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((4500/((280/cal)*(280/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)),2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5),2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*0.8),2).."mm\nDamage: "..math.Round((cal/20),2).."\nVelocity: 160 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*0.8*0.4),2).."mm\nDamage: "..math.Round((cal/20*0.5),2).."\nSplash Damage: "..math.Round((cal/20*7),2).."\nBlast Radius: "..math.Round((cal/10),2).."m\nVelocity: 160 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*0.8*0.75),2).."mm\nDamage: "..math.Round((cal/20/10),2).."\nPellets: 10\nVelocity: 120 m/s\n\nDescription: Light guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber." )
@@ -1394,24 +1394,24 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		end
 		if AmmoBoxSelect:GetSelected() == "Howitzer" then	
 			if ctrl:GetSelectedItem():GetText() == "AP Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
 			if ctrl:GetSelectedItem():GetText() == "HE Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
 			end
 			if ctrl:GetSelectedItem():GetText() == "FL Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
 		end
 		if AmmoBoxSelect:GetSelected() == "Mortar" then	
 			if ctrl:GetSelectedItem():GetText() == "AP Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((900/cal)*(900/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
 			if ctrl:GetSelectedItem():GetText() == "HE Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((900/cal)*(900/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
 			end
 			if ctrl:GetSelectedItem():GetText() == "FL Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((900/cal)*(900/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
 		end
 		if AmmoBoxSelect:GetSelected() == "Autocannon" then

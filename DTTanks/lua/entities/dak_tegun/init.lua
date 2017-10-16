@@ -131,7 +131,7 @@ function ENT:Think()
 
 		if self.DakGunType == "Howitzer" then
 			self.DakName = self.DakCaliber.."mm Howitzer"
-			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)
+			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100)*1.5,2)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = math.Round((9000/((240/self.DakCaliber)*(240/self.DakCaliber))))

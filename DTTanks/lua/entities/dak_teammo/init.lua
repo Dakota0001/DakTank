@@ -39,6 +39,20 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
+
+	self.Caliber = string.Split( self.DakName, m )[1]
+	if self.DakAmmoType == "Mortar" then
+		self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
+		if self.DakAmmo > self.DakMaxAmmo then
+			self.DakAmmo = self.DakMaxAmmo
+		end
+	else
+		self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
+		if self.DakAmmo > self.DakMaxAmmo then
+			self.DakAmmo = self.DakMaxAmmo
+		end
+	end
+
 	if CurTime()>=self.SparkTime+0.33 then
 		if self.DakHealth<=(self.DakMaxHealth*0.80) and self.DakHealth>(self.DakMaxHealth*0.60) then
 			local effectdata = EffectData()
