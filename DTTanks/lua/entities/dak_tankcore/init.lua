@@ -112,6 +112,7 @@ function ENT:Think()
 		self.Contraption=res
 		self.Ammoboxes={}
 		self.TurretControls={}
+		self.Guns={}
 		for i=1, #res do
 			if res[i]:IsSolid() then
 				if res[i]:GetClass()=="dak_tefuel" then
@@ -122,15 +123,19 @@ function ENT:Think()
 				end
 				if res[i]:GetClass()=="dak_tegun" then
 					res[i].DakTankCore = self
+					table.insert(self.Guns,res[i])
 				end
 				if res[i]:GetClass()=="dak_teautogun" then
 					res[i].DakTankCore = self
+					table.insert(self.Guns,res[i])
 				end
 				if res[i]:GetClass()=="dak_temachinegun" then
 					res[i].DakTankCore = self
+					table.insert(self.Guns,res[i])
 				end
 				if res[i]:GetClass()=="dak_turretcontrol" then
 					res[i].DakContraption = res
+					res[i].DakCore = self
 				end
 				Mass = Mass + res[i]:GetPhysicsObject():GetMass()
 			end

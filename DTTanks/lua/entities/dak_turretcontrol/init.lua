@@ -10,6 +10,7 @@ ENT.DakContraption = {}
 ENT.DakTurretMotor = nil
 ENT.SentError = 0
 ENT.SentError2 = 0
+ENT.DakCore = NULL
 
 function ENT:ApplyForce(entity, angle)
 	local phys = entity:GetPhysicsObject()
@@ -72,7 +73,7 @@ function ENT:Think()
 
 	if #self.DakContraption > 0 then
 		if IsValid(self.Inputs.Gun.Value) then
-			self.RotationSpeed = self.RotMult * (3000/self.Inputs.Gun.Value:GetPhysicsObject():GetMass())
+			
 
 			self.Elevation = self:GetElevation()
 			self.Depression = self:GetDepression()
@@ -83,18 +84,38 @@ function ENT:Think()
 			if IsValid(self.Inputs.Gun.Value:GetParent()) then
 				if IsValid(self.Inputs.Gun.Value:GetParent():GetParent()) then
 					self.DakGun = self.Inputs.Gun.Value:GetParent():GetParent()
+					self.GunMass = 0
+					for i=1, #self.DakCore.Guns do
+						if IsValid(self.DakCore.Guns[i]) then
+							if IsValid(self.DakCore.Guns[i]:GetParent()) then
+								if IsValid(self.DakCore.Guns[i]:GetParent():GetParent()) then
+									if self.DakCore.Guns[i]:GetParent():GetParent() == self.Inputs.Gun.Value:GetParent():GetParent() then
+										self.GunMass = self.GunMass + self.DakCore.Guns[i]:GetPhysicsObject():GetMass()
+									end
+								end
+							end
+						end
+					end
+					self.RotationSpeed = self.RotMult * (3000/self.GunMass)
 				end
+				self.DakParented = 1
 			else
-				self.DakGun = self.Inputs.Gun.Value
+				self.DakParented = 0
 			end
-			if self.DakGun:GetPhysicsObject():GetMass()>1000 then
+
+
+			
+
+			
+
+			if self.DakParented == 0 then
 				if self.SentError == 0 then
 					self.SentError = 1
-					self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: Gun is too heavy, please parent it or lower the aimer weight." )
+					self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: Gun must be parented to an aimer prop." )
 					self.ErrorTime=CurTime()
 				else
 					if CurTime()>=self.ErrorTime+10 then
-						self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: Gun is too heavy, please parent it or lower the aimer weight." )
+						self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: Gun must be parented to an aimer prop." )
 						self.ErrorTime=CurTime()
 					end
 				end
@@ -115,7 +136,7 @@ function ENT:Think()
 			self.DakTurret = self.Inputs.Turret.Value
 			self.DakCamHitPos = self.Inputs.CamHitPos.Value
 			self.DakCamAngle = self.Inputs.CamAngle.Value
-			if (self.DakGun:GetPhysicsObject():GetMass()<=1000) and (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
+			if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
 				if self.DakActive > 0 then
 					local trace = {}
 					trace.start = self.DakCamHitPos
