@@ -12,6 +12,42 @@ ENT.SentError = 0
 ENT.SentError2 = 0
 ENT.DakCore = NULL
 
+function ENT:toLocalAxis(worldAxis)
+	if not IsValid(self) then return Vector(0,0,0) end
+	return self:WorldToLocal(Vector(worldAxis[1],worldAxis[2],worldAxis[3])+self:GetPos())
+end
+
+function normalizedVector(vector)
+	local len = (vector[1] * vector[1] + vector[2] * vector[2] + vector[3] * vector[3]) ^ 0.5
+	if len > 0.0000001000000 then
+		return Vector( vector[1] / len, vector[2] / len, vector[3] / len )
+	else
+		return Vector( 0, 0, 0 )
+	end
+end
+
+local function angnorm(rv1)
+	return Angle((rv1[1] + 180) % 360 - 180,(rv1[2] + 180) % 360 - 180,(rv1[3] + 180) % 360 - 180)
+end
+
+local function angClamp(ang,clamp1,clamp2)
+	return Angle(math.Clamp(ang.pitch,clamp1.pitch,clamp2.pitch),math.Clamp(ang.yaw,clamp1.yaw,clamp2.yaw),math.Clamp(ang.roll,clamp1.roll,clamp2.roll))
+end
+
+local function angNumClamp(ang,clamp1,clamp2)
+	return Angle(math.Clamp(ang.pitch,clamp1,clamp2),math.Clamp(ang.yaw,clamp1,clamp2),math.Clamp(ang.roll,clamp1,clamp2))
+end
+
+local function heading(originpos,originangle,pos)
+	pos = WorldToLocal(Vector(pos[1],pos[2],pos[3]),Angle(0,0,0),Vector(originpos[1],originpos[2],originpos[3]),Angle(originangle[1],originangle[2],originangle[3]))
+
+	local bearing = (180 / math.pi)*-math.atan2(pos.y, pos.x)
+
+	local len = pos:Length()
+	if (len < 0.0000001000000) then return Angle( 0, bearing, 0 ) end
+	return Angle( (180 / math.pi)*math.asin(pos.z / len), bearing, 0 )
+end
+
 function ENT:ApplyForce(entity, angle)
 	local phys = entity:GetPhysicsObject()
 
@@ -52,7 +88,7 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 
-	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamHitPos [VECTOR]", "CamAngle [ANGLE]" })
+	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]" })
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.ErrorTime = CurTime()
@@ -66,9 +102,9 @@ end
 
 function ENT:Think()
 	if self.DakTurretMotor == nil then
-		self.RotMult = 2
+		self.RotMult = 0.08
 	else
-		self.RotMult = 4
+		self.RotMult = 0.16
 	end
 
 	if #self.DakContraption > 0 then
@@ -102,12 +138,7 @@ function ENT:Think()
 			else
 				self.DakParented = 0
 			end
-
-
 			
-
-			
-
 			if self.DakParented == 0 then
 				if self.SentError == 0 then
 					self.SentError = 1
@@ -134,38 +165,44 @@ function ENT:Think()
 				end
 			end
 			self.DakTurret = self.Inputs.Turret.Value
-			self.DakCamHitPos = self.Inputs.CamHitPos.Value
-			self.DakCamAngle = self.Inputs.CamAngle.Value
+			self.DakCamTrace = self.Inputs.CamTrace.Value
 			if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
+				
+				if self.Inertia == nil then
+					self.Inertia = Angle(self.DakGun:GetPhysicsObject():GetInertia().y,self.DakGun:GetPhysicsObject():GetInertia().z,self.DakGun:GetPhysicsObject():GetInertia().x)
+				end
+				if self.GunAng == nil then
+					self.GunAng = self:WorldToLocalAngles(self.DakGun:GetAngles())
+				end
+
 				if self.DakActive > 0 then
-					local trace = {}
-					trace.start = self.DakCamHitPos
-					trace.endpos = self.DakCamHitPos + (self.DakCamAngle:Forward() * 9999999)
-					trace.filter = self.DakContraption
-					local Hit = util.TraceLine( trace )
-					self.GunAng = (Hit.HitPos-self.DakGun:GetPos()):Angle()
-					self.RotAngle = Angle(math.Clamp(self.DakGun:WorldToLocalAngles(self.GunAng).pitch,-self.RotationSpeed,self.RotationSpeed),math.Clamp(self.DakGun:WorldToLocalAngles(self.GunAng).yaw,-self.RotationSpeed,self.RotationSpeed),math.Clamp(self.DakGun:WorldToLocalAngles(self.GunAng).roll,-self.RotationSpeed,self.RotationSpeed))
-					self.RotAngle = self.RotAngle - self:WorldToLocalAngles(self.LastHullAngles)*13.5
-					self.ClampAngle = Angle(math.Clamp(self:WorldToLocalAngles(self.DakGun:LocalToWorldAngles(self.RotAngle)).pitch,-self.Elevation,self.Depression),math.Clamp(self:WorldToLocalAngles(self.DakGun:LocalToWorldAngles(self.RotAngle)).yaw,-self.YawMin,self.YawMax),math.Clamp(self:WorldToLocalAngles(self.DakGun:LocalToWorldAngles(self.RotAngle)).roll,-1,1))
-					self.PreAngle = ((self.DakGun:WorldToLocalAngles(self:LocalToWorldAngles(self.ClampAngle)) * 250) - (Angle(self.DakGun:GetPhysicsObject():GetAngleVelocity().y,self.DakGun:GetPhysicsObject():GetAngleVelocity().z,self.DakGun:GetPhysicsObject():GetAngleVelocity().x) * 50))
-					self.PostAngle = Angle(self.PreAngle.pitch * self.DakGun:GetPhysicsObject():GetInertia().y,self.PreAngle.yaw * self.DakGun:GetPhysicsObject():GetInertia().z,self.PreAngle.roll)
-					self:ApplyForce(self.DakGun, self.PostAngle)
-					if IsValid(self.DakTurret) then
-						self:ApplyForce(self.DakTurret, Angle(0,self.PostAngle.yaw,0))
+					if not(self.DakCamTrace == nil) then
+					    self.GunDir = normalizedVector(self.DakCamTrace.HitPos - self.DakGun:GetPos())
+					    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(self.GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-self.Elevation, -self.YawMin, -1), Angle(self.Depression, self.YawMax, 1)))
+					    self.Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
+					    self.Ang = Angle(self.Ang.pitch*4500,self.Ang.yaw*4500,self.Ang.roll*4500)
+					    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
+					    local AngVelAng = Angle( AngVel.y*100, AngVel.z*100, AngVel.x*100 )
+					    self.Ang = Angle((self.Ang.pitch - AngVelAng.pitch),(self.Ang.yaw - AngVelAng.yaw),(self.Ang.roll - AngVelAng.roll))
+					    self.Ang = Angle((self.Ang.pitch*self.Inertia.pitch),(self.Ang.yaw*self.Inertia.yaw),(self.Ang.roll*self.Inertia.roll))
+					    self:ApplyForce(self.DakGun, self.Ang)
+						if IsValid(self.DakTurret) then
+							self:ApplyForce(self.DakTurret, Angle(0,self.Ang.yaw,0))
+						end
 					end
-					self.LastHullAngles = self:GetAngles()
 				else
-					self.GunAng = self:GetAngles()
-					self.RotAngle = Angle(math.Clamp(self.DakGun:WorldToLocalAngles(self.GunAng).pitch,-self.RotationSpeed,self.RotationSpeed),math.Clamp(self.DakGun:WorldToLocalAngles(self.GunAng).yaw,-self.RotationSpeed,self.RotationSpeed),math.Clamp(self.DakGun:WorldToLocalAngles(self.GunAng).roll,-self.RotationSpeed,self.RotationSpeed))
-					self.RotAngle = self.RotAngle - self:WorldToLocalAngles(self.LastHullAngles)*13.5
-					self.ClampAngle = Angle(math.Clamp(self:WorldToLocalAngles(self.DakGun:LocalToWorldAngles(self.RotAngle)).pitch,-self.Elevation,self.Depression),math.Clamp(self:WorldToLocalAngles(self.DakGun:LocalToWorldAngles(self.RotAngle)).yaw,-self.YawMin,self.YawMax),math.Clamp(self:WorldToLocalAngles(self.DakGun:LocalToWorldAngles(self.RotAngle)).roll,-1,1))
-					self.PreAngle = ((self.DakGun:WorldToLocalAngles(self:LocalToWorldAngles(self.ClampAngle)) * 250) - (Angle(self.DakGun:GetPhysicsObject():GetAngleVelocity().y,self.DakGun:GetPhysicsObject():GetAngleVelocity().z,self.DakGun:GetPhysicsObject():GetAngleVelocity().x) * 50))
-					self.PostAngle = Angle(self.PreAngle.pitch * self.DakGun:GetPhysicsObject():GetInertia().y,self.PreAngle.yaw * self.DakGun:GetPhysicsObject():GetInertia().z,self.PreAngle.roll)
-					self:ApplyForce(self.DakGun, self.PostAngle+(self:GetAngles()-self.LastHullAngles))
+					self.GunDir = self:GetForward()
+				    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(self.GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-self.Elevation, -self.YawMin, -1), Angle(self.Depression, self.YawMax, 1)))
+				    self.Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
+				    self.Ang = Angle(self.Ang.pitch*4500,self.Ang.yaw*4500,self.Ang.roll*4500)
+				    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
+				    local AngVelAng = Angle( AngVel.y*100, AngVel.z*100, AngVel.x*100 )
+				    self.Ang = Angle((self.Ang.pitch - AngVelAng.pitch),(self.Ang.yaw - AngVelAng.yaw),(self.Ang.roll - AngVelAng.roll))
+				    self.Ang = Angle((self.Ang.pitch*self.Inertia.pitch),(self.Ang.yaw*self.Inertia.yaw),(self.Ang.roll*self.Inertia.roll))
+				    self:ApplyForce(self.DakGun, self.Ang)
 					if IsValid(self.DakTurret) then
-						self:ApplyForce(self.DakTurret, Angle(0,self.PostAngle.yaw,0))
+						self:ApplyForce(self.DakTurret, Angle(0,self.Ang.yaw,0))
 					end
-					self.LastHullAngles = self:GetAngles()
 				end
 			end
 		end

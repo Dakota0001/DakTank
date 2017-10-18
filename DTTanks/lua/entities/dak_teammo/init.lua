@@ -134,8 +134,8 @@ function ENT:Think()
 			effectdata:SetEntity(self)
 			effectdata:SetAttachment(1)
 			effectdata:SetMagnitude(.5)
-			effectdata:SetScale(200)
-			util.Effect("daklongtomexplosion", effectdata)
+			effectdata:SetScale(500)
+			util.Effect("dakscalingexplosion", effectdata)
 
 			self.DamageList = {}
 			self.RemoveList = {}
@@ -259,7 +259,7 @@ function ENT:Think()
 			self:Remove()
 		else
 			if self.CookingOff == nil then
-			timer.Create( "AmmoCookTimer"..self:EntIndex(), 0.10, self.DakAmmo, function()
+			timer.Create( "AmmoCookTimer"..self:EntIndex(), math.Rand(0.05,0.25), self.DakAmmo, function()
 				if not(self.DakAmmo == nil) then
 					if self.DakAmmo > 0 then
 						local shootOrigin = self:GetPos()
@@ -268,12 +268,9 @@ function ENT:Think()
 		 				if ( !IsValid( shell ) ) then return end
 		 				shell:SetPos( shootOrigin + ( self:GetForward() * 1 ))
 						shell:SetAngles( shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1)) )
-
-
-
 						shell.DakTrail = "dakshelltrail"
 						shell.DakVelocity = 5000
-						shell.DakDamage = 200/self.DakMaxAmmo
+						shell.DakDamage = math.Clamp(200/self.DakMaxAmmo,1,200)
 						shell.DakMass = 500/self.DakMaxAmmo
 						shell.DakIsPellet = false
 						shell.DakSplashDamage = 0
@@ -294,6 +291,8 @@ function ENT:Think()
 						shell.DakPenSounds = self.ShellSounds
 						shell.DakBasePenetration = 150/self.DakMaxAmmo + 10
 						shell.DakCaliber = 500/self.DakMaxAmmo + 5
+						shell:SetNWString("FireSound",self.ShellSounds[math.random(1,#self.ShellSounds)])
+						shell:SetNWInt("FirePitch",100)
 						shell.DakGun = self
 						shell:Spawn()
 						local effectdata = EffectData()

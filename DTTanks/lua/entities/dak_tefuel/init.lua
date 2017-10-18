@@ -130,15 +130,15 @@ function ENT:Think()
 		self.PowerMod = self.PowerMod*(self.DakHealth/self.DakMaxHealth)
 		self:GetPhysicsObject():SetMass(self.DakMass)
 
-	if self.DakHealth<5 and self.DakIsExplosive then
+	if self.DakHealth<(self.DakMaxHealth*0.25) and self.DakIsExplosive then
 
 		local effectdata = EffectData()
 		effectdata:SetOrigin(self:GetPos())
 		effectdata:SetEntity(self)
 		effectdata:SetAttachment(1)
 		effectdata:SetMagnitude(.5)
-		effectdata:SetScale(200)
-		util.Effect("daklongtomexplosion", effectdata)
+		effectdata:SetScale(500)
+		util.Effect("dakscalingexplosion", effectdata)
 
 		self.DamageList = {}
 		self.RemoveList = {}

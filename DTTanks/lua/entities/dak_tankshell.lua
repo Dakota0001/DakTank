@@ -29,18 +29,25 @@ end
 
 if (CLIENT) then
 	function ENT:Think()
+
+		
+
 		if self.Triggered == nil then
 			if not(self:GetNWString("FireSound") == "") then
-				sound.Play( self:GetNWString("FireSound"), LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, self:GetNWInt("FirePitch"), math.Clamp(1500/LocalPlayer():GetPos():Distance(self:GetPos()),0,1) )
+				if self:GetNWBool("Cookoff") then
+					sound.Play( self:GetNWString("FireSound"), LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, self:GetNWInt("FirePitch"), math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/3000 ),0,0.5) )
+				else
+					sound.Play( self:GetNWString("FireSound"), LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, self:GetNWInt("FirePitch"), math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/5000 ),0,1) )
+				end
 				self.Triggered = 1
 			end
 		end
 	end
 	function ENT:OnRemove()
 		if self:GetNWBool("Explosive") then
-			--local ExpSounds = {"daktanks/dakexp1.wav","daktanks/dakexp2.wav","daktanks/dakexp3.wav","daktanks/dakexp4.wav"}
+			--local ExpSounds = {"daktanks/dakexp1.wav","daktanks/dakexp2.wav","daktanks/dakexp3.wav","daktanks/dakexp4.wav"} 
 			--print(self:GetNWFloat("ExpDamage")*350)
-			sound.Play( "daktanks/distexp1.wav", LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, 100, math.Clamp((self:GetNWFloat("ExpDamage")*350)/LocalPlayer():GetPos():Distance(self:GetPos()),0,1) )
+			sound.Play( "daktanks/distexp1.wav", LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, 100, math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/(500*self:GetNWFloat("ExpDamage")) ),0,1) )
 		end
 	end
 end
@@ -74,6 +81,11 @@ function ENT:Initialize()
 	self:SetNWInt("Damage",self.DakDamage)
 	self:SetNWBool("Explosive",self.DakExplosive)
 	self:SetNWFloat("ExpDamage",self.DakSplashDamage)
+	if self.DakGun:GetClass()=="dak_teammo" then
+		self:SetNWBool("Cookoff",1)
+	else
+		self:SetNWBool("Cookoff",0)
+	end
 
 	local phys = self:GetPhysicsObject()
 	if phys:IsValid() then
