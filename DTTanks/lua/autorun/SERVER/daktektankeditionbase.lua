@@ -72,17 +72,19 @@ if SERVER then
 	function impactexplode(collider, col)
 		if IsValid(collider.Controller) and IsValid(col.HitEntity.Controller) then
 			if not(collider.Controller==col.HitEntity.Controller) then
-				if hook.Run("DakTankDamageCheck", col.HitEntity, collider.Controller.DakOwner) ~= false then
-					local Damage = ((col.OurOldVelocity-col.TheirOldVelocity):Length()/100)*(collider.DakMaxHealth/col.HitEntity.DakMaxHealth)
-					col.HitEntity.DakHealth = col.HitEntity.DakHealth - Damage
-					collider:EmitSound( "physics/metal/metal_large_debris2.wav" )
-					local effectdata = EffectData()
-					effectdata:SetOrigin(col.HitPos)
-					effectdata:SetEntity(collider)
-					effectdata:SetAttachment(1)
-					effectdata:SetMagnitude(.5)
-					effectdata:SetScale(Damage/10)
-					util.Effect("dakshellbounce", effectdata)
+				if col.HitEntity:GetPhysicsObject():IsMotionEnabled() then
+					if hook.Run("DakTankDamageCheck", col.HitEntity, collider.Controller.DakOwner) ~= false then
+						local Damage = ((col.OurOldVelocity-col.TheirOldVelocity):Length()/100)*(collider.DakMaxHealth/col.HitEntity.DakMaxHealth)
+						col.HitEntity.DakHealth = col.HitEntity.DakHealth - Damage
+						collider:EmitSound( "physics/metal/metal_large_debris2.wav" )
+						local effectdata = EffectData()
+						effectdata:SetOrigin(col.HitPos)
+						effectdata:SetEntity(collider)
+						effectdata:SetAttachment(1)
+						effectdata:SetMagnitude(.5)
+						effectdata:SetScale(Damage/10)
+						util.Effect("dakshellbounce", effectdata)
+					end
 				end
 			end
 		end
