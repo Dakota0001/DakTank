@@ -135,8 +135,8 @@ function ENT:Think()
 		effectdata:SetEntity(self)
 		effectdata:SetAttachment(1)
 		effectdata:SetMagnitude(.5)
-		effectdata:SetScale(200)
-		util.Effect("daklongtomexplosion", effectdata)
+		effectdata:SetScale(500)
+		util.Effect("dakscalingexplosion", effectdata)
 
 		self.DamageList = {}
 		self.RemoveList = {}

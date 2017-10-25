@@ -7,7 +7,7 @@ ENT.DakEngine = NULL
 ENT.DakMaxHealth = 10
 ENT.DakHealth = 10
 ENT.DakName = "Turret Motor"
-ENT.DakModel = "models/Items/car_battery01.mdl"
+ENT.DakModel = "models/xqm/hydcontrolbox.mdl"
 ENT.DakMass = 100
 ENT.DakPooled=0
 
@@ -85,7 +85,13 @@ function ENT:Think()
 	end
 	self.DakMaxHealth = 10
 	self.DakMass = 100
-	self.DakModel = "models/Items/car_battery01.mdl"	
+	self.DakModel = "models/xqm/hydcontrolbox.mdl"	
+	if self:GetModel() ~= self.DakModel then
+		self:SetModel(self.DakModel)
+		self:PhysicsInit(SOLID_VPHYSICS)
+		self:SetMoveType(MOVETYPE_VPHYSICS)
+		self:SetSolid(SOLID_VPHYSICS)
+	end
 	if self.DakHealth > self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end

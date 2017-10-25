@@ -195,14 +195,14 @@ function ENT:Think()
 						if not(Hit.Entity.SPPOwner==nil) then			
 							if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
 								if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-									local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
-									Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
+									local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
+									Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
 									if not(Hit.Entity.DakRed == nil) then 
 										Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 									end
 								else
-									local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
-									Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
+									local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
+									Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
 									if not(Hit.Entity.DakRed == nil) then 
 										Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 									end
@@ -210,14 +210,14 @@ function ENT:Think()
 							end
 						else
 							if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-								local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
+								local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
+								Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
 								if not(Hit.Entity.DakRed == nil) then 
 									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 								end
 							else
-								local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
+								local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
+								Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
 								if not(Hit.Entity.DakRed == nil) then 
 									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 								end
@@ -695,14 +695,14 @@ function ENT:Damage(oldhit)
 					if not(Hit.Entity.SPPOwner==nil) then			
 						if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
 							if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-								local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
+								local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
+								Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
 								if not(Hit.Entity.DakRed == nil) then 
 									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 								end
 							else
-								local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
+								local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
+								Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
 								if not(Hit.Entity.DakRed == nil) then 
 									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 								end
@@ -710,14 +710,14 @@ function ENT:Damage(oldhit)
 						end
 					else
 						if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-							local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
-							Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
+							local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
+							Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
 							if not(Hit.Entity.DakRed == nil) then 
 								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 							end
 						else
-							local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
-							Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
+							local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
+							Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
 							if not(Hit.Entity.DakRed == nil) then 
 								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 							end

@@ -64,8 +64,8 @@ local function GetParents( ent, Results )
 end
 
 function ENT:Think()
-	if self.Dead==nil then
-		if self.DakMaxHealth == nil then
+	if not(self.Dead) then
+		if not(self.DakMaxHealth) then
 			self.DakMaxHealth = 10
 		end
 		if table.Count(self.HitBox)==0 then
@@ -82,7 +82,6 @@ function ENT:Think()
 		
 		self.Contraption = {}
 		table.Add(self.Contraption,GetParents(self))
-
 		for k, v in pairs(GetParents(self)) do
 			table.Add(self.Contraption,GetPhysCons(v))
 		end
@@ -119,19 +118,19 @@ function ENT:Think()
 					self.DakFuel=res[i]
 				end
 				if res[i]:GetClass() == "dak_teammo" then
-					table.insert(self.Ammoboxes,res[i])
+					self.Ammoboxes[#self.Ammoboxes+1] = res[i]
 				end
 				if res[i]:GetClass()=="dak_tegun" then
 					res[i].DakTankCore = self
-					table.insert(self.Guns,res[i])
+					self.Guns[#self.Guns+1] = res[i]
 				end
 				if res[i]:GetClass()=="dak_teautogun" then
 					res[i].DakTankCore = self
-					table.insert(self.Guns,res[i])
+					self.Guns[#self.Guns+1] = res[i]
 				end
 				if res[i]:GetClass()=="dak_temachinegun" then
 					res[i].DakTankCore = self
-					table.insert(self.Guns,res[i])
+					self.Guns[#self.Guns+1] = res[i]
 				end
 				if res[i]:GetClass()=="dak_turretcontrol" then
 					res[i].DakContraption = res
@@ -140,7 +139,7 @@ function ENT:Think()
 				Mass = Mass + res[i]:GetPhysicsObject():GetMass()
 			end
 		end
-		if not(self.DakFuel==nil) then
+		if self.DakFuel then
 			self.DakFuel.TotalMass = Mass
 		end
 		self.TotalMass = Mass
@@ -150,7 +149,7 @@ function ENT:Think()
 			WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
 		end
 		--SETUP HEALTHPOOL
-		if table.Count(self.HitBox) == 0 and not(self.Contraption==nil) then
+		if table.Count(self.HitBox) == 0 and self.Contraption then
 			if #self.Contraption>=1 then
 				self.Remake = 0
 				self.DakPooled = 1
@@ -160,9 +159,9 @@ function ENT:Think()
 					for i=1, #self.Contraption do
 						if self.Contraption[i].Controller == nil or self.Contraption[i].Controller == NULL or self.Contraption[i].Controller == self then
 							if IsValid(self.Contraption[i]) then
-								if not(string.Explode("_",self.Contraption[i]:GetClass(),false)[1] == "dak") then
+								if string.Explode("_",self.Contraption[i]:GetClass(),false)[1] ~= "dak" then
 									if self.Contraption[i]:IsSolid() then
-										table.insert(self.HitBox,self.Contraption[i])
+										self.HitBox[#self.HitBox+1] = self.Contraption[i]
 										self.Contraption[i].Controller = self
 										self.Contraption[i].DakPooled = 1
 									end
@@ -187,13 +186,13 @@ function ENT:Think()
 				self.LastRemake = CurTime()
 			end
 		end
-		if not(table.Count(self.HitBox)==0) then
+		if table.Count(self.HitBox)~=0 then
 			self.DakActive = 1
 		else
 			self.DakActive = 0
 		end
 
-		if self.DakActive == 1 and not(table.Count(self.HitBox)==0) and not(self.CurrentHealth==nil) then
+		if self.DakActive == 1 and table.Count(self.HitBox)~=0 and self.CurrentHealth then
 			if table.Count(self.HitBox) > 0 then
 				self.DamageCycle = 0
 				if self.DakHealth < self.CurrentHealth then
@@ -204,7 +203,7 @@ function ENT:Think()
 				self.LastCurMass = self.CurMass
 				self.CurMass = 0
 				for i = 1, table.Count(self.HitBox) do
-					if not(self.HitBox[i].Controller == self) then
+					if self.HitBox[i].Controller ~= self then
 						self.Remake = 1	
 					end
 					if self.Remake == 1 then
@@ -214,7 +213,7 @@ function ENT:Think()
 						end
 					end
 					if self.LastCurMass>0 then
-						if not(self.HitBox[i].DakHealth==nil) then
+						if self.HitBox[i].DakHealth then
 							if self.HitBox[i].DakHealth < self.CurrentHealth then
 								self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.HitBox[i].DakHealth)
 								self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos	
@@ -226,7 +225,7 @@ function ENT:Think()
 						self.Remake = 0
 						break
 					end
-					if not(self.HitBox[i]==NULL) then
+					if self.HitBox[i]~=NULL then
 						if self.HitBox[i].Controller == self then
 							if self.HitBox[i]:IsSolid() then
 								self.CurMass = self.CurMass + self.HitBox[i]:GetPhysicsObject():GetMass()
@@ -256,35 +255,17 @@ function ENT:Think()
 						self.HitBox[i]:SetColor(Color(self.HitBox[i].DakRed*HPPerc,self.HitBox[i].DakGreen*HPPerc,self.HitBox[i].DakBlue*HPPerc,self.HitBox[i]:GetColor().a))
 					end
 					self.HitBox[i].DakHealth = self.CurrentHealth
-					--[[
-					if not(self.HitBox[i]==NULL) then
-						if self.HitBox[i].DakHealth <= 0 then
-							if i <= 10 then
-								self.salvage = ents.Create( "dak_tesalvage" )
-								self.salvage.DakModel = self.HitBox[i]:GetModel()
-								self.salvage:SetPos( self.HitBox[i]:GetPos())
-								self.salvage:SetAngles( self.HitBox[i]:GetAngles())
-								self.salvage.DakLastDamagePos = self.DakLastDamagePos
-								self.salvage:Spawn()
-							end
-							self.HitBox[i]:Remove()
-						end
-					end
-					]]--
 				end
 				self.DakHealth = self.CurrentHealth
 				
 				WireLib.TriggerOutput(self, "Health", self.DakHealth)
 				WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
-				if not(self.DakHealth == nil) then
+				if self.DakHealth then
 					if self.DakHealth <= 0 then
 						for i=1, #self.Contraption do
 							if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
 								self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
-								--if self.Contraption[i].DakHealth == nil then
-								--	DakTekTankEditionSetupNewEnt(self.Contraption[i])
-								--end
-								if not(self.Contraption[i] == self:GetParent():GetParent()) and not(self.Contraption[i] == self:GetParent()) and not(self.Contraption[i] == self) then
+								if self.Contraption[i] ~= self:GetParent():GetParent() and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self then
 									if math.random(1,6)>1 then
 									self.salvage = ents.Create( "dak_tesalvage" )
 									if ( !IsValid( self.salvage ) ) then return end
@@ -332,7 +313,7 @@ function ENT:Think()
 			end
 		end
 	else
-		if not(self.DeathTime==nil) then
+		if self.DeathTime then
 			if self.DeathTime+30<CurTime() then
 				if IsValid(self) then
 					self:Remove()

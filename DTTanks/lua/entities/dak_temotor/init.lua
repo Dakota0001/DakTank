@@ -164,7 +164,7 @@ function ENT:Think()
 	if self.DakCrew == NULL then
 		self.DakSpeed = self.DakSpeed * 0.6
 	else
-		if not(self.DakCrew.DakEntity == self) then
+		if self.DakCrew.DakEntity ~= self then
 			self.DakSpeed = self.DakSpeed * 0.6
 		end
 	end
@@ -172,7 +172,7 @@ function ENT:Think()
 	if self.DakHealth > self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end
-	if not(self.initsound == self.DakSound) then
+	if self.initsound ~= self.DakSound then
 		self.initsound = self.DakSound
 		self.Sound:Stop()
 		self.Sound = CreateSound( self, self.DakSound, CReliableBroadcastRecipientFilter )
@@ -180,7 +180,7 @@ function ENT:Think()
 		self.Sound:ChangePitch( 0, 0 )
 		self.Sound:ChangeVolume( 0, 0 )
 	end
-	if not(self:GetModel() == self.DakModel) then
+	if self:GetModel() ~= self.DakModel then
 		self:SetModel(self.DakModel)
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -199,7 +199,12 @@ function ENT:Think()
 	self.CarTurning = self.Inputs.CarTurning.Value
     
     if IsValid(self.DakFuel) and IsValid(self.LeftDriveWheel) and IsValid(self.RightDriveWheel) and not(IsValid(self.LeftDriveWheel:GetParent())) and not(IsValid(self.RightDriveWheel:GetParent())) then
-    	if not(self.DakFuel.TotalMass==nil) then
+    	local LPhys = self.LeftDriveWheel:GetPhysicsObject()
+    	local RPhys = self.RightDriveWheel:GetPhysicsObject()
+    	local LPos = self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60)
+		local RPos = self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60)
+
+    	if self.DakFuel.TotalMass then
 	    	self.DakSpeed = self.DakSpeed*((10000/self.DakFuel.TotalMass)*self.DakFuel.PowerMod)
 	    	self.TopSpeed = (29.851*self.DakSpeed)
 			if(self:GetParent():IsValid()) then
@@ -216,13 +221,13 @@ function ENT:Think()
 	        	self.Sound:ChangeVolume( 1, 1 )
 
 	        	if self.Brakes>0 then
-		        	if constraint.FindConstraint( self.LeftDriveWheel, "Weld" )==nil then
+		        	if not(constraint.FindConstraint( self.LeftDriveWheel, "Weld" )) then
 		        		constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
 		        		constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
 		        	end
 		        	self.Sound:ChangePitch( 75, 1 )
 		        else
-		        	if constraint.FindConstraint( self.LeftDriveWheel, "Weld" )==nil then
+		        	if not(constraint.FindConstraint( self.LeftDriveWheel, "Weld" )) then
 		        	else
 		        		constraint.RemoveConstraints( self.LeftDriveWheel, "Weld" )
 		        		constraint.RemoveConstraints( self.RightDriveWheel, "Weld" )
@@ -242,7 +247,7 @@ function ENT:Think()
 					end
 						
 					local ForwardVal = self:GetForward():Distance(self.phy:GetVelocity():GetNormalized()) --if it is below one you are going forward, if it is above one you are reversing
-					if self.Speed < self.TopSpeed and math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) and math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) then
+					if self.Speed < self.TopSpeed and math.abs(LPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) and math.abs(RPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) then
 						if self.Perc > 0 then
 							if ForwardVal < 1 then
 								self.ExtraTorque = math.Clamp(self.TopSpeed/self.Speed,1,10)
@@ -290,61 +295,65 @@ function ENT:Think()
 							end
 						end
 
-						local LeftVel = math.Clamp( (3000/(math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y)/6))-0.99,1,5 )
-						local RightVel = math.Clamp( (3000/(math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y)/6))-0.99,1,5 )
+						local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
+						local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 
 						if self.Speed<self.TopSpeed/3 then
 							self.Sound:ChangePitch( math.Clamp(200*(TorqueBoost/50),0,255), 3 )
 						else
 							self.Sound:ChangePitch( math.Clamp(200*(self.Speed/self.TopSpeed),0,255), 1 )
 						end
-
-						self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost*self.LBoost, self.LeftDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-						self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*self.Perc*-1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost*self.LBoost, self.LeftDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-						self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost*self.RBoost, self.RightDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
-						self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*self.Perc*-1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost*self.RBoost, self.RightDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
+						local LForce = (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost*self.LBoost
+						local RForce = (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost*self.RBoost
+						LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()+LPos)
+						LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()-LPos)
+						RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()+RPos)
+						RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()-RPos)
 					end
 
-					if math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < 1500 and math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < 1500 then
+					if math.abs(LPhys:GetAngleVelocity().y/6) < 1500 and math.abs(RPhys:GetAngleVelocity().y/6) < 1500 then
 						if self.CarTurning==0 then
-							local LeftVel = math.Clamp( (3000/(math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y)/6))-0.99,1,5 )
-							local RightVel = math.Clamp( (3000/(math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y)/6))-0.99,1,5 )
+							local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.DakFuel.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (100/(self.DakFuel.TotalMass/1000))
+							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
+							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
+							local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost
+							local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost
 							if self.MoveLeft>0 and self.MoveRight==0 then
-								local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.DakFuel.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (100/(self.DakFuel.TotalMass/1000))
 								self.Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.DakFuel.TotalMass/10000)+3))),0,255), 1 )
-								self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-								self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-								self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
-								self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
+								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()+LPos)
+								LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()-LPos)
+								RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()+RPos)
+								RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()-RPos)
 							end
 							if self.MoveRight>0 and self.MoveLeft==0 then
-								local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.DakFuel.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (100/(self.DakFuel.TotalMass/1000))
 								self.Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.DakFuel.TotalMass/10000)+3))),0,255), 1 )
-								self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-								self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-								self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
-								self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
+								LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()+LPos)
+								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()-LPos)
+								RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()+RPos)
+								RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()-RPos)
 							end
 						end
 					end
 
-					if math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) and math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) then
+					if math.abs(LPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) and math.abs(RPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) then
 						if not(self.MoveForward>0) and not(self.MoveReverse>0) and not(self.MoveLeft>0) and not(self.MoveRight>0) then
 							self.Vel = ((self.phy:GetVelocity()*self:GetForward()).x+(self.phy:GetVelocity()*self:GetForward()).y)*100
 							local TorqueBoost = math.Clamp(math.abs(self.Vel/1000),1,10)
-							local LeftVel = math.Clamp( (3000/(math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y)/6))-0.99,1,5 )
-							local RightVel = math.Clamp( (3000/(math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y)/6))-0.99,1,5 )
+							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
+							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
+							local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost
+							local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost
 							if self.Vel>0.1 then
-								self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-								self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-								self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
-								self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
+								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()+LPos)
+								LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()-LPos)
+								RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()+RPos)
+								RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()-RPos)
 							end
 							if self.Vel<-0.1 then
-								self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-								self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-								self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
-								self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
+								LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()+LPos)
+								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()-LPos)
+								RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()+RPos)
+								RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()-RPos)
 							end
 							self.Sound:ChangePitch( 75, 1 )
 						end
@@ -352,22 +361,24 @@ function ENT:Think()
 					self.LastYaw = self:GetAngles().yaw
 				end
 	        else
-	        	if math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) and math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) then
+	        	if math.abs(LPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) and math.abs(RPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) then
 		        	self.Vel = ((self.phy:GetVelocity()*self:GetForward()).x+(self.phy:GetVelocity()*self:GetForward()).y)*100
 		        	local TorqueBoost = math.Clamp(math.abs(self.Vel/1000),1,10)
-		        	local LeftVel = math.Clamp( (3000/(math.abs(self.LeftDriveWheel:GetPhysicsObject():GetAngleVelocity().y)/6))-0.99,1,5 )
-					local RightVel = math.Clamp( (3000/(math.abs(self.RightDriveWheel:GetPhysicsObject():GetAngleVelocity().y)/6))-0.99,1,5 )
+		        	local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
+					local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
+					local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost
+					local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost
 					if self.Vel>0.1 then
-						self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-						self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-						self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
-						self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
+						LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()+LPos)
+						LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()-LPos)
+						RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()+RPos)
+						RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()-RPos)
 					end
 					if self.Vel<-0.1 then
-						self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-						self.LeftDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost, self.LeftDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60))
-						self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()+self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
-						self.RightDriveWheel:GetPhysicsObject():ApplyForceOffset( (self.DakHealth/self.DakMaxHealth)*-1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost, self.RightDriveWheel:GetPos()-self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60))
+						LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()+LPos)
+						LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()-LPos)
+						RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()+RPos)
+						RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()-RPos)
 					end
 				end
 	        	self.Sound:ChangeVolume( 0, 2 )
@@ -391,7 +402,7 @@ function ENT:Think()
 	        end
 	    end
 	else
-		if constraint.FindConstraint( self.LeftDriveWheel, "Weld" )==nil then
+		if not(constraint.FindConstraint( self.LeftDriveWheel, "Weld" )) then
     		constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
     		constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
     	end
@@ -442,7 +453,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.DakSound = Ent.EntityMods.DakTek.DakSound
 		self.DakOwner = Player
 		self.DakHealth = self.DakMaxHealth
-		if Ent.EntityMods.DakTek.DakColor == nil then
+		if not(Ent.EntityMods.DakTek.DakColor) then
 		else
 			self:SetColor(Ent.EntityMods.DakTek.DakColor)
 		end
