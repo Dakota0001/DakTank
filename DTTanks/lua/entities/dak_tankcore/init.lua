@@ -87,6 +87,7 @@ function ENT:Think()
 		end
 
 		local Mass = 0
+		local SA = 0
 
 		for i=1, #self.Contraption do
 			table.Add( self.Contraption, self.Contraption[i]:GetChildren() )
@@ -137,12 +138,19 @@ function ENT:Think()
 					res[i].DakCore = self
 				end
 				Mass = Mass + res[i]:GetPhysicsObject():GetMass()
+				if res[i]:GetPhysicsObject():GetSurfaceArea() then
+					if res[i]:GetPhysicsObject():GetMass()>1 then
+						SA = SA + res[i]:GetPhysicsObject():GetSurfaceArea()
+					end
+				end
 			end
 		end
 		if self.DakFuel then
 			self.DakFuel.TotalMass = Mass
 		end
 		self.TotalMass = Mass
+		self.SurfaceArea = SA
+		self.SizeMult = (SA/Mass)*0.18
 
 		if table.Count(self.HitBox) == 0 then
 			WireLib.TriggerOutput(self, "Health", self.DakHealth)
@@ -174,8 +182,8 @@ function ENT:Think()
 				for i=1, table.Count(self.HitBox) do
 					self.HitBoxMass = self.HitBoxMass + self.HitBox[i]:GetPhysicsObject():GetMass()
 				end
-				self.CurrentHealth = self.HitBoxMass*0.01
-				self.DakMaxHealth = self.HitBoxMass*0.01
+				self.CurrentHealth = self.HitBoxMass*0.01*self.SizeMult
+				self.DakMaxHealth = self.HitBoxMass*0.01*self.SizeMult
 				for i=1, table.Count(self.HitBox) do
 					DakTekTankEditionSetupNewEnt(self.HitBox[i])
 					self.HitBox[i].DakHealth = self.CurrentHealth
@@ -244,9 +252,9 @@ function ENT:Think()
 				end
 				for i = 1, table.Count(self.HitBox) do
 					if self.CurrentHealth >= self.DakMaxHealth then
-						self.DakMaxHealth = self.CurMass*0.01
-						self.CurrentHealth = self.CurMass*0.01
-						self.HitBox[i].DakMaxHealth = self.CurMass*0.01
+						self.DakMaxHealth = self.CurMass*0.01*self.SizeMult
+						self.CurrentHealth = self.CurMass*0.01*self.SizeMult
+						self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult
 						self.HitBox[i].DakRed = self.HitBox[i]:GetColor().r
 						self.HitBox[i].DakGreen = self.HitBox[i]:GetColor().g
 						self.HitBox[i].DakBlue = self.HitBox[i]:GetColor().b

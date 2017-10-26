@@ -313,7 +313,7 @@ function ENT:Think()
 
 					if math.abs(LPhys:GetAngleVelocity().y/6) < 1500 and math.abs(RPhys:GetAngleVelocity().y/6) < 1500 then
 						if self.CarTurning==0 then
-							local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.DakFuel.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (100/(self.DakFuel.TotalMass/1000))
+							local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.DakFuel.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (2*math.pow( 0.5,(self.DakFuel.TotalMass)/60000)) --make this last part log
 							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 							local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost

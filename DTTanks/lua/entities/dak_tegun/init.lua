@@ -261,7 +261,9 @@ function ENT:Think()
 				self.DakCooldown = self.DakCooldown * 1.5
 			end
 		end
-
+		if self.DakTankCore then
+			self.DakCooldown = self.DakCooldown/(2*math.pow( 0.0005,(0.09/(self.DakTankCore.SizeMult))))
+		end
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
 			self:PhysicsInit(SOLID_VPHYSICS)
