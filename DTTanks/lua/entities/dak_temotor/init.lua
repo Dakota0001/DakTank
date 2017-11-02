@@ -316,8 +316,11 @@ function ENT:Think()
 							local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.DakFuel.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (2*math.pow( 0.5,(self.DakFuel.TotalMass)/60000)) --make this last part log
 							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
-							local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost
-							local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost
+
+							self.turnmult = 15000*math.Clamp(((0.075*self.DakSpeed*self.Torque)/math.abs(self.LastYaw-self:GetAngles().yaw))*(2*math.pow( 0.5,(self.DakFuel.TotalMass)/60000)),0,1)
+
+							local LForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.LeftDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
+							local RForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.RightDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							if self.MoveLeft>0 and self.MoveRight==0 then
 								self.Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.DakFuel.TotalMass/10000)+3))),0,255), 1 )
 								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()+LPos)
