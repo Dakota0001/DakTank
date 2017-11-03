@@ -45,14 +45,12 @@ if (CLIENT) then
 	end
 	function ENT:OnRemove()
 		if self:GetNWBool("Explosive") then
-			--local ExpSounds = {"daktanks/dakexp1.wav","daktanks/dakexp2.wav","daktanks/dakexp3.wav","daktanks/dakexp4.wav"} 
-			--print(self:GetNWFloat("ExpDamage")*350)
 			sound.Play( "daktanks/distexp1.wav", LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, 100, math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/(500*self:GetNWFloat("ExpDamage")) ),0,1) )
 		end
 	end
 end
 
-if ( CLIENT ) then return end -- We do NOT want to execute anything below in this FILE on Cliet
+if ( CLIENT ) then return end
 
 ENT.DakVelocity = 1
 ENT.DakDamage = 1
@@ -97,9 +95,7 @@ function ENT:Initialize()
 	self:GetPhysicsObject():EnableGravity(true)
 	self.DakHealth=500
  	self.DakMaxHealth=500
- 	--if self.DakTrail=="daksmallshelltrail" then
- 		util.SpriteTrail( self, -1, Color(255,175,50,255), false, (self.DakCaliber*0.0393701), (self.DakCaliber*0.0393701)/2, 0.250, 1 / ((self.DakCaliber*0.0393701) + (self.DakCaliber*0.0393701)/2 ) * 0.5, "trails/smoke.vmt" )
- 	--end
+ 	util.SpriteTrail( self, -1, Color(255,175,50,255), false, (self.DakCaliber*0.0393701), (self.DakCaliber*0.0393701)/2, 0.250, 1 / ((self.DakCaliber*0.0393701) + (self.DakCaliber*0.0393701)/2 ) * 0.5, "trails/smoke.vmt" )
  	self.Activated = 0
 
  	self.DakPenetration = self.DakPenetration * math.Rand( 0.75, 1.25 )
@@ -194,33 +190,29 @@ function ENT:Think()
 					if EffArmor < self.DakPenetration and Hit.Entity.IsDakTekFutureTech == nil then
 						if not(Hit.Entity.SPPOwner==nil) then			
 							if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
-								if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-									local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
-									Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
-									if not(Hit.Entity.DakRed == nil) then 
-										Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-									end
-								else
-									local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
-									Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
-									if not(Hit.Entity.DakRed == nil) then 
-										Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-									end
-								end
-							end
-						else
-							if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-								local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
-								if not(Hit.Entity.DakRed == nil) then 
-									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-								end
-							else
 								local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
 								Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
 								if not(Hit.Entity.DakRed == nil) then 
 									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 								end
+							end
+						else
+							local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
+							Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
+							if not(Hit.Entity.DakRed == nil) then 
+								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
+							end
+						end
+						if(Hit.Entity:IsValid()) then
+							if(Hit.Entity:GetParent():IsValid()) then
+								if(Hit.Entity:GetParent():GetParent():IsValid()) then
+									local Div = Vector(Hit.Entity:GetParent():GetParent():OBBMaxs().x/75,Hit.Entity:GetParent():GetParent():OBBMaxs().y/75,Hit.Entity:GetParent():GetParent():OBBMaxs().z/75)
+									Hit.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( Div*(self:GetVelocity()*self:GetPhysicsObject():GetMass()/5000)*Hit.Entity:GetParent():GetParent():GetPhysicsObject():GetMass(),Hit.Entity:GetParent():GetParent():GetPos()+Hit.Entity:WorldToLocal(self.LastHit):GetNormalized() )
+								end
+							end
+							if not(Hit.Entity:GetParent():IsValid()) then
+								local Div = Vector(Hit.Entity:OBBMaxs().x/75,Hit.Entity:OBBMaxs().y/75,Hit.Entity:OBBMaxs().z/75)
+								Hit.Entity:GetPhysicsObject():ApplyForceOffset( Div*(self:GetVelocity()*self:GetPhysicsObject():GetMass()/5000)*Hit.Entity:GetPhysicsObject():GetMass(),Hit.Entity:GetPos()+Hit.Entity:WorldToLocal(self.LastHit):GetNormalized() )
 							end
 						end
 						local effectdata = EffectData()
@@ -248,40 +240,35 @@ function ENT:Think()
 					else
 						if not(Hit.Entity.SPPOwner==nil) then			
 							if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
-								if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-									local HPPerc = (Hit.Entity.DakHealth-(self.DakDamage*0.25))/Hit.Entity.DakMaxHealth
-									Hit.Entity.DakHealth = Hit.Entity.DakHealth-(self.DakDamage*0.25)
-									if not(Hit.Entity.DakRed == nil) then 
-										Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-									end
-								else
-									local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
-									Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
-									if not(Hit.Entity.DakRed == nil) then 
-										Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-									end
-								end
-							end
-						else
-							if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-								local HPPerc = (Hit.Entity.DakHealth-(self.DakDamage*0.25))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth-(self.DakDamage*0.25)
-								if not(Hit.Entity.DakRed == nil) then 
-									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-								end
-							else
 								local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
 								Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
 								if not(Hit.Entity.DakRed == nil) then 
 									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 								end
 							end
+						else
+							local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
+							Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
+							if not(Hit.Entity.DakRed == nil) then 
+								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
+							end
+						end
+						if(Hit.Entity:IsValid()) then
+							if(Hit.Entity:GetParent():IsValid()) then
+								if(Hit.Entity:GetParent():GetParent():IsValid()) then
+									local Div = Vector(Hit.Entity:GetParent():GetParent():OBBMaxs().x/75,Hit.Entity:GetParent():GetParent():OBBMaxs().y/75,Hit.Entity:GetParent():GetParent():OBBMaxs().z/75)
+									Hit.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( Div*(self:GetVelocity()*self:GetPhysicsObject():GetMass()/5000)*Hit.Entity:GetParent():GetParent():GetPhysicsObject():GetMass(),Hit.Entity:GetParent():GetParent():GetPos()+Hit.Entity:WorldToLocal(self.LastHit):GetNormalized() )
+								end
+							end
+							if not(Hit.Entity:GetParent():IsValid()) then
+								local Div = Vector(Hit.Entity:OBBMaxs().x/75,Hit.Entity:OBBMaxs().y/75,Hit.Entity:OBBMaxs().z/75)
+								Hit.Entity:GetPhysicsObject():ApplyForceOffset( Div*(self:GetVelocity()*self:GetPhysicsObject():GetMass()/5000)*Hit.Entity:GetPhysicsObject():GetMass(),Hit.Entity:GetPos()+Hit.Entity:WorldToLocal(self.LastHit):GetNormalized() )
+							end
 						end
 						if self.DakExplosive then
 							self:SetPos(Hit.HitPos)
 							self:GetPhysicsObject():SetVelocity(Vector(0,0,0))
 							self:SetPos(Hit.HitPos)
-							--self.DakPenetration = 0
 							self.DakDamage = 0
 							self.LastHit = Hit.HitPos
 							self.LastHitEnt = Hit.Entity
@@ -412,161 +399,7 @@ function ENT:Think()
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(self.DakBlastRadius)
 					util.Effect("dakscalingexplosion", effectdata)
-
-					self.DakDamageList = {}
-					self.RemoveList = {}
-					self.IgnoreList = {}
-					local Targets = ents.FindInSphere( self.LastHit, self.DakBlastRadius )
-					if table.Count(Targets) > 0 then
-						for i = 1, #Targets do
-							if Targets[i]:IsValid() then
-								if hook.Run("DakTankDamageCheck", Hit.Entity, self.DakGun.DakOwner) ~= false then
-								else
-									table.insert(self.IgnoreList,Targets[i])
-								end
-								if not(Targets[i].DakHealth == nil) then
-									if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 or Targets[i]:GetClass() == "dak_tankshell" or Targets[i]:GetClass() == "env_spritetrail" then
-										if IsValid(Targets[i]:GetPhysicsObject()) then
-											if Targets[i]:GetPhysicsObject():GetMass()<=1 then
-												table.insert(self.IgnoreList,Targets[i])
-											end
-										end
-										table.insert(self.IgnoreList,Targets[i])
-									end
-								end
-							end
-						end
-						table.insert(self.IgnoreList,self)
-
-						for i = 1, #Targets do
-							if Targets[i]:IsValid() or Targets[i]:IsPlayer() or Targets[i]:IsNPC() then
-								local trace = {}
-								trace.start = self.LastHit
-								trace.endpos = self.LastHit+(( Targets[i]:LocalToWorld( Targets[i]:OBBCenter() ) - self.LastHit ):Angle():Forward()*self.DakBlastRadius)						
-								trace.filter = self.IgnoreList
-								local ExpTrace = util.TraceHull( trace, self )
-								--Ghetto Debug, shows start and end pos of explosion
-								--[[
-								if Targets[i]:GetClass() == "prop_physics" then
-									local hitstart = ents.Create( "prop_physics" )
-									hitstart:SetModel("models/Combine_Helicopter/helicopter_bomb01.mdl")
-									local hitend = ents.Create( "prop_physics" )
-									hitend:SetModel("models/Combine_Helicopter/helicopter_bomb01.mdl")
-									hitstart:SetPos(self.LastHit)
-									hitend:SetPos(self.LastHit+(( Targets[i]:LocalToWorld( Targets[i]:OBBCenter() ) - self.LastHit ):Angle():Forward()*self.DakBlastRadius))
-									hitstart:Spawn()
-									hitend:Spawn()
-									hitstart:GetPhysicsObject():EnableMotion( false )
-									hitend:GetPhysicsObject():EnableMotion( false )
-									print(Targets[i])
-									print(self.LastHit)
-									print((Targets[i]:LocalToWorld( Targets[i]:OBBCenter() ) - self.LastHit ):Angle():Forward()*100)
-									print(ExpTrace.Entity)
-								end
-								]]--
-								if ExpTrace.Entity == Targets[i] then
-									if not(string.Explode("_",Targets[i]:GetClass(),false)[2] == "wire") and not(Targets[i]:GetClass() == self:GetClass()) and not(Targets[i]:IsVehicle()) and not(Targets[i]:GetClass() == "dak_salvage") and not(Targets[i]:GetClass() == "dak_tesalvage") and Targets[i]:GetPhysicsObject():GetMass()>1 and Targets[i].DakIsTread==nil and not(Targets[i]:GetClass() == "dak_turretcontrol") then
-										if (not(ExpTrace.Entity:IsPlayer())) and (not(ExpTrace.Entity:IsNPC())) then
-											if ExpTrace.Entity.DakArmor == nil then
-												DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-											end
-											table.insert(self.DakDamageList,ExpTrace.Entity)
-										else
-											if self.LastHitEnt:GetClass() == "dak_bot" then
-												self.LastHitEnt:SetHealth(self.LastHitEnt:Health() - self.DakSplashDamage*50*(1-(ExpTrace.Entity:GetPos():Distance(self.LastHit)/1000))*500)
-												if self.LastHitEnt:Health() <= 0 and self.revenge==0 then
-													local body = ents.Create( "prop_ragdoll" )
-													body:SetPos( self.LastHitEnt:GetPos() )
-													body:SetModel( self.LastHitEnt:GetModel() )
-													body:Spawn()
-													self.LastHitEnt:Remove()
-													local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-													body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-													timer.Simple( 5, function()
-														body:Remove()
-													end )
-												end
-											else
-												local ExpPain = DamageInfo()
-												ExpPain:SetDamageForce( ExpTrace.Normal*self.DakSplashDamage*self:GetPhysicsObject():GetMass()*self.DakVelocity )
-												ExpPain:SetDamage( self.DakSplashDamage*50*(1-(ExpTrace.Entity:GetPos():Distance(self.LastHit)/1000)) )
-												ExpPain:SetAttacker( self.DakGun.DakOwner )
-												ExpPain:SetInflictor( self.DakGun )
-												ExpPain:SetReportedPosition( self:GetPos() )
-												ExpPain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
-												ExpPain:SetDamageType(DMG_BLAST)
-												ExpTrace.Entity:TakeDamageInfo( ExpPain )
-											end
-										end
-									end
-								end
-							end
-						end
-						for i = 1, #self.DakDamageList do
-							if(self.DakDamageList[i]:IsValid()) then
-								if not(self.LastHitEnt:GetClass() == "dak_bot") then
-									if(self.DakDamageList[i]:GetParent():IsValid()) then
-										if(self.DakDamageList[i]:GetParent():GetParent():IsValid()) then
-										self.DakDamageList[i]:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (self.DakDamageList[i]:GetPos()-self.LastHit):GetNormalized()*(self.DakSplashDamage/table.Count(self.DakDamageList))*1000*2*(1-(self.DakDamageList[i]:GetPos():Distance(self.LastHit)/1000)) )
-										end
-									end
-									if not(self.DakDamageList[i]:GetParent():IsValid()) then
-										self.DakDamageList[i]:GetPhysicsObject():ApplyForceCenter( (self.DakDamageList[i]:GetPos()-self.LastHit):GetNormalized()*(self.DakSplashDamage/table.Count(self.DakDamageList))*1000*2*(1-(self.DakDamageList[i]:GetPos():Distance(self.LastHit)/1000))  )
-									end
-								end
-							end
-							local HPPerc = 0
-							if not(self.DakDamageList[i].SPPOwner==nil) then
-								if self.DakDamageList[i].SPPOwner:HasGodMode()==false then	
-									if self.DakDamageList[i].DakIsTread==nil then
-										if self.DakDamageList[i]:GetPos():Distance(self.LastHit) > self.DakBlastRadius/2 then 
-											HPPerc = (self.DakDamageList[i].DakHealth - (  (self.DakSplashDamage/table.Count(self.DakDamageList)) * ((self.DakBasePenetration*0.4)/self.DakDamageList[i].DakArmor)  )*(1-(self.DakDamageList[i]:GetPos():Distance(self.LastHit)/self.DakBlastRadius)))/self.DakDamageList[i].DakMaxHealth
-											self.DakDamageList[i].DakHealth = self.DakDamageList[i].DakHealth - (  (self.DakSplashDamage/table.Count(self.DakDamageList)) * ((self.DakBasePenetration*0.4)/self.DakDamageList[i].DakArmor)  )*(1-(self.DakDamageList[i]:GetPos():Distance(self.LastHit)/self.DakBlastRadius))
-										else
-											HPPerc = (self.DakDamageList[i].DakHealth- (  (self.DakSplashDamage/table.Count(self.DakDamageList)) * ((self.DakBasePenetration*0.4)/self.DakDamageList[i].DakArmor)  ))/self.DakDamageList[i].DakMaxHealth
-											self.DakDamageList[i].DakHealth = self.DakDamageList[i].DakHealth - (  (self.DakSplashDamage/table.Count(self.DakDamageList)) * ((self.DakBasePenetration*0.4)/self.DakDamageList[i].DakArmor)  )
-										end
-									end
-
-									if not(self.DakDamageList[i].DakRed == nil) then
-										self.DakDamageList[i]:SetColor(Color(self.DakDamageList[i].DakRed*HPPerc,self.DakDamageList[i].DakGreen*HPPerc,self.DakDamageList[i].DakBlue*HPPerc,self.DakDamageList[i]:GetColor().a))
-									end
-									self.DakDamageList[i].DakLastDamagePos = self.LastHit
-									if self.DakDamageList[i].DakHealth <= 0 and self.DakDamageList[i].DakPooled==0 then
-										table.insert(self.RemoveList,self.DakDamageList[i])
-									end
-								end
-							else
-								if self.DakDamageList[i].DakIsTread==nil then
-									if self.DakDamageList[i]:GetPos():Distance(self.LastHit) > self.DakBlastRadius/2 then 
-										HPPerc = (self.DakDamageList[i].DakHealth - (  (self.DakSplashDamage/table.Count(self.DakDamageList)) * ((self.DakBasePenetration*0.4)/self.DakDamageList[i].DakArmor)  )*(1-(self.DakDamageList[i]:GetPos():Distance(self.LastHit)/self.DakBlastRadius)))/self.DakDamageList[i].DakMaxHealth
-										self.DakDamageList[i].DakHealth = self.DakDamageList[i].DakHealth - (  (self.DakSplashDamage/table.Count(self.DakDamageList)) * ((self.DakBasePenetration*0.4)/self.DakDamageList[i].DakArmor)  )*(1-(self.DakDamageList[i]:GetPos():Distance(self.LastHit)/self.DakBlastRadius))
-									else
-										HPPerc = (self.DakDamageList[i].DakHealth- (  (self.DakSplashDamage/table.Count(self.DakDamageList)) * ((self.DakBasePenetration*0.4)/self.DakDamageList[i].DakArmor)  ))/self.DakDamageList[i].DakMaxHealth
-										self.DakDamageList[i].DakHealth = self.DakDamageList[i].DakHealth - (  (self.DakSplashDamage/table.Count(self.DakDamageList)) * ((self.DakBasePenetration*0.4)/self.DakDamageList[i].DakArmor)  )
-									end
-								end
-
-								if not(self.DakDamageList[i].DakRed == nil) then
-									self.DakDamageList[i]:SetColor(Color(self.DakDamageList[i].DakRed*HPPerc,self.DakDamageList[i].DakGreen*HPPerc,self.DakDamageList[i].DakBlue*HPPerc,self.DakDamageList[i]:GetColor().a))
-								end
-								self.DakDamageList[i].DakLastDamagePos = self.LastHit
-								if self.DakDamageList[i].DakHealth <= 0 and self.DakDamageList[i].DakPooled==0 then
-									table.insert(self.RemoveList,self.DakDamageList[i])
-								end
-							end
-
-						end
-						for i = 1, #self.RemoveList do
-							self.salvage = ents.Create( "dak_tesalvage" )
-							self.salvage.DakModel = self.RemoveList[i]:GetModel()
-							self.salvage:SetPos( self.RemoveList[i]:GetPos())
-							self.salvage:SetAngles( self.RemoveList[i]:GetAngles())
-							self.salvage.DakLastDamagePos = self.LastHit
-							self.salvage:Spawn()
-							self.RemoveList[i]:Remove()
-						end
-					end
+					self:DTExplosion(self.LastHit+(Hit.HitNormal*2),self.DakSplashDamage,self.DakBlastRadius,self.DakCaliber,self.DakBasePenetration*0.4,self.DakGun.DakOwner)
 				else
 					local effectdata = EffectData()
 					effectdata:SetOrigin(self.LastHit)
@@ -580,18 +413,6 @@ function ENT:Think()
 					end
 					util.Effect("dakshellimpact", effectdata)
 					util.Decal( "Impact.Concrete", self.LastHit+(self:GetForward()*-5), self.LastHit+(self:GetForward()*5), self)
-				end
-				if(self.LastHitEnt:IsValid()) then
-					if(self.LastHitEnt:GetParent():IsValid()) then
-						if(self.LastHitEnt:GetParent():GetParent():IsValid()) then
-							local Div = Vector(self.LastHitEnt:GetParent():GetParent():OBBMaxs().x/75,self.LastHitEnt:GetParent():GetParent():OBBMaxs().y/75,self.LastHitEnt:GetParent():GetParent():OBBMaxs().z/75)
-							self.LastHitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( Div*(self:GetVelocity()*self:GetPhysicsObject():GetMass()/20000)*self.LastHitEnt:GetParent():GetParent():GetPhysicsObject():GetMass(),self.LastHitEnt:GetParent():GetParent():GetPos()+self.LastHitEnt:WorldToLocal(self.LastHit):GetNormalized() )
-						end
-					end
-					if not(self.LastHitEnt:GetParent():IsValid()) then
-						local Div = Vector(self.LastHitEnt:OBBMaxs().x/75,self.LastHitEnt:OBBMaxs().y/75,self.LastHitEnt:OBBMaxs().z/75)
-						self.LastHitEnt:GetPhysicsObject():ApplyForceOffset( Div*(self:GetVelocity()*self:GetPhysicsObject():GetMass()/20000)*self.LastHitEnt:GetPhysicsObject():GetMass(),self.LastHitEnt:GetPos()+self.LastHitEnt:WorldToLocal(self.LastHit):GetNormalized() )
-					end
 				end
 			--soundhere impact ground sound here
 			local ExpSounds = {}
@@ -694,33 +515,17 @@ function ENT:Damage(oldhit)
 				if EffArmor < self.DakPenetration and Hit.Entity.IsDakTekFutureTech == nil then
 					if not(Hit.Entity.SPPOwner==nil) then			
 						if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
-							if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-								local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
-								if not(Hit.Entity.DakRed == nil) then 
-									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-								end
-							else
-								local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
-								if not(Hit.Entity.DakRed == nil) then 
-									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-								end
-							end
-						end
-					else
-						if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-							local HPPerc = (Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5))/Hit.Entity.DakMaxHealth
-							Hit.Entity.DakHealth = Hit.Entity.DakHealth-(math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)*0.5)
-							if not(Hit.Entity.DakRed == nil) then 
-								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-							end
-						else
 							local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
 							Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
 							if not(Hit.Entity.DakRed == nil) then 
 								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 							end
+						end
+					else
+						local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
+						Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
+						if not(Hit.Entity.DakRed == nil) then 
+							Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 						end
 					end
 					local effectdata = EffectData()
@@ -748,33 +553,17 @@ function ENT:Damage(oldhit)
 				else
 					if not(Hit.Entity.SPPOwner==nil) then			
 						if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
-							if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-								local HPPerc = (Hit.Entity.DakHealth-(self.DakDamage*0.25))/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth-(self.DakDamage*0.25)
-								if not(Hit.Entity.DakRed == nil) then 
-									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-								end
-							else
-								local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
-								Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
-								if not(Hit.Entity.DakRed == nil) then 
-									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-								end
-							end
-						end
-					else
-						if (Hit.Entity.DakName == "Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Armor")or(Hit.Entity.DakName == "Heavy Reactive Reflective Armor") then
-							local HPPerc = (Hit.Entity.DakHealth-(self.DakDamage*0.25))/Hit.Entity.DakMaxHealth
-							Hit.Entity.DakHealth = Hit.Entity.DakHealth-(self.DakDamage*0.25)
-							if not(Hit.Entity.DakRed == nil) then 
-								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-							end
-						else
 							local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
 							Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
 							if not(Hit.Entity.DakRed == nil) then 
 								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 							end
+						end
+					else
+						local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
+						Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
+						if not(Hit.Entity.DakRed == nil) then 
+							Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 						end
 					end
 					if self.DakExplosive then
@@ -921,4 +710,271 @@ function ENT:CheckClip(Ent, HitPos)
 		if HitClip then return true end
 	end
 	return HitClip
+end
+
+function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
+	local traces = math.Round(Caliber/2)
+	local Filter = {self}
+	for i=1, traces do
+		local Direction = VectorRand()
+		local trace = {}
+			trace.start = Pos
+			trace.endpos = Pos + Direction*Radius*10
+			trace.filter = Filter
+			trace.mins = Vector(-1,-1,-1)
+			trace.maxs = Vector(1,1,1)
+		local ExpTrace = util.TraceHull( trace )
+
+		if ExpTrace.Entity:IsValid() then
+			if ExpTrace.Entity:GetClass() == self:GetClass() then
+				ExpTrace.Entity =  NULL
+			end 
+		end
+		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
+			--decals don't like using the adjusted by normal Pos
+			util.Decal( "Impact.Concrete", self.LastHit, self.LastHit+(Direction*Radius), self)
+			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
+				if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
+					if ExpTrace.Entity.DakArmor == nil then
+						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+					end
+					local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+					if ExpTrace.Entity.IsDakTekFutureTech == 1 then
+						ExpTrace.Entity.DakArmor = 1000
+					else
+						if SA == nil then
+							--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
+							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
+							ExpTrace.Entity.DakIsTread = 1
+						else
+							if ExpTrace.Entity:GetClass()=="prop_physics" then 
+								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
+									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+								end
+							end
+						end
+					end
+					self:DamageEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
+				else
+					if ExpTrace.Entity.DakArmor == nil then
+						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+					end
+					local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+					if ExpTrace.Entity.IsDakTekFutureTech == 1 then
+						ExpTrace.Entity.DakArmor = 1000
+					else
+						if SA == nil then
+							--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
+							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
+							ExpTrace.Entity.DakIsTread = 1
+						else
+							if ExpTrace.Entity:GetClass()=="prop_physics" then 
+								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
+									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+								end
+							end
+						end
+					end
+					
+					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
+
+					if not(ExpTrace.Entity.SPPOwner==nil) then			
+						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
+							local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
+							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
+							if not(ExpTrace.Entity.DakRed == nil) then 
+								ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
+							end
+						end
+					else
+						local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
+						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
+						if not(ExpTrace.Entity.DakRed == nil) then 
+							ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
+						end
+					end
+					if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
+						self.salvage = ents.Create( "dak_tesalvage" )
+						self.salvage.DakModel = ExpTrace.Entity:GetModel()
+						self.salvage:SetPos( ExpTrace.Entity:GetPos())
+						self.salvage:SetAngles( ExpTrace.Entity:GetAngles())
+						self.salvage:Spawn()
+						ExpTrace.Entity:Remove()
+					end
+				end
+			end
+			if ExpTrace.Entity:IsValid() then
+				if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity:GetClass() == "dak_bot" then
+					if ExpTrace.Entity:GetClass() == "dak_bot" then
+						ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
+						if ExpTrace.Entity:Health() <= 0 and self.revenge==0 then
+							local body = ents.Create( "prop_ragdoll" )
+							body:SetPos( ExpTrace.Entity:GetPos() )
+							body:SetModel( ExpTrace.Entity:GetModel() )
+							body:Spawn()
+							ExpTrace.Entity:Remove()
+							local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+							body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+							timer.Simple( 5, function()
+								body:Remove()
+							end )
+						end
+					else
+						local Pain = DamageInfo()
+						Pain:SetDamageForce( Direction*(Damage/traces)*5000*self:GetPhysicsObject():GetMass() )
+						Pain:SetDamage( (Damage/traces)*500 )
+						Pain:SetAttacker( Owner )
+						Pain:SetInflictor( self.DakGun )
+						Pain:SetReportedPosition( self:GetPos() )
+						Pain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
+						Pain:SetDamageType(DMG_BLAST)
+						ExpTrace.Entity:TakeDamageInfo( Pain )
+					end
+				end
+			end
+
+			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
+				if(ExpTrace.Entity:GetParent():IsValid()) then
+					if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
+						ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+					end
+				end
+				if not(ExpTrace.Entity:GetParent():IsValid()) then
+					ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+				end
+			end		
+		end
+	end
+end
+
+function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
+	local traces = math.Round(Caliber/2)
+	local trace = {}
+		trace.start = Pos
+		trace.endpos = Pos + Direction*Radius*10
+		Filter[#Filter+1] = IgnoreEnt
+		trace.filter = Filter
+		trace.mins = Vector(-1,-1,-1)
+		trace.maxs = Vector(1,1,1)
+	local ExpTrace = util.TraceHull( trace )
+
+	if ExpTrace.Entity:IsValid() then
+		if ExpTrace.Entity:GetClass() == self:GetClass() then
+			ExpTrace.Entity =  NULL
+		end 
+	end
+
+	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
+		--decals don't like using the adjusted by normal Pos
+		util.Decal( "Impact.Concrete", self.LastHit, self.LastHit+(Direction*Radius), self)
+		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
+			if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
+				if ExpTrace.Entity.DakArmor == nil then
+					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+				end
+				local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+				if ExpTrace.Entity.IsDakTekFutureTech == 1 then
+					ExpTrace.Entity.DakArmor = 1000
+				else
+					if SA == nil then
+						--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
+						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
+						ExpTrace.Entity.DakIsTread = 1
+					else
+						if ExpTrace.Entity:GetClass()=="prop_physics" then 
+							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
+								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+							end
+						end
+					end
+				end
+				self:DamageEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
+			else
+				if ExpTrace.Entity.DakArmor == nil then
+					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+				end
+				local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+				if ExpTrace.Entity.IsDakTekFutureTech == 1 then
+					ExpTrace.Entity.DakArmor = 1000
+				else
+					if SA == nil then
+						--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
+						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
+						ExpTrace.Entity.DakIsTread = 1
+					else
+						if ExpTrace.Entity:GetClass()=="prop_physics" then 
+							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
+								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+							end
+						end
+					end
+				end
+				
+				ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
+
+				if not(ExpTrace.Entity.SPPOwner==nil) then			
+					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
+						local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
+						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
+						if not(ExpTrace.Entity.DakRed == nil) then 
+							ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
+						end
+					end
+				else
+					local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
+					ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
+					if not(ExpTrace.Entity.DakRed == nil) then 
+						ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
+					end
+				end
+				if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
+					self.salvage = ents.Create( "dak_tesalvage" )
+					self.salvage.DakModel = ExpTrace.Entity:GetModel()
+					self.salvage:SetPos( ExpTrace.Entity:GetPos())
+					self.salvage:SetAngles( ExpTrace.Entity:GetAngles())
+					self.salvage:Spawn()
+					ExpTrace.Entity:Remove()
+				end
+			end
+		end
+		if ExpTrace.Entity:IsValid() then
+			if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity:GetClass() == "dak_bot" then
+				if ExpTrace.Entity:GetClass() == "dak_bot" then
+					ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
+					if ExpTrace.Entity:Health() <= 0 and self.revenge==0 then
+						local body = ents.Create( "prop_ragdoll" )
+						body:SetPos( ExpTrace.Entity:GetPos() )
+						body:SetModel( ExpTrace.Entity:GetModel() )
+						body:Spawn()
+						ExpTrace.Entity:Remove()
+						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+						timer.Simple( 5, function()
+							body:Remove()
+						end )
+					end
+				else
+					local Pain = DamageInfo()
+					Pain:SetDamageForce( Direction*(Damage/traces)*5000*self:GetPhysicsObject():GetMass() )
+					Pain:SetDamage( (Damage/traces)*500 )
+					Pain:SetAttacker( Owner )
+					Pain:SetInflictor( self.DakGun )
+					Pain:SetReportedPosition( self:GetPos() )
+					Pain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
+					Pain:SetDamageType(DMG_BLAST)
+					ExpTrace.Entity:TakeDamageInfo( Pain )
+				end
+			end
+		end
+		if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
+			if(ExpTrace.Entity:GetParent():IsValid()) then
+				if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
+					ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+				end
+			end
+			if not(ExpTrace.Entity:GetParent():IsValid()) then
+				ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+			end
+		end		
+	end
 end
