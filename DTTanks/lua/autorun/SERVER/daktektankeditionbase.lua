@@ -12,6 +12,7 @@ if SERVER then
 		if IsValid(ent) and not (string.Explode("_",ent:GetClass(),false)[1] == "dak") then --make sure its not daktek stuff
 	 		--setup values
 	 		if ent.IsDakTekFutureTech == nil then
+	 			ent.DakBurnStacks = 0
 	 			if IsValid(ent:GetPhysicsObject()) then
 			 		ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
 			 	else
@@ -38,7 +39,7 @@ if SERVER then
 		 					ent.DakArmor = ent:OBBMaxs().x/2
 		 					ent.DakIsTread = 1
 		 				else
-		 					ent.DakArmor = 7.8125*(ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+		 					ent.DakArmor = 7.8125*(ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ent.DakBurnStacks*0.25
 		 				end
 				 	end
 			 	else
@@ -52,6 +53,7 @@ if SERVER then
 			--exceptions for bots
 			if ent:GetClass()=="dak_bot" then
 				--ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
+				ent.DakBurnStacks = 0
 				ent.DakHealth = 10
 		 		ent.DakRed = ent:GetColor().r
 				ent.DakGreen = ent:GetColor().g

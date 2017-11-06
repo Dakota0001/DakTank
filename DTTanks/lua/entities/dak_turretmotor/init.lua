@@ -25,6 +25,7 @@ function ENT:Initialize()
 	end
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
+ 	self.DakBurnStacks = 0
 end
 
 function ENT:Think()

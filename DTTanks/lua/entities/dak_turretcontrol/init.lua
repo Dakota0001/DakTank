@@ -98,6 +98,7 @@ function ENT:Initialize()
  	self.SentError = 0
  	self.SentError2 = 0
  	self.LastHullAngles = self:GetAngles()
+ 	self.DakBurnStacks = 0
 end
 
 function ENT:Think()

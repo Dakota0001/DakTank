@@ -31,7 +31,7 @@ function ENT:Initialize()
 		self.DakHealth = self.DakMaxHealth
 	end
  	
-
+	self.DakBurnStacks = 0
 end
 
 function ENT:Think()
@@ -247,8 +247,8 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakIsTread = 1
 						else
 							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
+									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
 								end
 							end
 						end
@@ -268,8 +268,8 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakIsTread = 1
 						else
 							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
+									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
 								end
 							end
 						end
@@ -325,7 +325,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 						Pain:SetAttacker( Owner )
 						Pain:SetInflictor( self )
 						Pain:SetReportedPosition( self:GetPos() )
-						Pain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
+						Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
 						ExpTrace.Entity:TakeDamageInfo( Pain )
 					end
@@ -381,8 +381,8 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakIsTread = 1
 					else
 						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
+								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
 							end
 						end
 					end
@@ -402,8 +402,8 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakIsTread = 1
 					else
 						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
+								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
 							end
 						end
 					end
@@ -459,7 +459,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 					Pain:SetAttacker( Owner )
 					Pain:SetInflictor( self )
 					Pain:SetReportedPosition( self:GetPos() )
-					Pain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
+					Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 					Pain:SetDamageType(DMG_BLAST)
 					ExpTrace.Entity:TakeDamageInfo( Pain )
 				end

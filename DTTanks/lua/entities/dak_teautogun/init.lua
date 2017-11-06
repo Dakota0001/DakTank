@@ -65,6 +65,7 @@ function ENT:Initialize()
 	self.DakLastReload = CurTime()
 	self.IsAutoLoader = 0
 	self.Loaded=0
+	self.DakBurnStacks = 0
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")

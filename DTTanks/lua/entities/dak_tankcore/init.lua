@@ -35,6 +35,7 @@ function ENT:Initialize()
 	self.HitBoxMass = 0
 	self.Hitboxthinktime = CurTime()
 	self.LastRemake = CurTime()
+	self.DakBurnStacks = 0
 end
 
 local function GetPhysCons( ent, Results )

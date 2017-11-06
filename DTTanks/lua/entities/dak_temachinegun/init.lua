@@ -53,6 +53,7 @@ function ENT:Initialize()
  	self.SlowThinkTime = CurTime()
  	self.LastFireTime = CurTime()
  	self.CurrentAmmoType = 1
+ 	self.DakBurnStacks = 0
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
@@ -120,6 +121,35 @@ function ENT:Think()
 				self.DakFireSound = "daktanks/14mm.wav"
 			end
 		end
+		--Machine Guns
+		if self.DakGunType == "Flamethrower" then
+			self.DakName = "Flamethrower"
+			self.DakCooldown = 0.1
+			self.DakMaxHealth = 10
+			self.DakArmor = 50
+			self.DakMass = 50
+
+			self.DakAP = "Flamethrower Fuel"
+
+			self.BaseDakShellDamage = 0.2
+			self.BaseDakShellMass = 1
+			self.DakShellSplashDamage = 0.2
+			self.BaseDakShellPenetration = 0.0001
+			self.DakShellExplosive = false
+			self.DakShellBlastRadius = 15
+
+			self.DakFireEffect = "dakflamefire"
+			self.DakFirePitch = 100
+			self.DakShellTrail = "dakflametrail"
+			self.BaseDakShellVelocity = 5000
+			self.DakIsFlechette = false
+			self.DakPellets = 10
+
+			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
+			self.ReloadSound = "daktanks/dakreloadlight.wav"
+
+			self.DakFireSound = "daktanks/flamerfire.wav"
+		end
 
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
@@ -146,7 +176,11 @@ end
 
 function ENT:DakTEAmmoCheck()
 	if self.CurrentAmmoType == 1 then
-		WireLib.TriggerOutput(self, "AmmoType", "Armor Piercing")
+		if self.DakName == "Flamethrower" then
+			WireLib.TriggerOutput(self, "AmmoType", "Fuel")
+		else
+			WireLib.TriggerOutput(self, "AmmoType", "Armor Piercing")
+		end
 		self.DakAmmoType = self.DakAP
 		self.DakIsFlechette = false
 		self.DakShellExplosive = false
@@ -256,6 +290,9 @@ function ENT:DakTEFire()
 					shell.DakExplosive = self.DakShellExplosive
 					shell.DakBlastRadius = self.DakShellBlastRadius
 					shell.DakPenSounds = self.DakShellPenSounds
+					if self.DakName == "Flamethrower" then
+						shell.DakIsFlame = 1
+					end
 
 					shell.DakBasePenetration = self.BaseDakShellPenetration
 

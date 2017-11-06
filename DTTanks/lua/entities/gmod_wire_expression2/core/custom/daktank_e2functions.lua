@@ -20,8 +20,8 @@ e2function number entity:daktankArmor()
 			this.DakIsTread = 1
 		else
 			if this:GetClass()=="prop_physics" then 
-				if not(this.DakArmor == 7.8125*(this:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-					this.DakArmor = 7.8125*(this:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+				if not(this.DakArmor == 7.8125*(this:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - this.DakBurnStacks*0.25) then
+					this.DakArmor = 7.8125*(this:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - this.DakBurnStacks*0.25
 				end
 			end
 		end
@@ -64,14 +64,19 @@ end
 e2function string entity:daktankGetAmmoType()
 	if not IsValid(this) then return end
 	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
-		if this.CurrentAmmoType == 1 then
-			return "Armor Piercing"
-		end
-		if this.CurrentAmmoType == 2 then
-			return "High Explosive"
-		end
-		if this.CurrentAmmoType == 3 then
-			return "Flechette"
+
+		if this.DakName == "Flamethrower" then
+			return "Fuel"
+		else
+			if this.CurrentAmmoType == 1 then
+				return "Armor Piercing"
+			end
+			if this.CurrentAmmoType == 2 then
+				return "High Explosive"
+			end
+			if this.CurrentAmmoType == 3 then
+				return "Flechette"
+			end
 		end
 	end
 end

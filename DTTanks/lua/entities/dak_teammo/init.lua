@@ -14,8 +14,6 @@ ENT.DakAmmoType = "Base"
 ENT.DakPooled=0
 
 function ENT:Initialize()
-
-	self:SetModel( "models/daktanks/Ammo.mdl" )
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
@@ -26,30 +24,38 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	self.DakAmmo = self.DakMaxAmmo
-	self.DakArmor = 10
+	
 	self.Inputs = Wire_CreateInputs(self, { "EjectAmmo" })
 	self.Outputs = WireLib.CreateOutputs( self, { "Ammo", "MaxAmmo" } )
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.DumpTime = CurTime()
- 	self.DakMaxHealth = 10
-	self.DakHealth = 10
-
+ 	self.DakArmor = 10
+ 	self.DakMaxHealth = 30
+	self.DakHealth = 30
+	self.DakBurnStacks = 0
 end
 
 function ENT:Think()
 
 	if not(self.DakName == "Base Ammo") then
 		self.DakCaliber = tonumber(string.Split( self.DakName, "m" )[1])
-		if self.DakAmmoType == "Mortar" then
-			self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
+		if self.DakAmmoType == "Flamethrower Fuel" then
+			self.DakMaxAmmo = 150
 			if self.DakAmmo > self.DakMaxAmmo then
 				self.DakAmmo = self.DakMaxAmmo
 			end
 		else
-			self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-			if self.DakAmmo > self.DakMaxAmmo then
-				self.DakAmmo = self.DakMaxAmmo
+			if self.DakAmmoType == "Mortar" then
+				self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
+				if self.DakAmmo > self.DakMaxAmmo then
+					self.DakAmmo = self.DakMaxAmmo
+				end
+			else
+				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
+				if self.DakAmmo > self.DakMaxAmmo then
+					self.DakAmmo = self.DakMaxAmmo
+				end
 			end
 		end
 	end
@@ -108,8 +114,28 @@ function ENT:Think()
 			end
 		end
 		self.SparkTime=CurTime()
+		if self.DakAmmoType == "Flamethrower Fuel" then
+			self:SetModel( "models/props_c17/canister_propane01a.mdl" )
+		else
+			self:SetModel( "models/daktanks/Ammo.mdl" )
+		end
 	end
-	self:GetPhysicsObject():SetMass(200)
+	if self.DakAmmoType == "Flamethrower Fuel" then
+		self.DakArmor = 25
+	 	self.DakMaxHealth = 30
+	 	if self.DakHealth >= self.DakMaxHealth then
+			self.DakHealth = 30
+		end
+		self:GetPhysicsObject():SetMass(500)
+	else
+		self.DakArmor = 10
+	 	self.DakMaxHealth = 10
+	 	if self.DakHealth >= self.DakMaxHealth then
+			self.DakHealth = 10
+		end
+		self:GetPhysicsObject():SetMass(200)
+	end
+	
 	WireLib.TriggerOutput(self, "Ammo", self.DakAmmo)
 	WireLib.TriggerOutput(self, "MaxAmmo", self.DakMaxAmmo)
 
@@ -127,7 +153,7 @@ function ENT:Think()
 		end
 	end
 
-	if self.DakAmmo>0 and self.DakHealth<5 and self.DakIsExplosive then
+	if self.DakAmmo>0 and self.DakHealth<(self.DakMaxHealth/2) and self.DakIsExplosive then
 		if self.DakIsHE then
 			local effectdata = EffectData()
 			effectdata:SetOrigin(self:GetPos())
@@ -298,8 +324,8 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakIsTread = 1
 						else
 							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
+									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
 								end
 							end
 						end
@@ -319,8 +345,8 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakIsTread = 1
 						else
 							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
+									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
 								end
 							end
 						end
@@ -376,7 +402,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 						Pain:SetAttacker( Owner )
 						Pain:SetInflictor( self )
 						Pain:SetReportedPosition( self:GetPos() )
-						Pain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
+						Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
 						ExpTrace.Entity:TakeDamageInfo( Pain )
 					end
@@ -432,8 +458,8 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakIsTread = 1
 					else
 						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
+								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
 							end
 						end
 					end
@@ -453,8 +479,8 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakIsTread = 1
 					else
 						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
+								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
 							end
 						end
 					end
@@ -510,7 +536,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 					Pain:SetAttacker( Owner )
 					Pain:SetInflictor( self )
 					Pain:SetReportedPosition( self:GetPos() )
-					Pain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
+					Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 					Pain:SetDamageType(DMG_BLAST)
 					ExpTrace.Entity:TakeDamageInfo( Pain )
 				end

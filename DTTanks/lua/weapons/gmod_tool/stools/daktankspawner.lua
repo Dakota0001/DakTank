@@ -564,6 +564,13 @@ function TOOL:LeftClick( trace )
 				self.DakModel = "models/daktanks/mg25mm.mdl"
 			end
 		end
+		if self:GetClientInfo("SpawnSettings") == "Flamethrower" then
+			self.DakGunType = "Flamethrower"
+			self.DakCaliber = 10
+			self.DakMaxHealth = 10
+			self.DakName = "Flamethrower"
+			self.DakModel = "models/daktanks/flamethrower.mdl"
+		end
 		if self:GetClientInfo("SpawnSettings") == "HMG" then
 			self.DakGunType = "HMG"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
@@ -622,7 +629,8 @@ function TOOL:LeftClick( trace )
 			end
 		end
 		--AMMO--
-				if self:GetClientInfo("SpawnSettings") == "SmallAPBox" then
+		if self:GetClientInfo("SpawnSettings") == "SmallAPBox" then
+			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
 			self.DakIsHE = false
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
@@ -674,6 +682,7 @@ function TOOL:LeftClick( trace )
 			end
 		end
 		if self:GetClientInfo("SpawnSettings") == "SmallHEBox" then
+			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
 			self.DakIsHE = true
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
@@ -725,6 +734,7 @@ function TOOL:LeftClick( trace )
 			end
 		end
 		if self:GetClientInfo("SpawnSettings") == "SmallFLBox" then
+			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
 			self.DakIsHE = false
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
@@ -774,6 +784,16 @@ function TOOL:LeftClick( trace )
 				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmHMGFLAmmo"
 			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "Flamethrower Fuel" then
+			self.DakIsHE = true
+			self.DakCaliber = 10
+			self.DakName = "Flamethrower Fuel Tank"
+			self.DakIsExplosive = true
+			self.DakAmmo = 150
+			self.DakMaxAmmo = 150
+			self.DakAmmoType = "Flamethrower Fuel"
+			self.spawnedent:SetModel( "models/props_c17/canister_propane01a.mdl" )
 		end
 		if self:GetClientInfo("SpawnEnt") == "dak_tegun" or self:GetClientInfo("SpawnEnt") == "dak_teautogun" or self:GetClientInfo("SpawnEnt") == "dak_temachinegun" then
 			self.spawnedent.DakOwner = self:GetOwner()
@@ -1117,8 +1137,8 @@ function TOOL:RightClick( trace )
 					trace.Entity.DakIsTread = 1
 				else
 					if trace.Entity:GetClass()=="prop_physics" then 
-						if not(trace.Entity.DakArmor == 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)) then
-							trace.Entity.DakArmor = 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA)
+						if not(trace.Entity.DakArmor == 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25) then
+							trace.Entity.DakArmor = 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25
 						end
 					end
 				end
@@ -1325,7 +1345,7 @@ DTTE_NodeList["Utilities"] = ctrl:AddNode( "Utilities" )
 	DTTE_NodeList["Turret"] = DTTE_NodeList["Utilities"]:AddNode( "Turret" )
 		DTTE_NodeList["TControl"] = DTTE_NodeList["Turret"]:AddNode( "Turret Controller" )
 		DTTE_NodeList["TMotor"] = DTTE_NodeList["Turret"]:AddNode( "Turret Motor" )
-DTTE_NodeList["Weapons"] = ctrl:AddNode( "Weapons" )
+	DTTE_NodeList["Weapons"] = ctrl:AddNode( "Weapons" )
 		DTTE_NodeList["Autocannons"] = DTTE_NodeList["Weapons"]:AddNode( "Autocannons" )
 		DTTE_NodeList["Autoloaders"] = DTTE_NodeList["Weapons"]:AddNode( "Autoloaders" )
 			DTTE_NodeList["ALGuns"] = DTTE_NodeList["Autoloaders"]:AddNode( "Autoloading Guns" )
@@ -1335,6 +1355,7 @@ DTTE_NodeList["Weapons"] = ctrl:AddNode( "Weapons" )
 				DTTE_NodeList["LALClip"] = DTTE_NodeList["ALClips"]:AddNode( "Large Autoloader Clip" )
 			
 		DTTE_NodeList["Cannons"] = DTTE_NodeList["Weapons"]:AddNode( "Cannons" )
+		DTTE_NodeList["Flamethrower"] = DTTE_NodeList["Weapons"]:AddNode( "Flamethrower" )
 		DTTE_NodeList["Howitzers"] = DTTE_NodeList["Weapons"]:AddNode( "Howitzers" )
 		DTTE_NodeList["Mortars"] = DTTE_NodeList["Weapons"]:AddNode( "Mortars" )
 		DTTE_NodeList["MGs"] = DTTE_NodeList["Weapons"]:AddNode( "Machine Guns" )
@@ -1356,6 +1377,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		--DTTE_NodeList["MediumFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Medium FL Ammo" )
 		--DTTE_NodeList["LargeFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Large FL Ammo" )
 		--DTTE_NodeList["HugeFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Huge FL Ammo" )
+	DTTE_NodeList["FTFuel"] = DTTE_NodeList["Ammo"]:AddNode( "Flamethrower Fuel" )
 
 	function DermaNumSlider:OnValueChanged( cal )
 		RunConsoleCommand("daktankspawner_DTTE_GunCaliber", cal)
@@ -1450,6 +1472,26 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 	end
 
 	function ctrl:DoClick( node )
+		--FLAMETHROWERS
+		if (node == DTTE_NodeList["Flamethrower"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_temachinegun")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "Flamethrower")
+			DLabel:SetText( "Flamethrower\n\nArmor: 50mm\nWeight: 50 kg\nHealth: 10\n\nDescription: Flamethrower capable of igniting infantry, softening armor, and stalling engines." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["FTFuel"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "Flamethrower Fuel")
+			DLabel:SetText( "Flamethrower Fuel\n\nArmor: 25mm\nWeight: 500 kg\nHealth: 30\nAmmo: 15 seconds\n\nDescription: Flamethrower fuel tank, more armored than normal ammo boxes but more likely to be crit, use with caution." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+
 		--CLIPs
 		if (node == DTTE_NodeList["SALClip"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teautoloadingmodule")

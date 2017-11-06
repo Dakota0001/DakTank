@@ -53,6 +53,7 @@ function ENT:Initialize()
  	self.SlowThinkTime = CurTime()
  	self.LastFireTime = CurTime()
  	self.CurrentAmmoType = 1
+ 	self.DakBurnStacks = 0
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")

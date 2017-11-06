@@ -48,6 +48,7 @@ function ENT:Initialize()
  	self.Speed = 0
  	self.ExtraTorque = 1
  	self.Vel = 1
+ 	self.DakBurnStacks = 0
 end
 
 function ENT:Think()
@@ -305,10 +306,10 @@ function ENT:Think()
 						end
 						local LForce = (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost*self.LBoost
 						local RForce = (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost*self.RBoost
-						LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()+LPos)
-						LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()-LPos)
-						RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()+RPos)
-						RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()-RPos)
+						LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
+						LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
+						RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
+						RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
 					end
 
 					if math.abs(LPhys:GetAngleVelocity().y/6) < 1500 and math.abs(RPhys:GetAngleVelocity().y/6) < 1500 then
@@ -323,17 +324,17 @@ function ENT:Think()
 							local RForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.RightDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							if self.MoveLeft>0 and self.MoveRight==0 then
 								self.Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.DakFuel.TotalMass/10000)+3))),0,255), 1 )
-								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()+LPos)
-								LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()-LPos)
-								RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()+RPos)
-								RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()-RPos)
+								LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
+								LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
+								RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
+								RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
 							end
 							if self.MoveRight>0 and self.MoveLeft==0 then
 								self.Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.DakFuel.TotalMass/10000)+3))),0,255), 1 )
-								LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()+LPos)
-								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()-LPos)
-								RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()+RPos)
-								RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()-RPos)
+								LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
+								LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
+								RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
+								RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
 							end
 						end
 					end
@@ -347,16 +348,16 @@ function ENT:Think()
 							local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost
 							local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost
 							if self.Vel>0.1 then
-								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()+LPos)
-								LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()-LPos)
-								RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()+RPos)
-								RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()-RPos)
+								LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
+								LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
+								RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
+								RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
 							end
 							if self.Vel<-0.1 then
-								LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()+LPos)
-								LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()-LPos)
-								RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()+RPos)
-								RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()-RPos)
+								LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
+								LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
+								RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
+								RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
 							end
 							self.Sound:ChangePitch( 75, 1 )
 						end
@@ -372,16 +373,16 @@ function ENT:Think()
 					local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost
 					local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost
 					if self.Vel>0.1 then
-						LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()+LPos)
-						LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()-LPos)
-						RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()+RPos)
-						RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()-RPos)
+						LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
+						LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
+						RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
+						RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
 					end
 					if self.Vel<-0.1 then
-						LPhys:ApplyForceOffset( LForce, self.LeftDriveWheel:GetPos()+LPos)
-						LPhys:ApplyForceOffset( -LForce, self.LeftDriveWheel:GetPos()-LPos)
-						RPhys:ApplyForceOffset( RForce, self.RightDriveWheel:GetPos()+RPos)
-						RPhys:ApplyForceOffset( -RForce, self.RightDriveWheel:GetPos()-RPos)
+						LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
+						LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
+						RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
+						RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
 					end
 				end
 	        	self.Sound:ChangeVolume( 0, 2 )
@@ -411,6 +412,11 @@ function ENT:Think()
     	end
     	self.Sound:ChangePitch( 75, 1 )
     end
+
+    if self.DakBurnStacks>0 and not(self:IsOnFire()) then
+    	self.DakBurnStacks = self.DakBurnStacks - 0.1
+    end
+
     self:NextThink(CurTime()+0.025)
     return true
 end

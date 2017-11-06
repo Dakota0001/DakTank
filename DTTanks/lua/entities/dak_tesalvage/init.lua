@@ -34,6 +34,7 @@ function ENT:Initialize()
 	if math.random(0,4) == 0 then
 		self:Ignite(25,1)
 	end
+	self.DakBurnStacks = 0
 
 end
 
