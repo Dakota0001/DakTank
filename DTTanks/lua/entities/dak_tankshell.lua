@@ -203,7 +203,7 @@ function ENT:Think()
 								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
 							end
 						end
-						if(Hit.Entity:IsValid()) then
+						if(Hit.Entity:IsValid() and Hit.Entity:GetClass()~="dak_bot" and Hit.Entity:GetClass()~="prop_ragdoll") then
 							if(Hit.Entity:GetParent():IsValid()) then
 								if(Hit.Entity:GetParent():GetParent():IsValid()) then
 									local Div = Vector(Hit.Entity:GetParent():GetParent():OBBMaxs().x/75,Hit.Entity:GetParent():GetParent():OBBMaxs().y/75,Hit.Entity:GetParent():GetParent():OBBMaxs().z/75)
@@ -238,7 +238,7 @@ function ENT:Think()
 						end
 						self:Damage(Hit.Entity)
 					else
-						if not(Hit.Entity.SPPOwner==nil) then			
+						if not(Hit.Entity.SPPOwner==nil) and not(Hit.Entity.SPPOwner:IsWorld()) and Hit.Entity:GetClass()~="dak_bot" then			
 							if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
 								local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
 								Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
@@ -258,7 +258,7 @@ function ENT:Think()
 								Hit.Entity.DakBurnStacks = Hit.Entity.DakBurnStacks+1
 							end
 						end
-						if(Hit.Entity:IsValid()) then
+						if(Hit.Entity:IsValid() and Hit.Entity:GetClass()~="dak_bot" and Hit.Entity:GetClass()~="prop_ragdoll") then
 							if(Hit.Entity:GetParent():IsValid()) then
 								if(Hit.Entity:GetParent():GetParent():IsValid()) then
 									local Div = Vector(Hit.Entity:GetParent():GetParent():OBBMaxs().x/75,Hit.Entity:GetParent():GetParent():OBBMaxs().y/75,Hit.Entity:GetParent():GetParent():OBBMaxs().z/75)
@@ -267,7 +267,7 @@ function ENT:Think()
 							end
 							if not(Hit.Entity:GetParent():IsValid()) then
 								local Div = Vector(Hit.Entity:OBBMaxs().x/75,Hit.Entity:OBBMaxs().y/75,Hit.Entity:OBBMaxs().z/75)
-								Hit.Entity:GetPhysicsObject():ApplyForceOffset( Div*(self:GetVelocity()*self:GetPhysicsObject():GetMass()/5000)*Hit.Entity:GetPhysicsObject():GetMass(),Hit.Entity:GetPos()+Hit.Entity:WorldToLocal(self.LastHit):GetNormalized() )
+								Hit.Entity:GetPhysicsObject():ApplyForceOffset( Div*(self:GetVelocity()*self:GetPhysicsObject():GetMass()/5000)*Hit.Entity:GetPhysicsObject():GetMass(),Hit.Entity:GetPos()+Hit.Entity:WorldToLocal(Hit.HitPos):GetNormalized() )
 							end
 						end
 						if self.DakExplosive then
@@ -292,25 +292,22 @@ function ENT:Think()
 								if table.Count(Targets) > 0 then
 									for i = 1, #Targets do
 										if Targets[i]:GetClass() == "dak_temotor" then
-											if Targets[i]:IsOnFire() then 
-												Targets[i]:Extinguish()
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
 											end
-											Targets[i]:Ignite(5,1)
 											Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 										end
 										if Targets[i]:IsPlayer() then
 											if not Targets[i]:InVehicle() then
-												if Targets[i]:IsOnFire() then 
-													Targets[i]:Extinguish()
+												if not(Targets[i]:IsOnFire()) then 
+													Targets[i]:Ignite(5,1)
 												end
-												Targets[i]:Ignite(5,1)
 											end
 										end
 										if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-											if Targets[i]:IsOnFire() then 
-												Targets[i]:Extinguish()
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
 											end
-											Targets[i]:Ignite(5,1)
 										end
 									end
 								end
@@ -371,6 +368,11 @@ function ENT:Think()
 								body:SetPos( self.LastHitEnt:GetPos() )
 								body:SetModel( self.LastHitEnt:GetModel() )
 								body:Spawn()
+								body.DakHealth=1000000
+								body.DakMaxHealth=1000000
+								if self.DakIsFlame == 1 then
+									body:Ignite(10,1)
+								end
 								self.LastHitEnt:Remove()
 								local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
 								body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
@@ -566,11 +568,22 @@ function ENT:Think()
 		end
 
 	end
-	self:NextThink( CurTime() )
+	if self.DakCaliber < 20 then
+		self:NextThink( CurTime()+0.25 )
+	else
+		self:NextThink( CurTime() )
+	end
 	return true
 end
 
 function ENT:Damage(oldhit)
+	if self.Repeats == nil then
+		self.Repeats = 0
+	end
+	self.Repeats = self.Repeats + 1
+	if self.Repeats > 5 then
+		return
+	end
 	trace = {}
 	trace.start = self.LastPos
 	trace.endpos = self:GetPos() + self:GetVelocity():GetNormalized()*self.LastPos:Distance(self:GetPos())
@@ -672,7 +685,7 @@ function ENT:Damage(oldhit)
 						sound.Play( self.DakPenSounds[math.random(1,#self.DakPenSounds)], Hit.HitPos, 100, 100, 1 )
 					end
 				else
-					if not(Hit.Entity.SPPOwner==nil) then			
+					if not(Hit.Entity.SPPOwner==nil) and not(Hit.Entity.SPPOwner:IsWorld()) and Hit.Entity:GetClass()~="dak_bot" then		
 						if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
 							local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
 							Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
@@ -784,6 +797,11 @@ function ENT:Damage(oldhit)
 						body:SetPos( self.LastHitEnt:GetPos() )
 						body:SetModel( self.LastHitEnt:GetModel() )
 						body:Spawn()
+						body.DakHealth=1000000
+						body.DakMaxHealth=1000000
+						if self.DakIsFlame == 1 then
+							body:Ignite(10,1)
+						end
 						self.LastHitEnt:Remove()
 						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
 						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
@@ -800,10 +818,10 @@ function ENT:Damage(oldhit)
 					Pain:SetReportedPosition( self:GetPos() )
 					Pain:SetDamagePosition( self.LastHitEnt:GetPos() )
 					if self.DakIsFlame == 1 then
-							Pain:SetDamageType(DMG_BURN)
-						else
-							Pain:SetDamageType(DMG_CRUSH)
-						end
+						Pain:SetDamageType(DMG_BURN)
+					else
+						Pain:SetDamageType(DMG_CRUSH)
+					end
 					self.LastHitEnt:TakeDamageInfo( Pain )
 				end
 
@@ -1008,6 +1026,8 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							body:SetPos( ExpTrace.Entity:GetPos() )
 							body:SetModel( ExpTrace.Entity:GetModel() )
 							body:Spawn()
+							body.DakHealth=1000000
+							body.DakMaxHealth=1000000
 							ExpTrace.Entity:Remove()
 							local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
 							body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
@@ -1029,7 +1049,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 				end
 			end
 
-			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
+			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
 				if(ExpTrace.Entity:GetParent():IsValid()) then
 					if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
 						ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
@@ -1142,6 +1162,8 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						body:SetPos( ExpTrace.Entity:GetPos() )
 						body:SetModel( ExpTrace.Entity:GetModel() )
 						body:Spawn()
+						body.DakHealth=1000000
+						body.DakMaxHealth=1000000
 						ExpTrace.Entity:Remove()
 						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
 						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )

@@ -172,6 +172,7 @@ function ENT:Think()
 									if self.Contraption[i]:IsSolid() then
 										self.HitBox[#self.HitBox+1] = self.Contraption[i]
 										self.Contraption[i].Controller = self
+										self.Contraption[i].DakOwner = self.DakOwner
 										self.Contraption[i].DakPooled = 1
 									end
 								end
@@ -190,6 +191,7 @@ function ENT:Think()
 					self.HitBox[i].DakHealth = self.CurrentHealth
 					self.HitBox[i].DakMaxHealth = self.CurrentHealth
 					self.HitBox[i].Controller = self
+					self.HitBox[i].DakOwner = self.DakOwner
 					self.HitBox[i].DakPooled = 1
 				end
 				self.LastRemake = CurTime()

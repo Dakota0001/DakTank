@@ -21,7 +21,7 @@ end
  
 SWEP.Author = "DakTank"
 SWEP.Purpose = "Shoots Things."
-SWEP.Instructions = "8mm average pen, 3.2m blast"
+SWEP.Instructions = "20mm average pen, 7m blast"
 
 SWEP.Category = "DakTank"
  
@@ -100,15 +100,15 @@ function SWEP:PrimaryAttack()
 				shell.DakDamage = 2
 				shell.DakMass = 20
 				shell.DakIsPellet = false
-				shell.DakSplashDamage = 14
-				shell.DakPenetration = 8
+				shell.DakSplashDamage = 50
+				shell.DakPenetration = 20
 				shell.DakExplosive = true
-				shell.DakBlastRadius = 126
+				shell.DakBlastRadius = 275
 				shell.DakPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
 
 				shell.DakBasePenetration = 20
 
-				shell.DakCaliber = 40
+				shell.DakCaliber = 80
 
 				shell.DakGun = self.Owner
 				shell.DakGun.DakOwner = self.Owner

@@ -79,7 +79,7 @@ function ENT:Think()
 			self.DakFL = math.Round(self.DakCaliber,2).."mmMGFLAmmo"
 
 			self.BaseDakShellDamage = self.DakCaliber/100
-			self.BaseDakShellMass = self.DakCaliber
+			self.BaseDakShellMass = self.DakCaliber/10
 			self.DakShellSplashDamage = self.DakCaliber/10*1.25
 			self.BaseDakShellPenetration = self.DakCaliber*2
 			self.DakShellExplosive = false

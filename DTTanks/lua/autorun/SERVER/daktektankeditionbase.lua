@@ -13,11 +13,15 @@ if SERVER then
 	 		--setup values
 	 		if ent.IsDakTekFutureTech == nil then
 	 			ent.DakBurnStacks = 0
-	 			if IsValid(ent:GetPhysicsObject()) then
-			 		ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
-			 	else
-			 		ent.DakHealth = 100000000000000000000
-			 	end
+	 			if ent:GetClass() == "prop_ragdoll" then
+	 				ent.DakHealth = 100000000000000000000
+	 			else
+		 			if IsValid(ent:GetPhysicsObject()) then
+				 		ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
+				 	else
+				 		ent.DakHealth = 100000000000000000000
+				 	end
+				 end
 		 		ent.DakRed = ent:GetColor().r
 				ent.DakGreen = ent:GetColor().g
 				ent.DakBlue = ent:GetColor().b
