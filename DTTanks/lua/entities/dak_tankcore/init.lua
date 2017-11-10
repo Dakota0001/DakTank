@@ -114,10 +114,20 @@ function ENT:Think()
 		self.Ammoboxes={}
 		self.TurretControls={}
 		self.Guns={}
+		self.Crew={}
+		self.Motors={}
+		self.Fuel={}
 		for i=1, #res do
 			if res[i]:IsSolid() then
+				if res[i]:GetClass()=="dak_tegearbox" then
+					res[i].DakTankCore = self
+					self.Gearbox = res[i]
+				end
 				if res[i]:GetClass()=="dak_tefuel" then
-					self.DakFuel=res[i]
+					self.Fuel[#self.Fuel+1] = res[i]
+				end
+				if res[i]:GetClass()=="dak_temotor" then
+					self.Motors[#self.Motors+1] = res[i]
 				end
 				if res[i]:GetClass() == "dak_teammo" then
 					self.Ammoboxes[#self.Ammoboxes+1] = res[i]
@@ -138,6 +148,9 @@ function ENT:Think()
 					res[i].DakContraption = res
 					res[i].DakCore = self
 				end
+				if res[i]:GetClass()=="dak_crew" then
+					self.Crew[#self.Crew+1]=res[i]
+				end
 				Mass = Mass + res[i]:GetPhysicsObject():GetMass()
 				if res[i]:GetPhysicsObject():GetSurfaceArea() then
 					if res[i]:GetPhysicsObject():GetMass()>1 then
@@ -146,8 +159,8 @@ function ENT:Think()
 				end
 			end
 		end
-		if self.DakFuel then
-			self.DakFuel.TotalMass = Mass
+		if self.Gearbox then
+			self.Gearbox.TotalMass = Mass
 		end
 		self.TotalMass = Mass
 		self.SurfaceArea = SA

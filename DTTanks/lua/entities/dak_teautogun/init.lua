@@ -246,12 +246,20 @@ function ENT:Think()
 			self.Loaded=1
 		end
 
-		if not(self.IsAutoLoader == 1) then
-			if self.DakCrew == NULL then
-				self.DakReloadTime = self.DakReloadTime * 1.5
-			else
-				if not(self.DakCrew.DakEntity == self) then
+		self.Loaders = 0
+		if self.DakTankCore then
+			if #self.DakTankCore.Crew>0 then
+				for i=1, #self.DakTankCore.Crew do
+					if self.DakTankCore.Crew[i].DakEntity == self then
+						self.Loaders = self.Loaders + 1
+					end
+				end
+			end
+			if not(self.IsAutoLoader == 1) then
+				if self.Loaders == 0 then
 					self.DakReloadTime = self.DakReloadTime * 1.5
+				else
+					self.DakReloadTime = self.DakReloadTime*(1/math.pow((self.Loaders),0.4))
 				end
 			end
 		end

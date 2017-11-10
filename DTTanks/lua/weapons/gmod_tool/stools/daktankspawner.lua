@@ -134,9 +134,6 @@ function TOOL:LeftClick( trace )
 			self.DakName = "Micro Engine"
 			self.DakHealth = 15
 			self.DakMaxHealth = 15
-			self.DakMass = 1250
-			self.DakSpeed = 1.675
-			self.DakEngine = NULL
 			self.DakModel = "models/daktanks/engine1.mdl"
 			self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 		end
@@ -144,9 +141,6 @@ function TOOL:LeftClick( trace )
 			self.DakName = "Small Engine"
 			self.DakHealth = 30
 			self.DakMaxHealth = 30
-			self.DakMass = 1875
-			self.DakSpeed = 2.68
-			self.DakEngine = NULL
 			self.DakModel = "models/daktanks/engine2.mdl"
 			self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 		end
@@ -154,9 +148,6 @@ function TOOL:LeftClick( trace )
 			self.DakName = "Standard Engine"
 			self.DakHealth = 45
 			self.DakMaxHealth = 45
-			self.DakMass = 2500
-			self.DakSpeed = 3.685
-			self.DakEngine = NULL
 			self.DakModel = "models/daktanks/engine3.mdl"
 			self.DakSound = "vehicles/airboat/fan_motor_idle_loop1.wav"
 		end
@@ -164,9 +155,6 @@ function TOOL:LeftClick( trace )
 			self.DakName = "Large Engine"
 			self.DakHealth = 60
 			self.DakMaxHealth = 60
-			self.DakMass = 3125
-			self.DakSpeed = 4.69
-			self.DakEngine = NULL
 			self.DakModel = "models/daktanks/engine4.mdl"
 			self.DakSound = "vehicles/crane/crane_idle_loop3.wav"
 		end
@@ -174,9 +162,6 @@ function TOOL:LeftClick( trace )
 			self.DakName = "Huge Engine"
 			self.DakHealth = 75
 			self.DakMaxHealth = 75
-			self.DakMass = 3750
-			self.DakSpeed = 5.695
-			self.DakEngine = NULL
 			self.DakModel = "models/daktanks/engine5.mdl"
 			self.DakSound = "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"
 		end
@@ -184,11 +169,81 @@ function TOOL:LeftClick( trace )
 			self.DakName = "Ultra Engine"
 			self.DakHealth = 90
 			self.DakMaxHealth = 90
-			self.DakMass = 5000
-			self.DakSpeed = 6.7
-			self.DakEngine = NULL
 			self.DakModel = "models/daktanks/engine6.mdl"
 			self.DakSound = "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"
+		end
+		--GEARBOXES
+		if self:GetClientInfo("SpawnSettings") == "MicroGearboxF" then
+			self.DakName = "Micro Frontal Mount Gearbox"
+			self.DakHealth = 15
+			self.DakMaxHealth = 15
+			self.DakModel = "models/daktanks/gearbox1f1.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "SmallGearboxF" then
+			self.DakName = "Small Frontal Mount Gearbox"
+			self.DakHealth = 35
+			self.DakMaxHealth = 35
+			self.DakModel = "models/daktanks/gearbox1f2.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "StandardGearboxF" then
+			self.DakName = "Standard Frontal Mount Gearbox"
+			self.DakHealth = 60
+			self.DakMaxHealth = 60
+			self.DakModel = "models/daktanks/gearbox1f3.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "LargeGearboxF" then
+			self.DakName = "Large Frontal Mount Gearbox"
+			self.DakHealth = 95
+			self.DakMaxHealth = 95
+			self.DakModel = "models/daktanks/gearbox1f4.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "HugeGearboxF" then
+			self.DakName = "Huge Frontal Mount Gearbox"
+			self.DakHealth = 140
+			self.DakMaxHealth = 140
+			self.DakModel = "models/daktanks/gearbox1f5.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "UltraGearboxF" then
+			self.DakName = "Ultra Frontal Mount Gearbox"
+			self.DakHealth = 250
+			self.DakMaxHealth = 250
+			self.DakModel = "models/daktanks/gearbox1f6.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "MicroGearboxR" then
+			self.DakName = "Micro Rear Mount Gearbox"
+			self.DakHealth = 15
+			self.DakMaxHealth = 15
+			self.DakModel = "models/daktanks/gearbox1r1.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "SmallGearboxR" then
+			self.DakName = "Small Rear Mount Gearbox"
+			self.DakHealth = 35
+			self.DakMaxHealth = 35
+			self.DakModel = "models/daktanks/gearbox1r2.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "StandardGearboxR" then
+			self.DakName = "Standard Rear Mount Gearbox"
+			self.DakHealth = 60
+			self.DakMaxHealth = 60
+			self.DakModel = "models/daktanks/gearbox1r3.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "LargeGearboxR" then
+			self.DakName = "Large Rear Mount Gearbox"
+			self.DakHealth = 95
+			self.DakMaxHealth = 95
+			self.DakModel = "models/daktanks/gearbox1r4.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "HugeGearboxR" then
+			self.DakName = "Huge Rear Mount Gearbox"
+			self.DakHealth = 140
+			self.DakMaxHealth = 140
+			self.DakModel = "models/daktanks/gearbox1r5.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "UltraGearboxR" then
+			self.DakName = "Ultra Rear Mount Gearbox"
+			self.DakHealth = 250
+			self.DakMaxHealth = 250
+			self.DakModel = "models/daktanks/gearbox1r6.mdl"
 		end
 		--CLIPS--
 		if self:GetClientInfo("SpawnSettings") == "SALClip" then
@@ -862,7 +917,6 @@ function TOOL:LeftClick( trace )
 					trace.Entity.DakName = self.DakName
 					trace.Entity.DakMaxHealth = self.DakMaxHealth
 					trace.Entity.DakHealth = self.DakHealth
-					trace.Entity.DakSpeed = self.DakSpeed
 					trace.Entity.DakModel = self.DakModel
 					trace.Entity.DakSound = self.DakSound
 					trace.Entity:PhysicsDestroy()
@@ -877,7 +931,6 @@ function TOOL:LeftClick( trace )
 				self.spawnedent.DakName = self.DakName
 				self.spawnedent.DakMaxHealth = self.DakMaxHealth
 				self.spawnedent.DakHealth = self.DakHealth
-				self.spawnedent.DakSpeed = self.DakSpeed
 				self.spawnedent.DakModel = self.DakModel
 				self.spawnedent.DakSound = self.DakSound
 				self.spawnedent:SetModel(self.spawnedent.DakModel)
@@ -906,62 +959,36 @@ function TOOL:LeftClick( trace )
 				self.spawnedent:SetModel(self.spawnedent.DakModel)
 			end
 		end
+		if self:GetClientInfo("SpawnEnt") == "dak_tegearbox" then
+			if trace.Entity then
+				if trace.Entity:GetClass() == "dak_tegearbox" then
+					trace.Entity.DakName = self.DakName
+					trace.Entity.DakMaxHealth = self.DakMaxHealth
+					trace.Entity.DakHealth = self.DakMaxHealth
+					trace.Entity.DakModel = self.DakModel
+					trace.Entity:PhysicsDestroy()
+					trace.Entity:SetModel(trace.Entity.DakModel)
+					trace.Entity:PhysicsInit(SOLID_VPHYSICS)
+					trace.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+					trace.Entity:SetSolid(SOLID_VPHYSICS)
+					self:GetOwner():ChatPrint( "Gearbox updated.")
+				end
+			end
+			if not(trace.Entity:IsValid()) then
+				self.spawnedent.DakName = self.DakName
+				self.spawnedent.DakMaxHealth = self.DakMaxHealth
+				self.spawnedent.DakHealth = self.DakMaxHealth
+				self.spawnedent.DakModel = self.DakModel
+				self.spawnedent:SetModel(self.spawnedent.DakModel)
+			end
+		end
 		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
 			self.spawnedent:Spawn()
 			self.spawnedent.DakOwner = self:GetOwner()
 			self.spawnedent:GetPhysicsObject():EnableMotion( false )
 			self.spawnedent:SetPos(trace.HitPos+Vector(0,0,-self.spawnedent:OBBMins().z))
-
-			if not(self.spawnedent:GetClass() == "dak_engine") and not(self.spawnedent:GetClass() == "dak_module") and not(self.spawnedent:GetClass() == "dak_ammo") and not(self.spawnedent:GetClass() == "dak_teammo") and not(self.spawnedent:GetClass() == "dak_heatsink") and not(self.spawnedent:GetClass() == "dak_hitboxcontroller") and not(self.spawnedent:GetClass() == "dak_masc") and not(self.spawnedent:GetClass() == "dak_supercharger") and not(self.spawnedent:GetClass() == "dak_motor") and not(self.spawnedent:GetClass() == "dak_temotor") and not(self.spawnedent:GetClass() == "dak_vtol") and not(self.spawnedent:GetClass() == "dak_fighter") and not(self.spawnedent:GetClass() == "dak_hoverdrive") and not(self.spawnedent:GetClass() == "dak_gyro") and not(self.spawnedent:GetClass() == "dak_quadgyro") and not(self.spawnedent:GetClass() == "dak_lams") and not(self.spawnedent:GetClass() == "dak_jumpjet") then
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 1 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetallight" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 2 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 3 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakscratchedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 4 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakscratchedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 5 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakpittedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 6 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakpittedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 7 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakrustedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 8 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakrustedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 2 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetallight" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 1 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 4 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakscratchedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 3 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakscratchedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 6 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakpittedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 5 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakpittedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 8 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakrustedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 7 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakrustedmetaldark" )
-				end
-			end
+			--self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetallight" )
+			--self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetaldark" )
 			local ply = self:GetOwner()
 			ply:AddCount( "daktek", self.spawnedent)
 			undo.Create( "daktek" )
@@ -976,57 +1003,8 @@ function TOOL:LeftClick( trace )
 			self.spawnedent:Spawn()
 			self.spawnedent.DakOwner = self:GetOwner()
 			self.spawnedent:GetPhysicsObject():EnableMotion( false )
-
-			if not(self.spawnedent:GetClass() == "dak_engine") and not(self.spawnedent:GetClass() == "dak_module") and not(self.spawnedent:GetClass() == "dak_ammo") and not(self.spawnedent:GetClass() == "dak_teammo") and not(self.spawnedent:GetClass() == "dak_heatsink") and not(self.spawnedent:GetClass() == "dak_hitboxcontroller") and not(self.spawnedent:GetClass() == "dak_masc") and not(self.spawnedent:GetClass() == "dak_supercharger") and not(self.spawnedent:GetClass() == "dak_motor") and not(self.spawnedent:GetClass() == "dak_temotor") and not(self.spawnedent:GetClass() == "dak_vtol") and not(self.spawnedent:GetClass() == "dak_fighter") and not(self.spawnedent:GetClass() == "dak_hoverdrive") and not(self.spawnedent:GetClass() == "dak_gyro") and not(self.spawnedent:GetClass() == "dak_quadgyro") and not(self.spawnedent:GetClass() == "dak_lams") and not(self.spawnedent:GetClass() == "dak_jumpjet") then
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 1 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetallight" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 2 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 3 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakscratchedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 4 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakscratchedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 5 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakpittedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 6 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakpittedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 7 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakrustedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("PTSpawnMod"), 0 ) == 8 then
-					self.spawnedent:SetSubMaterial( 0, "dak/dakrustedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 2 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetallight" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 1 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 4 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakscratchedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 3 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakscratchedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 6 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakpittedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 5 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakpittedmetaldark" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 8 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakrustedmetallight" )
-				end
-				if math.Round( self:GetClientInfo("STSpawnMod"), 0 ) == 7 then
-					self.spawnedent:SetSubMaterial( 1, "dak/dakrustedmetaldark" )
-				end
-			end
+			--self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetallight" )
+			--self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetaldark" )
 			local ply = self:GetOwner()
 			ply:AddCount( "daktek", self.spawnedent)
 			undo.Create( "daktek" )
@@ -1316,14 +1294,18 @@ DLabelAmmo:SetVisible(false)
 DermaNumSlider:SetVisible(false)
 
 DTTE_NodeList={}
-DTTE_NodeList["Help1"] = ctrl:AddNode( "DakTank Guide: The Basics" )
-DTTE_NodeList["Help2"] = ctrl:AddNode( "DakTank Guide: Armor" )
-DTTE_NodeList["Help3"] = ctrl:AddNode( "DakTank Guide: Munitions: AP" )
-DTTE_NodeList["Help4"] = ctrl:AddNode( "DakTank Guide: Munitions: HE" )
-DTTE_NodeList["Help5"] = ctrl:AddNode( "DakTank Guide: Munitions: FL" )
-DTTE_NodeList["Help6"] = ctrl:AddNode( "DakTank Guide: Weaponry" )
-DTTE_NodeList["Help7"] = ctrl:AddNode( "DakTank Guide: Mobility" )
-DTTE_NodeList["Help8"] = ctrl:AddNode( "DakTank Guide: Critical Hits" )
+DTTE_NodeList["Guide"] = ctrl:AddNode( "DakTank Guide" )
+DTTE_NodeList["Help1"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: The Basics" )
+DTTE_NodeList["Help2"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Armor" )
+DTTE_NodeList["Help3"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Health" )
+DTTE_NodeList["Help4"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Munitions: AP" )
+DTTE_NodeList["Help5"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Munitions: HE" )
+DTTE_NodeList["Help6"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Munitions: FL" )
+DTTE_NodeList["Help7"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Weaponry" )
+DTTE_NodeList["Help8"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Flamethrowers" )
+DTTE_NodeList["Help9"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Mobility" )
+DTTE_NodeList["Help10"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Critical Hits" )
+DTTE_NodeList["Help11"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Crew" )
 DTTE_NodeList["Utilities"] = ctrl:AddNode( "Utilities" )
 	DTTE_NodeList["Core"] = DTTE_NodeList["Utilities"]:AddNode( "Tank Core" )
 	DTTE_NodeList["Crew"] = DTTE_NodeList["Utilities"]:AddNode( "Crew Member" )
@@ -1342,6 +1324,21 @@ DTTE_NodeList["Utilities"] = ctrl:AddNode( "Utilities" )
 			DTTE_NodeList["LargeFuel"] = DTTE_NodeList["Fuel"]:AddNode( "Large Fuel Tank" )
 			DTTE_NodeList["HugeFuel"] = DTTE_NodeList["Fuel"]:AddNode( "Huge Fuel Tank" )
 			DTTE_NodeList["UltraFuel"] = DTTE_NodeList["Fuel"]:AddNode( "Ultra Fuel Tank" )
+		DTTE_NodeList["Gearbox"] = DTTE_NodeList["Mobility"]:AddNode( "Gearbox" )
+			DTTE_NodeList["GearboxF"] = DTTE_NodeList["Gearbox"]:AddNode( "Frontal Mount Gearbox" )
+				DTTE_NodeList["MicroGearboxF"] = DTTE_NodeList["GearboxF"]:AddNode( "Micro Frontal Mount Gearbox" )
+				DTTE_NodeList["SmallGearboxF"] = DTTE_NodeList["GearboxF"]:AddNode( "Small Frontal Mount Gearbox" )
+				DTTE_NodeList["StandardGearboxF"] = DTTE_NodeList["GearboxF"]:AddNode( "Standard Frontal Mount Gearbox" )
+				DTTE_NodeList["LargeGearboxF"] = DTTE_NodeList["GearboxF"]:AddNode( "Large Frontal Mount Gearbox" )
+				DTTE_NodeList["HugeGearboxF"] = DTTE_NodeList["GearboxF"]:AddNode( "Huge Frontal Mount Gearbox" )
+				DTTE_NodeList["UltraGearboxF"] = DTTE_NodeList["GearboxF"]:AddNode( "Ultra Frontal Mount Gearbox" )
+			DTTE_NodeList["GearboxR"] = DTTE_NodeList["Gearbox"]:AddNode( "Rear Mount Gearbox" )
+				DTTE_NodeList["MicroGearboxR"] = DTTE_NodeList["GearboxR"]:AddNode( "Micro Rear Mount Gearbox" )
+				DTTE_NodeList["SmallGearboxR"] = DTTE_NodeList["GearboxR"]:AddNode( "Small Rear Mount Gearbox" )
+				DTTE_NodeList["StandardGearboxR"] = DTTE_NodeList["GearboxR"]:AddNode( "Standard Rear Mount Gearbox" )
+				DTTE_NodeList["LargeGearboxR"] = DTTE_NodeList["GearboxR"]:AddNode( "Large Rear Mount Gearbox" )
+				DTTE_NodeList["HugeGearboxR"] = DTTE_NodeList["GearboxR"]:AddNode( "Huge Rear Mount Gearbox" )
+				DTTE_NodeList["UltraGearboxR"] = DTTE_NodeList["GearboxR"]:AddNode( "Ultra Rear Mount Gearbox" )
 	DTTE_NodeList["Turret"] = DTTE_NodeList["Utilities"]:AddNode( "Turret" )
 		DTTE_NodeList["TControl"] = DTTE_NodeList["Turret"]:AddNode( "Turret Controller" )
 		DTTE_NodeList["TMotor"] = DTTE_NodeList["Turret"]:AddNode( "Turret Motor" )
@@ -1635,10 +1632,120 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 			AmmoBoxSelect:SetVisible(true)
 		end
 
+		if (node == DTTE_NodeList["MicroGearboxF"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "MicroGearboxF")
+			DLabel:SetText( "Micro Frontal Mount Gearbox\n\nHealth: 15\nArmor: 15mm\nWeight: 150 kg\nMax Power Rating: 150 hp\nTorque Multiplier: 0.85\n\nDescription: Tiny gearbox for tiny tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["SmallGearboxF"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "SmallGearboxF")
+			DLabel:SetText( "Small Frontal Mount Gearbox\n\nHealth: 35\nArmor: 35mm\nWeight: 350 kg\nMax Power Rating: 330 hp\nTorque Multiplier: 0.95\n\nDescription: Small gearbox for small tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["StandardGearboxF"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "StandardGearboxF")
+			DLabel:SetText( "Standard Frontal Mount Gearbox\n\nHealth: 60\nArmor: 60mm\nWeight: 625 kg\nMax Power Rating: 600 hp\nTorque Multiplier: 1\n\nDescription: Medium gearbox for medium tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["LargeGearboxF"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "LargeGearboxF")
+			DLabel:SetText( "Large Frontal Mount Gearbox\n\nHealth: 95\nArmor: 95mm\nWeight: 975 kg\nMax Power Rating: 930 hp\nTorque Multiplier: 1.15\n\nDescription: Large gearbox for large tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["HugeGearboxF"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "HugeGearboxF")
+			DLabel:SetText( "Huge Frontal Mount Gearbox\n\nHealth: 140\nArmor: 140mm\nWeight: 1400 kg\nMax Power Rating: 1350 hp\nTorque Multiplier: 1.25\n\nDescription: Huge gearbox for huge tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["UltraGearboxF"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "UltraGearboxF")
+			DLabel:SetText( "Ultra Frontal Mount Gearbox\n\nHealth: 250\nArmor: 250mm\nWeight: 2500 kg\nMax Power Rating: 2400 hp\nTorque Multiplier: 1.3\n\nDescription: ultra gearbox for landcruisers." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+
+		if (node == DTTE_NodeList["MicroGearboxR"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "MicroGearboxR")
+			DLabel:SetText( "Micro Rear Mount Gearbox\n\nHealth: 15\nArmor: 15mm\nWeight: 150 kg\nMax Power Rating: 150 hp\nTorque Multiplier: 0.85\n\nDescription: Tiny gearbox for tiny tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["SmallGearboxR"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "SmallGearboxR")
+			DLabel:SetText( "Small Rear Mount Gearbox\n\nHealth: 35\nArmor: 35mm\nWeight: 350 kg\nMax Power Rating: 330 hp\nTorque Multiplier: 0.95\n\nDescription: Small gearbox for small tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["StandardGearboxR"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "StandardGearboxR")
+			DLabel:SetText( "Standard Rear Mount Gearbox\n\nHealth: 60\nArmor: 60mm\nWeight: 625 kg\nMax Power Rating: 600 hp\nTorque Multiplier: 1\n\nDescription: Medium gearbox for medium tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["LargeGearboxR"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "LargeGearboxR")
+			DLabel:SetText( "Large Rear Mount Gearbox\n\nHealth: 95\nArmor: 95mm\nWeight: 975 kg\nMax Power Rating: 930 hp\nTorque Multiplier: 1.15\n\nDescription: Large gearbox for large tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["HugeGearboxR"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "HugeGearboxR")
+			DLabel:SetText( "Huge Rear Mount Gearbox\n\nHealth: 140\nArmor: 140mm\nWeight: 1400 kg\nMax Power Rating: 1350 hp\nTorque Multiplier: 1.25\n\nDescription: Huge gearbox for huge tanks." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["UltraGearboxR"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tegearbox")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "UltraGearboxR")
+			DLabel:SetText( "Ultra Rear Mount Gearbox\n\nHealth: 250\nArmor: 250mm\nWeight: 2500 kg\nMax Power Rating: 2400 hp\nTorque Multiplier: 1.3\n\nDescription: ultra gearbox for landcruisers." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+
 		if (node == DTTE_NodeList["MicroEngine"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_temotor")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "MicroEngine")
-			DLabel:SetText( "Micro Engine\n\nHealth: 15\nArmor: 15mm\nWeight: 1250 kg\nSpeed: 50 crewed/30 uncrewed kph at 10 ton total mass\n\nDescription: Tiny engine for tiny tanks." )
+			DLabel:SetText( "Micro Engine\n\nHealth: 15\nArmor: 15mm\nWeight: 150 kg\nSpeed: 25 crewed/15 uncrewed kph at 10 ton total mass\nPower: 75 hp\nFuel Required: 45 (lowers output with less fuel)\n\nDescription: Tiny engine for tiny tanks." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1647,7 +1754,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["SmallEngine"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_temotor")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "SmallEngine")
-			DLabel:SetText( "Small Engine\n\nHealth: 30\nArmor: 30mm\nWeight: 1875 kg\nSpeed: 80 crewed/48 uncrewed kph at 10 ton total mass\n\nDescription: Small engine for light tanks and slow mediums." )
+			DLabel:SetText( "Small Engine\n\nHealth: 30\nArmor: 30mm\nWeight: 350 kg\nSpeed: 55 crewed/33 uncrewed kph at 10 ton total mass\nPower: 165 hp\nFuel Required: 90 (lowers output with less fuel)\n\nDescription: Small engine for light tanks and slow mediums." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1656,7 +1763,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["StandardEngine"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_temotor")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "StandardEngine")
-			DLabel:SetText( "Standard Engine\n\nHealth: 45\nArmor: 45mm\nWeight: 2500 kg\nSpeed: 110 crewed/66 uncrewed kph at 10 ton total mass\n\nDescription: Standard sized engine for medium tanks or slow heavies." )
+			DLabel:SetText( "Standard Engine\n\nHealth: 45\nArmor: 45mm\nWeight: 625 kg\nSpeed: 100 crewed/60 uncrewed kph at 10 ton total mass\nPower: 300 hp\nFuel Required: 180 (lowers output with less fuel)\n\nDescription: Standard sized engine for medium tanks or slow heavies." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1665,7 +1772,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["LargeEngine"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_temotor")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "LargeEngine")
-			DLabel:SetText( "Large Engine\n\nHealth: 60\nArmor: 60mm\nWeight: 3125 kg\nSpeed: 140 crewed/84 uncrewed kph at 10 ton total mass\n\nDescription: Large engine for heavy tanks." )
+			DLabel:SetText( "Large Engine\n\nHealth: 60\nArmor: 60mm\nWeight: 975 kg\nSpeed: 155 crewed/93 uncrewed kph at 10 ton total mass\nPower: 465 hp\nFuel Required: 360 (lowers output with less fuel)\n\nDescription: Large engine for heavy tanks." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1674,7 +1781,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["HugeEngine"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_temotor")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "HugeEngine")
-			DLabel:SetText( "Huge Engine\n\nHealth: 75\nArmor: 75mm\nWeight: 3750 kg\nSpeed: 170 crewed/102 uncrewed kph at 10 ton total mass\n\nDescription: Huge engine for heavy tanks that want to move fast." )
+			DLabel:SetText( "Huge Engine\n\nHealth: 75\nArmor: 75mm\nWeight: 1400 kg\nSpeed: 225 crewed/135 uncrewed kph at 10 ton total mass\nPower: 675 hp\nFuel Required: 720 (lowers output with less fuel)\n\nDescription: Huge engine for heavy tanks that want to move fast." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1683,18 +1790,17 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["UltraEngine"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_temotor")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "UltraEngine")
-			DLabel:SetText( "Ultra Engine\n\nHealth: 90\nArmor: 90mm\nWeight: 5000 kg\nSpeed: 200 crewed/120 uncrewed kph at 10 ton total mass\n\nDescription: Ultra engine for use in super heavy tanks." )
+			DLabel:SetText( "Ultra Engine\n\nHealth: 90\nArmor: 90mm\nWeight: 2500 kg\nSpeed: 400 crewed/240 uncrewed kph at 10 ton total mass\nPower: 1200 hp\nFuel Required: 1440 (lowers output with less fuel)\n\nDescription: Ultra engine for use in super heavy tanks." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
 			AmmoBoxSelect:SetVisible(false)
 		end
 
-
 		if (node == DTTE_NodeList["MicroFuel"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tefuel")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "MicroFuel")
-			DLabel:SetText( "Micro Fuel Tank\n\nHealth: 10\nWeight: 65 kg\nSpeed: Multiplies engine power by 0.5\n\nDescription: Tiny fuel tank to run light tanks and tankettes." )
+			DLabel:SetText( "Micro Fuel Tank\n\nHealth: 10\nWeight: 65 kg\nFuel Capacity: 45\n\nDescription: Tiny fuel tank to run light tanks and tankettes." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1703,7 +1809,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["SmallFuel"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tefuel")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "SmallFuel")
-			DLabel:SetText( "Small Fuel Tank\n\nHealth: 20\nWeight: 120 kg\nSpeed: Multiplies engine power by 0.75\n\nDescription: Small fuel tank for light tanks and weak engined mediums." )
+			DLabel:SetText( "Small Fuel Tank\n\nHealth: 20\nWeight: 120 kg\nFuel Capacity: 90\n\nDescription: Small fuel tank for light tanks and weak engined mediums." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1712,7 +1818,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["StandardFuel"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tefuel")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "StandardFuel")
-			DLabel:SetText( "Standard Fuel Tank\n\nHealth: 30\nWeight: 240 kg\nSpeed: Multiplies engine power by 1.0\n\nDescription: Standard medium tank fuel tank." )
+			DLabel:SetText( "Standard Fuel Tank\n\nHealth: 30\nWeight: 240 kg\nFuel Capacity: 180\n\nDescription: Standard medium tank fuel tank." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1721,7 +1827,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["LargeFuel"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tefuel")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "LargeFuel")
-			DLabel:SetText( "Large Fuel Tank\n\nHealth: 40\nWeight: 475 kg\nSpeed: Multiplies engine power by 1.25\n\nDescription: Large fuel tanks for heavies running mid sized engines." )
+			DLabel:SetText( "Large Fuel Tank\n\nHealth: 40\nWeight: 475 kg\nFuel Capacity: 360\n\nDescription: Large fuel tanks for heavies running mid sized engines." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1730,7 +1836,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["HugeFuel"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tefuel")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "HugeFuel")
-			DLabel:SetText( "Huge Fuel Tank\n\nHealth: 50\nWeight: 950 kg\nSpeed: Multiplies engine power by 1.5\n\nDescription: Huge fuel tank for heavies running large gas guzzlers." )
+			DLabel:SetText( "Huge Fuel Tank\n\nHealth: 50\nWeight: 950 kg\nFuel Capacity: 720\n\nDescription: Huge fuel tank for heavies running large gas guzzlers." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1739,7 +1845,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["UltraFuel"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_tefuel")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "UltraFuel")
-			DLabel:SetText( "Ultra Fuel Tank\n\nHealth: 60\nWeight: 1900 kg\nSpeed: Multiplies engine power by 2\n\nDescription: Massive fuel tank designed for super heavy tanks running the largest of engines." )
+			DLabel:SetText( "Ultra Fuel Tank\n\nHealth: 60\nWeight: 1900 kg\nFuel Capacity: 1440\n\nDescription: Massive fuel tank designed for super heavy tanks running the largest of engines." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
@@ -1819,6 +1925,27 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 			DermaNumSlider:SetVisible(false)
 			AmmoBoxSelect:SetVisible(false)
 		end
+		if (node == DTTE_NodeList["Gearbox"]) then
+			DLabel:SetText( "Gearboxes\n\nTransfers the power of your engines to the wheels, you'll need heavy gearboxes to handle high power engines." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["GearboxR"]) then
+			DLabel:SetText( "Rear Mount Gearboxes\n\nGearbox for rear mounting." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["GearboxF"]) then
+			DLabel:SetText( "Frontal Mount Gearboxes\n\nGearbox for frontal mounting." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
 		if (node == DTTE_NodeList["Weapons"]) then
 			DLabel:SetText( "Weapons\n\nEquipment used to make things deader, point at things you want removed." )
 			DLabel:SetVisible(true)
@@ -1870,53 +1997,89 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 			AmmoBoxSelect:SetVisible(false)
 		end
 
-		if (node == DTTE_NodeList["Help1"]) then
-			DLabel:SetText( "DakTank Guide: The Basics\n\nIn DakTanks tanks consist of props making up armor, a fuel tank, an engine, at least one gun, ammo, a seat, and wiring all held together by the tank core entity. The tank core must be parented to a gate that has been parented (NOT WELDED) to the baseplate of the tank. Doing this will pool the tank's health and allow your guns to fire. Props set to 1kg will be considered detail props by the system and will be entirely ignored by the damage system (but will count towards total pooled HP). Please set any detail props to 1kg." )
+		if (node == DTTE_NodeList["Guide"]) then
+			DLabel:SetText( "DakTank Guide\n\nIn this folder you'll find a guide going over the game mechanics of DakTank, providing you some insight to get started on or improve your tanks." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["Help1"]) then
+			DLabel:SetText( "DakTank Guide: The Basics\n\nIn DakTanks tanks consist of props making up armor, a fuel tank, an engine, a gearbox, at least one gun, ammo, a seat, a turret controller, and wiring all held together by the tank core entity. The tank core must be parented to a gate that has been parented (NOT WELDED) to the baseplate of the tank. Doing this will pool the tank's health and allow your guns to fire. Props set to 1kg will be considered detail props by the system and will be entirely ignored by the damage system (but will count towards total pooled HP). Please set any detail props to 1kg." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
 		end
 		if (node == DTTE_NodeList["Help2"]) then
 			DLabel:SetText( "DakTank Guide: Armor\n\nEach prop has its own armor value based on the mm protection of steel plate. The amount of protection you get on the prop is determined by its weight and volume, or simply put its density. A large prop will take much more weight than a small prop, but you'll need large props on your tank if you are to fit your equipment, larger equipment tends to offer much better bonuses than smaller counterparts. Angling your armor will increase its effective thickness, making it harder for your armor to be penetrated, though HE damage ignores slope. Treads (or anything you set to make spherical using the tool for it) have their own designated armor value based on the actual thickness of the prop then run through a modifier. Treads can be penetrated but take no damage, this lets you use them as extra armor for your sides that will reduce the AP damage they take (slightly) but does nothing against HE." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
 		end
 		if (node == DTTE_NodeList["Help3"]) then
+			DLabel:SetText( "DakTank Guide: Health\n\nHealth determines just how much damage your tank can take and is totalled up by the tank core, health is based mainly on the armor weight of the vehicle in tons multiplied by 10, so two tanks can be the same total weight but have different health, the more armored one being stronger. However, health is modified further by size multipliers, which also affect rate of fire of cannons, howitzers, mortars, autocannons, and HMGs, if your tank is large for its weight it gains bonus health to improve its durability due to the higher cost to armor it, if a tank is small for its weight it will lose health but have an easy time armoring itself. Ramming damage is calculated based on max health of a tank, it finds the total mass involved in the collision then each tank takes a percentage of the damage equal to the other tank's percentage of the weight, so a 5 ton tank ramming a 50 ton tank would take 11 times the damage that the 50 ton tank took. Each module has its own health value." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["Help4"]) then
 			DLabel:SetText( "DakTank Guide: Munitions: AP\n\nThere are 3 types of ammo, Armor Piercing (AP), High Explosive (HE), and Flechette (FL). Each type of ammo has its own purposes in the combat of daktek, it is a good idea to take at least some amount of each if your gun allows it.\n\nAP fires a single shell at a target, if it doesn't have enough penetration to go through the armor then it will only deal a quarter its specified damage and be deflected away. If your shell does penetrate then it deals damage equal to its specified value multiplied by its own penetration value divided by the armor value of the prop it went through. The damage is capped to the amount of armor the prop has, making extremely heavy cannons firing AP not the best tool for dealing with light tanks, however you'll still shoot a hole right through them and likely rip out many modules at once and still deal respectable damage." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
 		end
-		if (node == DTTE_NodeList["Help4"]) then
-			DLabel:SetText( "DakTank Guide: Munitions: HE\n\nHE fires an explosive shell at its target. It has penetration equal to 40% of an AP round's penetration and acts as an AP until it finds something it cannot penetrate, at which point it explodes, dealing damage to all things around it equal to the number designated in its stats divided by the amount of entities it hit. Each entity has the damage it takes further modified however, as the damage is multiplied by its penetration value and then divided by the enemy's armor value, similar to AP. HE does not have a damage cap however, making it very good at taking out lightly armored weak spots on enemies, such as extremely angled armor, roofs, weak sides, rears, and baseplates. HE's much lower base penetration than AP makes it generally do much weaker damage against heavy armor. Howitzers get a bonus to splash radius and damage compared to cannons." )
+		if (node == DTTE_NodeList["Help5"]) then
+			DLabel:SetText( "DakTank Guide: Munitions: HE\n\nHE fires an explosive shell at its target. It has penetration equal to 40% of an AP round's penetration and acts as an AP until it finds something it cannot penetrate, at which point it explodes, creating fragments equal to half the caliber. Each fragment acts as an AP shell with no damage cap and pen equal to the shell's pen before exploding, making HE extremely powerful against low armor and very effective if you get a penetrating shot and explode inside. HE is also very effective against low armor but highly angled armor. HE's fragmentation based nature can be very random with lower chances to hit targets further from the blast radius, you'll do much more damage on direct hits than splashes." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
 		end
-		if (node == DTTE_NodeList["Help5"]) then
+		if (node == DTTE_NodeList["Help6"]) then
 			DLabel:SetText( "DakTank Guide: Munitions: FL\n\nFL fires a volley of 10 projectiles at once like a large shotgun. It has more spread than normal shells, has 75% less penetration and velocity than AP. Each projectile is equal to a tenth of the damage of an AP shell. Where FL shines is attacking armor that it can overpenetrate by large margins. As I stated previously, AP's damage is capped to the total armor of a prop, so if you have 100mm of penetration going through 10mm armor and your shell does 5 damage then you get a times 10 multiplier to your damage, but you are capped to 10 damage instead of your 50 point potential. With FL you split the shell into 10 different bits and would have 75mm of penetration going through 10mm of armor, so you would have a 7.5 times multiplier and each shell has a base of 0.5 damage, this leads to 3.75 damage per shell, giving a total of 37.5 damage, nearly 4 times the amount of what AP would have done. It also is more likely to tear apart modules if it penetrates, great for flankers." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
-		end
-		if (node == DTTE_NodeList["Help6"]) then
-			DLabel:SetText( "DakTank Guide: Weaponry\n\nIn DakTanks there are cannons, howitzers, autoloaders, mortars, autocannons, heavy machine guns, and machine guns. Cannons are your basic weapon type and have access to any ammo type. Howitzers have a higher focus on HE, with larger splash radius, splash damage, and total damage than cannons of equal weight but longer reloads and often less penetration per ton. Autoloaders are cannons that can only fire AP and HE and require a clip module, they can fire devastating bursts in a short period of time but can have very long reloading periods. Mortars are low velocity HE focused guns. Autocannons are low caliber AP and HE firing guns that fire 13-30 shots at a rate of 10 shots per second but then have a 30 second reload, they're great for light weight hit and run. HMGs have larger clips than autocannons and half the reload times but also half the penetration, slightly over half the damage per shot, and half the velocity. Machine Guns are rapid fire anti infantry weapons that barely scratch light armor and only uses AP." )
-			DLabel:SetVisible(true)
-			DLabelAmmo:SetVisible(false)
-			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
 		end
 		if (node == DTTE_NodeList["Help7"]) then
-			DLabel:SetText( "DakTank Guide: Mobility\n\nVehicle speed is determined by the engine size, modified by the fuel tank size and total weight of the vehicle. Given the same engine and fuel tank a 30 ton tank will move twice as fast as a 60 tonner and will turn faster. The largest fuel tanks provide 100% bonuses to speed while the smallest will decrease your maximum speed, however the compact size makes it less likely to be hit if your tank is penetrated and a smaller vehicle has to spend less weight for the same armor values. You could create large but fast moving vehicles or small but heavily armored vehicles that will run into ammo problems or be forced to use small guns. The faster vehicle would be good against heavier tanks that it could flank while the heavy vehicle with a weak gun would be good for dominating tanks that are lighter than it. Turning speeds can also be modified by the length and width of your vehicle and the physical properties of the wheels." )
+			DLabel:SetText( "DakTank Guide: Weaponry\n\nIn DakTanks there are cannons, howitzers, autoloaders, mortars, autocannons, heavy machine guns, and machine guns. Cannons are your basic weapon type and have access to any ammo type. Howitzers have a higher focus on HE, with larger splash radius, splash damage, and total damage than cannons of equal weight but longer reloads and often less penetration per ton. Autoloaders are cannons that can only fire AP and HE and require a clip module, they can fire devastating bursts in a short period of time but can have very long reloading periods. Mortars are low velocity HE focused guns. Autocannons are low caliber AP and HE firing guns that fire 10-30 shots at a rate of 10 shots per second but then have a 30 second reload, they're great for light weight hit and run. HMGs have larger clips than autocannons and half the reload times but also half the penetration, and half the velocity. Machine Guns are rapid fire anti infantry weapons that barely scratch light armor and only uses AP." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
 		end
 		if (node == DTTE_NodeList["Help8"]) then
-			DLabel:SetText( "DakTank Guide: Critical Hits\n\nCertain components such as fuel, ammo, and autoloader clips can suffer from catastrophic failure in cases in which they are reduced to less than half health but not outright destroyed. Upon exploding fuel and clips will deal 250 points of damage between the entities nearby and ammo will deal between 0 and 500 damage depending on how full the crate is. Ammo boxes can have their ammo ejected via its wire input to avoid such failures in dire circumstances, though it can take a few seconds to empty out fully." )
+			DLabel:SetText( "DakTank Guide: Flamethrowers\n\nFlamethrowers are a special weapon type that reduces the armor value of armor it hits over time to a minimum of half of its original value. Flamethrowers also can overheat the engines of a vehicle, reducing the power and eventually stalling a tank, making it easy to flank or easy to hit. They will also ignite infantry caught in the impact zone, dealing burn damage over the next 5 seconds. Flamethrowers require a lot of fuel to keep them firing, allowing only 15 seconds of fire per fuel tank. This means that dedicated flamethrower tanks will either need to be very large, have external tanks, or bring along a somewhat vulnerable fuel trailer or they'll be limited to short bursts of fire. Flamethrower fuel tanks have more armor and health than regular ammo crates but are also heavier and larger. However, their combination of armor and health makes them very vulnerable to crits from guns that do penetrate their armor." )
 			DLabel:SetVisible(true)
 			DLabelAmmo:SetVisible(false)
 			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["Help9"]) then
+			DLabel:SetText( "DakTank Guide: Mobility\n\nVehicle speed is determined by your combined engine power, modified by how much fuel you have and total weight of the vehicle. Given the same engine and fuel tank a 30 ton tank will move twice as fast as a 60 tonner and will turn faster. You can use as many engines or fuel tanks as you want, each engine requires a certain amount of fuel and each fuel tank has a certain amount of fuel. Having less fuel than you require reduces your power output. Each gearbox can only handle a certain amount of power and each tank can only support one gearbox, providing more power to the gearbox than it can handle will result in waste power. Damage will reduce the stats of each of the mobility entities, potentially immobilizing you. You could create large but fast and lightly armored vehicles or small but slow and heavily armored vehicles. The faster vehicle would be good against heavier tanks that it could flank while the heavy vehicle would be good for dominating tanks that can't pen it." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["Help10"]) then
+			DLabel:SetText( "DakTank Guide: Critical Hits\n\nCertain components such as fuel, ammo, and autoloader clips can suffer from catastrophic failure in cases in which they are reduced to less than half health but not outright destroyed. Upon exploding fuel and clips will deal 250 points of damage between the entities nearby and ammo will deal between 0 and 500 damage depending on how full the crate is. Ammo boxes can have their ammo ejected via its wire input to avoid such failures in dire circumstances, though it can take a few seconds to empty out fully. Crit explosions function just like HE explosions, so damage may be much higher than stated, this gives some reason to place explosive items in the front of the tank so that the frontal armor absorbs some of the damage. AP and FL ammo cooks off instead of exploding outright, causing multiple internal penetrations to occur in a short time span." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
+		end
+		if (node == DTTE_NodeList["Help11"]) then
+			DLabel:SetText( "DakTank Guide: Crew\n\nCrew greatly improve the performance of a tank they are working on, each crew member is relatively light but takes up a sizeable area. Crew can be tasked with driving or loading while a turret motor can assist in improving turret rotation speeds. Only one crew member can be driver at once but you can have as many loaders as you want, each gives diminishing returns though, the first loader reduces reload times by a third, each loader after this reduces reload times by half as much as the last. Machineguns and Autoloaders cannot be crewed, as they are fully automated. Crew members are lightly armored and have low health, making them easy to lose in the case of an armor penetration, having many crew members taken out at once can be cripling, be sure to keep them safe." )
+			DLabel:SetVisible(true)
+			DLabelAmmo:SetVisible(false)
+			DermaNumSlider:SetVisible(false)
+			AmmoBoxSelect:SetVisible(false)
 		end
 	end
 end

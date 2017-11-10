@@ -255,14 +255,21 @@ function ENT:Think()
 			end
 		end
 
-		if self.DakCrew == NULL then
-			self.DakCooldown = self.DakCooldown * 1.5
-		else
-			if not(self.DakCrew.DakEntity == self) then
-				self.DakCooldown = self.DakCooldown * 1.5
-			end
-		end
+		self.Loaders = 0
+
 		if self.DakTankCore then
+			if #self.DakTankCore.Crew>0 then
+				for i=1, #self.DakTankCore.Crew do
+					if self.DakTankCore.Crew[i].DakEntity == self then
+						self.Loaders = self.Loaders + 1
+					end
+				end
+			end
+			if self.Loaders == 0 then
+				self.DakCooldown = self.DakCooldown * 1.5
+			else
+				self.DakCooldown = self.DakCooldown*(1/math.pow((self.Loaders),0.4))
+			end
 			self.DakCooldown = self.DakCooldown/(2*math.pow( 0.0005,(0.09/(self.DakTankCore.SizeMult))))
 		end
 		if not(self:GetModel() == self.DakModel) then

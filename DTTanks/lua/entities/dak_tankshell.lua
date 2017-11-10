@@ -295,6 +295,11 @@ function ENT:Think()
 											if not(Targets[i]:IsOnFire()) then 
 												Targets[i]:Ignite(5,1)
 											end
+										end
+										if Targets[i]:GetClass() == "dak_tegearbox" then
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
+											end
 											Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 										end
 										if Targets[i]:IsPlayer() then
@@ -425,25 +430,27 @@ function ENT:Think()
 							if table.Count(Targets) > 0 then
 								for i = 1, #Targets do
 									if Targets[i]:GetClass() == "dak_temotor" then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
+									end
+									if Targets[i]:GetClass() == "dak_tegearbox" then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
+										end
 										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 									end
 									if Targets[i]:IsPlayer() then
 										if not Targets[i]:InVehicle() then
-											if Targets[i]:IsOnFire() then 
-												Targets[i]:Extinguish()
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
 											end
-											Targets[i]:Ignite(5,1)
 										end
 									end
 									if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
 									end
 								end
 							end
@@ -497,27 +504,31 @@ function ENT:Think()
 						util.Effect("dakflameimpact", effectdata)
 						local Targets = ents.FindInSphere( self.LastHit, 150 )
 						if table.Count(Targets) > 0 then
-							for i = 1, #Targets do
-								if Targets[i]:GetClass() == "dak_temotor" then
-									if Targets[i]:IsOnFire() then 
-										Targets[i]:Extinguish()
-									end
-									Targets[i]:Ignite(5,1)
-									Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-								end
-								if Targets[i]:IsPlayer() then
-									if not Targets[i]:InVehicle() then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+							if table.Count(Targets) > 0 then
+								for i = 1, #Targets do
+									if Targets[i]:GetClass() == "dak_temotor" then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
 									end
-								end
-								if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-									if Targets[i]:IsOnFire() then 
-										Targets[i]:Extinguish()
+									if Targets[i]:GetClass() == "dak_tegearbox" then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
+										end
+										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 									end
-									Targets[i]:Ignite(5,1)
+									if Targets[i]:IsPlayer() then
+										if not Targets[i]:InVehicle() then
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
+											end
+										end
+									end
+									if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
+										end
+									end
 								end
 							end
 						end
@@ -728,25 +739,27 @@ function ENT:Damage(oldhit)
 							if table.Count(Targets) > 0 then
 								for i = 1, #Targets do
 									if Targets[i]:GetClass() == "dak_temotor" then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
+									end
+									if Targets[i]:GetClass() == "dak_tegearbox" then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
+										end
 										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 									end
 									if Targets[i]:IsPlayer() then
 										if not Targets[i]:InVehicle() then
-											if Targets[i]:IsOnFire() then 
-												Targets[i]:Extinguish()
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
 											end
-											Targets[i]:Ignite(5,1)
 										end
 									end
 									if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
 									end
 								end
 							end
@@ -854,25 +867,27 @@ function ENT:Damage(oldhit)
 						if table.Count(Targets) > 0 then
 							for i = 1, #Targets do
 								if Targets[i]:GetClass() == "dak_temotor" then
-									if Targets[i]:IsOnFire() then 
-										Targets[i]:Extinguish()
+									if not(Targets[i]:IsOnFire()) then 
+										Targets[i]:Ignite(5,1)
 									end
-									Targets[i]:Ignite(5,1)
+								end
+								if Targets[i]:GetClass() == "dak_tegearbox" then
+									if not(Targets[i]:IsOnFire()) then 
+										Targets[i]:Ignite(5,1)
+									end
 									Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 								end
 								if Targets[i]:IsPlayer() then
 									if not Targets[i]:InVehicle() then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
 									end
 								end
 								if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-									if Targets[i]:IsOnFire() then 
-										Targets[i]:Extinguish()
+									if not(Targets[i]:IsOnFire()) then 
+										Targets[i]:Ignite(5,1)
 									end
-									Targets[i]:Ignite(5,1)
 								end
 							end
 						end

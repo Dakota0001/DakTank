@@ -9,6 +9,7 @@ ENT.DakArmor = 10
 ENT.DakMaxHealth = 10
 ENT.DakHealth = 10
 ENT.DakPooled=0
+ENT.DakFuel = 0
 
 function ENT:Initialize()
 
@@ -94,32 +95,32 @@ function ENT:Think()
 
 		if self.DakName == "Micro Fuel Tank" then
 			self.DakMass = 65
-			self.PowerMod = 0.5
+			self.DakFuel = 45
 			self.DakMaxHealth = 10
 		end
 		if self.DakName == "Small Fuel Tank" then
 			self.DakMass = 120
-			self.PowerMod = 0.75
+			self.DakFuel = 90
 			self.DakMaxHealth = 20
 		end
 		if self.DakName == "Standard Fuel Tank" then
 			self.DakMass = 240
-			self.PowerMod = 1.0
+			self.DakFuel = 180
 			self.DakMaxHealth = 30
 		end
 		if self.DakName == "Large Fuel Tank" then
 			self.DakMass = 475
-			self.PowerMod = 1.25
+			self.DakFuel = 360
 			self.DakMaxHealth = 40
 		end
 		if self.DakName == "Huge Fuel Tank" then
 			self.DakMass = 950
-			self.PowerMod = 1.5
+			self.DakFuel = 720
 			self.DakMaxHealth = 50
 		end
 		if self.DakName == "Ultra Fuel Tank" then
 			self.DakMass = 1900
-			self.PowerMod = 2.0
+			self.DakFuel = 1440
 			self.DakMaxHealth = 60
 		end
 
@@ -127,7 +128,8 @@ function ENT:Think()
 			self.DakHealth = self.DakMaxHealth
 		end
 
-		self.PowerMod = self.PowerMod*(self.DakHealth/self.DakMaxHealth)
+		self.DakFuel = self.DakFuel * (self.DakHealth/self.DakMaxHealth)
+
 		self:GetPhysicsObject():SetMass(self.DakMass)
 
 	if self.DakHealth<(self.DakMaxHealth*0.25) and self.DakIsExplosive then
