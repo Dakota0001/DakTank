@@ -271,12 +271,6 @@ function ENT:Think()
 						self.DakMaxHealth = self.CurMass*0.01*self.SizeMult
 						self.CurrentHealth = self.CurMass*0.01*self.SizeMult
 						self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult
-						self.HitBox[i].DakRed = self.HitBox[i]:GetColor().r
-						self.HitBox[i].DakGreen = self.HitBox[i]:GetColor().g
-						self.HitBox[i].DakBlue = self.HitBox[i]:GetColor().b
-					else
-						local HPPerc = self.HitBox[i].DakHealth/self.HitBox[i].DakMaxHealth --get hp percent then set colors based on it
-						self.HitBox[i]:SetColor(Color(self.HitBox[i].DakRed*HPPerc,self.HitBox[i].DakGreen*HPPerc,self.HitBox[i].DakBlue*HPPerc,self.HitBox[i]:GetColor().a))
 					end
 					self.HitBox[i].DakHealth = self.CurrentHealth
 				end

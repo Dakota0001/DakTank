@@ -19,6 +19,72 @@ You can use this in ENT:Think() or PrimaryEffect in an entity or hook.Add("Think
 Think is for animated effects
 */
 function EFFECT:Init( data )
+	self.StartPos = data:GetStart()
+	self.EndPos = data:GetOrigin()
+	self.Caliber = data:GetScale()*1
+
+	self.Dir = (self.EndPos-self.StartPos):GetNormalized()
+	self.Dist = self.EndPos:Distance(self.StartPos)
+
+	self.TracerTime = math.min( 1, self.StartPos:Distance( self.EndPos ) / 10000 )
+	self.DieTime = CurTime() + 0.25
+
+	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
+
+	local emitter = ParticleEmitter( self.StartPos )
+	for i = 1, 10 do
+
+		local particle = emitter:Add( "dak/flamelet5", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
+		 
+		if particle == nil then particle = emitter:Add( "dak/flamelet5", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
+		
+		if (particle) then
+			particle:SetVelocity(Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(0.5) 
+			particle:SetStartAlpha(150)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(15)
+			particle:SetEndSize(10)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
+			particle:SetGravity( Vector(0,0,math.random(-5,-25)) )  
+			particle:SetAirResistance(0)  
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+		end
+	end
+
+	for i = 1, 10 do
+
+		local particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
+		 
+		if particle == nil then particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
+		
+		if (particle) then
+			particle:SetVelocity(Vector(math.Rand(-25,25),math.Rand(-25,25),math.Rand(-25,25)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(2.0) 
+			particle:SetStartAlpha(75)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(0)
+			particle:SetEndSize(25)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			local CVal = math.random(50,100)
+			particle:SetColor(CVal,CVal,CVal,math.random(50,50))
+			particle:SetGravity( Vector(0,0,math.random(5,25)) ) 
+			particle:SetAirResistance(20) 
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+		end
+	end
+	emitter:Finish()
+--[[
+
 	local Pos = data:GetOrigin()
 	local Ent = data:GetEntity()
 
@@ -80,12 +146,17 @@ function EFFECT:Init( data )
 	end
 
 	emitter:Finish()
-		
+	]]--
 end
 
 function EFFECT:Think()		
-	return false
+	if ( CurTime() > self.DieTime ) then
+		return false
+	end
+	return true
 end
 
 function EFFECT:Render()
+	--render.SetMaterial( self.Mat )
+	--render.DrawBeam( self.StartPos, self.EndPos, self.Caliber, 1, 0, Color( 255,175,50, 255 ) )
 end
