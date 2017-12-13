@@ -684,159 +684,729 @@ function TOOL:LeftClick( trace )
 			end
 		end
 		--AMMO--
-		if self:GetClientInfo("SpawnSettings") == "SmallAPBox" then
-			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
+		--Micro--
+		if self:GetClientInfo("SpawnSettings") == "MicroAPBox" then
+			self.spawnedent:SetModel( "models/Items/BoxSRounds.mdl" )
 			self.DakIsHE = false
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 				self.DakName = self.DakCaliber.."mmCAPAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmCAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 				self.DakName = self.DakCaliber.."mmHAPAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmHAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMAPAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 				self.DakName = self.DakCaliber.."mmACAPAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmACAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 				self.DakName = self.DakCaliber.."mmMGAPAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMGAPAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 				self.DakName = self.DakCaliber.."mmHMGAPAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmHMGAPAmmo"
 			end
 		end
-		if self:GetClientInfo("SpawnSettings") == "SmallHEBox" then
-			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
+		if self:GetClientInfo("SpawnSettings") == "MicroHEBox" then
+			self.spawnedent:SetModel( "models/Items/BoxSRounds.mdl" )
 			self.DakIsHE = true
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 				self.DakName = self.DakCaliber.."mmCHEAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmCHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 				self.DakName = self.DakCaliber.."mmHHEAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmHHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMHEAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 				self.DakName = self.DakCaliber.."mmACHEAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmACHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 				self.DakName = self.DakCaliber.."mmMGHEAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMGHEAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 				self.DakName = self.DakCaliber.."mmHMGHEAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmHMGHEAmmo"
 			end
 		end
-		if self:GetClientInfo("SpawnSettings") == "SmallFLBox" then
-			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
+		if self:GetClientInfo("SpawnSettings") == "MicroFLBox" then
+			self.spawnedent:SetModel( "models/Items/BoxSRounds.mdl" )
 			self.DakIsHE = false
 			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 				self.DakName = self.DakCaliber.."mmCFLAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmCFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 				self.DakName = self.DakCaliber.."mmHFLAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmHFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 				self.DakName = self.DakCaliber.."mmMFLAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 				self.DakName = self.DakCaliber.."mmACFLAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmACFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 				self.DakName = self.DakCaliber.."mmMGFLAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
 				self.DakAmmoType = self.DakCaliber.."mmMGFLAmmo"
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 				self.DakName = self.DakCaliber.."mmHMGFLAmmo"
 				self.DakIsExplosive = true
-				self.DakAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
+				self.DakAmmoType = self.DakCaliber.."mmHMGFLAmmo"
+			end
+		end
+		--Small--
+		if self:GetClientInfo("SpawnSettings") == "SmallAPBox" then
+			self.spawnedent:SetModel( "models/props_c17/SuitCase_Passenger_Physics.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGAPAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "SmallHEBox" then
+			self.spawnedent:SetModel( "models/props_c17/SuitCase_Passenger_Physics.mdl" )
+			self.DakIsHE = true
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGHEAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "SmallFLBox" then
+			self.spawnedent:SetModel( "models/props_c17/SuitCase_Passenger_Physics.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGFLAmmo"
+			end
+		end
+		--Standard--
+		if self:GetClientInfo("SpawnSettings") == "StandardAPBox" then
+			self.spawnedent:SetModel( "models/Items/BoxMRounds.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGAPAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "StandardHEBox" then
+			self.spawnedent:SetModel( "models/Items/BoxMRounds.mdl" )
+			self.DakIsHE = true
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGHEAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "StandardFLBox" then
+			self.spawnedent:SetModel( "models/Items/BoxMRounds.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGFLAmmo"
+			end
+		end
+		--Large--
+		if self:GetClientInfo("SpawnSettings") == "LargeAPBox" then
+			self.spawnedent:SetModel( "models/props_c17/SuitCase001a.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGAPAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "LargeHEBox" then
+			self.spawnedent:SetModel( "models/props_c17/SuitCase001a.mdl" )
+			self.DakIsHE = true
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGHEAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "LargeFLBox" then
+			self.spawnedent:SetModel( "models/props_c17/SuitCase001a.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGFLAmmo"
+			end
+		end
+		--Huge--
+		if self:GetClientInfo("SpawnSettings") == "HugeAPBox" then
+			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGAPAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "HugeHEBox" then
+			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
+			self.DakIsHE = true
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGHEAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "HugeFLBox" then
+			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGFLAmmo"
+			end
+		end
+		--Ultra--
+		if self:GetClientInfo("SpawnSettings") == "UltraAPBox" then
+			self.spawnedent:SetModel( "models/Items/ammocrate_smg1.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGAPAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGAPAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGAPAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "UltraHEBox" then
+			self.spawnedent:SetModel( "models/Items/ammocrate_smg1.mdl" )
+			self.DakIsHE = true
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGHEAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGHEAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHMGHEAmmo"
+			end
+		end
+		if self:GetClientInfo("SpawnSettings") == "UltraFLBox" then
+			self.spawnedent:SetModel( "models/Items/ammocrate_smg1.mdl" )
+			self.DakIsHE = false
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+				self.DakName = self.DakCaliber.."mmCFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmCFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+				self.DakName = self.DakCaliber.."mmHFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmHFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+				self.DakName = self.DakCaliber.."mmMFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakName = self.DakCaliber.."mmACFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmACFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+				self.DakName = self.DakCaliber.."mmMGFLAmmo"
+				self.DakIsExplosive = true
+				self.DakAmmoType = self.DakCaliber.."mmMGFLAmmo"
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakName = self.DakCaliber.."mmHMGFLAmmo"
+				self.DakIsExplosive = true
 				self.DakAmmoType = self.DakCaliber.."mmHMGFLAmmo"
 			end
 		end
@@ -864,8 +1434,8 @@ function TOOL:LeftClick( trace )
 				if trace.Entity:GetClass() == "dak_teammo" then
 					trace.Entity.DakName = self.DakName
 					trace.Entity.DakIsExplosive = self.DakIsExplosive
-					trace.Entity.DakAmmo = self.DakAmmo
-					trace.Entity.DakMaxAmmo = self.DakMaxAmmo
+					--trace.Entity.DakAmmo = self.DakAmmo
+					--trace.Entity.DakMaxAmmo = self.DakMaxAmmo
 					trace.Entity.DakAmmoType = self.DakAmmoType
 					trace.Entity.DakOwner = self:GetOwner()
 					trace.Entity.DakIsHE = self.DakIsHE
@@ -875,8 +1445,8 @@ function TOOL:LeftClick( trace )
 			if not(trace.Entity:IsValid()) then
 				self.spawnedent.DakName = self.DakName
 				self.spawnedent.DakIsExplosive = self.DakIsExplosive
-				self.spawnedent.DakAmmo = self.DakAmmo
-				self.spawnedent.DakMaxAmmo = self.DakMaxAmmo
+				--self.spawnedent.DakAmmo = self.DakAmmo
+				--self.spawnedent.DakMaxAmmo = self.DakMaxAmmo
 				self.spawnedent.DakAmmoType = self.DakAmmoType
 				self.spawnedent.DakOwner = self:GetOwner()
 				self.spawnedent.DakIsHE = self.DakIsHE
@@ -1144,6 +1714,47 @@ function TOOL:RightClick( trace )
 			end
 		else
 			ply:ChatPrint(TarName..", ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.." Health, "..MHP.." Max Health, "..PHP.."% Health")
+			if Target:GetClass() == "dak_teammo" then
+				if Target.DakAmmo and Target.DakMaxAmmo then
+					ply:ChatPrint("Ammo: "..Target.DakAmmo.."/"..Target.DakMaxAmmo.." Rounds")
+				end
+			end
+			if Target:GetClass() == "dak_tegearbox" then
+				if Target.DakHP and Target.TotalMass then
+					if Target.DakCrew == NULL then
+						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Uncrewed")
+					else
+						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Crewed")
+					end
+				end
+			end
+			if Target:GetClass() == "dak_temotor" then
+				if Target.DakHP then
+					ply:ChatPrint("HP: "..Target.DakHP)
+				end
+			end
+			if Target:GetClass() == "dak_tefuel" then
+				if Target.DakFuel then
+					ply:ChatPrint("Fuel: "..Target.DakFuel.." L")
+				end
+			end
+			if Target:GetClass() == "dak_tegun" then
+				if Target.Loaders then
+					ply:ChatPrint("Loaders: "..Target.Loaders)
+				end
+			end
+			if Target:GetClass() == "dak_teautogun" then
+				if Target.Loaders then
+					ply:ChatPrint("Loaders: "..Target.Loaders)
+				end
+			end
+			if Target:GetClass() == "dak_crew" then
+				if Target.DakEntity.DakName ~= nil then
+					ply:ChatPrint("Crew for "..Target.DakEntity.DakName)
+				else
+					ply:ChatPrint("Crew idle")
+				end
+			end
 		end
 	end
 	end
@@ -1243,7 +1854,7 @@ DLabelAmmo:SetWrap( true )
 
 local DermaNumSlider = vgui.Create( "DNumSlider", panel )
 DermaNumSlider:SetPos( 10, 355 )			// Set the position
-DermaNumSlider:SetSize( 300, 20 )		// Set the size
+DermaNumSlider:SetSize( 200, 20 )		// Set the size
 DermaNumSlider:SetText( "Caliber" )	// Set the text above the slider
 DermaNumSlider:SetValue(5)
 DermaNumSlider:SetMin( 0 )				// Set the minimum number you can slide to
@@ -1360,111 +1971,447 @@ DTTE_NodeList["Utilities"] = ctrl:AddNode( "Utilities" )
 
 DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 	DTTE_NodeList["APAmmo"] = DTTE_NodeList["Ammo"]:AddNode( "Armor Piercing" )
-		DTTE_NodeList["SmallAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "AP Ammo Box" )
-		--DTTE_NodeList["MediumAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Medium AP Ammo" )
-		--DTTE_NodeList["LargeAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Large AP Ammo" )
-		--DTTE_NodeList["HugeAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Huge AP Ammo" )
+		DTTE_NodeList["MicroAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Micro AP Ammo Box" )
+		DTTE_NodeList["SmallAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Small AP Ammo Box" )
+		DTTE_NodeList["StandardAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Standard AP Ammo Box" )
+		DTTE_NodeList["LargeAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Large AP Ammo Box" )
+		DTTE_NodeList["HugeAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Huge AP Ammo Box" )
+		DTTE_NodeList["UltraAPBox"] = DTTE_NodeList["APAmmo"]:AddNode( "Ultra AP Ammo Box" )
 	DTTE_NodeList["HEAmmo"] = DTTE_NodeList["Ammo"]:AddNode( "High Explosive" )
-		DTTE_NodeList["SmallHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "HE Ammo Box" )
-		--DTTE_NodeList["MediumHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Medium HE Ammo" )
-		--DTTE_NodeList["LargeHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Large HE Ammo" )
-		--DTTE_NodeList["HugeHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Huge HE Ammo" )
+		DTTE_NodeList["MicroHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Micro HE Ammo Box" )
+		DTTE_NodeList["SmallHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Small HE Ammo Box" )
+		DTTE_NodeList["StandardHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Standard HE Ammo Box" )
+		DTTE_NodeList["LargeHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Large HE Ammo Box" )
+		DTTE_NodeList["HugeHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Huge HE Ammo Box" )
+		DTTE_NodeList["UltraHEBox"] = DTTE_NodeList["HEAmmo"]:AddNode( "Ultra HE Ammo Box" )
 	DTTE_NodeList["FLAmmo"] = DTTE_NodeList["Ammo"]:AddNode( "Flechette" )
-		DTTE_NodeList["SmallFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "FL Ammo Box" )
-		--DTTE_NodeList["MediumFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Medium FL Ammo" )
-		--DTTE_NodeList["LargeFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Large FL Ammo" )
-		--DTTE_NodeList["HugeFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Huge FL Ammo" )
+		DTTE_NodeList["MicroFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Micro FL Ammo Box" )
+		DTTE_NodeList["SmallFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Small FL Ammo Box" )
+		DTTE_NodeList["StandardFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Standard FL Ammo Box" )
+		DTTE_NodeList["LargeFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Large FL Ammo Box" )
+		DTTE_NodeList["HugeFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Huge FL Ammo Box" )
+		DTTE_NodeList["UltraFLBox"] = DTTE_NodeList["FLAmmo"]:AddNode( "Ultra FL Ammo Box" )
 	DTTE_NodeList["FTFuel"] = DTTE_NodeList["Ammo"]:AddNode( "Flamethrower Fuel" )
 
 	function DermaNumSlider:OnValueChanged( cal )
 		RunConsoleCommand("daktankspawner_DTTE_GunCaliber", cal)
 
 		if ctrl:GetSelectedItem():GetText() == "Cannons" then
-			DLabel:SetText( math.Round(cal,2).."mm Cannon\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((200/cal)*(200/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)),2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5),2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round((cal/5)*1.5,2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*2*0.25),2).."mm\nDamage: "..math.Round((cal/5*0.5*1.5),2).."\nSplash Damage: "..math.Round((cal/5*1.25),2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 800 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*2*0.75),2).."mm\nDamage: "..math.Round((cal/5/10)*1.5,2).."\nPellets: 10\nVelocity: 600 m/s\n\nDescription: Versatile and reliable guns with high penetration and velocity but high weight." )
+			DLabel:SetText( math.Round(cal,2).."mm Cannon\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((200/cal)*(200/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)),2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5),2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round(cal*0.25,2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*2*0.3),2).."mm\nFrag Penetration: "..math.Round((cal/2.5),2).."mm\nDamage: "..math.Round(cal*0.25*0.5,2).."\nSplash Damage: "..math.Round(cal*0.375,2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 800 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*2*0.75),2).."mm\nDamage: "..math.Round(cal*0.025,2).."\nPellets: 10\nVelocity: 600 m/s\n\nDescription: Versatile and reliable guns with high penetration and velocity but high weight." )
 		end
 		if ctrl:GetSelectedItem():GetText() == "Autoloading Guns" then
-			DLabel:SetText( math.Round(cal,2).."mm Autoloader\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((200/cal)*(200/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)*0.2),2).."\nSmall Clip Size: "..math.Round(600/cal).."\nMedium Clip Size: "..math.Round((600/cal)*1.5).."\nLarge Clip Size: "..math.Round((600/cal)*2).."\nSmall Clip Reload Time: "..math.Round((cal/13 + cal/100)*math.Round(600/cal),2).."\nMedium Clip Reload Time: "..math.Round(((cal/13 + cal/100)*math.Round((600/cal)*1.5)*0.75),2).."\nLarge Clip Reload Time: "..math.Round(((cal/13 + cal/100)*math.Round((600/cal)*2)*0.5),2).."\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round((cal/5)*1.5,2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*2*0.25),2).."mm\nDamage: "..math.Round((cal/5*0.5*1.5),2).."\nSplash Damage: "..math.Round((cal/5*1.25),2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 800 m/s\n\nDescription: Cannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip." )
+			DLabel:SetText( math.Round(cal,2).."mm Autoloader\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((200/cal)*(200/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)*0.2),2).."\nSmall Clip Size: "..math.Round(600/cal).."\nMedium Clip Size: "..math.Round((600/cal)*1.5).."\nLarge Clip Size: "..math.Round((600/cal)*2).."\nSmall Clip Reload Time: "..math.Round((cal/13 + cal/100)*math.Round(600/cal),2).."\nMedium Clip Reload Time: "..math.Round(((cal/13 + cal/100)*math.Round((600/cal)*1.5)*0.75),2).."\nLarge Clip Reload Time: "..math.Round(((cal/13 + cal/100)*math.Round((600/cal)*2)*0.5),2).."\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round(cal*0.25,2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*2*0.3),2).."mm\nFrag Penetration: "..math.Round((cal/2.5),2).."mm\nDamage: "..math.Round(cal*0.25*0.5,2).."\nSplash Damage: "..math.Round(cal*0.375,2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 800 m/s\n\nDescription: Cannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip." )
 		end
 		if ctrl:GetSelectedItem():GetText() == "Howitzers" then
-			DLabel:SetText( math.Round(cal,2).."mm Howitzer\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((240/cal)*(240/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100))*1.5,2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5)*1.5,2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*1.5),2).."mm\nDamage: "..math.Round((cal/2.5),2).."\nVelocity: 600 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*1.5*0.25),2).."mm\nDamage: "..math.Round((cal/2.5*0.5),2).."\nSplash Damage: "..math.Round((cal/5*1.5),2).."\nBlast Radius: "..math.Round((cal/12.5),2).."m\nVelocity: 600 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*1.5*0.75),2).."mm\nDamage: "..math.Round((cal/2.5/10),2).."\nPellets: 10\nVelocity: 450 m/s\n\nDescription: Powerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius." )
+			DLabel:SetText( math.Round(cal,2).."mm Howitzer\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((9000/((240/cal)*(240/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)),2).." seconds crewed, "..math.Round(((cal/13 + cal/100))*1.5,2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*1.5),2).."mm\nDamage: "..math.Round(cal*0.25,2).."\nVelocity: 600 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*1.5*0.3),2).."mm\nFrag Penetration: "..math.Round((cal/2.5)*1.3,2).."mm\nDamage: "..math.Round(cal*0.25*0.5,2).."\nSplash Damage: "..math.Round(cal*0.375,2).."\nBlast Radius: "..math.Round((cal/25)*1.3,2).."m\nVelocity: 600 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*1.5*0.75),2).."mm\nDamage: "..math.Round(cal*0.025,2).."\nPellets: 10\nVelocity: 450 m/s\n\nDescription: Powerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius." )
 		end
 		if ctrl:GetSelectedItem():GetText() == "Mortars" then
-			DLabel:SetText( math.Round(cal,2).."mm Mortar\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((4500/((280/cal)*(280/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)),2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5),2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*0.8),2).."mm\nDamage: "..math.Round((cal/10),2).."\nVelocity: 160 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*0.8*0.25),2).."mm\nDamage: "..math.Round((cal/10*0.5),2).."\nSplash Damage: "..math.Round((cal/20*7),2).."\nBlast Radius: "..math.Round((cal/10),2).."m\nVelocity: 160 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*0.8*0.75),2).."mm\nDamage: "..math.Round((cal/10/10),2).."\nPellets: 10\nVelocity: 120 m/s\n\nDescription: Light guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber." )
+			DLabel:SetText( math.Round(cal,2).."mm Mortar\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((4500/((280/cal)*(280/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)),2).." seconds crewed, "..math.Round(((cal/13 + cal/100)*1.5),2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((cal*0.4),2).."mm\nDamage: "..math.Round(cal*0.25,2).."\nVelocity: 160 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*0.4*0.3),2).."mm\nFrag Penetration: "..math.Round((cal/2.5)*1.15,2).."mm\nDamage: "..math.Round(cal*0.25*0.5,2).."\nSplash Damage: "..math.Round(cal*0.375,2).."\nBlast Radius: "..math.Round((cal/25)*1.15,2).."m\nVelocity: 160 m/s\n\nFL Stats\nPenetration: "..math.Round((cal*0.4*0.75),2).."mm\nDamage: "..math.Round(cal*0.025,2).."\nPellets: 10\nVelocity: 120 m/s\n\nDescription: Light guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber." )
 		end
 		if ctrl:GetSelectedItem():GetText() == "Autocannons" then
-			DLabel:SetText( math.Round(cal,2).."mm Autocannon\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((2000/((50/cal)*(50/cal)))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 25 seconds\nClip Size: "..math.Round(600/cal).."\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round((cal/5),2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*2*0.25),2).."mm\nDamage: "..math.Round((cal/5*0.5),2).."\nSplash Damage: "..math.Round((cal/10*1.25),2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 800 m/s\n\nDescription: Light guns with large clips and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo." )
+			DLabel:SetText( math.Round(cal,2).."mm Autocannon\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((2000/((50/cal)*(50/cal)))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 25 seconds\nClip Size: "..math.Round(600/cal).."\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round(cal*0.25,2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*2*0.3),2).."mm\nFrag Penetration: "..math.Round((cal/2.5),2).."mm\nDamage: "..math.Round(cal*0.25*0.5,2).."\nSplash Damage: "..math.Round(cal*0.375,2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 800 m/s\n\nDescription: Light guns with large clips and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo." )
 		end
 		if ctrl:GetSelectedItem():GetText() == "Machine Guns" then
-			DLabel:SetText( math.Round(cal,2).."mm Machine Gun\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((60/((14.5/cal)*(14.5/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)*0.1),2).." seconds\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round((cal/50),2).."\nVelocity: 600 m/s\n\nDescription: Light and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets." )
+			DLabel:SetText( math.Round(cal,2).."mm Machine Gun\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((60/((14.5/cal)*(14.5/cal)))).." kg\nReload Time: "..math.Round(((cal/13 + cal/100)*0.1),2).." seconds\n\nAP Stats\nPenetration: "..math.Round((cal*2),2).."mm\nDamage: "..math.Round(cal*0.025,2).."\nVelocity: 600 m/s\n\nDescription: Light and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets." )
 		end
 		if ctrl:GetSelectedItem():GetText() == "Heavy Machine Guns" then
-			DLabel:SetText( math.Round(cal,2).."mm Heavy Machine Gun\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((600/((40/cal)*(40/cal)))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 20 seconds\nClip Size: "..math.Round(800/cal).."\n\nAP Stats\nPenetration: "..math.Round((cal*1.5),2).."mm\nDamage: "..math.Round((cal/5),2).."\nVelocity: 400 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*1.5*0.25),2).."mm\nDamage: "..math.Round((cal/5*0.5),2).."\nSplash Damage: "..math.Round((cal/10*1.25),2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 400 m/s\n\nDescription: More light barreled autocannons than machine guns, these are somewhat useful against both armored targets and infantry. They can only use AP and HE HMG ammo." )
+			DLabel:SetText( math.Round(cal,2).."mm Heavy Machine Gun\n\nArmor: "..math.Round((cal*5),2).."mm\nWeight: "..math.Round((600/((40/cal)*(40/cal)))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 20 seconds\nClip Size: "..math.Round(800/cal).."\n\nAP Stats\nPenetration: "..math.Round((cal*1.5),2).."mm\nDamage: "..math.Round(cal*0.25,2).."\nVelocity: 400 m/s\n\nHE Stats\nPenetration: "..math.Round((cal*1.5*0.3),2).."mm\nFrag Penetration: "..math.Round((cal/2.5),2).."mm\nDamage: "..math.Round(cal*0.25*0.5,2).."\nSplash Damage: "..math.Round(cal*0.375,2).."\nBlast Radius: "..math.Round((cal/25),2).."m\nVelocity: 600 m/s\n\nDescription: More light barreled autocannons than machine guns, these are somewhat useful against both armored targets and infantry. They can only use AP and HE HMG ammo." )
 		end
+
+		local MicroVol = 1097.1177978516	
+		local SmallVol = 2778.4775390625	
+		local StandardVol = 2880.7651367188	
+		local LargeVol = 6702.1049804688	
+		local HugeVol = 12977.875976563	
+		local UltraVol = 56916.671875
+
 		if AmmoBoxSelect:GetSelected() == "Cannon" then	
-			if ctrl:GetSelectedItem():GetText() == "AP Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmCAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			local ShellVol = math.pi*(((cal*0.5)*0.0393701)^2)*(cal*0.0393701*13)
+			local ShellMass = ShellVol*0.044
+			if ctrl:GetSelectedItem():GetText() == "Micro AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "HE Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmCHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
+			if ctrl:GetSelectedItem():GetText() == "Micro HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "FL Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmCFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			if ctrl:GetSelectedItem():GetText() == "Micro FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Small AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Standard AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Large AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Huge AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Ultra AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmCFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
 		end
 		if AmmoBoxSelect:GetSelected() == "Howitzer" then	
-			if ctrl:GetSelectedItem():GetText() == "AP Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			local ShellVol = math.pi*(((cal*0.5)*0.0393701)^2)*(cal*0.0393701*8)
+			local ShellMass = ShellVol*0.044
+
+			if ctrl:GetSelectedItem():GetText() == "Micro AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "HE Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
+			if ctrl:GetSelectedItem():GetText() == "Micro HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, also explodes.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "FL Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			if ctrl:GetSelectedItem():GetText() == "Micro FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Small AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Standard AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Large AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Huge AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Ultra AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/4)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/4).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
 		end
 		if AmmoBoxSelect:GetSelected() == "Mortar" then	
-			if ctrl:GetSelectedItem():GetText() == "AP Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			local ShellVol = math.pi*(((cal*0.5)*0.0393701)^2)*(cal*0.0393701*5.25)
+			local ShellMass = ShellVol*0.044
+
+			if ctrl:GetSelectedItem():GetText() == "Micro AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "HE Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
+			if ctrl:GetSelectedItem():GetText() == "Micro HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, also explodes.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "FL Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((600/cal)*(600/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			if ctrl:GetSelectedItem():GetText() == "Micro FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Small AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Standard AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Large AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Huge AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Ultra AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/2.75)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/2.75).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
 		end
 		if AmmoBoxSelect:GetSelected() == "Autocannon" then
-			if ctrl:GetSelectedItem():GetText() == "AP Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmACAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			local ShellVol = math.pi*(((cal*0.5)*0.0393701)^2)*(cal*0.0393701*13)
+			local ShellMass = ShellVol*0.044
+
+			if ctrl:GetSelectedItem():GetText() == "Micro AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "HE Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmACHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
+			if ctrl:GetSelectedItem():GetText() == "Micro HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "FL Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmACFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			if ctrl:GetSelectedItem():GetText() == "Micro FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Small AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Standard AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Large AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Huge AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Ultra AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmACFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
 		end
 		if AmmoBoxSelect:GetSelected() == "Heavy Machine Gun" then
-			if ctrl:GetSelectedItem():GetText() == "AP Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			local ShellVol = math.pi*(((cal*0.5)*0.0393701)^2)*(cal*0.0393701*13)
+			local ShellMass = ShellVol*0.044
+
+			if ctrl:GetSelectedItem():GetText() == "Micro AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "HE Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
+			if ctrl:GetSelectedItem():GetText() == "Micro HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "FL Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			if ctrl:GetSelectedItem():GetText() == "Micro FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Small AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Standard AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Large AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Huge AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Ultra AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmHMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
 		end
 		if AmmoBoxSelect:GetSelected() == "Machine Gun" then
-			if ctrl:GetSelectedItem():GetText() == "AP Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMGAP Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			local ShellVol = math.pi*(((cal*0.5)*0.0393701)^2)*(cal*0.0393701*13)
+			local ShellMass = ShellVol*0.044
+
+			if ctrl:GetSelectedItem():GetText() == "Micro AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "HE Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMGHE Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, also explodes.")
+			if ctrl:GetSelectedItem():GetText() == "Micro HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
 			end
-			if ctrl:GetSelectedItem():GetText() == "FL Ammo Box" then
-				DLabelAmmo:SetText(math.Round(cal,2).."mmMGFL Ammo\n\nHealth: 10\nWeight: 200kg\nAmmo: "..math.Round(((500/cal)*(500/cal))*0.25).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			if ctrl:GetSelectedItem():GetText() == "Micro FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((MicroVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
 			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Small AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Small FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((SmallVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Standard AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Standard FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((StandardVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Large AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Large FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((LargeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Huge AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Huge FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((HugeVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
+			if ctrl:GetSelectedItem():GetText() == "Ultra AP Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGAP Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra HE Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGHE Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, also explodes.")
+			end
+			if ctrl:GetSelectedItem():GetText() == "Ultra FL Ammo Box" then
+				DLabelAmmo:SetText(math.Round(cal,2).."mmMGFL Ammo\n\nHealth: 10\nWeight: "..math.Round(ShellMass*math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5)+10).."kg\nAmmo: "..math.floor((((UltraVol^(1/3))/(cal*0.0393701))^2)/6.5).."\n\nDescription: Makes guns shootier, cooks off when damaged.")
+			end
+			--
 		end
 	end
 
@@ -1604,10 +2551,37 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		end
 
 		----AMMO
+		if (node == DTTE_NodeList["MicroAPBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "MicroAPBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["MicroHEBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "MicroHEBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["MicroFLBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "MicroFLBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
 		if (node == DTTE_NodeList["SmallAPBox"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "SmallAPBox")
-			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 200kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
 			DLabel:SetVisible(false)
 			DLabelAmmo:SetVisible(true)
 			DermaNumSlider:SetVisible(true)
@@ -1616,7 +2590,7 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["SmallHEBox"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "SmallHEBox")
-			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 200kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
 			DLabel:SetVisible(false)
 			DLabelAmmo:SetVisible(true)
 			DermaNumSlider:SetVisible(true)
@@ -1625,7 +2599,115 @@ DTTE_NodeList["Ammo"] = ctrl:AddNode( "Ammo" )
 		if (node == DTTE_NodeList["SmallFLBox"]) then
 			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
 			RunConsoleCommand("daktankspawner_SpawnSettings", "SmallFLBox")
-			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 200kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["StandardAPBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "StandardAPBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["StandardHEBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "StandardHEBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["StandardFLBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "StandardFLBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["LargeAPBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "LargeAPBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["LargeHEBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "LargeHEBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["LargeFLBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "LargeFLBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["HugeAPBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "HugeAPBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["HugeHEBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "HugeHEBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["HugeFLBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "HugeFLBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["UltraAPBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "UltraAPBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["UltraHEBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "UltraHEBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
+			DLabel:SetVisible(false)
+			DLabelAmmo:SetVisible(true)
+			DermaNumSlider:SetVisible(true)
+			AmmoBoxSelect:SetVisible(true)
+		end
+		if (node == DTTE_NodeList["UltraFLBox"]) then
+			RunConsoleCommand("daktankspawner_SpawnEnt", "dak_teammo")
+			RunConsoleCommand("daktankspawner_SpawnSettings", "UltraFLBox")
+			DLabelAmmo:SetText( "Pick an ammo type\n\nHealth: 10\nWeight: 10kg\nAmmo: ?\n\nDescription: Makes guns shootier, also explodes sometimes." )
 			DLabel:SetVisible(false)
 			DLabelAmmo:SetVisible(true)
 			DermaNumSlider:SetVisible(true)

@@ -117,6 +117,7 @@ function ENT:Think()
 		self.Crew={}
 		self.Motors={}
 		self.Fuel={}
+		self.Tread={}
 		for i=1, #res do
 			if res[i]:IsSolid() then
 				if res[i]:GetClass()=="dak_tegearbox" then
@@ -156,12 +157,23 @@ function ENT:Think()
 					if res[i]:GetPhysicsObject():GetMass()>1 then
 						SA = SA + res[i]:GetPhysicsObject():GetSurfaceArea()
 					end
+				else
+					self.Tread[#self.Tread+1]=res[i]
 				end
 			end
 		end
 		if self.Gearbox then
 			self.Gearbox.TotalMass = Mass
 		end
+
+		if IsValid(self.Tread[1]) then
+			if self.Tread[1]:GetPhysicsObject():GetMaterial()~="jeeptire" then
+				for i=1, table.Count(self.Tread) do
+					self.Tread[i]:GetPhysicsObject():SetMaterial("jeeptire")
+				end
+			end
+		end
+
 		self.TotalMass = Mass
 		self.SurfaceArea = SA
 		self.SizeMult = (SA/Mass)*0.18

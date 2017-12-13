@@ -32,6 +32,7 @@ ENT.DakArmor = 1
 ENT.DakTankCore = nil
 ENT.DakCrew = NULL
 ENT.ShellList = {}
+ENT.BasicVelocity = 41992
 
 function ENT:Initialize()
 	self:SetModel(self.DakModel)
@@ -56,6 +57,7 @@ function ENT:Initialize()
  	self.LastFireTime = CurTime()
  	self.CurrentAmmoType = 1
  	self.DakBurnStacks = 0
+ 	self.BasicVelocity = 41992
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
@@ -81,17 +83,18 @@ function ENT:Think()
 			self.DakHE = math.Round(self.DakCaliber,2).."mmCHEAmmo"
 			self.DakFL = math.Round(self.DakCaliber,2).."mmCFLAmmo"
 
-			self.BaseDakShellDamage = (self.DakCaliber*0.2)*1.5
+			self.BaseDakShellDamage = self.DakCaliber*0.25
 			self.BaseDakShellMass = self.DakCaliber
-			self.DakShellSplashDamage = (self.DakCaliber*0.1)*1.5*1.25
+			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = self.DakCaliber*2
 			self.DakShellExplosive = false
-			self.DakShellBlastRadius = self.DakCaliber/25*39
+			self.DakShellBlastRadius = (self.DakCaliber/25*39)
+			self.DakShellFragPen = (self.DakCaliber/2.5)
 
 			self.DakFireEffect = "dakballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakballistictracer"
-			self.BaseDakShellVelocity = 41992
+			self.BaseDakShellVelocity = self.BasicVelocity
 			self.DakIsFlechette = false
 			self.DakPellets = 10
 
@@ -136,7 +139,7 @@ function ENT:Think()
 
 		if self.DakGunType == "Howitzer" then
 			self.DakName = self.DakCaliber.."mm Howitzer"
-			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100)*1.5,2)
+			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = math.Round((9000/((240/self.DakCaliber)*(240/self.DakCaliber))))
@@ -145,17 +148,18 @@ function ENT:Think()
 			self.DakHE = math.Round(self.DakCaliber,2).."mmHHEAmmo"
 			self.DakFL = math.Round(self.DakCaliber,2).."mmHFLAmmo"
 
-			self.BaseDakShellDamage = self.DakCaliber/2.5
+			self.BaseDakShellDamage = self.DakCaliber*0.25
 			self.BaseDakShellMass = self.DakCaliber
-			self.DakShellSplashDamage = self.DakCaliber/5*1.5
+			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = self.DakCaliber*1.5
 			self.DakShellExplosive = false
-			self.DakShellBlastRadius = self.DakCaliber/12.5*39
+			self.DakShellBlastRadius = (self.DakCaliber/25*39)*1.3
+			self.DakShellFragPen = (self.DakCaliber/2.5)*1.3
 
 			self.DakFireEffect = "dakballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakballistictracer"
-			self.BaseDakShellVelocity = 31494
+			self.BaseDakShellVelocity = self.BasicVelocity*0.75
 			self.DakIsFlechette = false
 			self.DakPellets = 10
 
@@ -206,17 +210,18 @@ function ENT:Think()
 			self.DakHE = math.Round(self.DakCaliber,2).."mmMHEAmmo"
 			self.DakFL = math.Round(self.DakCaliber,2).."mmMFLAmmo"
 
-			self.BaseDakShellDamage = self.DakCaliber/10
+			self.BaseDakShellDamage = self.DakCaliber*0.25
 			self.BaseDakShellMass = self.DakCaliber
-			self.DakShellSplashDamage = self.DakCaliber/20*7
-			self.BaseDakShellPenetration = self.DakCaliber*0.8
+			self.DakShellSplashDamage = self.DakCaliber*0.375
+			self.BaseDakShellPenetration = self.DakCaliber*0.4
 			self.DakShellExplosive = false
-			self.DakShellBlastRadius = self.DakCaliber/10*39
+			self.DakShellBlastRadius = (self.DakCaliber/25*39)*1.15
+			self.DakShellFragPen = (self.DakCaliber/2.5)*1.15
 
 			self.DakFireEffect = "dakballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakballistictracer"
-			self.BaseDakShellVelocity = 8398
+			self.BaseDakShellVelocity = self.BasicVelocity*0.2
 			self.DakIsFlechette = false
 			self.DakPellets = 10
 
@@ -287,6 +292,9 @@ function ENT:Think()
 			self.DakHealth = self.DakMaxHealth
 		end
 		self:GetPhysicsObject():SetMass(self.DakMass)
+
+		self:DakTEAmmoCheck()
+		
 		self.SlowThinkTime = CurTime()
 	end
 	if CurTime()>=self.MidThinkTime+0.33 then
@@ -299,11 +307,11 @@ function ENT:Think()
 
 	for i = 1, #self.ShellList do
 		self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
-		self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
-
+		--self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
+		
 		local trace = {}
-			trace.start = self.ShellList[i].Pos
-			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+			trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
+			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
 			trace.filter = self.ShellList[i].Filter
 			trace.mins = Vector(-1,-1,-1)
 			trace.maxs = Vector(1,1,1)
@@ -330,7 +338,7 @@ function ENT:Think()
 			self.RemoveList[#self.RemoveList+1] = i
 		end
 
-		self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+		--self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
 	end
 	
 	if #self.RemoveList > 0 then
@@ -366,7 +374,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/2
 		self.DakShellMass = self.BaseDakShellMass
-		self.DakShellPenetration = self.BaseDakShellPenetration*0.25
+		self.DakShellPenetration = self.BaseDakShellPenetration*0.3
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
@@ -385,8 +393,8 @@ function ENT:DakTEAmmoCheck()
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
-	self.AmmoCount = 0 
 	if IsValid(self.DakTankCore) then
+		self.AmmoCount = 0 
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -396,14 +404,14 @@ function ENT:DakTEAmmoCheck()
 				end
 			end
 		end
+		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
-	WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 end
 
 function ENT:DakTEFire()
 	if( self.Firing ) then
-		self.AmmoCount = 0 
 		if IsValid(self.DakTankCore) then
+			self.AmmoCount = 0 
 			if not(self.DakTankCore.Ammoboxes == nil) then
 				for i = 1, #self.DakTankCore.Ammoboxes do
 					if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -439,16 +447,18 @@ function ENT:DakTEFire()
 		 				shell.Pos = shootOrigin + ( self:GetForward() * 1 )
 		 				shell.Ang = shootAngles + Angle(math.Rand(-0.5,0.5),math.Rand(-0.5,0.5),math.Rand(-0.5,0.5))
 						shell.DakTrail = self.DakShellTrail
-						shell.DakVelocity = self.DakShellVelocity
-						shell.DakDamage = self.DakShellDamage
+						shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.95, 1.05 )
+						shell.DakDamage = self.DakShellDamage * math.Rand( 0.75, 1.25 )
 						shell.DakMass = self.DakShellMass
 						shell.DakIsPellet = false
-						shell.DakSplashDamage = self.DakShellSplashDamage
-						shell.DakPenetration = self.DakShellPenetration
+						shell.DakIsFlechette = true
+						shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.75, 1.25 )
+						shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.75, 1.25 )
 						shell.DakExplosive = self.DakShellExplosive
 						shell.DakBlastRadius = self.DakShellBlastRadius
 						shell.DakPenSounds = self.DakShellPenSounds
 						shell.DakBasePenetration = self.BaseDakShellPenetration
+						shell.DakFragPen = self.DakShellFragPen
 						shell.DakCaliber = self.DakMaxHealth/10
 						shell.DakFireSound = self.DakFireSound
 						shell.DakFirePitch = self.DakFirePitch
@@ -466,16 +476,17 @@ function ENT:DakTEFire()
 	 				shell.Pos = shootOrigin + ( self:GetForward() * 1 )
 	 				shell.Ang = shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
 					shell.DakTrail = self.DakShellTrail
-					shell.DakVelocity = self.DakShellVelocity
-					shell.DakDamage = self.DakShellDamage
+					shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.95, 1.05 )
+					shell.DakDamage = self.DakShellDamage * math.Rand( 0.75, 1.25 )
 					shell.DakMass = self.DakShellMass
 					shell.DakIsPellet = false
-					shell.DakSplashDamage = self.DakShellSplashDamage
-					shell.DakPenetration = self.DakShellPenetration
+					shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.75, 1.25 )
+					shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.75, 1.25 )
 					shell.DakExplosive = self.DakShellExplosive
 					shell.DakBlastRadius = self.DakShellBlastRadius
 					shell.DakPenSounds = self.DakShellPenSounds
 					shell.DakBasePenetration = self.BaseDakShellPenetration
+					shell.DakFragPen = self.DakShellFragPen
 					shell.DakCaliber = self.DakMaxHealth
 					shell.DakFireSound = self.DakFireSound
 					shell.DakFirePitch = self.DakFirePitch
@@ -529,8 +540,8 @@ function ENT:DakTEFire()
 			end
 		end
 	end
-	self.AmmoCount = 0 
 	if IsValid(self.DakTankCore) then
+		self.AmmoCount = 0 
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -540,8 +551,8 @@ function ENT:DakTEFire()
 				end
 			end
 		end
+		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
-	WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 end
 
 function ENT:DakTEGunAmmoSwap()
@@ -573,7 +584,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/2
 		self.DakShellMass = self.BaseDakShellMass
-		self.DakShellPenetration = self.BaseDakShellPenetration*0.25
+		self.DakShellPenetration = self.BaseDakShellPenetration*0.3
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
@@ -592,8 +603,8 @@ function ENT:DakTEGunAmmoSwap()
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
-	self.AmmoCount = 0 
 	if IsValid(self.DakTankCore) then
+		self.AmmoCount = 0 
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -603,8 +614,8 @@ function ENT:DakTEGunAmmoSwap()
 				end
 			end
 		end
+		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
-	WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 end
 
 

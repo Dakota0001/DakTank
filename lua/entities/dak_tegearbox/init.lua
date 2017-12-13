@@ -390,11 +390,12 @@ function ENT:Think()
 
 					if math.abs(LPhys:GetAngleVelocity().y/6) < 1500 and math.abs(RPhys:GetAngleVelocity().y/6) < 1500 then
 						if self.CarTurning==0 then
-							local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (2*math.pow( 0.5,(self.TotalMass)/60000)) --make this last part log
+							--local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (2*math.pow( 0.5,(self.TotalMass)/60000)) --make this last part log
+							local TorqueBoost = 0.15*self.DakHP/(self.TotalMass/1000) 
 							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 
-							self.turnmult = 15000*math.Clamp(((0.075*self.DakSpeed*self.Torque)/math.abs(self.LastYaw-self:GetAngles().yaw))*(2*math.pow( 0.5,(self.TotalMass)/60000)),0,1)
+							self.turnmult = math.Clamp(15000*math.Clamp(((0.075*self.DakSpeed*self.Torque)/math.abs(self.LastYaw-self:GetAngles().yaw))*(0.15*self.DakHP/(self.TotalMass/1000)),0,1),0,15000)
 
 							local LForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.LeftDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							local RForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.RightDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
@@ -509,6 +510,10 @@ function ENT:Think()
 				end
 			end
 		end
+    end
+
+    if self.DakBurnStacks>40 then
+    	self.DakBurnStacks = 40
     end
 
     if self.DakBurnStacks>0 and not(self:IsOnFire()) then

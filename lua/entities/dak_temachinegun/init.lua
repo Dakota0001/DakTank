@@ -32,6 +32,7 @@ ENT.DakArmor = 1
 ENT.DakTankCore = nil
 ENT.HasCrew = 0
 ENT.ShellList = {}
+ENT.BasicVelocity = 41992
 
 function ENT:Initialize()
 	self:SetModel(self.DakModel)
@@ -56,6 +57,7 @@ function ENT:Initialize()
  	self.LastFireTime = CurTime()
  	self.CurrentAmmoType = 1
  	self.DakBurnStacks = 0
+ 	self.BasicVelocity = 41992
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
@@ -82,17 +84,18 @@ function ENT:Think()
 			self.DakHE = math.Round(self.DakCaliber,2).."mmMGHEAmmo"
 			self.DakFL = math.Round(self.DakCaliber,2).."mmMGFLAmmo"
 
-			self.BaseDakShellDamage = self.DakCaliber/50
-			self.BaseDakShellMass = self.DakCaliber/10
-			self.DakShellSplashDamage = self.DakCaliber/10*1.25
+			self.BaseDakShellDamage = self.DakCaliber*0.025
+			self.BaseDakShellMass = self.DakCaliber
+			self.DakShellSplashDamage = self.DakCaliber*0.0375
 			self.BaseDakShellPenetration = self.DakCaliber*2
 			self.DakShellExplosive = false
-			self.DakShellBlastRadius = self.DakCaliber/25*39
+			self.DakShellBlastRadius = (self.DakCaliber/25*39)
+			self.DakShellFragPen = (self.DakCaliber/2.5)
 
-			self.DakFireEffect = "dakballisticfirelight"
+			self.DakFireEffect = "dakballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakballistictracer"
-			self.BaseDakShellVelocity = 31494
+			self.BaseDakShellVelocity = self.BasicVelocity
 			self.DakIsFlechette = false
 			self.DakPellets = 10
 
@@ -182,8 +185,8 @@ function ENT:Think()
 		self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
 
 		local trace = {}
-			trace.start = self.ShellList[i].Pos
-			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+			trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
+			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
 			trace.filter = self.ShellList[i].Filter
 			trace.mins = Vector(-1,-1,-1)
 			trace.maxs = Vector(1,1,1)
@@ -210,7 +213,7 @@ function ENT:Think()
 			self.RemoveList[#self.RemoveList+1] = i
 		end
 
-		self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+		--self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
 	end
 	
 	if #self.RemoveList > 0 then
@@ -243,8 +246,8 @@ function ENT:DakTEAmmoCheck()
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
-	self.AmmoCount = 0 
 	if IsValid(self.DakTankCore) then
+		self.AmmoCount = 0 
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -254,14 +257,14 @@ function ENT:DakTEAmmoCheck()
 				end
 			end
 		end
+		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
-	WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 end
 
 function ENT:DakTEFire()
 	if( self.Firing ) then
-		self.AmmoCount = 0 
 		if IsValid(self.DakTankCore) then
+			self.AmmoCount = 0 
 			if not(self.DakTankCore.Ammoboxes == nil) then
 				for i = 1, #self.DakTankCore.Ammoboxes do
 					if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -297,16 +300,17 @@ function ENT:DakTEFire()
 		 				shell.Pos = shootOrigin + ( self:GetForward() * 1 )
 		 				shell.Ang = shootAngles + Angle(math.Rand(-0.5,0.5),math.Rand(-0.5,0.5),math.Rand(-0.5,0.5))
 						shell.DakTrail = self.DakShellTrail
-						shell.DakVelocity = self.DakShellVelocity
-						shell.DakDamage = self.DakShellDamage
+						shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.95, 1.05 )
+						shell.DakDamage = self.DakShellDamage * math.Rand( 0.75, 1.25 )
 						shell.DakMass = self.DakShellMass
 						shell.DakIsPellet = false
-						shell.DakSplashDamage = self.DakShellSplashDamage
-						shell.DakPenetration = self.DakShellPenetration
+						shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.75, 1.25 )
+						shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.75, 1.25 )
 						shell.DakExplosive = self.DakShellExplosive
 						shell.DakBlastRadius = self.DakShellBlastRadius
 						shell.DakPenSounds = self.DakShellPenSounds
 						shell.DakBasePenetration = self.BaseDakShellPenetration
+						shell.DakFragPen = self.DakShellFragPen
 						shell.DakCaliber = self.DakMaxHealth/10
 						shell.DakFireSound = self.DakFireSound
 						shell.DakFirePitch = self.DakFirePitch
@@ -324,16 +328,17 @@ function ENT:DakTEFire()
 	 				shell.Pos = shootOrigin + ( self:GetForward() * 1 )
 	 				shell.Ang = shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
 					shell.DakTrail = self.DakShellTrail
-					shell.DakVelocity = self.DakShellVelocity
-					shell.DakDamage = self.DakShellDamage
+					shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.95, 1.05 )
+					shell.DakDamage = self.DakShellDamage * math.Rand( 0.75, 1.25 )
 					shell.DakMass = self.DakShellMass
 					shell.DakIsPellet = false
-					shell.DakSplashDamage = self.DakShellSplashDamage
-					shell.DakPenetration = self.DakShellPenetration
+					shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.75, 1.25 )
+					shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.75, 1.25 )
 					shell.DakExplosive = self.DakShellExplosive
 					shell.DakBlastRadius = self.DakShellBlastRadius
 					shell.DakPenSounds = self.DakShellPenSounds
 					shell.DakBasePenetration = self.BaseDakShellPenetration
+					shell.DakFragPen = self.DakShellFragPen
 					shell.DakCaliber = self.DakMaxHealth
 					shell.DakFireSound = self.DakFireSound
 					shell.DakFirePitch = self.DakFirePitch
@@ -383,8 +388,8 @@ function ENT:DakTEFire()
 			end
 		end
 	end
-	self.AmmoCount = 0 
 	if IsValid(self.DakTankCore) then
+		self.AmmoCount = 0 
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -394,8 +399,8 @@ function ENT:DakTEFire()
 				end
 			end
 		end
+		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
-	WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 end
 
 function ENT:TriggerInput(iname, value)
@@ -540,11 +545,19 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				local EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())))
 				if EffArmor < Shell.DakPenetration and HitEnt.IsDakTekFutureTech == nil then
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then		
-						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then	
-							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor)
+						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
+							if Shell.DakIsFlechette==true then
+								HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor*0.2)
+							else
+								HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor)
+							end
 						end
 					else
-						HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor)
+						if Shell.DakIsFlechette==true then
+							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor*0.2)
+						else
+							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor)
+						end
 					end
 					if(HitEnt:IsValid() and HitEnt:GetClass()~="dak_bot" and HitEnt:GetClass()~="prop_ragdoll") then
 						if(HitEnt:GetParent():IsValid()) then
@@ -565,9 +578,17 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakDamage)
 					util.Effect("dakshellpenetrate", effectdata)
-					util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.DakVelocity = Shell.DakVelocity - (Shell.DakVelocity * (EffArmor/Shell.DakPenetration))
+					local checktrace = {}
+						checktrace.start = Start
+						checktrace.endpos = End
+						checktrace.filter = Shell.Filter
+						checktrace.mins = Vector(-1,-1,-1)
+						checktrace.maxs = Vector(1,1,1)
+					local CheckShellTrace = util.TraceHull( checktrace )
 					Shell.Pos = End
+					Shell.LifeTime = 0
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-Shell.DakPenetration*(EffArmor/Shell.DakPenetration)
 					--soundhere penetrate sound
@@ -581,14 +602,14 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				else
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt:GetClass()~="dak_bot" then			
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
-							if Shell.DakIsPellet then	
+							if Shell.DakIsFlechette == true then	
 								HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.375
 							else
 								HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.5
 							end
 						end
 					else
-						if Shell.DakIsPellet then	
+						if Shell.DakIsFlechette == true then	
 							HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.375
 						else
 							HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.5
@@ -614,7 +635,15 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 					if Shell.DakExplosive then
+						local checktrace = {}
+							checktrace.start = Start
+							checktrace.endpos = End
+							checktrace.filter = Shell.Filter
+							checktrace.mins = Vector(-1,-1,-1)
+							checktrace.maxs = Vector(1,1,1)
+						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
+						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -664,7 +693,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							effectdata:SetMagnitude(.5)
 							effectdata:SetScale(Shell.DakDamage)
 							util.Effect("dakshellbounce", effectdata)
-							util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+							util.Decal( "Impact.Glass", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 							local BounceSounds = {}
 							if Shell.DakCaliber < 20 then
 								BounceSounds = {"weapons/fx/rics/ric1.wav","weapons/fx/rics/ric2.wav","weapons/fx/rics/ric3.wav","weapons/fx/rics/ric4.wav","weapons/fx/rics/ric5.wav"}
@@ -679,7 +708,15 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 						Shell.DakVelocity = Shell.DakVelocity*0.025
 						Shell.Ang = ((End-Start) - 1.25 * (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5))
+						local checktrace = {}
+							checktrace.start = Start
+							checktrace.endpos = End
+							checktrace.filter = Shell.Filter
+							checktrace.mins = Vector(-1,-1,-1)
+							checktrace.maxs = Vector(1,1,1)
+						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
+						Shell.LifeTime = 0
 						Shell.DakPenetration = Shell.DakPenetration-Shell.DakPenetration*(HitEnt.DakArmor/Shell.DakPenetration)
 						Shell.DakDamage = 0
 						--soundhere bounce sound
@@ -697,27 +734,26 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 		end
 		if HitEnt:IsValid() then
 			if HitEnt:IsPlayer() or HitEnt:IsNPC() or HitEnt:GetClass() == "dak_bot" then
-
-					if HitEnt:GetClass() == "dak_bot" then
-						HitEnt:SetHealth(HitEnt:Health() - Shell.DakDamage*500)
-						if HitEnt:Health() <= 0 and HitEnt.revenge==0 then
-							local body = ents.Create( "prop_ragdoll" )
-							body:SetPos( HitEnt:GetPos() )
-							body:SetModel( HitEnt:GetModel() )
-							body:Spawn()
-							body.DakHealth=1000000
-							body.DakMaxHealth=1000000
-							if Shell.DakIsFlame == 1 then
-								body:Ignite(10,1)
-							end
-							HitEnt:Remove()
-							local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-							body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-							timer.Simple( 5, function()
-								body:Remove()
-							end )
+				if HitEnt:GetClass() == "dak_bot" then
+					HitEnt:SetHealth(HitEnt:Health() - Shell.DakDamage*500)
+					if HitEnt:Health() <= 0 and HitEnt.revenge==0 then
+						local body = ents.Create( "prop_ragdoll" )
+						body:SetPos( HitEnt:GetPos() )
+						body:SetModel( HitEnt:GetModel() )
+						body:Spawn()
+						body.DakHealth=1000000
+						body.DakMaxHealth=1000000
+						if Shell.DakIsFlame == 1 then
+							body:Ignite(10,1)
 						end
-					else
+						HitEnt:Remove()
+						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+						timer.Simple( 5, function()
+							body:Remove()
+						end )
+					end
+				else
 					local Pain = DamageInfo()
 					Pain:SetDamageForce( Shell.Ang:Forward()*Shell.DakDamage*Shell.DakMass*Shell.DakVelocity )
 					Pain:SetDamage( Shell.DakDamage*500 )
@@ -740,7 +776,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakDamage)
 					util.Effect("dakshellpenetrate", effectdata)
-					util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.Filter[#Shell.Filter+1] = HitEnt
 					DTShellContinue(Start,Shell,Normal)
 					--soundhere penetrate human sound
@@ -794,7 +830,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(Shell.DakDamage)
 						util.Effect("dakshellimpact", effectdata)
-						util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+						util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 						local ExpSounds = {}
 						if Shell.DakCaliber < 20 then
 							ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
@@ -808,6 +844,12 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							sound.Play( ExpSounds[math.random(1,#ExpSounds)], End, 100, 100, 1 )	
 						end
 					end
+					Shell.RemoveNow = 1
+					if Shell.DakExplosive then
+						Shell.ExplodeNow = true
+					end
+					Shell.LifeTime = 0
+					Shell.DakVelocity = 0
 					Shell.DakDamage = 0
 				end
 			end
@@ -837,8 +879,8 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					end
 					sound.Play( ExpSounds[math.random(1,#ExpSounds)], End, 100, 100, 1 )	
 				end
-				
-				DTExplosion(End+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakBasePenetration*0.25,Shell.DakGun.DakOwner,Shell)
+				DTShockwave(End+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+				DTExplosion(End+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
 			else
 				local effectdata = EffectData()
 				if Shell.DakIsFlame == 1 then
@@ -890,7 +932,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						effectdata:SetScale(Shell.DakDamage)
 					end
 					util.Effect("dakshellimpact", effectdata)
-					util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 					local ExpSounds = {}
 					if Shell.DakCaliber < 20 then
 						ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
@@ -906,19 +948,29 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 			end
 			Shell.RemoveNow = 1
+			if Shell.DakExplosive then
+				Shell.ExplodeNow = true
+			end
+			Shell.LifeTime = 0
+			Shell.DakVelocity = 0
+			Shell.DakDamage = 0
+		else
+
 		end	
 
 		if Shell.DakPenetration <= 0 then
 			Shell.Spent = 1
-			Shell.DieTime = CurTime()
+			if Shell.DieTime == nil then
+				Shell.DieTime = CurTime()
+			end
 		end
 	end
 end
 
 function DTShellContinue(Start,Shell,Normal)
 	local newtrace = {}
-		newtrace.start = Shell.Pos
-		newtrace.endpos = Shell.Pos + (Shell.Ang:Forward()*Shell.DakVelocity*0.1) + (Shell.Gravity*0.1)
+		newtrace.start = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * (Shell.LifeTime-0.1)) - (-physenv.GetGravity()*((Shell.LifeTime-0.1)^2)/2)
+		newtrace.endpos = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * Shell.LifeTime) - (-physenv.GetGravity()*(Shell.LifeTime^2)/2)
 		newtrace.filter = Shell.Filter
 		newtrace.mins = Vector(-1,-1,-1)
 		newtrace.maxs = Vector(1,1,1)
@@ -991,10 +1043,18 @@ function DTShellContinue(Start,Shell,Normal)
 				if EffArmor < Shell.DakPenetration and HitEnt.IsDakTekFutureTech == nil then
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then			
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then	
-							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor)
+							if Shell.DakIsFlechette==true then
+								HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor*0.2)
+							else
+								HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor)
+							end
 						end
 					else
-						HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor)
+						if Shell.DakIsFlechette==true then
+							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor*0.2)
+						else
+							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*2*(Shell.DakPenetration/HitEnt.DakArmor),0,HitEnt.DakArmor)
+						end
 					end
 					if(HitEnt:IsValid() and HitEnt:GetClass()~="dak_bot" and HitEnt:GetClass()~="prop_ragdoll") then
 						if(HitEnt:GetParent():IsValid()) then
@@ -1015,9 +1075,17 @@ function DTShellContinue(Start,Shell,Normal)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakDamage)
 					util.Effect("dakshellpenetrate", effectdata)
-					util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.DakVelocity = Shell.DakVelocity - (Shell.DakVelocity * (EffArmor/Shell.DakPenetration))
+					local checktrace = {}
+						checktrace.start = Start
+						checktrace.endpos = End
+						checktrace.filter = Shell.Filter
+						checktrace.mins = Vector(-1,-1,-1)
+						checktrace.maxs = Vector(1,1,1)
+					local CheckShellTrace = util.TraceHull( checktrace )
 					Shell.Pos = End
+					Shell.LifeTime = 0
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-Shell.DakPenetration*(EffArmor/Shell.DakPenetration)
 					--soundhere penetrate sound
@@ -1031,14 +1099,14 @@ function DTShellContinue(Start,Shell,Normal)
 				else
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt:GetClass()~="dak_bot" then			
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then	
-							if Shell.DakIsPellet then	
+							if Shell.DakIsFlechette == true then	
 								HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.375
 							else
 								HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.5
 							end
 						end
 					else
-						if Shell.DakIsPellet then	
+						if Shell.DakIsFlechette == true then	
 							HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.375
 						else
 							HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.5
@@ -1064,7 +1132,15 @@ function DTShellContinue(Start,Shell,Normal)
 						end
 					end
 					if Shell.DakExplosive then
+						local checktrace = {}
+							checktrace.start = Start
+							checktrace.endpos = End
+							checktrace.filter = Shell.Filter
+							checktrace.mins = Vector(-1,-1,-1)
+							checktrace.maxs = Vector(1,1,1)
+						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
+						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -1114,7 +1190,7 @@ function DTShellContinue(Start,Shell,Normal)
 							effectdata:SetMagnitude(.5)
 							effectdata:SetScale(Shell.DakDamage)
 							util.Effect("dakshellbounce", effectdata)
-							util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+							util.Decal( "Impact.Glass", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 							local BounceSounds = {}
 							if Shell.DakCaliber < 20 then
 								BounceSounds = {"weapons/fx/rics/ric1.wav","weapons/fx/rics/ric2.wav","weapons/fx/rics/ric3.wav","weapons/fx/rics/ric4.wav","weapons/fx/rics/ric5.wav"}
@@ -1129,7 +1205,15 @@ function DTShellContinue(Start,Shell,Normal)
 						end
 						Shell.DakVelocity = Shell.DakVelocity*0.025
 						Shell.Ang = ((End-Start) - 1.25 * (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5))
+						local checktrace = {}
+							checktrace.start = Start
+							checktrace.endpos = End
+							checktrace.filter = Shell.Filter
+							checktrace.mins = Vector(-1,-1,-1)
+							checktrace.maxs = Vector(1,1,1)
+						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
+						Shell.LifeTime = 0
 						Shell.DakPenetration = Shell.DakPenetration-Shell.DakPenetration*(HitEnt.DakArmor/Shell.DakPenetration)
 						Shell.DakDamage = 0
 						--soundhere bounce sound
@@ -1148,27 +1232,26 @@ function DTShellContinue(Start,Shell,Normal)
 		end
 		if HitEnt:IsValid() then
 			if HitEnt:IsPlayer() or HitEnt:IsNPC() or HitEnt:GetClass() == "dak_bot" then
-
-					if HitEnt:GetClass() == "dak_bot" then
-						HitEnt:SetHealth(HitEnt:Health() - Shell.DakDamage*500)
-						if HitEnt:Health() <= 0 and HitEnt.revenge==0 then
-							local body = ents.Create( "prop_ragdoll" )
-							body:SetPos( HitEnt:GetPos() )
-							body:SetModel( HitEnt:GetModel() )
-							body:Spawn()
-							body.DakHealth=1000000
-							body.DakMaxHealth=1000000
-							if Shell.DakIsFlame == 1 then
-								body:Ignite(10,1)
-							end
-							HitEnt:Remove()
-							local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-							body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-							timer.Simple( 5, function()
-								body:Remove()
-							end )
+				if HitEnt:GetClass() == "dak_bot" then
+					HitEnt:SetHealth(HitEnt:Health() - Shell.DakDamage*500)
+					if HitEnt:Health() <= 0 and HitEnt.revenge==0 then
+						local body = ents.Create( "prop_ragdoll" )
+						body:SetPos( HitEnt:GetPos() )
+						body:SetModel( HitEnt:GetModel() )
+						body:Spawn()
+						body.DakHealth=1000000
+						body.DakMaxHealth=1000000
+						if Shell.DakIsFlame == 1 then
+							body:Ignite(10,1)
 						end
-					else
+						HitEnt:Remove()
+						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+						timer.Simple( 5, function()
+							body:Remove()
+						end )
+					end
+				else
 					local Pain = DamageInfo()
 					Pain:SetDamageForce( Shell.Ang:Forward()*Shell.DakDamage*Shell.DakMass*Shell.DakVelocity )
 					Pain:SetDamage( Shell.DakDamage*500 )
@@ -1191,7 +1274,7 @@ function DTShellContinue(Start,Shell,Normal)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakDamage)
 					util.Effect("dakshellpenetrate", effectdata)
-					util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.Filter[#Shell.Filter+1] = HitEnt
 					DTShellContinue(Start,Shell,Normal)
 					--soundhere penetrate human sound
@@ -1245,7 +1328,7 @@ function DTShellContinue(Start,Shell,Normal)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(Shell.DakDamage)
 						util.Effect("dakshellimpact", effectdata)
-						util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+						util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 						local ExpSounds = {}
 						if Shell.DakCaliber < 20 then
 							ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
@@ -1259,6 +1342,12 @@ function DTShellContinue(Start,Shell,Normal)
 							sound.Play( ExpSounds[math.random(1,#ExpSounds)], End, 100, 100, 1 )	
 						end
 					end
+					Shell.RemoveNow = 1
+					if Shell.DakExplosive then
+						Shell.ExplodeNow = true
+					end
+					Shell.LifeTime = 0
+					Shell.DakVelocity = 0
 					Shell.DakDamage = 0
 				end
 			end
@@ -1288,8 +1377,8 @@ function DTShellContinue(Start,Shell,Normal)
 					end
 					sound.Play( ExpSounds[math.random(1,#ExpSounds)], End, 100, 100, 1 )	
 				end
-
-				DTExplosion(End+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakBasePenetration*0.25,Shell.DakGun.DakOwner,Shell)
+				DTShockwave(End+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+				DTExplosion(End+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
 			else
 				local effectdata = EffectData()
 				if Shell.DakIsFlame == 1 then
@@ -1341,7 +1430,7 @@ function DTShellContinue(Start,Shell,Normal)
 						effectdata:SetScale(Shell.DakDamage)
 					end
 					util.Effect("dakshellimpact", effectdata)
-					util.Decal( "Impact.Concrete", Start, End, Shell.DakGun)
+					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 					local ExpSounds = {}
 					if Shell.DakCaliber < 20 then
 						ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
@@ -1357,11 +1446,19 @@ function DTShellContinue(Start,Shell,Normal)
 				end
 			end
 			Shell.RemoveNow = 1
+			if Shell.DakExplosive then
+				Shell.ExplodeNow = true
+			end
+			Shell.LifeTime = 0
+			Shell.DakVelocity = 0
+			Shell.DakDamage = 0
 		end	
 
 		if Shell.DakPenetration <= 0 then
 			Shell.Spent=1
-			Shell.DieTime = CurTime()
+			if Shell.DieTime == nil then
+				Shell.DieTime = CurTime()
+			end
 		end
 	end
 end
@@ -1607,5 +1704,132 @@ function DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Directio
 				ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*3.5*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 			end
 		end		
+	end
+end
+
+function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
+	Shell.DakDamageList = {}
+	Shell.RemoveList = {}
+	Shell.IgnoreList = {}
+	local Targets = ents.FindInSphere( Pos, Radius )
+	if table.Count(Targets) > 0 then
+		for i = 1, #Targets do
+			if Targets[i]:IsValid() then
+				if hook.Run("DakTankDamageCheck", Targets[i], Owner) ~= false then
+				else
+					table.insert(Shell.IgnoreList,Targets[i])
+				end
+				if not(Targets[i].DakHealth == nil) then
+					if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 then
+						if IsValid(Targets[i]:GetPhysicsObject()) then
+							if Targets[i]:GetPhysicsObject():GetMass()<=1 then
+								table.insert(Shell.IgnoreList,Targets[i])
+							end
+						end
+						table.insert(Shell.IgnoreList,Targets[i])
+					end
+				end
+			end
+		end
+
+		for i = 1, #Targets do
+			if Targets[i]:IsValid() or Targets[i]:IsPlayer() or Targets[i]:IsNPC() then
+				local trace = {}
+				trace.start = Pos
+				trace.endpos = Targets[i]:LocalToWorld( Targets[i]:OBBCenter() )
+				trace.filter = Shell.IgnoreList
+				trace.mins = Vector(-1,-1,-1)
+				trace.maxs = Vector(1,1,1)
+				local ExpTrace = util.TraceHull( trace )
+				if ExpTrace.Entity == Targets[i] then
+					if not(string.Explode("_",Targets[i]:GetClass(),false)[2] == "wire") and not(Targets[i]:IsVehicle()) and not(Targets[i]:GetClass() == "dak_salvage") and not(Targets[i]:GetClass() == "dak_tesalvage") and Targets[i]:GetPhysicsObject():GetMass()>1 and Targets[i].DakIsTread==nil and not(Targets[i]:GetClass() == "dak_turretcontrol") then
+						if (not(ExpTrace.Entity:IsPlayer())) and (not(ExpTrace.Entity:IsNPC())) then
+							if ExpTrace.Entity.DakArmor == nil then
+								DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+							end
+							table.insert(Shell.DakDamageList,ExpTrace.Entity)
+						else
+							if Targets[i]:GetClass() == "dak_bot" then
+								Targets[i]:SetHealth(Targets[i]:Health() - Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000))*500)
+								if Targets[i]:Health() <= 0 and Shell.revenge==0 then
+									local body = ents.Create( "prop_ragdoll" )
+									body:SetPos( Targets[i]:GetPos() )
+									body:SetModel( Targets[i]:GetModel() )
+									body:Spawn()
+									Targets[i]:Remove()
+									local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+									body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+									timer.Simple( 5, function()
+										body:Remove()
+									end )
+								end
+							else
+								local ExpPain = DamageInfo()
+								ExpPain:SetDamageForce( ExpTrace.Normal*Damage*Shell.DakMass*Shell.DakVelocity )
+								ExpPain:SetDamage( Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)) )
+								ExpPain:SetAttacker( Owner )
+								ExpPain:SetInflictor( Shell.DakGun )
+								ExpPain:SetReportedPosition( self:GetPos() )
+								ExpPain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
+								ExpPain:SetDamageType(DMG_BLAST)
+								ExpTrace.Entity:TakeDamageInfo( ExpPain )
+							end
+						end
+					end
+				end
+			end
+		end
+		for i = 1, #Shell.DakDamageList do
+			if(Shell.DakDamageList[i]:IsValid()) then
+				if not(Shell.DakDamageList[i]:GetClass() == "dak_bot") then
+					if(Shell.DakDamageList[i]:GetParent():IsValid()) then
+						if(Shell.DakDamageList[i]:GetParent():GetParent():IsValid()) then
+						Shell.DakDamageList[i]:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*1000*2*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000)) )
+						end
+					end
+					if not(Shell.DakDamageList[i]:GetParent():IsValid()) then
+						Shell.DakDamageList[i]:GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*1000*2*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000))  )
+					end
+				end
+			end
+			local HPPerc = 0
+			if not(Shell.DakDamageList[i].SPPOwner==nil) then
+				if Shell.DakDamageList[i].SPPOwner:HasGodMode()==false then	
+					if Shell.DakDamageList[i].DakIsTread==nil then
+						if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
+							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))
+						else
+							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )
+						end
+					end
+					Shell.DakDamageList[i].DakLastDamagePos = Pos
+					if Shell.DakDamageList[i].DakHealth <= 0 and Shell.DakDamageList[i].DakPooled==0 then
+						table.insert(Shell.RemoveList,Shell.DakDamageList[i])
+					end
+				end
+			else
+				if Shell.DakDamageList[i].DakIsTread==nil then
+					if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
+						Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))
+					else
+						Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )
+					end
+				end
+				Shell.DakDamageList[i].DakLastDamagePos = Pos
+				if Shell.DakDamageList[i].DakHealth <= 0 and Shell.DakDamageList[i].DakPooled==0 then
+					table.insert(Shell.RemoveList,Shell.DakDamageList[i])
+				end
+			end
+
+		end
+		for i = 1, #Shell.RemoveList do
+			Shell.salvage = ents.Create( "dak_tesalvage" )
+			Shell.salvage.DakModel = Shell.RemoveList[i]:GetModel()
+			Shell.salvage:SetPos( Shell.RemoveList[i]:GetPos())
+			Shell.salvage:SetAngles( Shell.RemoveList[i]:GetAngles())
+			Shell.salvage.DakLastDamagePos = Pos
+			Shell.salvage:Spawn()
+			Shell.RemoveList[i]:Remove()
+		end
 	end
 end
