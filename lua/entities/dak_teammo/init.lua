@@ -330,7 +330,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakIsExplosive = Ent.EntityMods.DakTek.DakIsExplosive
-		self.DakAmmo = Ent.EntityMods.DakTek.DakAmmo
+		self.DakAmmo = Ent.EntityMods.DakTek.DakMaxAmmo
 		self.DakMaxAmmo = Ent.EntityMods.DakTek.DakMaxAmmo
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth

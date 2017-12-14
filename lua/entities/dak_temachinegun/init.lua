@@ -579,6 +579,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetScale(Shell.DakDamage)
 					util.Effect("dakshellpenetrate", effectdata)
 					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
+					util.Decal( "Impact.Concrete", End+((End-Start):GetNormalized()*5), End-((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.DakVelocity = Shell.DakVelocity - (Shell.DakVelocity * (EffArmor/Shell.DakPenetration))
 					local checktrace = {}
 						checktrace.start = Start
@@ -724,11 +725,15 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				if HitEnt.DakHealth <= 0 and HitEnt.DakPooled==0 then
 					local salvage = ents.Create( "dak_tesalvage" )
+					Shell.salvage = salvage
 					salvage.DakModel = HitEnt:GetModel()
 					salvage:SetPos( HitEnt:GetPos())
 					salvage:SetAngles( HitEnt:GetAngles())
 					salvage:Spawn()
 					HitEnt:Remove()
+					if Shell.salvage then
+						Shell.Filter[#Shell.Filter+1] = Shell.salvage
+					end
 				end
 			end
 		end
@@ -777,7 +782,11 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetScale(Shell.DakDamage)
 					util.Effect("dakshellpenetrate", effectdata)
 					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
+					util.Decal( "Impact.Concrete", End+((End-Start):GetNormalized()*5), End-((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.Filter[#Shell.Filter+1] = HitEnt
+					if Shell.salvage then
+						Shell.Filter[#Shell.Filter+1] = Shell.salvage
+					end
 					DTShellContinue(Start,Shell,Normal)
 					--soundhere penetrate human sound
 					if Shell.DakIsPellet then
@@ -1076,6 +1085,7 @@ function DTShellContinue(Start,Shell,Normal)
 					effectdata:SetScale(Shell.DakDamage)
 					util.Effect("dakshellpenetrate", effectdata)
 					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
+					util.Decal( "Impact.Concrete", End+((End-Start):GetNormalized()*5), End-((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.DakVelocity = Shell.DakVelocity - (Shell.DakVelocity * (EffArmor/Shell.DakPenetration))
 					local checktrace = {}
 						checktrace.start = Start
@@ -1222,11 +1232,15 @@ function DTShellContinue(Start,Shell,Normal)
 				end
 				if HitEnt.DakHealth <= 0 and HitEnt.DakPooled==0 then
 					local salvage = ents.Create( "dak_tesalvage" )
+					Shell.salvage = salvage
 					salvage.DakModel = HitEnt:GetModel()
 					salvage:SetPos( HitEnt:GetPos())
 					salvage:SetAngles( HitEnt:GetAngles())
 					salvage:Spawn()
 					HitEnt:Remove()
+					if Shell.salvage then
+						Shell.Filter[#Shell.Filter+1] = Shell.salvage
+					end
 				end
 			end
 		end
@@ -1275,7 +1289,11 @@ function DTShellContinue(Start,Shell,Normal)
 					effectdata:SetScale(Shell.DakDamage)
 					util.Effect("dakshellpenetrate", effectdata)
 					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
+					util.Decal( "Impact.Concrete", End+((End-Start):GetNormalized()*5), End-((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.Filter[#Shell.Filter+1] = HitEnt
+					if Shell.salvage then
+						Shell.Filter[#Shell.Filter+1] = Shell.salvage
+					end
 					DTShellContinue(Start,Shell,Normal)
 					--soundhere penetrate human sound
 					if Shell.DakIsPellet then
@@ -1533,6 +1551,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell)
 					end
 					if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
 						local salvage = ents.Create( "dak_tesalvage" )
+						Shell.salvage = salvage
 						salvage.DakModel = ExpTrace.Entity:GetModel()
 						salvage:SetPos( ExpTrace.Entity:GetPos())
 						salvage:SetAngles( ExpTrace.Entity:GetAngles())
@@ -1655,6 +1674,7 @@ function DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Directio
 				end
 				if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
 					local salvage = ents.Create( "dak_tesalvage" )
+					Shell.salvage = salvage
 					salvage.DakModel = ExpTrace.Entity:GetModel()
 					salvage:SetPos( ExpTrace.Entity:GetPos())
 					salvage:SetAngles( ExpTrace.Entity:GetAngles())
