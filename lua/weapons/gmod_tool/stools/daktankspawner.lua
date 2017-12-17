@@ -1871,22 +1871,22 @@ AmmoBoxSelect:AddChoice( "Mortar" )
 AmmoBoxSelect.OnSelect = function( panel, index, value )
 	RunConsoleCommand("daktankspawner_DTTE_AmmoType", value)
 	local values = {
-		["Machine Gun"] = function( )
+		["Machine Gun"] = function()
 			DermaNumSlider:SetMinMax( 5, 25 )
 		end,
-		["Heavy Machine Gun"] = function( )
+		["Heavy Machine Gun"] = function()
 			DermaNumSlider:SetMinMax( 20, 40 )
 		end,
-		["Autocannon"] = function( )
+		["Autocannon"] = function()
 			DermaNumSlider:SetMinMax( 20, 60 )
 		end,
-		["Cannon"] = function( )
+		["Cannon"] = function()
 			DermaNumSlider:SetMinMax( 25, 200 )
 		end,
-		["Howitzer"] = function( )
+		["Howitzer"] = function()
 			DermaNumSlider:SetMinMax( 50, 240 )
 		end,
-		["Mortar"] = function( )
+		["Mortar"] = function()
 			DermaNumSlider:SetMinMax( 40, 280 )
 		end
 	}
