@@ -22,9 +22,6 @@ if SERVER then
 				 		ent.DakHealth = 100000000000000000000
 				 	end
 				 end
-		 		ent.DakRed = ent:GetColor().r
-				ent.DakGreen = ent:GetColor().g
-				ent.DakBlue = ent:GetColor().b
 				ent.DakName = "Armor"
 				if IsValid(ent:GetPhysicsObject()) then
 			 		ent.DakMaxHealth = ent:GetPhysicsObject():GetMass()/20
@@ -59,9 +56,6 @@ if SERVER then
 				--ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
 				ent.DakBurnStacks = 0
 				ent.DakHealth = 10
-		 		ent.DakRed = ent:GetColor().r
-				ent.DakGreen = ent:GetColor().g
-				ent.DakBlue = ent:GetColor().b
 				ent.DakName = "Armor"
 				ent.DakMaxHealth = 10
 		 		--ent.DakMaxHealth = ent:GetPhysicsObject():GetMass()/20

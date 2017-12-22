@@ -114,10 +114,21 @@ function ENT:Think()
 		self.Ammoboxes={}
 		self.TurretControls={}
 		self.Guns={}
+		self.Crew={}
+		self.Motors={}
+		self.Fuel={}
+		self.Tread={}
 		for i=1, #res do
 			if res[i]:IsSolid() then
+				if res[i]:GetClass()=="dak_tegearbox" then
+					res[i].DakTankCore = self
+					self.Gearbox = res[i]
+				end
 				if res[i]:GetClass()=="dak_tefuel" then
-					self.DakFuel=res[i]
+					self.Fuel[#self.Fuel+1] = res[i]
+				end
+				if res[i]:GetClass()=="dak_temotor" then
+					self.Motors[#self.Motors+1] = res[i]
 				end
 				if res[i]:GetClass() == "dak_teammo" then
 					self.Ammoboxes[#self.Ammoboxes+1] = res[i]
@@ -138,17 +149,31 @@ function ENT:Think()
 					res[i].DakContraption = res
 					res[i].DakCore = self
 				end
+				if res[i]:GetClass()=="dak_crew" then
+					self.Crew[#self.Crew+1]=res[i]
+				end
 				Mass = Mass + res[i]:GetPhysicsObject():GetMass()
 				if res[i]:GetPhysicsObject():GetSurfaceArea() then
 					if res[i]:GetPhysicsObject():GetMass()>1 then
 						SA = SA + res[i]:GetPhysicsObject():GetSurfaceArea()
 					end
+				else
+					self.Tread[#self.Tread+1]=res[i]
 				end
 			end
 		end
-		if self.DakFuel then
-			self.DakFuel.TotalMass = Mass
+		if self.Gearbox then
+			self.Gearbox.TotalMass = Mass
 		end
+
+		if IsValid(self.Tread[1]) then
+			if self.Tread[1]:GetPhysicsObject():GetMaterial()~="jeeptire" then
+				for i=1, table.Count(self.Tread) do
+					self.Tread[i]:GetPhysicsObject():SetMaterial("jeeptire")
+				end
+			end
+		end
+
 		self.TotalMass = Mass
 		self.SurfaceArea = SA
 		self.SizeMult = (SA/Mass)*0.18
@@ -258,12 +283,6 @@ function ENT:Think()
 						self.DakMaxHealth = self.CurMass*0.01*self.SizeMult
 						self.CurrentHealth = self.CurMass*0.01*self.SizeMult
 						self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult
-						self.HitBox[i].DakRed = self.HitBox[i]:GetColor().r
-						self.HitBox[i].DakGreen = self.HitBox[i]:GetColor().g
-						self.HitBox[i].DakBlue = self.HitBox[i]:GetColor().b
-					else
-						local HPPerc = self.HitBox[i].DakHealth/self.HitBox[i].DakMaxHealth --get hp percent then set colors based on it
-						self.HitBox[i]:SetColor(Color(self.HitBox[i].DakRed*HPPerc,self.HitBox[i].DakGreen*HPPerc,self.HitBox[i].DakBlue*HPPerc,self.HitBox[i]:GetColor().a))
 					end
 					self.HitBox[i].DakHealth = self.CurrentHealth
 				end

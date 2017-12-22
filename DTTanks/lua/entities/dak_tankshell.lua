@@ -190,18 +190,10 @@ function ENT:Think()
 					if EffArmor < self.DakPenetration and Hit.Entity.IsDakTekFutureTech == nil then
 						if not(Hit.Entity.SPPOwner==nil) then			
 							if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
-								local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
 								Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
-								if not(Hit.Entity.DakRed == nil) then 
-									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-								end
 							end
 						else
-							local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
 							Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
-							if not(Hit.Entity.DakRed == nil) then 
-								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-							end
 						end
 						if(Hit.Entity:IsValid() and Hit.Entity:GetClass()~="dak_bot" and Hit.Entity:GetClass()~="prop_ragdoll") then
 							if(Hit.Entity:GetParent():IsValid()) then
@@ -240,18 +232,10 @@ function ENT:Think()
 					else
 						if not(Hit.Entity.SPPOwner==nil) and not(Hit.Entity.SPPOwner:IsWorld()) and Hit.Entity:GetClass()~="dak_bot" then			
 							if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
-								local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
 								Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
-								if not(Hit.Entity.DakRed == nil) then 
-									Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-								end
 							end
 						else
-							local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
 							Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
-							if not(Hit.Entity.DakRed == nil) then 
-								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-							end
 						end
 						if self.DakIsFlame == 1 then
 							if Hit.Entity.DakArmor > (7.8125*(Hit.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA))*0.5 then
@@ -292,6 +276,11 @@ function ENT:Think()
 								if table.Count(Targets) > 0 then
 									for i = 1, #Targets do
 										if Targets[i]:GetClass() == "dak_temotor" then
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
+											end
+										end
+										if Targets[i]:GetClass() == "dak_tegearbox" then
 											if not(Targets[i]:IsOnFire()) then 
 												Targets[i]:Ignite(5,1)
 											end
@@ -425,25 +414,27 @@ function ENT:Think()
 							if table.Count(Targets) > 0 then
 								for i = 1, #Targets do
 									if Targets[i]:GetClass() == "dak_temotor" then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
+									end
+									if Targets[i]:GetClass() == "dak_tegearbox" then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
+										end
 										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 									end
 									if Targets[i]:IsPlayer() then
 										if not Targets[i]:InVehicle() then
-											if Targets[i]:IsOnFire() then 
-												Targets[i]:Extinguish()
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
 											end
-											Targets[i]:Ignite(5,1)
 										end
 									end
 									if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
 									end
 								end
 							end
@@ -497,27 +488,31 @@ function ENT:Think()
 						util.Effect("dakflameimpact", effectdata)
 						local Targets = ents.FindInSphere( self.LastHit, 150 )
 						if table.Count(Targets) > 0 then
-							for i = 1, #Targets do
-								if Targets[i]:GetClass() == "dak_temotor" then
-									if Targets[i]:IsOnFire() then 
-										Targets[i]:Extinguish()
-									end
-									Targets[i]:Ignite(5,1)
-									Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-								end
-								if Targets[i]:IsPlayer() then
-									if not Targets[i]:InVehicle() then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+							if table.Count(Targets) > 0 then
+								for i = 1, #Targets do
+									if Targets[i]:GetClass() == "dak_temotor" then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
 									end
-								end
-								if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-									if Targets[i]:IsOnFire() then 
-										Targets[i]:Extinguish()
+									if Targets[i]:GetClass() == "dak_tegearbox" then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
+										end
+										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 									end
-									Targets[i]:Ignite(5,1)
+									if Targets[i]:IsPlayer() then
+										if not Targets[i]:InVehicle() then
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
+											end
+										end
+									end
+									if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
+										end
+									end
 								end
 							end
 						end
@@ -568,11 +563,7 @@ function ENT:Think()
 		end
 
 	end
-	if self.DakCaliber < 20 then
-		self:NextThink( CurTime()+0.25 )
-	else
-		self:NextThink( CurTime() )
-	end
+	self:NextThink( CurTime() )
 	return true
 end
 
@@ -649,18 +640,10 @@ function ENT:Damage(oldhit)
 				if EffArmor < self.DakPenetration and Hit.Entity.IsDakTekFutureTech == nil then
 					if not(Hit.Entity.SPPOwner==nil) then			
 						if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
-							local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
 							Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
-							if not(Hit.Entity.DakRed == nil) then 
-								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-							end
 						end
 					else
-						local HPPerc = (Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor))/Hit.Entity.DakMaxHealth
 						Hit.Entity.DakHealth = Hit.Entity.DakHealth- math.Clamp(self.DakDamage*2*(self.DakPenetration/Hit.Entity.DakArmor),0,Hit.Entity.DakArmor)
-						if not(Hit.Entity.DakRed == nil) then 
-							Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-						end
 					end
 					local effectdata = EffectData()
 					effectdata:SetOrigin(Hit.HitPos)
@@ -687,18 +670,10 @@ function ENT:Damage(oldhit)
 				else
 					if not(Hit.Entity.SPPOwner==nil) and not(Hit.Entity.SPPOwner:IsWorld()) and Hit.Entity:GetClass()~="dak_bot" then		
 						if Hit.Entity.SPPOwner:HasGodMode()==false and Hit.Entity.DakIsTread == nil then	
-							local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
 							Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
-							if not(Hit.Entity.DakRed == nil) then 
-								Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-							end
 						end
 					else
-						local HPPerc = (Hit.Entity.DakHealth-self.DakDamage*0.5)/Hit.Entity.DakMaxHealth
 						Hit.Entity.DakHealth = Hit.Entity.DakHealth-self.DakDamage*0.5
-						if not(Hit.Entity.DakRed == nil) then 
-							Hit.Entity:SetColor(Color(Hit.Entity.DakRed*HPPerc,Hit.Entity.DakGreen*HPPerc,Hit.Entity.DakBlue*HPPerc,Hit.Entity:GetColor().a))
-						end
 					end
 					if self.DakIsFlame == 1 then
 						if Hit.Entity.DakArmor > (7.8125*(Hit.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA))*0.5 then
@@ -728,25 +703,27 @@ function ENT:Damage(oldhit)
 							if table.Count(Targets) > 0 then
 								for i = 1, #Targets do
 									if Targets[i]:GetClass() == "dak_temotor" then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
+									end
+									if Targets[i]:GetClass() == "dak_tegearbox" then
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
+										end
 										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 									end
 									if Targets[i]:IsPlayer() then
 										if not Targets[i]:InVehicle() then
-											if Targets[i]:IsOnFire() then 
-												Targets[i]:Extinguish()
+											if not(Targets[i]:IsOnFire()) then 
+												Targets[i]:Ignite(5,1)
 											end
-											Targets[i]:Ignite(5,1)
 										end
 									end
 									if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
 									end
 								end
 							end
@@ -854,25 +831,27 @@ function ENT:Damage(oldhit)
 						if table.Count(Targets) > 0 then
 							for i = 1, #Targets do
 								if Targets[i]:GetClass() == "dak_temotor" then
-									if Targets[i]:IsOnFire() then 
-										Targets[i]:Extinguish()
+									if not(Targets[i]:IsOnFire()) then 
+										Targets[i]:Ignite(5,1)
 									end
-									Targets[i]:Ignite(5,1)
+								end
+								if Targets[i]:GetClass() == "dak_tegearbox" then
+									if not(Targets[i]:IsOnFire()) then 
+										Targets[i]:Ignite(5,1)
+									end
 									Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
 								end
 								if Targets[i]:IsPlayer() then
 									if not Targets[i]:InVehicle() then
-										if Targets[i]:IsOnFire() then 
-											Targets[i]:Extinguish()
+										if not(Targets[i]:IsOnFire()) then 
+											Targets[i]:Ignite(5,1)
 										end
-										Targets[i]:Ignite(5,1)
 									end
 								end
 								if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
-									if Targets[i]:IsOnFire() then 
-										Targets[i]:Extinguish()
+									if not(Targets[i]:IsOnFire()) then 
+										Targets[i]:Ignite(5,1)
 									end
-									Targets[i]:Ignite(5,1)
 								end
 							end
 						end
@@ -994,18 +973,10 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 
 					if not(ExpTrace.Entity.SPPOwner==nil) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
-							local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
 							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-							if not(ExpTrace.Entity.DakRed == nil) then 
-								ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
-							end
 						end
 					else
-						local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-						if not(ExpTrace.Entity.DakRed == nil) then 
-							ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
-						end
 					end
 					if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
 						self.salvage = ents.Create( "dak_tesalvage" )
@@ -1130,18 +1101,10 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 
 				if not(ExpTrace.Entity.SPPOwner==nil) then			
 					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
-						local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-						if not(ExpTrace.Entity.DakRed == nil) then 
-							ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
-						end
 					end
 				else
-					local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
 					ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-					if not(ExpTrace.Entity.DakRed == nil) then 
-						ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
-					end
 				end
 				if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
 					self.salvage = ents.Create( "dak_tesalvage" )

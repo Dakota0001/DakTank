@@ -5,13 +5,14 @@ include("shared.lua")
 
 ENT.DakName = "Base Ammo"
 ENT.DakIsExplosive = true
-ENT.DakAmmo = 10
+--ENT.DakAmmo = 10
 ENT.DakArmor = 10
-ENT.DakMaxAmmo = 10
+--ENT.DakMaxAmmo = 10
 ENT.DakMaxHealth = 10
 ENT.DakHealth = 10
 ENT.DakAmmoType = "Base"
 ENT.DakPooled=0
+ENT.ShellList = {}
 
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -23,208 +24,280 @@ function ENT:Initialize()
 	if(IsValid(phys)) then
 		phys:Wake()
 	end
-	self.DakAmmo = self.DakMaxAmmo
+	--self.DakAmmo = self.DakMaxAmmo
 	
 	self.Inputs = Wire_CreateInputs(self, { "EjectAmmo" })
 	self.Outputs = WireLib.CreateOutputs( self, { "Ammo", "MaxAmmo" } )
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.DumpTime = CurTime()
+ 	self.SlowThinkTime = CurTime()
  	self.DakArmor = 10
  	self.DakMaxHealth = 30
 	self.DakHealth = 30
 	self.DakBurnStacks = 0
+
+	function self:SetupDataTables()
+ 		self:NetworkVar("Bool",0,"Firing")
+ 	end
+
+	self.ShellList = {}
+ 	self.RemoveList = {}
 end
 
 function ENT:Think()
-
-	if not(self.DakName == "Base Ammo") then
-		self.DakCaliber = tonumber(string.Split( self.DakName, "m" )[1])
-		if self.DakAmmoType == "Flamethrower Fuel" then
-			self.DakMaxAmmo = 150
-			if self.DakAmmo > self.DakMaxAmmo then
-				self.DakAmmo = self.DakMaxAmmo
-			end
-		else
-			if self.DakAmmoType == "Mortar" then
-				self.DakMaxAmmo = math.Round(((600/self.DakCaliber)*(600/self.DakCaliber))*0.25)
+	if CurTime()>=self.SlowThinkTime+1 then
+		if not(self.DakName == "Base Ammo") then
+			self.DakCaliber = tonumber(string.Split( self.DakName, "m" )[1])
+			if self.DakAmmoType == "Flamethrower Fuel" then
+				self.DakMaxAmmo = 150
 				if self.DakAmmo > self.DakMaxAmmo then
 					self.DakAmmo = self.DakMaxAmmo
 				end
 			else
-				self.DakMaxAmmo = math.Round(((500/self.DakCaliber)*(500/self.DakCaliber))*0.25)
+				-- steel density 0.132 kg/in3
+				self.BoxLength = self:GetPhysicsObject():GetVolume()^(1/3)
+				self.DakMaxAmmo = math.floor( ((self.BoxLength/(self.DakCaliber*0.0393701))^2)/6.5 )
+				self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
+				self.ShellMass = self.ShellVolume*0.044
+				if string.Split( self.DakName, "m" )[3][1] == "H" and string.Split( self.DakName, "m" )[3][2] ~= "M" then
+					self.DakMaxAmmo = math.floor( ((self.BoxLength/(self.DakCaliber*0.0393701))^2)/4 )
+					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*8)
+					self.ShellMass = self.ShellVolume*0.044
+				end
+				if string.Split( self.DakName, "m" )[3][1] == "M" and string.Split( self.DakName, "m" )[3][2] ~= "G" then
+					self.DakMaxAmmo = math.floor( ((self.BoxLength/(self.DakCaliber*0.0393701))^2)/2.75 )
+					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*5.25)
+					self.ShellMass = self.ShellVolume*0.044
+				end
+				if self.DakAmmo == nil then 
+					self.DakAmmo = self.DakMaxAmmo
+				end
 				if self.DakAmmo > self.DakMaxAmmo then
 					self.DakAmmo = self.DakMaxAmmo
 				end
 			end
 		end
-	end
 
-	if CurTime()>=self.SparkTime+0.33 then
-		if self.DakHealth<=(self.DakMaxHealth*0.80) and self.DakHealth>(self.DakMaxHealth*0.60) then
-			local effectdata = EffectData()
-			effectdata:SetOrigin(self:GetPos())
-			effectdata:SetEntity(self)
-			effectdata:SetAttachment(1)
-			effectdata:SetMagnitude(.5)
-			effectdata:SetScale(1)
-			util.Effect("dakdamage", effectdata)
-			if CurTime()>=self.Soundtime+3 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.4, 6)
-				self.Soundtime=CurTime()
+		if CurTime()>=self.SparkTime+0.33 then
+			if self.DakHealth<=(self.DakMaxHealth*0.80) and self.DakHealth>(self.DakMaxHealth*0.60) then
+				local effectdata = EffectData()
+				effectdata:SetOrigin(self:GetPos())
+				effectdata:SetEntity(self)
+				effectdata:SetAttachment(1)
+				effectdata:SetMagnitude(.5)
+				effectdata:SetScale(1)
+				util.Effect("dakdamage", effectdata)
+				if CurTime()>=self.Soundtime+3 then
+					self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.4, 6)
+					self.Soundtime=CurTime()
+				end
 			end
-		end
-		if self.DakHealth<=(self.DakMaxHealth*0.60) and self.DakHealth>(self.DakMaxHealth*0.40) then
-			local effectdata = EffectData()
-			effectdata:SetOrigin(self:GetPos())
-			effectdata:SetEntity(self)
-			effectdata:SetAttachment(1)
-			effectdata:SetMagnitude(.5)
-			effectdata:SetScale(2)
-			util.Effect("dakdamage", effectdata)
-			if CurTime()>=self.Soundtime+2 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.5, 6)
-				self.Soundtime=CurTime()
+			if self.DakHealth<=(self.DakMaxHealth*0.60) and self.DakHealth>(self.DakMaxHealth*0.40) then
+				local effectdata = EffectData()
+				effectdata:SetOrigin(self:GetPos())
+				effectdata:SetEntity(self)
+				effectdata:SetAttachment(1)
+				effectdata:SetMagnitude(.5)
+				effectdata:SetScale(2)
+				util.Effect("dakdamage", effectdata)
+				if CurTime()>=self.Soundtime+2 then
+					self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.5, 6)
+					self.Soundtime=CurTime()
+				end
 			end
-		end
-		if self.DakHealth<=(self.DakMaxHealth*0.40) and self.DakHealth>(self.DakMaxHealth*0.20) then
-			local effectdata = EffectData()
-			effectdata:SetOrigin(self:GetPos())
-			effectdata:SetEntity(self)
-			effectdata:SetAttachment(1)
-			effectdata:SetMagnitude(.5)
-			effectdata:SetScale(3)
-			util.Effect("dakdamage", effectdata)
-			if CurTime()>=self.Soundtime+1 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.6, 6)
-				self.Soundtime=CurTime()
+			if self.DakHealth<=(self.DakMaxHealth*0.40) and self.DakHealth>(self.DakMaxHealth*0.20) then
+				local effectdata = EffectData()
+				effectdata:SetOrigin(self:GetPos())
+				effectdata:SetEntity(self)
+				effectdata:SetAttachment(1)
+				effectdata:SetMagnitude(.5)
+				effectdata:SetScale(3)
+				util.Effect("dakdamage", effectdata)
+				if CurTime()>=self.Soundtime+1 then
+					self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.6, 6)
+					self.Soundtime=CurTime()
+				end
 			end
-		end
-		if self.DakHealth<=(self.DakMaxHealth*0.20) then
-			local effectdata = EffectData()
-			effectdata:SetOrigin(self:GetPos())
-			effectdata:SetEntity(self)
-			effectdata:SetAttachment(1)
-			effectdata:SetMagnitude(.5)
-			effectdata:SetScale(4)
-			util.Effect("dakdamage", effectdata)
-			if CurTime()>=self.Soundtime+0.5 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.75, 6)
-				self.Soundtime=CurTime()
+			if self.DakHealth<=(self.DakMaxHealth*0.20) then
+				local effectdata = EffectData()
+				effectdata:SetOrigin(self:GetPos())
+				effectdata:SetEntity(self)
+				effectdata:SetAttachment(1)
+				effectdata:SetMagnitude(.5)
+				effectdata:SetScale(4)
+				util.Effect("dakdamage", effectdata)
+				if CurTime()>=self.Soundtime+0.5 then
+					self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.75, 6)
+					self.Soundtime=CurTime()
+				end
 			end
+			self.SparkTime=CurTime()
+			--if self.DakAmmoType == "Flamethrower Fuel" then
+			--	self:SetModel( "models/props_c17/canister_propane01a.mdl" )
+			--else
+			--	self:SetModel( "models/daktanks/Ammo.mdl" )
+			--end
 		end
-		self.SparkTime=CurTime()
 		if self.DakAmmoType == "Flamethrower Fuel" then
-			self:SetModel( "models/props_c17/canister_propane01a.mdl" )
-		else
-			self:SetModel( "models/daktanks/Ammo.mdl" )
-		end
-	end
-	if self.DakAmmoType == "Flamethrower Fuel" then
-		self.DakArmor = 25
-	 	self.DakMaxHealth = 30
-	 	if self.DakHealth >= self.DakMaxHealth then
-			self.DakHealth = 30
-		end
-		self:GetPhysicsObject():SetMass(500)
-	else
-		self.DakArmor = 10
-	 	self.DakMaxHealth = 10
-	 	if self.DakHealth >= self.DakMaxHealth then
-			self.DakHealth = 10
-		end
-		self:GetPhysicsObject():SetMass(200)
-	end
-	
-	WireLib.TriggerOutput(self, "Ammo", self.DakAmmo)
-	WireLib.TriggerOutput(self, "MaxAmmo", self.DakMaxAmmo)
-
-	self.DakEjectAmmo = self.Inputs.EjectAmmo.Value
-	if self.DakEjectAmmo == 1 then
-		if CurTime()>=self.DumpTime+0.5 then
-			if self.DakAmmo>0 then
-				self.DakAmmo = self.DakAmmo - math.Round(self.DakMaxAmmo/10,0)
-				if self.DakAmmo < 0 then
-					self.DakAmmo = 0
-				end
-				self:EmitSound( "dak/Jam.wav", 100, 75, 1)
-				self.DumpTime = CurTime()
+			self.DakArmor = 25
+		 	self.DakMaxHealth = 30
+		 	if self.DakHealth >= self.DakMaxHealth then
+				self.DakHealth = 30
 			end
-		end
-	end
-
-	if self.DakAmmo>0 and self.DakHealth<(self.DakMaxHealth/2) and self.DakIsExplosive then
-		if self.DakIsHE then
-			local effectdata = EffectData()
-			effectdata:SetOrigin(self:GetPos())
-			effectdata:SetEntity(self)
-			effectdata:SetAttachment(1)
-			effectdata:SetMagnitude(.5)
-			effectdata:SetScale(500)
-			util.Effect("dakscalingexplosion", effectdata)
-
-			self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,200,100,self.DakOwner)
-
-			self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
-			self:Remove()
+			self:GetPhysicsObject():SetMass(500)
 		else
-			if self.CookingOff == nil then
-			timer.Create( "AmmoCookTimer"..self:EntIndex(), math.Rand(0.05,0.25), self.DakAmmo, function()
-				if not(self.DakAmmo == nil) then
-					if self.DakAmmo > 0 then
-						local shootOrigin = self:GetPos()
-						local shootAngles = AngleRand()
-						local shell = ents.Create( "dak_tankshell" )
-		 				if ( !IsValid( shell ) ) then return end
-		 				shell:SetPos( shootOrigin + ( self:GetForward() * 1 ))
-						shell:SetAngles( shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1)) )
-						shell.DakTrail = "dakshelltrail"
-						shell.DakVelocity = 5000
-						shell.DakDamage = math.Clamp(200/self.DakMaxAmmo,1,200)
-						shell.DakMass = 500/self.DakMaxAmmo
-						shell.DakIsPellet = false
-						shell.DakSplashDamage = 0
-						shell.DakPenetration = 150/self.DakMaxAmmo + 10
-						shell.DakExplosive = false
-						shell.DakBlastRadius = 0
-
-						if self.DakMaxAmmo<5 then
-							self.ShellSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-						end
-						if self.DakMaxAmmo>=5 and self.DakMaxAmmo<=15 then
-							self.ShellSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-						end
-						if self.DakMaxAmmo>15 then
-							self.ShellSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-						end
-
-						shell.DakPenSounds = self.ShellSounds
-						shell.DakBasePenetration = 150/self.DakMaxAmmo + 10
-						shell.DakCaliber = 500/self.DakMaxAmmo + 5
-						shell:SetNWString("FireSound",self.ShellSounds[math.random(1,#self.ShellSounds)])
-						shell:SetNWInt("FirePitch",100)
-						shell.DakGun = self
-						shell:Spawn()
-						local effectdata = EffectData()
-						effectdata:SetOrigin( self:GetPos() )
-						effectdata:SetEntity(self)
-						effectdata:SetAttachment(1)
-						effectdata:SetMagnitude(.5)
-						effectdata:SetScale(50/self.DakMaxAmmo)
-						util.Effect("dakshellimpact", effectdata)
-						self:EmitSound( self.ShellSounds[math.random(1,#self.ShellSounds)], 100, 100, 1, 1)
-
-						self.DakAmmo = self.DakAmmo - 1
-					end
-				end
-				end )
-			self.CookingOff = 1
+			self.DakArmor = 10
+		 	self.DakMaxHealth = 10
+		 	if self.DakHealth >= self.DakMaxHealth then
+				self.DakHealth = 10
+			end
+			if self.ShellMass == nil then
+				self:GetPhysicsObject():SetMass(10)
+			else
+				self:GetPhysicsObject():SetMass(math.Round((self.ShellMass*self.DakAmmo)+10))
 			end
 		end
 		
+		WireLib.TriggerOutput(self, "Ammo", self.DakAmmo)
+		WireLib.TriggerOutput(self, "MaxAmmo", self.DakMaxAmmo)
+
+		self.DakEjectAmmo = self.Inputs.EjectAmmo.Value
+		if self.DakEjectAmmo == 1 then
+			if CurTime()>=self.DumpTime+0.5 then
+				if self.DakAmmo>0 then
+					self.DakAmmo = self.DakAmmo - math.Round(self.DakMaxAmmo/10,0)
+					if self.DakAmmo < 0 then
+						self.DakAmmo = 0
+					end
+					self:EmitSound( "dak/Jam.wav", 100, 75, 1)
+					self.DumpTime = CurTime()
+				end
+			end
+		end
+		if self.DakAmmo then
+			if self.DakAmmo>0 and self.DakHealth<(self.DakMaxHealth/2) and self.DakIsExplosive then
+				if self.DakIsHE then
+					local effectdata = EffectData()
+					effectdata:SetOrigin(self:GetPos())
+					effectdata:SetEntity(self)
+					effectdata:SetAttachment(1)
+					effectdata:SetMagnitude(.5)
+					effectdata:SetScale(500)
+					util.Effect("dakscalingexplosion", effectdata)
+
+					self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,200,100,self.DakOwner)
+
+					self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
+					self:Remove()
+				else
+					if self.CookingOff == nil then
+					timer.Create( "AmmoCookTimer"..self:EntIndex(), math.Clamp((1/math.pow((self.DakMaxAmmo),0.5)),0.075,1)*math.Rand(0.75,1.25), self.DakAmmo, function()
+						if not(self.DakAmmo == nil) then
+							if self.DakAmmo > 0 then
+								local shootOrigin = self:GetPos()
+								local shootAngles = AngleRand()
+								if self.DakMaxAmmo<5 then
+									self.ShellSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
+								end
+								if self.DakMaxAmmo>=5 and self.DakMaxAmmo<=15 then
+									self.ShellSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
+								end
+								if self.DakMaxAmmo>15 then
+									self.ShellSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
+								end
+								local shell = {}
+				 				shell.Pos = shootOrigin + ( self:GetForward() * 1 )
+				 				shell.Ang = shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
+								shell.DakTrail = "dakshelltrail"
+								shell.DakVelocity = 5000
+								shell.DakDamage = math.Clamp(200/self.DakMaxAmmo,1,200)
+								shell.DakMass = 500/self.DakMaxAmmo
+								shell.DakIsPellet = false
+								shell.DakSplashDamage = 0
+								shell.DakPenetration = 150/self.DakMaxAmmo + 10
+								shell.DakExplosive = false
+								shell.DakBlastRadius = 0
+								shell.DakPenSounds = self.ShellSounds
+								shell.DakBasePenetration = 150/self.DakMaxAmmo + 10
+								shell.DakCaliber = 500/self.DakMaxAmmo + 5
+								shell.DakFireSound = self.ShellSounds[math.random(1,#self.ShellSounds)]
+								shell.DakFirePitch = 100
+								shell.DakGun = self
+								shell.Filter = {self}
+								shell.LifeTime = 0
+								shell.Gravity = 0
+								if self.DakName == "Flamethrower" then
+									shell.DakIsFlame = 1
+								end
+								self.ShellList[#self.ShellList+1] = shell
+								local effectdata = EffectData()
+								effectdata:SetOrigin( self:GetPos() )
+								effectdata:SetEntity(self)
+								effectdata:SetAttachment(1)
+								effectdata:SetMagnitude(.5)
+								effectdata:SetScale(50/self.DakMaxAmmo)
+								util.Effect("dakshellimpact", effectdata)
+								self:EmitSound( self.ShellSounds[math.random(1,#self.ShellSounds)], 100, 100, 1, 1)
+
+								self.DakAmmo = self.DakAmmo - 1
+							end
+						end
+						end )
+					self.CookingOff = 1
+					end
+				end
+
+			end
+		end
+		self.SlowThinkTime = CurTime()
 	end
 
-	self:NextThink(CurTime()+1)
+	for i = 1, #self.ShellList do
+		self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
+		self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
+
+		local trace = {}
+			trace.start = self.ShellList[i].Pos
+			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+			trace.filter = self.ShellList[i].Filter
+			trace.mins = Vector(-1,-1,-1)
+			trace.maxs = Vector(1,1,1)
+		local ShellTrace = util.TraceHull( trace )
+
+		local effectdata = EffectData()
+		effectdata:SetStart(ShellTrace.StartPos)
+		effectdata:SetOrigin(ShellTrace.HitPos)
+		effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
+		util.Effect("dakballistictracer", effectdata)
+
+		if ShellTrace.Hit then
+			DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+		end
+
+		if self.ShellList[i].DieTime then
+			--self.RemoveList[#self.RemoveList+1] = i
+			if self.ShellList[i].DieTime+1.5<CurTime()then
+				self.RemoveList[#self.RemoveList+1] = i
+			end
+		end
+
+		if self.ShellList[i].RemoveNow == 1 then
+			self.RemoveList[#self.RemoveList+1] = i
+		end
+
+		self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+	end
+	
+	if #self.RemoveList > 0 then
+		for i = 1, #self.RemoveList do
+			table.remove( self.ShellList, self.RemoveList[i] )
+		end
+	end
+
+	self.RemoveList = {}
+
+	self:NextThink( CurTime()+0.1 )
     return true
 end
 
@@ -257,7 +330,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakIsExplosive = Ent.EntityMods.DakTek.DakIsExplosive
-		self.DakAmmo = Ent.EntityMods.DakTek.DakAmmo
+		self.DakAmmo = Ent.EntityMods.DakTek.DakMaxAmmo
 		self.DakMaxAmmo = Ent.EntityMods.DakTek.DakMaxAmmo
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
@@ -356,18 +429,10 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 
 					if not(ExpTrace.Entity.SPPOwner==nil) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
-							local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
 							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-							if not(ExpTrace.Entity.DakRed == nil) then 
-								ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
-							end
 						end
 					else
-						local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-						if not(ExpTrace.Entity.DakRed == nil) then 
-							ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
-						end
 					end
 					if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
 						self.salvage = ents.Create( "dak_tesalvage" )
@@ -489,19 +554,11 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 				ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
 				if not(ExpTrace.Entity.SPPOwner==nil) then			
-					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
-						local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
+					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-						if not(ExpTrace.Entity.DakRed == nil) then 
-							ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
-						end
 					end
 				else
-					local HPPerc = (ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor))/ExpTrace.Entity.DakMaxHealth
 					ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-					if not(ExpTrace.Entity.DakRed == nil) then 
-						ExpTrace.Entity:SetColor(Color(ExpTrace.Entity.DakRed*HPPerc,ExpTrace.Entity.DakGreen*HPPerc,ExpTrace.Entity.DakBlue*HPPerc,ExpTrace.Entity:GetColor().a))
-					end
 				end
 				if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
 					self.salvage = ents.Create( "dak_tesalvage" )

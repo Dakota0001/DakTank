@@ -75,6 +75,9 @@ function SWEP:Initialize()
 	end
 	self.PrimaryLastFire = 0
 	self.Fired = 0
+
+	self.ShellList = {}
+ 	self.RemoveList = {}
 end
 
 function SWEP:Reload()
@@ -84,6 +87,52 @@ function SWEP:Reload()
 end
  
 function SWEP:Think()
+	for i = 1, #self.ShellList do
+		self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
+		self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
+
+		local trace = {}
+			trace.start = self.ShellList[i].Pos
+			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+			trace.filter = self.ShellList[i].Filter
+			trace.mins = Vector(-1,-1,-1)
+			trace.maxs = Vector(1,1,1)
+		local ShellTrace = util.TraceHull( trace )
+
+		local effectdata = EffectData()
+		effectdata:SetStart(ShellTrace.StartPos)
+		effectdata:SetOrigin(ShellTrace.HitPos)
+		effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
+		util.Effect("dakballistictracer", effectdata)
+
+		if ShellTrace.Hit then
+			DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+		end
+
+		if self.ShellList[i].DieTime then
+			--self.RemoveList[#self.RemoveList+1] = i
+			if self.ShellList[i].DieTime+1.5<CurTime()then
+				self.RemoveList[#self.RemoveList+1] = i
+			end
+		end
+
+		if self.ShellList[i].RemoveNow == 1 then
+			self.RemoveList[#self.RemoveList+1] = i
+		end
+
+		self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+	end
+	
+	if #self.RemoveList > 0 then
+		for i = 1, #self.RemoveList do
+			table.remove( self.ShellList, self.RemoveList[i] )
+		end
+	end
+
+	self.RemoveList = {}
+
+	self:NextThink( CurTime()+0.1 )
+    return true
 end
 
 function SWEP:PrimaryAttack()
@@ -93,12 +142,9 @@ function SWEP:PrimaryAttack()
 				local shootOrigin = self.Owner:EyePos()
 				local shootDir = self.Owner:GetAimVector()
 				for i = 1, 10 do
-					local shell = ents.Create( "dak_tankshell" )
-					if ( !IsValid( shell ) ) then return end
-
-					shell:SetPos(self.Owner:EyePos())
-					shell:SetAngles( shootDir:Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1)) )
-
+					local shell = {}
+	 				shell.Pos = self.Owner:EyePos()
+	 				shell.Ang = shootDir:Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
 					shell.DakTrail = "dakshelltrail"
 					shell.DakVelocity = 20000
 					shell.DakDamage = 0.03
@@ -109,15 +155,19 @@ function SWEP:PrimaryAttack()
 					shell.DakExplosive = false
 					shell.DakBlastRadius = 0
 					shell.DakPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-
 					shell.DakBasePenetration = 10
-
 					shell.DakCaliber = 1
-
+					shell.DakFireSound = ""
+					shell.DakFirePitch = 100
 					shell.DakGun = self.Owner
 					shell.DakGun.DakOwner = self.Owner
-					shell:SetCollisionGroup(10)
-					shell:Spawn()
+					shell.Filter = {self.Owner}
+					shell.LifeTime = 0
+					shell.Gravity = 0
+					if self.DakName == "Flamethrower" then
+						shell.DakIsFlame = 1
+					end
+					self.ShellList[#self.ShellList+1] = shell
 				end
 			end
 			self:EmitSound( "weapons/famas/famas-1.wav", 140, 100, 1, 2)
