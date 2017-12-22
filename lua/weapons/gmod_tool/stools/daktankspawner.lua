@@ -1374,6 +1374,7 @@ function TOOL.BuildCPanel( panel )
 	DLabel:SetWide( 250 )
 	DLabel:SetWrap( true )
 
+<<<<<<< HEAD
 	--Gun Selection Combo Box
 	local AmmoType = ""
 	local GunType = ""
@@ -1513,6 +1514,8 @@ function TOOL.BuildCPanel( panel )
 		crateList[value]()
 =======
 --Builds UI panel
+=======
+>>>>>>> origin/patch-1
 function TOOL.BuildCPanel( panel )
 	panel:SetMouseInputEnabled( true )
 	local ctrl = vgui.Create( "DTree", panel )
@@ -1537,6 +1540,7 @@ function TOOL.BuildCPanel( panel )
 	DLabelAmmo:SetWide( 200 )
 	DLabelAmmo:SetWrap( true )
 
+<<<<<<< HEAD
 	local DermaNumSlider = vgui.Create( "DNumSlider", panel )
 	DermaNumSlider:SetPos( 10, 355 )
 	DermaNumSlider:SetSize( 200, 20 )
@@ -1545,6 +1549,15 @@ function TOOL.BuildCPanel( panel )
 	DermaNumSlider:SetMin( 0 )
 	DermaNumSlider:SetMax( 10 )
 	DermaNumSlider:SetDecimals( 2 )
+=======
+local DermaNumSlider = vgui.Create( "DNumSlider", panel )
+DermaNumSlider:SetPos( 10, 355 )			// Set the position
+DermaNumSlider:SetSize( 200, 20 )		// Set the size
+DermaNumSlider:SetText( "Caliber" )	// Set the text above the slider
+DermaNumSlider:SetValue( 5 )
+DermaNumSlider:SetMinMax( 0, 10 )		// Set the minimum and maximum number you can slide to
+DermaNumSlider:SetDecimals( 2 )			// Decimal places - zero for whole number
+>>>>>>> origin/patch-1
 
 	local AmmoBoxSelect = vgui.Create( "DComboBox", panel )
 	AmmoBoxSelect:SetPos( 10, 385 )
@@ -1558,6 +1571,7 @@ function TOOL.BuildCPanel( panel )
 	AmmoBoxSelect:AddChoice( "Mortar" )
 	AmmoBoxSelect.OnSelect = function( panel, index, value )
 	RunConsoleCommand("daktankspawner_DTTE_AmmoType", value)
+<<<<<<< HEAD
 	if value == "Autocannon" then
 		DermaNumSlider:SetMin( 20 )
 		DermaNumSlider:SetMax( 60 )	
@@ -1713,6 +1727,22 @@ function TOOL.BuildCPanel( panel )
 		end
 		clipList[value]()
 		RunConsoleCommand( "daktankspawner_SpawnSettings", AutoloaderClip )
+=======
+	local values = {}
+	values["Autocannon"] = function() DermaNumSlider:SetMinMax( 20, 60 ) end
+	values["Cannon"] = function() DermaNumSlider:SetMinMax( 25, 200 ) end
+	values["Heavy Machine Gun"] = function() DermaNumSlider:SetMinMax( 20, 40 ) end
+	values["Howitzer"] = function() DermaNumSlider:SetMinMax( 50, 240 ) end
+	values["Machine Gun"] = function() DermaNumSlider:SetMinMax( 5, 25 ) end
+	values["Mortar"] = function() DermaNumSlider:SetMinMax( 40, 280 ) end
+	
+	if (values[value]) then
+		values[value]()
+		DermaNumSlider:SetValue( math.Clamp(DermaNumSlider:GetValue(),DermaNumSlider:GetMin(),DermaNumSlider:GetMax()) )
+	else
+		values["Machine Gun"]()
+		DermaNumSlider:SetValue( 5 )
+>>>>>>> origin/patch-1
 	end
 	
 	AutoloaderClipSelect:SetVisible( false )
