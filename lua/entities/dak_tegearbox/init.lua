@@ -11,11 +11,7 @@ ENT.DakSpeed = 1.1725
 ENT.DakMass = 1000
 ENT.DakPooled=0
 ENT.DakCrew = NULL
-<<<<<<< HEAD:DTTanks/lua/entities/dak_temotor/init.lua
-ENT.DakHP = 0
-=======
 ENT.MaxHP = 0
->>>>>>> upstream/master:lua/entities/dak_tegearbox/init.lua
 
 
 function ENT:Initialize()
@@ -24,23 +20,28 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self.DakHealth = self.DakMaxHealth
+	self.DakSpeed = 2
 	local phys = self:GetPhysicsObject()
 	if(phys:IsValid()) then
 		phys:Wake()
 	end
-<<<<<<< HEAD:DTTanks/lua/entities/dak_temotor/init.lua
-	--self:EmitSound(self.DakSound,75,0,1,CHAN_AUTO)
-	self.initsound = self.DakSound
-	self.Sound = CreateSound( self, self.DakSound, CReliableBroadcastRecipientFilter )
-	self.Sound:PlayEx(1,100)
-	self.Sound:ChangePitch( 0, 0 )
-	self.Sound:ChangeVolume( 0, 0 )
-=======
 	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "LeftDriveWheel [ENTITY]" , "RightDriveWheel [ENTITY]", "CarTurning" })
 	self.YawAng = Angle(0,self:GetAngles().yaw,0)
->>>>>>> upstream/master:lua/entities/dak_tegearbox/init.lua
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
+ 	self.Perc = 0
+ 	self.TurnPerc = 0
+ 	self.LastYaw = self:GetAngles().yaw
+ 	self.Prev = {}
+ 	self.PrevPos = self:GetPos()
+ 	self.Time = CurTime()
+ 	self.TopSpeed = 1
+ 	self.RBoost = 1
+ 	self.LBoost = 1
+ 	self.Speed = 0
+ 	self.ExtraTorque = 1
+ 	self.Vel = 1
+ 	self.DakBurnStacks = 0
 end
 
 function ENT:Think()
@@ -103,32 +104,6 @@ function ENT:Think()
 		self.DakMaxHealth = 15
 		self.DakArmor = 15
 		self.DakMass = 150
-<<<<<<< HEAD:DTTanks/lua/entities/dak_temotor/init.lua
-		self.DakSpeed = 0.8375
-		self.DakModel = "models/daktanks/engine1.mdl"
-		self.DakFuelReq = 45
-		self.DakHP = 75
-		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Small Engine" then
-		self.DakMaxHealth = 30
-		self.DakArmor = 30
-		self.DakMass = 350
-		self.DakSpeed = 1.8425
-		self.DakModel = "models/daktanks/engine2.mdl"
-		self.DakFuelReq = 90
-		self.DakHP = 165
-		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Standard Engine" then
-		self.DakMaxHealth = 45
-		self.DakArmor = 45
-		self.DakMass = 625
-		self.DakSpeed = 3.35
-		self.DakModel = "models/daktanks/engine3.mdl"
-		self.DakFuelReq = 180
-		self.DakHP = 300
-=======
 		self.DakModel = "models/daktanks/gearbox1f1.mdl"
 		self.Torque = 0.85
 		self.MaxHP = 150
@@ -195,57 +170,11 @@ function ENT:Think()
 		self.DakModel = "models/daktanks/gearbox1r2.mdl"
 		self.Torque = 0.95
 		self.MaxHP = 330
->>>>>>> upstream/master:lua/entities/dak_tegearbox/init.lua
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Standard Rear Mount Gearbox" then
 		self.DakMaxHealth = 60
 		self.DakArmor = 60
-<<<<<<< HEAD:DTTanks/lua/entities/dak_temotor/init.lua
-		self.DakMass = 975
-		self.DakSpeed = 5.1925
-		self.DakModel = "models/daktanks/engine4.mdl"
-		self.DakFuelReq = 360
-		self.DakHP = 465
-		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Huge Engine" then
-		self.DakMaxHealth = 75
-		self.DakArmor = 75
-		self.DakMass = 1400
-		self.DakSpeed = 7.5375
-		self.DakModel = "models/daktanks/engine5.mdl"
-		self.DakFuelReq = 720
-		self.DakHP = 675
-		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Ultra Engine" then
-		self.DakMaxHealth = 90
-		self.DakArmor = 90
-		self.DakMass = 2500
-		self.DakSpeed = 13.4
-		self.DakModel = "models/daktanks/engine6.mdl"
-		self.DakFuelReq = 1440
-		self.DakHP = 1200
-		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-
-	if self.DakHealth > self.DakMaxHealth then
-		self.DakHealth = self.DakMaxHealth
-	end
-
-	self.DakSpeed = self.DakSpeed * (self.DakHealth/self.DakMaxHealth)
-	self.DakHP = self.DakHP * (self.DakHealth/self.DakMaxHealth)
-
-	if self.initsound ~= self.DakSound then
-		self.initsound = self.DakSound
-		self.Sound:Stop()
-		self.Sound = CreateSound( self, self.DakSound, CReliableBroadcastRecipientFilter )
-		self.Sound:PlayEx(1,100)
-		self.Sound:ChangePitch( 0, 0 )
-		self.Sound:ChangeVolume( 0, 0 )
-	end
-=======
 		self.DakMass = 625
 		self.DakModel = "models/daktanks/gearbox1r3.mdl"
 		self.Torque = 1
@@ -312,7 +241,6 @@ function ENT:Think()
 	if self.DakHealth > self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end
->>>>>>> upstream/master:lua/entities/dak_tegearbox/init.lua
 	if self:GetModel() ~= self.DakModel then
 		self:SetModel(self.DakModel)
 		self:PhysicsInit(SOLID_VPHYSICS)
@@ -320,8 +248,6 @@ function ENT:Think()
 		self:SetSolid(SOLID_VPHYSICS)
 	end
 	self:GetPhysicsObject():SetMass(self.DakMass)
-<<<<<<< HEAD:DTTanks/lua/entities/dak_temotor/init.lua
-=======
 	self.MoveForward = self.Inputs.Forward.Value
 	self.MoveReverse = self.Inputs.Reverse.Value
 	self.MoveLeft = self.Inputs.Left.Value
@@ -593,9 +519,8 @@ function ENT:Think()
     if self.DakBurnStacks>0 and not(self:IsOnFire()) then
     	self.DakBurnStacks = self.DakBurnStacks - 0.1
     end
->>>>>>> upstream/master:lua/entities/dak_tegearbox/init.lua
 
-    self:NextThink(CurTime()+0.25)
+    self:NextThink(CurTime()+0.025)
     return true
 end
 
