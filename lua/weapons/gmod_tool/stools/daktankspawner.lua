@@ -668,6 +668,10 @@ function TOOL:LeftClick( trace )
 			self.GunType = "M"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
 		end
+		if self:GetClientInfo("DTTE_AmmoType") == "Autoloader" then
+			self.GunType = "AL"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),75,200)
+		end
 		if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
 			self.GunType = "AC"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
