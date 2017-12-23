@@ -688,27 +688,27 @@ function TOOL:LeftClick( trace )
 		end
 		--Micro--
 		if self:GetClientInfo("SpawnSettings") == "MicroAPBox" or self:GetClientInfo("SpawnSettings") == "MicroHEBox" or self:GetClientInfo("SpawnSettings") == "MicroFLBox" then
-			self.spawnedent:SetModel( "models/Items/BoxSRounds.mdl" )
+			self.spawnedent:SetModel( "models/daktanks/ammo1.mdl" )
 		end
 		--Small--
 		if self:GetClientInfo("SpawnSettings") == "SmallAPBox" or self:GetClientInfo("SpawnSettings") == "SmallHEBox" or self:GetClientInfo("SpawnSettings") == "SmallFLBox" then
-			self.spawnedent:SetModel( "models/props_c17/SuitCase_Passenger_Physics.mdl" )
+			self.spawnedent:SetModel( "models/daktanks/ammo2.mdl" )
 		end
 		--Standard--
 		if self:GetClientInfo("SpawnSettings") == "StandardAPBox" or self:GetClientInfo("SpawnSettings") == "StandardHEBox" or self:GetClientInfo("SpawnSettings") == "StandardFLBox" then
-			self.spawnedent:SetModel( "models/Items/BoxMRounds.mdl" )
+			self.spawnedent:SetModel( "models/daktanks/ammo3.mdl" )
 		end
 		--Large--
 		if self:GetClientInfo("SpawnSettings") == "LargeAPBox" or self:GetClientInfo("SpawnSettings") == "LargeHEBox" or self:GetClientInfo("SpawnSettings") == "LargeFLBox" then
-			self.spawnedent:SetModel( "models/props_c17/SuitCase001a.mdl" )
+			self.spawnedent:SetModel( "models/daktanks/ammo4.mdl" )
 		end
 		--Huge--
 		if self:GetClientInfo("SpawnSettings") == "HugeAPBox" or self:GetClientInfo("SpawnSettings") == "HugeHEBox" or self:GetClientInfo("SpawnSettings") == "HugeFLBox" then
-			self.spawnedent:SetModel( "models/daktanks/Ammo.mdl" )
+			self.spawnedent:SetModel( "models/daktanks/ammo5.mdl" )
 		end
 		--Ultra--
 		if self:GetClientInfo("SpawnSettings") == "UltraAPBox" or self:GetClientInfo("SpawnSettings") == "UltraHEBox" or self:GetClientInfo("SpawnSettings") == "UltraFLBox" then
-			self.spawnedent:SetModel( "models/Items/ammocrate_smg1.mdl" )
+			self.spawnedent:SetModel( "models/daktanks/ammo6.mdl" )
 		end
 		--Flamethrower--
 		if self:GetClientInfo("SpawnSettings") == "Flamethrower Fuel" then
@@ -731,9 +731,7 @@ function TOOL:LeftClick( trace )
 			self.spawnedent.DakModel = self.DakModel
 			self.spawnedent:SetModel(self.spawnedent.DakModel)
 		end
-
 		--
-
 		if self:GetClientInfo("SpawnEnt") == "dak_teammo" then
 			if trace.Entity then
 				if trace.Entity:GetClass() == "dak_teammo" then
@@ -742,8 +740,6 @@ function TOOL:LeftClick( trace )
 					trace.Entity.DakAmmoType = self.DakAmmoType
 					trace.Entity.DakOwner = self:GetOwner()
 					trace.Entity.DakIsHE = self.DakIsHE
-					trace.Entity.DakMaxHealth = self.DakMaxHealth
-					trace.Entity.DakHealth = self.DakMaxHealth
 					self:GetOwner():ChatPrint("Ammo updated.")
 				end
 			end
@@ -753,8 +749,6 @@ function TOOL:LeftClick( trace )
 				self.spawnedent.DakAmmoType = self.DakAmmoType
 				self.spawnedent.DakOwner = self:GetOwner()
 				self.spawnedent.DakIsHE = self.DakIsHE
-				self.spawnedent.DakMaxHealth = self.DakMaxHealth
-				self.spawnedent.DakHealth = self.DakMaxHealth
 			end
 		end
 		if self:GetClientInfo("SpawnEnt") == "dak_teautoloadingmodule" then
@@ -1645,6 +1639,7 @@ function TOOL.BuildCPanel( panel )
 			local ShellVol = math.pi*((cal*0.01968505)^2)*(cal*0.5118113)
 			local ShellLenMult = 6.5
 
+<<<<<<< HEAD
 			if AmmoBoxSelect:GetSelected() == "Howitzer" then
 				ShellVol = math.pi*((cal*0.01968505)^2)*(cal*0.3149608)
 				ShellLenMult = 4
@@ -1652,6 +1647,16 @@ function TOOL.BuildCPanel( panel )
 				ShellVol = math.pi*((cal*0.01968505)^2)*(cal*0.206693025)
 				ShellLenMult = 2.75
 			end
+=======
+		--Setup Ammo Labels
+		--Define volume for each crate (need to get the volume from ingame first then paste here since at this point the crate isn't created)
+		local MicroVol = 3384.4787597656	
+		local SmallVol = 6797.3989257813		
+		local StandardVol = 13651.918945313	
+		local LargeVol = 20506.4375	
+		local HugeVol = 30802.55859375
+		local UltraVol = 41098.6796875
+>>>>>>> upstream/master
 
 			local ShellMass = ShellVol * 0.044
 			local AmmoWeight = math.Round(ShellMass*math.floor((((Volume^(1/3))/(cal*0.0393701))^2)/ShellLenMult)+10)

@@ -51,6 +51,9 @@ function ENT:Think()
 			self.DakCaliber = tonumber(string.Split( self.DakName, "m" )[1])
 			if self.DakAmmoType == "Flamethrower Fuel" then
 				self.DakMaxAmmo = 150
+				if not(self.DakAmmo) then
+					self.DakAmmo = self.DakMaxAmmo
+				end
 				if self.DakAmmo > self.DakMaxAmmo then
 					self.DakAmmo = self.DakMaxAmmo
 				end
