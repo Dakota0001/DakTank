@@ -1,29 +1,28 @@
- 
 TOOL.Category = "DakTek Tank Edition"
 TOOL.Name = "#Tool.daktankspawner.listname"
 TOOL.Command = nil
 TOOL.ConfigName = "" --Setting this means that you do not have to create external configuration files to define the layout of the tool config-hud 
 if CLIENT then
-language.Add( "Tool.daktankspawner.listname", "DakTek Tank Edition Spawner" )
-language.Add( "Tool.daktankspawner.name", "DakTek Tank Edition Spawner" )
-language.Add( "Tool.daktankspawner.desc", "Spawns DakTek Tank Edition entities." )
-language.Add( "Tool.daktankspawner.0", "Left click to spawn or update valid entities. Right click to check health of target. Reload to get contraption total mass." )
+	language.Add( "Tool.daktankspawner.listname", "DakTek Tank Edition Spawner" )
+	language.Add( "Tool.daktankspawner.name", "DakTek Tank Edition Spawner" )
+	language.Add( "Tool.daktankspawner.desc", "Spawns DakTek Tank Edition entities." )
+	language.Add( "Tool.daktankspawner.0", "Left click to spawn or update valid entities. Right click to check health of target. Reload to get contraption total mass." )
 end
-TOOL.ClientConVar[ "SpawnEnt" ] = ""
-TOOL.ClientConVar[ "SpawnSettings" ] = ""
+TOOL.ClientConVar[ "SpawnEnt" ] 	   = ""
+TOOL.ClientConVar[ "SpawnSettings" ]   = ""
 TOOL.ClientConVar[ "DTTE_GunCaliber" ] = 5
-TOOL.ClientConVar[ "DTTE_AmmoType" ] = ""
+TOOL.ClientConVar[ "DTTE_AmmoType" ]   = ""
 
-//setup info requirements
-TOOL.DakName = "Base Ammo Gun"
-TOOL.DakHealth = 1
-TOOL.DakMaxHealth = 1
-TOOL.DakAmmo = 0
-TOOL.DakMaxAmmo = 10
-TOOL.DakModel = "models/daktanks/cannon25mm.mdl"
-TOOL.DakAmmoType = "AC2Ammo"
+--setup info requirements
+TOOL.DakName 		= "Base Ammo Gun"
+TOOL.DakHealth 		= 1
+TOOL.DakMaxHealth 	= 1
+TOOL.DakAmmo 		= 0
+TOOL.DakMaxAmmo 	= 10
+TOOL.DakModel 		= "models/daktanks/cannon25mm.mdl"
+TOOL.DakAmmoType 	= "AC2Ammo"
 TOOL.DakIsExplosive = false
-TOOL.DakSound = "npc/combine_gunship/engine_whine_loop1.wav"
+TOOL.DakSound 		= "npc/combine_gunship/engine_whine_loop1.wav"
 
 --Main spawning function, creates entities based on the options selected in the menu and updates current entities
 function TOOL:LeftClick( trace )
@@ -676,11 +675,11 @@ function TOOL:LeftClick( trace )
 			self.GunType = "AC"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Machine Gun" then
+		if self:GetClientInfo("DTTE_AmmoType") == "MG" then
 			self.GunType = "MG"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Heavy Machine Gun" then
+		if self:GetClientInfo("DTTE_AmmoType") == "HMG" then
 			self.GunType = "HMG"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 		end
@@ -1131,18 +1130,211 @@ function TOOL.BuildCPanel( panel )
 	local AutoloaderClipSelect 	 = vgui.Create( "DComboBox", panel )
 	
 	--Variables
-	local CrateModel 		= ""
-	local Volume 			= 0
-	local FuelModel 		= ""
-	local GearboxDirection  = ""
-	local Caliber			= 5
-	local GunType			= ""
-	local AmmoTypes 		= {}
-	local AmmoTypeCount 	= 0
-	local AutoloaderClip	= ""
-	local EngineModel		= ""
-	local GearboxModel		= ""
+	local CrateModel 	   = ""
+	local Volume		   = 0
+	local FuelModel		   = ""
+	local GearboxDirection = ""
+	local Caliber		   = 5
+	local GunType		   = ""
+	local EntType		   = ""
+	local AmmoTypes 	   = {}
+	local AmmoTypeCount    = 0
+	local AutoloaderClip   = ""
+	local EngineModel	   = ""
+	local GearboxModel	   = ""
+	local AmmoWeight	   = 0
+	local AmmoCount 	   = 0
+	local AmmoData		   = { 0, 0, 0, 0, 0, 0, 0 } --1 = AP Pen Multiplier, 2 = AP Velocity, 3 = HE Pen Multiplier, 4 = HE Blast and Frag Pen Multiplier, 5 = HE Velocity, 6 = FL Pen Multiplier, 7 = FL Velocity
 	
+	--Table containing the information of the available engines
+	local engineList = {}
+	engineList["Micro Engine"] = function()
+		DLabel:SetText( "Micro Engine\nTiny engine for tiny tanks.\n\nHealth:                  15\nArmor:                   15mm\nWeight:                 150kg\nCrewed Speed:     25km/h with 10t contraption\nUncrewed Speed: 15km/h with 10t contraption\nPower:                  75 HP\nFuel Required:      45L (for full performance)" )
+	end
+	engineList["Small Engine"] = function()
+		DLabel:SetText( "Small Engine\nSmall engine for light tanks and slow mediums.\n\nHealth:                  30\nArmor:                   30mm\nWeight:                 350kg\nCrewed Speed:     55km/h with 10t contraption\nUncrewed Speed: 33km/h with 10t contraption\nPower:                  165 HP\nFuel Required:      90L (for full performance)" )
+	end
+	engineList["Standard Engine"] = function()
+		DLabel:SetText( "Standard Engine\nStandard sized engine for medium tanks or slow heavies.\n\nHealth:                  45\nArmor:                   45mm\nWeight:                 625kg\nCrewed Speed:     100km/h with 10t contraption\nUncrewed Speed: 60km/h with 10t contraption\nPower:                  300 HP\nFuel Required:      180L (for full performance)" )
+	end
+	engineList["Large Engine"] = function()
+		DLabel:SetText( "Large Engine\nLarge engine for heavy tanks.\n\nHealth:                  60\nArmor:                   60mm\nWeight:                 975kg\nCrewed Speed:     155km/h with 10t contraption\nUncrewed Speed: 93km/h with 10t contraption\nPower:                  465 HP\nFuel Required:      360L (for full performance)" )
+	end
+	engineList["Huge Engine"] = function()
+		DLabel:SetText( "Huge Engine\nHuge engine for heavy tanks that want to move fast.\n\nHealth:                  75\nArmor:                   75mm\nWeight:                 1400kg\nCrewed Speed:     225km/h with 10t contraption\nUncrewed Speed: 135km/h with 10t contraption\nPower:                  675 HP\nFuel Required:      720L (for full performance)" )
+	end
+	engineList["Ultra Engine"] = function()
+		DLabel:SetText( "Ultra Engine\nUltra engine for use in super heavy tanks.\n\nHealth:                  90\nArmor:                   90mm\nWeight:                 2500kg\nCrewed Speed:     400km/h with 10t contraption\nUncrewed Speed: 240km/h with 10t contraption\nPower:                  1200 HP\nFuel Required:      1440L (for full performance)" )
+	end
+	
+	--Table containing the description of the available gearboxes
+	local gearboxList = {}
+	gearboxList["Micro Gearbox"] = function()
+		DLabel:SetText( "Micro "..GearboxDirection.." Mount Gearbox\nTiny gearbox for tiny tanks.\n\nHealth:                 15\nArmor:                  15mm\nWeight:                150kg\nPower Rating:      150 HP\nTorque Multiplier: 0.85" )
+	end
+	gearboxList["Small Gearbox"] = function()
+		DLabel:SetText( "Small "..GearboxDirection.." Mount Gearbox\nSmall gearbox for small tanks.\n\nHealth:                 35\nArmor:                  35mm\nWeight:                350kg\nPower Rating:      330 HP\nTorque Multiplier: 0.95" )
+	end
+	gearboxList["Standard Gearbox"] = function()
+		DLabel:SetText( "Standard "..GearboxDirection.." Mount Gearbox\nMedium gearbox for medium tanks.\n\nHealth:                 60\nArmor:                  60mm\nWeight:                625kg\nPower Rating:      600 HP\nTorque Multiplier: 1" )
+	end
+	gearboxList["Large Gearbox"] = function()
+		DLabel:SetText( "Large "..GearboxDirection.." Mount Gearbox\nLarge gearbox for large tanks.\n\nHealth:                 95\nArmor:                  95mm\nWeight:                975kg\nPower Rating:      930 HP\nTorque Multiplier: 1.15" )
+	end
+	gearboxList["Huge Gearbox"] = function()
+		DLabel:SetText( "Huge "..GearboxDirection.." Mount Gearbox\nHuge gearbox for huge tanks.\n\nHealth:                 140\nArmor:                  140mm\nWeight:                1400kg\nPower Rating:      1350 HP\nTorque Multiplier: 1.25" )
+	end
+	gearboxList["Ultra Gearbox"] = function()
+		DLabel:SetText( "Ultra "..GearboxDirection.." Mount Gearbox\nUltra gearbox for landcruisers.\n\nHealth:                 250\nArmor:                  250mm\nWeight:                2500kg\nPower Rating:      2400 HP\nTorque Multiplier: 1.3" )
+	end
+	
+	--Table containing the description of the autoloader clips
+	local clipList = {}
+	clipList["Small Autoloader Clip"] = function()
+		DLabel:SetText( "Small Autoloader Clip\nSmall sized clip required to load an autoloader.\n\nArmor:   10mm\nWeight: 1000kg\nHealth:  50" )
+	end
+	clipList["Medium Autoloader Clip"] = function()
+		DLabel:SetText( "Medium Autoloader Clip\nMedium sized clip required to load an autoloader. Increases clip size and decreases reload times by 20% per shell\n\nArmor:   10mm\nWeight: 2000kg\nHealth:  75" )
+	end
+	clipList["Large Autoloader Clip"] = function()
+		DLabel:SetText( "Large Autoloader Clip\nLarge sized clip required to load an autoloader. Increases clip size and decreases reload times by 40% per shell\n\nArmor:   10mm\nWeight: 3000kg\nHealth:  100" )
+	end
+	
+	--Table containing the description of the available ammo types
+	local selectedAmmo = {}
+	selectedAmmo["AP"] = function()
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage: "..math.Round(Caliber*0.25,2).."\nVelocity: "..AmmoData[2].." m/s" )
+	end
+	selectedAmmo["HE"] = function()
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats\nPenetration: "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage: "..math.Round(Caliber*0.125,2).."\nSplash Damage: "..math.Round(Caliber*0.375,2).."\nBlast Radius: "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity: "..AmmoData[5].." m/s" )
+	end
+	selectedAmmo["FL"] = function()
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage: "..math.Round(Caliber*0.025,2).."\nPellets: 10\nVelocity: "..AmmoData[7].." m/s" )
+	end
+	
+	--Table containing the description of the fuel tanks
+	local fuelList = {}
+	fuelList["Micro Fuel Tank"] = function()
+		DLabel:SetText( "Micro Fuel Tank\nTiny fuel tank to run light tanks and tankettes.\n\nHealth:    10\nWeight:   65kg\nCapacity: 45L" )
+	end
+	fuelList["Small Fuel Tank"] = function()
+		DLabel:SetText( "Small Fuel Tank\nSmall fuel tank for light tanks and weak engined mediums.\n\nHealth:    20\nWeight:   120kg\nCapacity: 90L" )
+	end
+	fuelList["Standard Fuel Tank"] = function()
+		DLabel:SetText( "Standard Fuel Tank\nStandard medium tank fuel tank.\n\nHealth:    30\nWeight:   240kg\nCapacity: 180L" )
+	end
+	fuelList["Large Fuel Tank"] = function()
+		DLabel:SetText( "Large Fuel Tank\nLarge fuel tanks for heavies running mid sized engines.\n\nHealth:    40\nWeight:   475kg\nCapacity: 360L" )
+	end
+	fuelList["Huge Fuel Tank"] = function()
+		DLabel:SetText( "Huge Fuel Tank\nHuge fuel tank for heavies running large gas guzzlers.\n\nHealth:    50\nWeight:   950kg\nCapacity: 720L" )
+	end
+	fuelList["Ultra Fuel Tank"] = function()
+		DLabel:SetText( "Ultra Fuel Tank\nMassive fuel tank designed for super heavy tanks running the largest of engines.\n\nHealth:    60\nWeight:   1900kg\nCapacity: 1440L" )
+	end
+	
+	--Table containing the description of the available weapons
+	local gunList = {}
+	gunList["Autocannon"] = function()
+		DLabel:SetText( Caliber.."mm Autocannon\nLight guns with large clips and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round(2000/((50/Caliber)*(50/Caliber))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 25 seconds\nClip Size: "..math.Round(600/Caliber) )
+	end
+	gunList["Autoloader"] = function()
+		DLabel:SetText( Caliber.."mm Autoloader\nCannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round(9000/((200/Caliber)*(200/Caliber))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)*0.2),2).."\nSmall Clip Size: "..math.Round(600/Caliber).."\nMedium Clip Size: "..math.Round((600/Caliber)*1.5).."\nLarge Clip Size: "..math.Round((600/Caliber)*2).."\nSmall Clip Reload Time: "..math.Round((Caliber/13 + Caliber/100)*math.Round(600/Caliber),2).."\nMedium Clip Reload Time: "..math.Round(((Caliber/13 + Caliber/100)*math.Round((600/Caliber)*1.5)*0.75),2).."\nLarge Clip Reload Time: "..math.Round(((Caliber/13 + Caliber/100)*math.Round((600/Caliber)*2)*0.5),2) )
+	end
+	gunList["Cannon"] = function()
+		DLabel:SetText( Caliber.."mm Cannon\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((9000/((200/Caliber)*(200/Caliber)))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed, "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed" )
+	end
+	gunList["Flamethrower"] = function()
+		DLabel:SetPos( 15, 380 )
+		DLabel:SetText( "Flamethrower\nFlamethrower capable of igniting infantry, softening armor and stalling engines.\n\nArmor:   50mm\nWeight: 50kg\nHealth:  10" )
+		DermaNumSlider:SetVisible( false )
+	end
+	gunList["HMG"] = function()
+		DLabel:SetText( Caliber.."mm Heavy Machine Gun\nMore light barreled autocannons than machine guns, these are somewhat useful against both armored targets and infantry. They can only use AP and HE HMG ammo.\n\nArmor: "..math.Round((Caliber*5),2).."mm\nWeight: "..math.Round((600/((40/Caliber)*(40/Caliber)))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 20 seconds\nClip Size: "..math.Round(800/Caliber) )
+	end
+	gunList["Howitzer"] = function()
+		DLabel:SetText( Caliber.."mm Howitzer\nPowerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((9000/((240/Caliber)*(240/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)),2).." seconds crewed, "..math.Round(((Caliber/13 + Caliber/100))*1.5,2).." seconds uncrewed" )
+	end
+	gunList["MG"] = function()
+		DLabel:SetText( Caliber.."mm Machine Gun\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nArmor: "..math.Round((Caliber*5),2).."mm\nWeight: "..math.Round((60/((14.5/Caliber)*(14.5/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)*0.1),2).." seconds" )
+	end
+	gunList["Mortar"] = function()
+		DLabel:SetText( Caliber.."mm Mortar\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((4500/((280/Caliber)*(280/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)),2).." seconds crewed, "..math.Round(((Caliber/13 + Caliber/100)*1.5),2).." seconds uncrewed" )
+	end
+	
+	--Table containing information and settings for weapons, this is called by the Gun Type combobox
+	local gunData = {}
+	gunData["Autocannon"] = function()
+		EntType = "dak_teautogun"
+		AmmoData = { 2, 800, 0.6, 0.04, 800 }
+		DermaNumSlider:SetMinMax( 20, 60 )
+		AmmoTypes = { "Armor Piercing", "High Explosive" }
+	end
+	gunData["Autoloader"] = function()
+		EntType = "dak_teautogun"
+		AmmoData = { 2, 800, 0.6, 0.04, 800 }
+		DermaNumSlider:SetMinMax( 75, 200 )
+		AmmoTypes = { "Armor Piercing", "High Explosive" }
+	end
+	gunData["Cannon"] = function()
+		EntType = "dak_tegun"
+		AmmoData = { 2, 800, 0.6, 0.04, 800, 1.5, 600 }
+		DermaNumSlider:SetMinMax( 25, 200 )
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
+	end
+	gunData["Flamethrower"] = function()
+		EntType = "dak_temachinegun"
+		AmmoTypes = { }
+	end
+	gunData["Heavy Machine Gun"] = function()
+		GunType = "HMG"
+		EntType = "dak_teautogun"
+		AmmoData = { 1.5, 400, 0.45, 0.04, 600 }
+		DermaNumSlider:SetMinMax( 20, 40 )
+		AmmoTypes = { "Armor Piercing", "High Explosive" }
+	end
+	gunData["Howitzer"] = function()
+		EntType = "dak_tegun"
+		AmmoData = { 2, 600, 0.45, 0.04, 600, 1.125, 450 }
+		DermaNumSlider:SetMinMax( 50, 240 )
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
+	end
+	gunData["Machine Gun"] = function()
+		GunType = "MG"
+		EntType = "dak_temachinegun"
+		AmmoData = { 2, 600 }
+		DermaNumSlider:SetMinMax( 5, 25 )
+		AmmoTypes = { "Armor Piercing" }
+	end
+	gunData["Mortar"] = function()
+		EntType = "dak_tegun"
+		AmmoData = { 0.4, 160, 0.12, 0.046, 160, 0.3, 120 }
+		DermaNumSlider:SetMinMax( 40, 280 )
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette"}
+	end
+	
+	--Table containing the volume of the available ammo crates
+	local crateList = {}
+	crateList["Micro Ammo Box"] = function()
+		Volume = 3384.4787597656
+	end
+	crateList["Small Ammo Box"] = function()
+		Volume = 6797.3989257813
+	end
+	crateList["Standard Ammo Box"] = function()
+		Volume = 13651.918945313
+	end
+	crateList["Large Ammo Box"] = function()
+		Volume = 20506.4375
+	end
+	crateList["Huge Ammo Box"] = function()
+		Volume = 30802.55859375
+	end
+	crateList["Ultra Ammo Box"] = function()
+		Volume = 41098.6796875
+	end
+	
+	--Table containing the information of the different tree nodes
 	local selection = {}
 	------------- Guide -------------
 	selection["DakTank Guide"] = function()
@@ -1150,47 +1342,47 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: The Basics"] = function()
-		DLabel:SetText( "DakTank Guide: The Basics\n\nIn DakTanks tanks consist of props making up armor, a fuel tank, an engine, a gearbox, at least one gun, ammo, a seat, a turret controller, and wiring all held together by the tank core entity. The tank core must be parented to a gate that has been parented (NOT WELDED) to the baseplate of the tank. Doing this will pool the tank's health and allow your guns to fire. Props set to 1kg will be considered detail props by the system and will be entirely ignored by the damage system (but will count towards total pooled HP). Please set any detail props to 1kg." )
+		DLabel:SetText( "DakTank Guide: The Basics\n\nIn DakTanks tanks consist of props making up armor, a fuel tank, an engine, a gearbox, at least one gun, ammo, a seat, a turret controller, and wiring all held together by the tank core entity.\n\nThe tank core must be parented to a gate that has been parented (NOT WELDED) to the baseplate of the tank. Doing this will pool the tank's health and allow your guns to fire.\n\nProps set to 1kg will be considered detail props by the system and will be entirely ignored by the damage system (but will count towards total pooled HP). Please set any detail props to 1kg." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Armor"] = function()
-		DLabel:SetText( "DakTank Guide: Armor\n\nEach prop has its own armor value based on the mm protection of steel plate. The amount of protection you get on the prop is determined by its weight and volume, or simply put its density. A large prop will take much more weight than a small prop, but you'll need large props on your tank if you are to fit your equipment, larger equipment tends to offer much better bonuses than smaller counterparts. Angling your armor will increase its effective thickness, making it harder for your armor to be penetrated, though HE damage ignores slope. Treads (or anything you set to make spherical using the tool for it) have their own designated armor value based on the actual thickness of the prop then run through a modifier. Treads can be penetrated but take no damage, this lets you use them as extra armor for your sides that will reduce the AP damage they take (slightly) but does nothing against HE." )
+		DLabel:SetText( "DakTank Guide: Armor\n\nEach prop has its own armor value based on the mm protection of steel plate. The amount of protection you get on the prop is determined by its weight and volume, or simply put its density. A large prop will take much more weight than a small prop, but you'll need large props on your tank if you are to fit your equipment, larger equipment tends to offer much better bonuses than smaller counterparts.\n\nAngling your armor will increase its effective thickness, making it harder for your armor to be penetrated, though HE damage ignores slope.\n\nTreads (or anything you set to make spherical using the tool for it) have their own designated armor value based on the actual thickness of the prop then run through a modifier.\n\nTreads can be penetrated but take no damage, this lets you use them as extra armor for your sides that will reduce the AP damage they take (slightly) but does nothing against HE." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Health"] = function()
-		DLabel:SetText( "DakTank Guide: Health\n\nHealth determines just how much damage your tank can take and is totalled up by the tank core, health is based mainly on the armor weight of the vehicle in tons multiplied by 10, so two tanks can be the same total weight but have different health, the more armored one being stronger. However, health is modified further by size multipliers, which also affect rate of fire of cannons, howitzers, mortars, autocannons, and HMGs, if your tank is large for its weight it gains bonus health to improve its durability due to the higher cost to armor it, if a tank is small for its weight it will lose health but have an easy time armoring itself. Ramming damage is calculated based on max health of a tank, it finds the total mass involved in the collision then each tank takes a percentage of the damage equal to the other tank's percentage of the weight, so a 5 ton tank ramming a 50 ton tank would take 11 times the damage that the 50 ton tank took. Each module has its own health value." )
+		DLabel:SetText( "DakTank Guide: Health\n\nHealth determines just how much damage your tank can take and is totalled up by the tank core, health is based mainly on the armor weight of the vehicle in tons multiplied by 10, so two tanks can be the same total weight but have different health, the more armored one being stronger.\n\nHowever, health is modified further by size multipliers, which also affect rate of fire of cannons, howitzers, mortars, autocannons, and HMGs, if your tank is large for its weight it gains bonus health to improve its durability due to the higher cost to armor it, if a tank is small for its weight it will lose health but have an easy time armoring itself.\n\nRamming damage is calculated based on max health of a tank, it finds the total mass involved in the collision then each tank takes a percentage of the damage equal to the other tank's percentage of the weight, so a 5 ton tank ramming a 50 ton tank would take 11 times the damage that the 50 ton tank took. Each module has its own health value." )
 		DLabel:SetVisible( true )
 	end
-	selection["DakTank Guide: Munitions: AP"] = function()
-		DLabel:SetText( "DakTank Guide: Munitions: AP\n\nThere are 3 types of ammo, Armor Piercing (AP), High Explosive (HE), and Flechette (FL). Each type of ammo has its own purposes in the combat of daktek, it is a good idea to take at least some amount of each if your gun allows it.\n\nAP fires a single shell at a target, if it doesn't have enough penetration to go through the armor then it will only deal a quarter its specified damage and be deflected away. If your shell does penetrate then it deals damage equal to its specified value multiplied by its own penetration value divided by the armor value of the prop it went through. The damage is capped to the amount of armor the prop has, making extremely heavy cannons firing AP not the best tool for dealing with light tanks, however you'll still shoot a hole right through them and likely rip out many modules at once and still deal respectable damage." )
+	selection["DakTank Guide: AP Ammunition"] = function()
+		DLabel:SetText( "DakTank Guide: AP Ammunition\n\nThere are 3 types of ammo, Armor Piercing (AP), High Explosive (HE), and Flechette (FL). Each type of ammo has its own purposes in the combat of daktek, it is a good idea to take at least some amount of each if your gun allows it.\n\nAP fires a single shell at a target, if it doesn't have enough penetration to go through the armor then it will only deal a quarter its specified damage and be deflected away.\n\nIf your shell does penetrate then it deals damage equal to its specified value multiplied by its own penetration value divided by the armor value of the prop it went through.\n\nThe damage is capped to the amount of armor the prop has, making extremely heavy cannons firing AP not the best tool for dealing with light tanks, however you'll still shoot a hole right through them and likely rip out many modules at once and still deal respectable damage." )
 		DLabel:SetVisible( true )
 	end
-	selection["DakTank Guide: Munitions: HE"] = function()
-		DLabel:SetText( "DakTank Guide: Munitions: HE\n\nHE fires an explosive shell at its target. It has penetration equal to 40% of an AP round's penetration and acts as an AP until it finds something it cannot penetrate, at which point it explodes, creating fragments equal to half the caliber. Each fragment acts as an AP shell with no damage cap and pen equal to the shell's pen before exploding, making HE extremely powerful against low armor and very effective if you get a penetrating shot and explode inside. HE is also very effective against low armor but highly angled armor. HE's fragmentation based nature can be very random with lower chances to hit targets further from the blast radius, you'll do much more damage on direct hits than splashes." )
+	selection["DakTank Guide: HE Ammunition"] = function()
+		DLabel:SetText( "DakTank Guide: HE Ammunition\n\nHE fires an explosive shell at its target. It has penetration equal to 40% of an AP round's penetration and acts as an AP until it finds something it cannot penetrate, at which point it explodes, creating fragments equal to half the caliber. Each fragment acts as an AP shell with no damage cap and pen equal to the shell's pen before exploding, making HE extremely powerful against low armor and very effective if you get a penetrating shot and explode inside.\n\nHE is also very effective against low armor but highly angled armor. HE's fragmentation based nature can be very random with lower chances to hit targets further from the blast radius, you'll do much more damage on direct hits than splashes." )
 		DLabel:SetVisible( true )
 	end
-	selection["DakTank Guide: Munitions: FL"] = function()
-		DLabel:SetText( "DakTank Guide: Munitions: FL\n\nFL fires a volley of 10 projectiles at once like a large shotgun. It has more spread than normal shells, has 75% less penetration and velocity than AP. Each projectile is equal to a tenth of the damage of an AP shell. Where FL shines is attacking armor that it can overpenetrate by large margins. As I stated previously, AP's damage is capped to the total armor of a prop, so if you have 100mm of penetration going through 10mm armor and your shell does 5 damage then you get a times 10 multiplier to your damage, but you are capped to 10 damage instead of your 50 point potential. With FL you split the shell into 10 different bits and would have 75mm of penetration going through 10mm of armor, so you would have a 7.5 times multiplier and each shell has a base of 0.5 damage, this leads to 3.75 damage per shell, giving a total of 37.5 damage, nearly 4 times the amount of what AP would have done. It also is more likely to tear apart modules if it penetrates, great for flankers." )
+	selection["DakTank Guide: FL Ammunition"] = function()
+		DLabel:SetText( "DakTank Guide: FL Ammunition\n\nFL fires a volley of 10 projectiles at once like a large shotgun. It has more spread than normal shells, has 75% less penetration and velocity than AP. Each projectile is equal to a tenth of the damage of an AP shell.\n\nWhere FL shines is attacking armor that it can overpenetrate by large margins. As I stated previously, AP's damage is capped to the total armor of a prop, so if you have 100mm of penetration going through 10mm armor and your shell does 5 damage then you get a times 10 multiplier to your damage, but you are capped to 10 damage instead of your 50 point potential. With FL you split the shell into 10 different bits and would have 75mm of penetration going through 10mm of armor, so you would have a 7.5 times multiplier and each shell has a base of 0.5 damage, this leads to 3.75 damage per shell, giving a total of 37.5 damage, nearly 4 times the amount of what AP would have done.\n\nIt also is more likely to tear apart modules if it penetrates, great for flankers." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Weaponry"] = function()
-		DLabel:SetText( "DakTank Guide: Weaponry\n\nIn DakTanks there are cannons, howitzers, autoloaders, mortars, autocannons, heavy machine guns, and machine guns. Cannons are your basic weapon type and have access to any ammo type. Howitzers have a higher focus on HE, with larger splash radius, splash damage, and total damage than cannons of equal weight but longer reloads and often less penetration per ton. Autoloaders are cannons that can only fire AP and HE and require a clip module, they can fire devastating bursts in a short period of time but can have very long reloading periods. Mortars are low velocity HE focused guns. Autocannons are low caliber AP and HE firing guns that fire 10-30 shots at a rate of 10 shots per second but then have a 30 second reload, they're great for light weight hit and run. HMGs have larger clips than autocannons and half the reload times but also half the penetration, and half the velocity. Machine Guns are rapid fire anti infantry weapons that barely scratch light armor and only uses AP." )
+		DLabel:SetText( "DakTank Guide: Weaponry\n\nIn DakTanks there are cannons, howitzers, autoloaders, mortars, autocannons, heavy machine guns, and machine guns.\n\nCannons are your basic weapon type and have access to any ammo type.\n\nHowitzers have a higher focus on HE, with larger splash radius, splash damage, and total damage than cannons of equal weight but longer reloads and often less penetration per ton.\n\nAutoloaders are cannons that can only fire AP and HE and require a clip module, they can fire devastating bursts in a short period of time but can have very long reloading periods.\n\nMortars are low velocity HE focused guns.\n\nAutocannons are low caliber AP and HE firing guns that fire 10-30 shots at a rate of 10 shots per second but then have a 30 second reload, they're great for light weight hit and run.\n\nHMGs have larger clips than autocannons and half the reload times but also half the penetration, and half the velocity.\n\nMachine Guns are rapid fire anti infantry weapons that barely scratch light armor and only uses AP." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Flamethrowers"] = function()
-		DLabel:SetText( "DakTank Guide: Flamethrowers\n\nFlamethrowers are a special weapon type that reduces the armor value of armor it hits over time to a minimum of half of its original value. Flamethrowers also can overheat the engines of a vehicle, reducing the power and eventually stalling a tank, making it easy to flank or easy to hit. They will also ignite infantry caught in the impact zone, dealing burn damage over the next 5 seconds. Flamethrowers require a lot of fuel to keep them firing, allowing only 15 seconds of fire per fuel tank. This means that dedicated flamethrower tanks will either need to be very large, have external tanks, or bring along a somewhat vulnerable fuel trailer or they'll be limited to short bursts of fire. Flamethrower fuel tanks have more armor and health than regular ammo crates but are also heavier and larger. However, their combination of armor and health makes them very vulnerable to crits from guns that do penetrate their armor." )
+		DLabel:SetText( "DakTank Guide: Flamethrowers\n\nFlamethrowers are a special weapon type that reduces the armor value of armor it hits over time to a minimum of half of its original value.\n\nFlamethrowers also can overheat the engines of a vehicle, reducing the power and eventually stalling a tank, making it easy to flank or easy to hit. They will also ignite infantry caught in the impact zone, dealing burn damage over the next 5 seconds.\n\nFlamethrowers require a lot of fuel to keep them firing, allowing only 15 seconds of fire per fuel tank. This means that dedicated flamethrower tanks will either need to be very large, have external tanks, or bring along a somewhat vulnerable fuel trailer or they'll be limited to short bursts of fire.\n\nFlamethrower fuel tanks have more armor and health than regular ammo crates but are also heavier and larger. However, their combination of armor and health makes them very vulnerable to crits from guns that do penetrate their armor." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Mobility"] = function()
-		DLabel:SetText( "DakTank Guide: Mobility\n\nVehicle speed is determined by your combined engine power, modified by how much fuel you have and total weight of the vehicle. Given the same engine and fuel tank a 30 ton tank will move twice as fast as a 60 tonner and will turn faster. You can use as many engines or fuel tanks as you want, each engine requires a certain amount of fuel and each fuel tank has a certain amount of fuel. Having less fuel than you require reduces your power output. Each gearbox can only handle a certain amount of power and each tank can only support one gearbox, providing more power to the gearbox than it can handle will result in waste power. Damage will reduce the stats of each of the mobility entities, potentially immobilizing you. You could create large but fast and lightly armored vehicles or small but slow and heavily armored vehicles. The faster vehicle would be good against heavier tanks that it could flank while the heavy vehicle would be good for dominating tanks that can't pen it." )
+		DLabel:SetText( "DakTank Guide: Mobility\n\nVehicle speed is determined by your combined engine power, modified by how much fuel you have and total weight of the vehicle.\n\nGiven the same engine and fuel tank a 30 ton tank will move twice as fast as a 60 tonner and will turn faster.\n\nYou can use as many engines or fuel tanks as you want, each engine requires a certain amount of fuel and each fuel tank has a certain amount of fuel. Having less fuel than you require reduces your power output.\n\nEach gearbox can only handle a certain amount of power and each tank can only support one gearbox, providing more power to the gearbox than it can handle will result in waste power.\n\nDamage will reduce the stats of each of the mobility entities, potentially immobilizing you. You could create large but fast and lightly armored vehicles or small but slow and heavily armored vehicles. The faster vehicle would be good against heavier tanks that it could flank while the heavy vehicle would be good for dominating tanks that can't pen it." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Critical Hits"] = function()
-		DLabel:SetText( "DakTank Guide: Critical Hits\n\nCertain components such as fuel, ammo, and autoloader clips can suffer from catastrophic failure in cases in which they are reduced to less than half health but not outright destroyed. Upon exploding fuel and clips will deal 250 points of damage between the entities nearby and ammo will deal between 0 and 500 damage depending on how full the crate is. Ammo boxes can have their ammo ejected via its wire input to avoid such failures in dire circumstances, though it can take a few seconds to empty out fully. Crit explosions function just like HE explosions, so damage may be much higher than stated, this gives some reason to place explosive items in the front of the tank so that the frontal armor absorbs some of the damage. AP and FL ammo cooks off instead of exploding outright, causing multiple internal penetrations to occur in a short time span." )
+		DLabel:SetText( "DakTank Guide: Critical Hits\n\nCertain components such as fuel, ammo, and autoloader clips can suffer from catastrophic failure in cases in which they are reduced to less than half health but not outright destroyed.\n\nUpon exploding fuel and clips will deal 250 points of damage between the entities nearby and ammo will deal between 0 and 500 damage depending on how full the crate is.\n\nAmmo boxes can have their ammo ejected via its wire input to avoid such failures in dire circumstances, though it can take a few seconds to empty out fully.\n\nCrit explosions function just like HE explosions, so damage may be much higher than stated, this gives some reason to place explosive items in the front of the tank so that the frontal armor absorbs some of the damage.\n\nAP and FL ammo cooks off instead of exploding outright, causing multiple internal penetrations to occur in a short time span." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Crew"] = function()
-		DLabel:SetText( "DakTank Guide: Crew\n\nCrew greatly improve the performance of a tank they are working on, each crew member is relatively light but takes up a sizeable area. Crew can be tasked with driving or loading while a turret motor can assist in improving turret rotation speeds. Only one crew member can be driver at once but you can have as many loaders as you want, each gives diminishing returns though, the first loader reduces reload times by a third, each loader after this reduces reload times by half as much as the last. Machineguns and Autoloaders cannot be crewed, as they are fully automated. Crew members are lightly armored and have low health, making them easy to lose in the case of an armor penetration, having many crew members taken out at once can be cripling, be sure to keep them safe." )
+		DLabel:SetText( "DakTank Guide: Crew\n\nCrew greatly improve the performance of a tank they are working on, each crew member is relatively light but takes up a sizeable area. Crew can be tasked with driving or loading while a turret motor can assist in improving turret rotation speeds.\n\nOnly one crew member can be driver at once but you can have as many loaders as you want, each gives diminishing returns though, the first loader reduces reload times by a third, each loader after this reduces reload times by half as much as the last.\n\nMachineguns and Autoloaders cannot be crewed, as they are fully automated. Crew members are lightly armored and have low health, making them easy to lose in the case of an armor penetration, having many crew members taken out at once can be cripling, be sure to keep them safe." )
 		DLabel:SetVisible( true )
 	end
 	------------- Utilities -------------
@@ -1235,26 +1427,6 @@ function TOOL.BuildCPanel( panel )
 		if EngineModelSelect:GetSelectedID() == nil then
 			DLabel:SetText( "Engines\n\nLarge gas guzzlers to get your tank moving at speeds faster than a brisk walk." )
 		else
-			local engineList = {}
-			engineList["Micro Engine"] = function()
-				DLabel:SetText( "Micro Engine\nTiny engine for tiny tanks.\n\nHealth:                  15\nArmor:                   15mm\nWeight:                 150kg\nCrewed Speed:     25km/h with 10t contraption\nUncrewed Speed: 15km/h with 10t contraption\nPower:                  75 HP\nFuel Required:      45L (for full performance)" )
-			end
-			engineList["Small Engine"] = function()
-				DLabel:SetText( "Small Engine\nSmall engine for light tanks and slow mediums.\n\nHealth:                  30\nArmor:                   30mm\nWeight:                 350kg\nCrewed Speed:     55km/h with 10t contraption\nUncrewed Speed: 33km/h with 10t contraption\nPower:                  165 HP\nFuel Required:      90L (for full performance)" )
-			end
-			engineList["Standard Engine"] = function()
-				DLabel:SetText( "Standard Engine\nStandard sized engine for medium tanks or slow heavies.\n\nHealth:                  45\nArmor:                   45mm\nWeight:                 625kg\nCrewed Speed:     100km/h with 10t contraption\nUncrewed Speed: 60km/h with 10t contraption\nPower:                  300 HP\nFuel Required:      180L (for full performance)" )
-			end
-			engineList["Large Engine"] = function()
-				DLabel:SetText( "Large Engine\nLarge engine for heavy tanks.\n\nHealth:                  60\nArmor:                   60mm\nWeight:                 975kg\nCrewed Speed:     155km/h with 10t contraption\nUncrewed Speed: 93km/h with 10t contraption\nPower:                  465 HP\nFuel Required:      360L (for full performance)" )
-			end
-			engineList["Huge Engine"] = function()
-				DLabel:SetText( "Huge Engine\nHuge engine for heavy tanks that want to move fast.\n\nHealth:                  75\nArmor:                   75mm\nWeight:                 1400kg\nCrewed Speed:     225km/h with 10t contraption\nUncrewed Speed: 135km/h with 10t contraption\nPower:                  675 HP\nFuel Required:      720L (for full performance)" )
-			end
-			engineList["Ultra Engine"] = function()
-				DLabel:SetText( "Ultra Engine\nUltra engine for use in super heavy tanks.\n\nHealth:                  90\nArmor:                   90mm\nWeight:                 2500kg\nCrewed Speed:     400km/h with 10t contraption\nUncrewed Speed: 240km/h with 10t contraption\nPower:                  1200 HP\nFuel Required:      1440L (for full performance)" )
-			end
-			
 			engineList[EngineModel]()
 			RunConsoleCommand( "daktankspawner_SpawnSettings", string.Replace( EngineModel, " ", "" ) )
 			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_temotor" )
@@ -1268,26 +1440,6 @@ function TOOL.BuildCPanel( panel )
 		if FuelModelSelect:GetSelectedID() == nil then
 			DLabel:SetText( "Fuel\n\nFuel tanks are required to run your engine, there are different sizes providing different bonuses." )
 		else
-			local fuelList = {}
-			fuelList["Micro Fuel Tank"] = function()
-				DLabel:SetText( "Micro Fuel Tank\nTiny fuel tank to run light tanks and tankettes.\n\nHealth:    10\nWeight:   65kg\nCapacity: 45L" )
-			end
-			fuelList["Small Fuel Tank"] = function()
-				DLabel:SetText( "Small Fuel Tank\nSmall fuel tank for light tanks and weak engined mediums.\n\nHealth:    20\nWeight:   120kg\nCapacity: 90L" )
-			end
-			fuelList["Standard Fuel Tank"] = function()
-				DLabel:SetText( "Standard Fuel Tank\nStandard medium tank fuel tank.\n\nHealth:    30\nWeight:   240kg\nCapacity: 180L" )
-			end
-			fuelList["Large Fuel Tank"] = function()
-				DLabel:SetText( "Large Fuel Tank\nLarge fuel tanks for heavies running mid sized engines.\n\nHealth:    40\nWeight:   475kg\nCapacity: 360L" )
-			end
-			fuelList["Huge Fuel Tank"] = function()
-				DLabel:SetText( "Huge Fuel Tank\nHuge fuel tank for heavies running large gas guzzlers.\n\nHealth:    50\nWeight:   950kg\nCapacity: 720L" )
-			end
-			fuelList["Ultra Fuel Tank"] = function()
-				DLabel:SetText( "Ultra Fuel Tank\nMassive fuel tank designed for super heavy tanks running the largest of engines.\n\nHealth:    60\nWeight:   1900kg\nCapacity: 1440L" )
-			end
-			
 			fuelList[FuelModel]()
 			local String = string.Explode( " ", FuelModel )
 			RunConsoleCommand( "daktankspawner_SpawnSettings", String[1]..String[2] )
@@ -1306,26 +1458,6 @@ function TOOL.BuildCPanel( panel )
 		if GearboxModelSelect:GetSelectedID() == nil then
 			DLabel:SetText( "Gearboxes\n\nTransfers the power of your engines to the wheels, you'll need heavy gearboxes to handle high power engines." )
 		else
-			local gearboxList = {}
-			gearboxList["Micro Gearbox"] = function()
-				DLabel:SetText( "Micro "..GearboxDirection.." Mount Gearbox\nTiny gearbox for tiny tanks.\n\nHealth:                 15\nArmor:                  15mm\nWeight:                150kg\nPower Rating:      150 HP\nTorque Multiplier: 0.85" )
-			end
-			gearboxList["Small Gearbox"] = function()
-				DLabel:SetText( "Small "..GearboxDirection.." Mount Gearbox\nSmall gearbox for small tanks.\n\nHealth:                 35\nArmor:                  35mm\nWeight:                350kg\nPower Rating:      330 HP\nTorque Multiplier: 0.95" )
-			end
-			gearboxList["Standard Gearbox"] = function()
-				DLabel:SetText( "Standard "..GearboxDirection.." Mount Gearbox\nMedium gearbox for medium tanks.\n\nHealth:                 60\nArmor:                  60mm\nWeight:                625kg\nPower Rating:      600 HP\nTorque Multiplier: 1" )
-			end
-			gearboxList["Large Gearbox"] = function()
-				DLabel:SetText( "Large "..GearboxDirection.." Mount Gearbox\nLarge gearbox for large tanks.\n\nHealth:                 95\nArmor:                  95mm\nWeight:                975kg\nPower Rating:      930 HP\nTorque Multiplier: 1.15" )
-			end
-			gearboxList["Huge Gearbox"] = function()
-				DLabel:SetText( "Huge "..GearboxDirection.." Mount Gearbox\nHuge gearbox for huge tanks.\n\nHealth:                 140\nArmor:                  140mm\nWeight:                1400kg\nPower Rating:      1350 HP\nTorque Multiplier: 1.25" )
-			end
-			gearboxList["Ultra Gearbox"] = function()
-				DLabel:SetText( "Ultra "..GearboxDirection.." Mount Gearbox\nUltra gearbox for landcruisers.\n\nHealth:                 250\nArmor:                  250mm\nWeight:                2500kg\nPower Rating:      2400 HP\nTorque Multiplier: 1.3" )
-			end
-
 			gearboxList[GearboxModel]()
 			RunConsoleCommand( "daktankspawner_SpawnSettings", string.Replace( GearboxModel, " ", "" )..string.sub( GearboxDirection, 1, 1 ) )
 			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_tegearbox" )
@@ -1345,37 +1477,9 @@ function TOOL.BuildCPanel( panel )
 			DLabel:SetText( "Weapons\n\nThis kills the enemy, point at things you want removed." )
 		else
 			DermaNumSlider:SetVisible( true )
-			local gunList = {}
-			gunList["Autocannon"] = function()
-				DLabel:SetText( Caliber.."mm Autocannon\nLight guns with large clips and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((2000/((50/Caliber)*(50/Caliber)))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 25 seconds\nClip Size: "..math.Round(600/Caliber).."\n\nAP Stats\nPenetration: "..math.Round((Caliber*2),2).."mm\nDamage: "..math.Round(Caliber*0.25,2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round((Caliber*2*0.3),2).."mm\nFrag Penetration: "..math.Round((Caliber/2.5),2).."mm\nDamage: "..math.Round(Caliber*0.25*0.5,2).."\nSplash Damage: "..math.Round(Caliber*0.375,2).."\nBlast Radius: "..math.Round((Caliber/25),2).."m\nVelocity: 800 m/s" )
-			end
-			gunList["Autoloader"] = function()
-				DLabel:SetText( Caliber.."mm Autoloader\nCannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((9000/((200/Caliber)*(200/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)*0.2),2).."\nSmall Clip Size: "..math.Round(600/Caliber).."\nMedium Clip Size: "..math.Round((600/Caliber)*1.5).."\nLarge Clip Size: "..math.Round((600/Caliber)*2).."\nSmall Clip Reload Time: "..math.Round((Caliber/13 + Caliber/100)*math.Round(600/Caliber),2).."\nMedium Clip Reload Time: "..math.Round(((Caliber/13 + Caliber/100)*math.Round((600/Caliber)*1.5)*0.75),2).."\nLarge Clip Reload Time: "..math.Round(((Caliber/13 + Caliber/100)*math.Round((600/Caliber)*2)*0.5),2).."\n\nAP Stats\nPenetration: "..math.Round(Caliber*2,2).."mm\nDamage: "..math.Round(Caliber*0.25,2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round(Caliber*0.6,2).."mm\nFrag Penetration: "..math.Round(Caliber/2.5,2).."mm\nDamage: "..math.Round(Caliber*0.125,2).."\nSplash Damage: "..math.Round(Caliber*0.375,2).."\nBlast Radius: "..math.Round(Caliber/25,2).."m\nVelocity: 800 m/s" )
-			end
-			gunList["Cannon"] = function()
-				DLabel:SetText( Caliber.."mm Cannon\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((9000/((200/Caliber)*(200/Caliber)))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed, "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round(Caliber*2,2).."mm\nDamage: "..math.Round(Caliber*0.25,2).."\nVelocity: 800 m/s\n\nHE Stats\nPenetration: "..math.Round(Caliber*0.6,2).."mm\nFrag Penetration: "..math.Round(Caliber/2.5,2).."mm\nDamage: "..math.Round(Caliber*0.125,2).."\nSplash Damage: "..math.Round(Caliber*0.375,2).."\nBlast Radius: "..math.Round(Caliber/25,2).."m\nVelocity: 800 m/s\n\nFL Stats\nPenetration: "..math.Round(Caliber*1.5,2).."mm\nDamage: "..math.Round(Caliber*0.025,2).."\nPellets: 10\nVelocity: 600 m/s" )
-			end
-			gunList["Flamethrower"] = function()
-				DLabel:SetPos( 15, 380 )
-				DLabel:SetText( "Flamethrower\nFlamethrower capable of igniting infantry, softening armor and stalling engines.\n\nArmor:   50mm\nWeight: 50kg\nHealth:  10" )
-				DermaNumSlider:SetVisible( false )
-			end
-			gunList["Heavy Machine Gun"] = function()
-				DLabel:SetText( Caliber.."mm Heavy Machine Gun\nMore light barreled autocannons than machine guns, these are somewhat useful against both armored targets and infantry. They can only use AP and HE HMG ammo.\n\nArmor: "..math.Round((Caliber*5),2).."mm\nWeight: "..math.Round((600/((40/Caliber)*(40/Caliber)))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 20 seconds\nClip Size: "..math.Round(800/Caliber).."\n\nAP Stats\nPenetration: "..math.Round((Caliber*1.5),2).."mm\nDamage: "..math.Round(Caliber*0.25,2).."\nVelocity: 400 m/s\n\nHE Stats\nPenetration: "..math.Round((Caliber*1.5*0.3),2).."mm\nFrag Penetration: "..math.Round((Caliber/2.5),2).."mm\nDamage: "..math.Round(Caliber*0.25*0.5,2).."\nSplash Damage: "..math.Round(Caliber*0.375,2).."\nBlast Radius: "..math.Round((Caliber/25),2).."m\nVelocity: 600 m/s" )
-			end
-			gunList["Howitzer"] = function()
-				DLabel:SetText( Caliber.."mm Howitzer\nPowerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((9000/((240/Caliber)*(240/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)),2).." seconds crewed, "..math.Round(((Caliber/13 + Caliber/100))*1.5,2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((Caliber*1.5),2).."mm\nDamage: "..math.Round(Caliber*0.25,2).."\nVelocity: 600 m/s\n\nHE Stats\nPenetration: "..math.Round((Caliber*1.5*0.3),2).."mm\nFrag Penetration: "..math.Round((Caliber/2.5)*1.3,2).."mm\nDamage: "..math.Round(Caliber*0.25*0.5,2).."\nSplash Damage: "..math.Round(Caliber*0.375,2).."\nBlast Radius: "..math.Round((Caliber/25)*1.3,2).."m\nVelocity: 600 m/s\n\nFL Stats\nPenetration: "..math.Round((Caliber*1.5*0.75),2).."mm\nDamage: "..math.Round(Caliber*0.025,2).."\nPellets: 10\nVelocity: 450 m/s" )
-			end
-			gunList["Machine Gun"] = function()
-				DLabel:SetText( Caliber.."mm Machine Gun\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nArmor: "..math.Round((Caliber*5),2).."mm\nWeight: "..math.Round((60/((14.5/Caliber)*(14.5/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)*0.1),2).." seconds\n\nAP Stats\nPenetration: "..math.Round((Caliber*2),2).."mm\nDamage: "..math.Round(Caliber*0.025,2).."\nVelocity: 600 m/s" )
-			end
-			gunList["Mortar"] = function()
-				DLabel:SetText( Caliber.."mm Mortar\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((4500/((280/Caliber)*(280/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)),2).." seconds crewed, "..math.Round(((Caliber/13 + Caliber/100)*1.5),2).." seconds uncrewed\n\nAP Stats\nPenetration: "..math.Round((Caliber*0.4),2).."mm\nDamage: "..math.Round(Caliber*0.25,2).."\nVelocity: 160 m/s\n\nHE Stats\nPenetration: "..math.Round((Caliber*0.4*0.3),2).."mm\nFrag Penetration: "..math.Round((Caliber/2.5)*1.15,2).."mm\nDamage: "..math.Round(Caliber*0.25*0.5,2).."\nSplash Damage: "..math.Round(Caliber*0.375,2).."\nBlast Radius: "..math.Round((Caliber/25)*1.15,2).."m\nVelocity: 160 m/s\n\nFL Stats\nPenetration: "..math.Round((Caliber*0.4*0.75),2).."mm\nDamage: "..math.Round(Caliber*0.025,2).."\nPellets: 10\nVelocity: 120 m/s" )
-			end
-
 			gunList[GunType]()
 			RunConsoleCommand( "daktankspawner_SpawnSettings", GunType )
-			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_tegun" )
+			RunConsoleCommand( "daktankspawner_SpawnEnt", EntType )
 		end
 	end
 	selection["Autoloader Clips"] = function()
@@ -1386,17 +1490,6 @@ function TOOL.BuildCPanel( panel )
 		if AutoloaderClipSelect:GetSelectedID() == nil then
 			DLabel:SetText( "Autoloader Clips\n\nThese are the clips that hold shells and supply them to an autoloader. They are explosive." )
 		else
-			local clipList = {}
-			clipList["Small Autoloader Clip"] = function()
-				DLabel:SetText( "Small Autoloader Clip\nSmall sized clip required to load an autoloader.\n\nArmor:   10mm\nWeight: 1000kg\nHealth:  50" )
-			end
-			clipList["Medium Autoloader Clip"] = function()
-				DLabel:SetText( "Medium Autoloader Clip\nMedium sized clip required to load an autoloader. Increases clip size and decreases reload times by 20% per shell\n\nArmor:   10mm\nWeight: 2000kg\nHealth:  75" )
-			end
-			clipList["Large Autoloader Clip"] = function()
-				DLabel:SetText( "Large Autoloader Clip\nLarge sized clip required to load an autoloader. Increases clip size and decreases reload times by 40% per shell\n\nArmor:   10mm\nWeight: 3000kg\nHealth:  100" )
-			end
-			
 			clipList[AutoloaderClip]()
 			RunConsoleCommand( "daktankspawner_SpawnSettings", string.sub( AutoloaderClip, 1, 1 ).."ALClip" )
 			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautoloadingmodule" )
@@ -1424,7 +1517,6 @@ function TOOL.BuildCPanel( panel )
 						AmmoTypeSelect:AddChoice( AmmoTypes[k] )
 					end
 				end
-				RunConsoleCommand( "daktankspawner_DTTE_AmmoType", GunType )
 			end
 				
 			if AmmoTypeSelect:GetSelectedID() ~= nil then
@@ -1447,29 +1539,19 @@ function TOOL.BuildCPanel( panel )
 					ShellLenMult = 2.75
 				end
 
-				local ShellMass  = ShellVol * 0.044
-				local AmmoWeight = math.Round(ShellMass*math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)+10)
-				local AmmoCount  = math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)
-
-				local selectedAmmo = {}
-				selectedAmmo["AP"] = function()
-					DLabel:SetText(Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, cooks off when damaged.\n\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)")
-				end
-				selectedAmmo["HE"] = function()
-					DLabel:SetText(Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, also explodes.\n\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)")
-				end
-				selectedAmmo["FL"] = function()
-					DLabel:SetText(Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, cooks off when damaged.\n\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)")
-				end
+				local ShellMass = ShellVol * 0.044
+				AmmoWeight 		= math.Round(ShellMass*math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)+10)
+				AmmoCount 		= math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)
 
 				selectedAmmo[AmmoType]()
+				RunConsoleCommand( "daktankspawner_DTTE_AmmoType", GunType )
 				RunConsoleCommand( "daktankspawner_SpawnSettings", AmmoCrate )
 				RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teammo" )
 			end
 		end
 	end
 
-	--Function to display and update what you see in the User Interface menu
+	--Function to update what you see in the User Interface menu
 	local function updateUI()
 		RunConsoleCommand( "daktankspawner_SpawnEnt", "" )
 		RunConsoleCommand( "daktankspawner_SpawnSettings", "" )
@@ -1519,40 +1601,8 @@ function TOOL.BuildCPanel( panel )
 	AmmoBoxSelect:AddChoice( "Machine Gun" )
 	AmmoBoxSelect:AddChoice( "Mortar" )
 	AmmoBoxSelect.OnSelect = function( panel, index, value )
-		local gunList = {}
-		gunList["Autocannon"] = function()
-			DermaNumSlider:SetMinMax( 20, 60 )
-			AmmoTypes = { "Armor Piercing", "High Explosive" }
-		end
-		gunList["Autoloader"] = function()
-			DermaNumSlider:SetMinMax( 75, 200 )
-			AmmoTypes = { "Armor Piercing", "High Explosive" }
-		end
-		gunList["Cannon"] = function()
-			DermaNumSlider:SetMinMax( 25, 200 )
-			AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
-		end
-		gunList["Flamethrower"] = function()
-			AmmoTypes = { "Flamethrower Fuel" }
-		end
-		gunList["Heavy Machine Gun"] = function()
-			DermaNumSlider:SetMinMax( 20, 40 )
-			AmmoTypes = { "Armor Piercing", "High Explosive" }
-		end
-		gunList["Howitzer"] = function()
-			DermaNumSlider:SetMinMax( 50, 240 )
-			AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
-		end
-		gunList["Machine Gun"] = function()
-			DermaNumSlider:SetMinMax( 5, 25 )
-			AmmoTypes = { "Armor Piercing" }
-		end
-		gunList["Mortar"] = function()
-			DermaNumSlider:SetMinMax( 40, 280 )
-			AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette"}
-		end
 		GunType = value
-		gunList[value]()
+		gunData[value]()
 		DermaNumSlider:SetValue( math.Clamp(DermaNumSlider:GetValue(),DermaNumSlider:GetMin(),DermaNumSlider:GetMax()) )
 
 		updateUI()
@@ -1594,25 +1644,6 @@ function TOOL.BuildCPanel( panel )
 	AmmoModelSelect:AddChoice( "Huge Ammo Box" )
 	AmmoModelSelect:AddChoice( "Ultra Ammo Box" )
 	AmmoModelSelect.OnSelect = function( panel, index, value )
-		local crateList = {}
-		crateList["Micro Ammo Box"] = function()
-			Volume = 3384.4787597656
-		end
-		crateList["Small Ammo Box"] = function()
-			Volume = 6797.3989257813
-		end
-		crateList["Standard Ammo Box"] = function()
-			Volume = 13651.918945313
-		end
-		crateList["Large Ammo Box"] = function()
-			Volume = 20506.4375
-		end
-		crateList["Huge Ammo Box"] = function()
-			Volume = 30802.55859375
-		end
-		crateList["Ultra Ammo Box"] = function()
-			Volume = 41098.6796875
-		end
 		CrateModel = value
 		crateList[value]()
 
@@ -1718,9 +1749,9 @@ function TOOL.BuildCPanel( panel )
 		DTTE_NodeList["Help1"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: The Basics", "icon16/page.png" )
 		DTTE_NodeList["Help2"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Armor", "icon16/page.png" )
 		DTTE_NodeList["Help3"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Health", "icon16/page.png" )
-		DTTE_NodeList["Help4"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Munitions: AP", "icon16/page.png" )
-		DTTE_NodeList["Help5"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Munitions: HE", "icon16/page.png" )
-		DTTE_NodeList["Help6"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Munitions: FL", "icon16/page.png" )
+		DTTE_NodeList["Help4"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: AP Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help5"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HE Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help6"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: FL Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help7"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Weaponry", "icon16/page.png" )
 		DTTE_NodeList["Help8"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Flamethrowers", "icon16/page.png" )
 		DTTE_NodeList["Help9"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Mobility", "icon16/page.png" )
