@@ -1265,52 +1265,52 @@ function TOOL.BuildCPanel( panel )
 	--Table containing information and settings for weapons, this is called by the Gun Type combobox
 	local gunData = {}
 	gunData["Autocannon"] = function()
-		EntType = "dak_teautogun"
-		AmmoData = { 2, 800, 0.6, 0.04, 800 }
-		DermaNumSlider:SetMinMax( 20, 60 )
+		EntType   = "dak_teautogun"
+		AmmoData  = { 2, 800, 0.6, 0.04, 800 }
 		AmmoTypes = { "Armor Piercing", "High Explosive" }
+		DermaNumSlider:SetMinMax( 20, 60 )
 	end
 	gunData["Autoloader"] = function()
-		EntType = "dak_teautogun"
-		AmmoData = { 2, 800, 0.6, 0.04, 800 }
-		DermaNumSlider:SetMinMax( 75, 200 )
+		EntType   = "dak_teautogun"
+		AmmoData  = { 2, 800, 0.6, 0.04, 800 }
 		AmmoTypes = { "Armor Piercing", "High Explosive" }
+		DermaNumSlider:SetMinMax( 75, 200 )
 	end
 	gunData["Cannon"] = function()
-		EntType = "dak_tegun"
-		AmmoData = { 2, 800, 0.6, 0.04, 800, 1.5, 600 }
-		DermaNumSlider:SetMinMax( 25, 200 )
+		EntType   = "dak_tegun"
+		AmmoData  = { 2, 800, 0.6, 0.04, 800, 1.5, 600 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
+		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Flamethrower"] = function()
-		EntType = "dak_temachinegun"
-		AmmoTypes = { }
+		EntType   = "dak_temachinegun"
+		AmmoTypes = {}
 	end
 	gunData["Heavy Machine Gun"] = function()
-		GunType = "HMG"
-		EntType = "dak_teautogun"
-		AmmoData = { 1.5, 400, 0.45, 0.04, 600 }
-		DermaNumSlider:SetMinMax( 20, 40 )
+		GunType   = "HMG"
+		EntType   = "dak_teautogun"
+		AmmoData  = { 1.5, 400, 0.45, 0.04, 600 }
 		AmmoTypes = { "Armor Piercing", "High Explosive" }
+		DermaNumSlider:SetMinMax( 20, 40 )
 	end
 	gunData["Howitzer"] = function()
-		EntType = "dak_tegun"
-		AmmoData = { 2, 600, 0.45, 0.04, 600, 1.125, 450 }
-		DermaNumSlider:SetMinMax( 50, 240 )
+		EntType   = "dak_tegun"
+		AmmoData  = { 2, 600, 0.45, 0.04, 600, 1.125, 450 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
+		DermaNumSlider:SetMinMax( 50, 240 )
 	end
 	gunData["Machine Gun"] = function()
-		GunType = "MG"
-		EntType = "dak_temachinegun"
-		AmmoData = { 2, 600 }
-		DermaNumSlider:SetMinMax( 5, 25 )
+		GunType   = "MG"
+		EntType   = "dak_temachinegun"
+		AmmoData  = { 2, 600 }
 		AmmoTypes = { "Armor Piercing" }
+		DermaNumSlider:SetMinMax( 5, 25 )
 	end
 	gunData["Mortar"] = function()
-		EntType = "dak_tegun"
-		AmmoData = { 0.4, 160, 0.12, 0.046, 160, 0.3, 120 }
-		DermaNumSlider:SetMinMax( 40, 280 )
+		EntType   = "dak_tegun"
+		AmmoData  = { 0.4, 160, 0.12, 0.046, 160, 0.3, 120 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette"}
+		DermaNumSlider:SetMinMax( 40, 280 )
 	end
 	
 	--Table containing the volume of the available ammo crates
@@ -1573,23 +1573,42 @@ function TOOL.BuildCPanel( panel )
 		end
 	end
 
+	--Function in charge of adjusting the width of the components of the UI
+	panel.PerformLayoutLegacy = panel.PerformLayout
+	function panel:PerformLayout( Width, Height )
+		local PanelWidth = Width-30
+		
+		ctrl:SetSize( PanelWidth, 300 )
+		DLabel:SetWide( PanelWidth )
+		AmmoBoxSelect:SetSize( PanelWidth, 20 )
+		DermaNumSlider:SetSize( PanelWidth, 20 )
+		AmmoTypeSelect:SetSize( PanelWidth, 20 )
+		AmmoModelSelect:SetSize( PanelWidth, 20 )
+		FuelModelSelect:SetSize( PanelWidth, 20 )
+		EngineModelSelect:SetSize( PanelWidth, 20 )
+		GearboxDirectionSelect:SetSize( PanelWidth, 20 )
+		GearboxModelSelect:SetSize( PanelWidth, 20 )
+		AutoloaderClipSelect:SetSize( PanelWidth, 20 )
+		
+		self:PerformLayoutLegacy( Width, Height )
+	end
+
 	--Main Tree
 	ctrl:SetPos( 15, 30 )
 	ctrl:SetPadding( 5 )
-	ctrl:SetSize( 250, 300 )
 	ctrl:SetShowIcons( true )
+	ctrl:SetVisible( true )
 
 	--Text Box
 	DLabel:SetPos( 15, 345 )
-	DLabel:SetAutoStretchVertical( true )
 	DLabel:SetText( "Select an entity and information for it will appear here" )
 	DLabel:SetTextColor( Color( 0, 0, 0, 255 ) )
-	DLabel:SetWide( 250 )
+	DLabel:SetAutoStretchVertical( true )
 	DLabel:SetWrap( true )
+	DLabel:SetVisible( true )
 
 	--Gun Selection Combo Box
 	AmmoBoxSelect:SetPos( 15, 345 )
-	AmmoBoxSelect:SetSize( 250, 20 )
 	AmmoBoxSelect:SetSortItems( false )
 	AmmoBoxSelect:SetValue( "--Select Weapon--" )
 	AmmoBoxSelect:AddChoice( "Autocannon" )
@@ -1610,7 +1629,6 @@ function TOOL.BuildCPanel( panel )
 
 	--Caliber Slider
 	DermaNumSlider:SetPos( 15, 370 )
-	DermaNumSlider:SetSize( 250, 20 )
 	DermaNumSlider:SetText( "Caliber" )
 	DermaNumSlider:SetDark( true )
 	DermaNumSlider:SetValue( 5 )
@@ -1619,7 +1637,6 @@ function TOOL.BuildCPanel( panel )
 
 	--Ammo Type Combo Box
 	AmmoTypeSelect:SetPos( 15, 395 )
-	AmmoTypeSelect:SetSize( 250, 20 )
 	AmmoTypeSelect:SetSortItems( false )
 	AmmoTypeSelect.OnSelect = function( panel, index, value )
 		local String = string.Explode( " ", value )
@@ -1634,7 +1651,6 @@ function TOOL.BuildCPanel( panel )
 
 	--Ammo Crate Model Combo Box
 	AmmoModelSelect:SetPos( 15, 420 )
-	AmmoModelSelect:SetSize( 250, 20 )
 	AmmoModelSelect:SetSortItems( false )
 	AmmoModelSelect:SetValue( "--Select Ammo Crate--" )
 	AmmoModelSelect:AddChoice( "Micro Ammo Box" )
@@ -1652,7 +1668,6 @@ function TOOL.BuildCPanel( panel )
 
 	--Fuel Tank Model Combo Box
 	FuelModelSelect:SetPos( 15, 345 )
-	FuelModelSelect:SetSize( 250, 20 )
 	FuelModelSelect:SetSortItems( false )
 	FuelModelSelect:SetValue( "--Select Fuel Tank--" )
 	FuelModelSelect:AddChoice( "Micro Fuel Tank" )
@@ -1669,7 +1684,6 @@ function TOOL.BuildCPanel( panel )
 
 	--Engine Model Combo Box
 	EngineModelSelect:SetPos( 15, 345 )
-	EngineModelSelect:SetSize( 250, 20 )
 	EngineModelSelect:SetSortItems( false )
 	EngineModelSelect:SetValue( "--Select Engine--" )
 	EngineModelSelect:AddChoice( "Micro Engine" )
@@ -1686,7 +1700,6 @@ function TOOL.BuildCPanel( panel )
 
 	--Gearbox Direction Combo Box
 	GearboxDirectionSelect:SetPos( 15, 345 )
-	GearboxDirectionSelect:SetSize( 250, 20 )
 	GearboxDirectionSelect:SetValue( "--Select Direction--" )
 	GearboxDirectionSelect:AddChoice( "Frontal Mount" )
 	GearboxDirectionSelect:AddChoice( "Rear Mount" )
@@ -1698,7 +1711,6 @@ function TOOL.BuildCPanel( panel )
 
 	--Gearbox Model Combo Box
 	GearboxModelSelect:SetPos( 15, 370 )
-	GearboxModelSelect:SetSize( 250, 20 )
 	GearboxModelSelect:SetSortItems( false )
 	GearboxModelSelect:SetValue( "--Select Gearbox--" )
 	GearboxModelSelect:AddChoice( "Micro Gearbox" )
@@ -1715,7 +1727,6 @@ function TOOL.BuildCPanel( panel )
 
 	--Autoloader Clip Model Combo Box
 	AutoloaderClipSelect:SetPos( 15, 345 )
-	AutoloaderClipSelect:SetSize( 250, 20 )
 	AutoloaderClipSelect:SetValue( "--Select Autoloader Clip--" )
 	AutoloaderClipSelect:SetSortItems( false )
 	AutoloaderClipSelect:AddChoice( "Small Autoloader Clip" )
@@ -1745,34 +1756,34 @@ function TOOL.BuildCPanel( panel )
 
 	--Creation of the main tree menu
 	DTTE_NodeList={}
-	DTTE_NodeList["Guide"] = ctrl:AddNode( "DakTank Guide", "icon16/book.png" )
-		DTTE_NodeList["Help1"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: The Basics", "icon16/page.png" )
-		DTTE_NodeList["Help2"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Armor", "icon16/page.png" )
-		DTTE_NodeList["Help3"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Health", "icon16/page.png" )
-		DTTE_NodeList["Help4"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: AP Ammunition", "icon16/page.png" )
-		DTTE_NodeList["Help5"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HE Ammunition", "icon16/page.png" )
-		DTTE_NodeList["Help6"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: FL Ammunition", "icon16/page.png" )
-		DTTE_NodeList["Help7"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Weaponry", "icon16/page.png" )
-		DTTE_NodeList["Help8"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Flamethrowers", "icon16/page.png" )
-		DTTE_NodeList["Help9"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Mobility", "icon16/page.png" )
+	DTTE_NodeList["Guide"] 		= ctrl:AddNode( "DakTank Guide", "icon16/book.png" )
+		DTTE_NodeList["Help1"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: The Basics", "icon16/page.png" )
+		DTTE_NodeList["Help2"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Armor", "icon16/page.png" )
+		DTTE_NodeList["Help3"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Health", "icon16/page.png" )
+		DTTE_NodeList["Help4"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: AP Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help5"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HE Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help6"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: FL Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help7"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Weaponry", "icon16/page.png" )
+		DTTE_NodeList["Help8"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Flamethrowers", "icon16/page.png" )
+		DTTE_NodeList["Help9"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Mobility", "icon16/page.png" )
 		DTTE_NodeList["Help10"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Critical Hits", "icon16/page.png" )
 		DTTE_NodeList["Help11"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Crew", "icon16/page.png" )
 
-	DTTE_NodeList["Utilities"] = ctrl:AddNode( "Utilities", "icon16/folder_brick.png" )
-		DTTE_NodeList["Core"] = DTTE_NodeList["Utilities"]:AddNode( "Tank Core", "icon16/cog.png" )
-		DTTE_NodeList["Crew"] = DTTE_NodeList["Utilities"]:AddNode( "Crew Member", "icon16/cog.png" )	
+	DTTE_NodeList["Utilities"] 	  = ctrl:AddNode( "Utilities", "icon16/folder_brick.png" )
+		DTTE_NodeList["Core"] 	  = DTTE_NodeList["Utilities"]:AddNode( "Tank Core", "icon16/cog.png" )
+		DTTE_NodeList["Crew"] 	  = DTTE_NodeList["Utilities"]:AddNode( "Crew Member", "icon16/cog.png" )	
 		DTTE_NodeList["TControl"] = DTTE_NodeList["Utilities"]:AddNode( "Turret Controller", "icon16/cog.png" )
-		DTTE_NodeList["TMotor"] = DTTE_NodeList["Utilities"]:AddNode( "Turret Motor", "icon16/cog.png" )
+		DTTE_NodeList["TMotor"]   = DTTE_NodeList["Utilities"]:AddNode( "Turret Motor", "icon16/cog.png" )
 
-	DTTE_NodeList["Mobility"] = ctrl:AddNode( "Mobility", "icon16/folder_wrench.png" )
-		DTTE_NodeList["Engine"] = DTTE_NodeList["Mobility"]:AddNode( "Engines", "icon16/cog.png" )
-		DTTE_NodeList["Fuel"] = DTTE_NodeList["Mobility"]:AddNode( "Fuel Tanks", "icon16/cog.png" )
+	DTTE_NodeList["Mobility"] 	 = ctrl:AddNode( "Mobility", "icon16/folder_wrench.png" )
+		DTTE_NodeList["Engine"]  = DTTE_NodeList["Mobility"]:AddNode( "Engines", "icon16/cog.png" )
+		DTTE_NodeList["Fuel"] 	 = DTTE_NodeList["Mobility"]:AddNode( "Fuel Tanks", "icon16/cog.png" )
 		DTTE_NodeList["Gearbox"] = DTTE_NodeList["Mobility"]:AddNode( "Gearboxes", "icon16/cog.png" )
 
-	DTTE_NodeList["Weapons"] = ctrl:AddNode( "Weaponry", "icon16/folder_wrench.png" )
+	DTTE_NodeList["Weapons"] 	= ctrl:AddNode( "Weaponry", "icon16/folder_wrench.png" )
 		DTTE_NodeList["Weapon"] = DTTE_NodeList["Weapons"]:AddNode( "Weapons", "icon16/cog.png" )
 		DTTE_NodeList["ALClip"] = DTTE_NodeList["Weapons"]:AddNode( "Autoloader Clips", "icon16/cog.png" )
-		DTTE_NodeList["Ammo"] = DTTE_NodeList["Weapons"]:AddNode( "Ammunition", "icon16/cog.png" )
+		DTTE_NodeList["Ammo"] 	= DTTE_NodeList["Weapons"]:AddNode( "Ammunition", "icon16/cog.png" )
 end
 
 function TOOL:Think()
