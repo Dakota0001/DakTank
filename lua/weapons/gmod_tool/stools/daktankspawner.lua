@@ -1149,117 +1149,117 @@ function TOOL.BuildCPanel( panel )
 	--Table containing the information of the available engines
 	local engineList = {}
 	engineList["Micro Engine"] = function()
-		DLabel:SetText( "Micro Engine\nTiny engine for tiny tanks.\n\nHealth:                  15\nArmor:                   15mm\nWeight:                 150kg\nCrewed Speed:     25km/h with 10t contraption\nUncrewed Speed: 15km/h with 10t contraption\nPower:                  75 HP\nFuel Required:      45L (for full performance)" )
+		DLabel:SetText( "Micro Engine\n\nTiny engine for tiny tanks.\n\nEngine Stats:\nHealth:                  15\nArmor:                   15mm\nWeight:                 150kg\nCrewed Speed:     25km/h with 10t contraption\nUncrewed Speed: 15km/h with 10t contraption\nPower:                  75 HP\nFuel Required:      45L (for full performance)" )
 	end
 	engineList["Small Engine"] = function()
-		DLabel:SetText( "Small Engine\nSmall engine for light tanks and slow mediums.\n\nHealth:                  30\nArmor:                   30mm\nWeight:                 350kg\nCrewed Speed:     55km/h with 10t contraption\nUncrewed Speed: 33km/h with 10t contraption\nPower:                  165 HP\nFuel Required:      90L (for full performance)" )
+		DLabel:SetText( "Small Engine\n\nSmall engine for light tanks and slow mediums.\n\nEngine Stats:\nHealth:                  30\nArmor:                   30mm\nWeight:                 350kg\nCrewed Speed:     55km/h with 10t contraption\nUncrewed Speed: 33km/h with 10t contraption\nPower:                  165 HP\nFuel Required:      90L (for full performance)" )
 	end
 	engineList["Standard Engine"] = function()
-		DLabel:SetText( "Standard Engine\nStandard sized engine for medium tanks or slow heavies.\n\nHealth:                  45\nArmor:                   45mm\nWeight:                 625kg\nCrewed Speed:     100km/h with 10t contraption\nUncrewed Speed: 60km/h with 10t contraption\nPower:                  300 HP\nFuel Required:      180L (for full performance)" )
+		DLabel:SetText( "Standard Engine\n\nStandard sized engine for medium tanks or slow heavies.\n\nEngine Stats:\nHealth:                  45\nArmor:                   45mm\nWeight:                 625kg\nCrewed Speed:     100km/h with 10t contraption\nUncrewed Speed: 60km/h with 10t contraption\nPower:                  300 HP\nFuel Required:      180L (for full performance)" )
 	end
 	engineList["Large Engine"] = function()
-		DLabel:SetText( "Large Engine\nLarge engine for heavy tanks.\n\nHealth:                  60\nArmor:                   60mm\nWeight:                 975kg\nCrewed Speed:     155km/h with 10t contraption\nUncrewed Speed: 93km/h with 10t contraption\nPower:                  465 HP\nFuel Required:      360L (for full performance)" )
+		DLabel:SetText( "Large Engine\n\nLarge engine for heavy tanks.\n\nEngine Stats:\nHealth:                  60\nArmor:                   60mm\nWeight:                 975kg\nCrewed Speed:     155km/h with 10t contraption\nUncrewed Speed: 93km/h with 10t contraption\nPower:                  465 HP\nFuel Required:      360L (for full performance)" )
 	end
 	engineList["Huge Engine"] = function()
-		DLabel:SetText( "Huge Engine\nHuge engine for heavy tanks that want to move fast.\n\nHealth:                  75\nArmor:                   75mm\nWeight:                 1400kg\nCrewed Speed:     225km/h with 10t contraption\nUncrewed Speed: 135km/h with 10t contraption\nPower:                  675 HP\nFuel Required:      720L (for full performance)" )
+		DLabel:SetText( "Huge Engine\n\nHuge engine for heavy tanks that want to move fast.\n\nEngine Stats:\nHealth:                  75\nArmor:                   75mm\nWeight:                 1400kg\nCrewed Speed:     225km/h with 10t contraption\nUncrewed Speed: 135km/h with 10t contraption\nPower:                  675 HP\nFuel Required:      720L (for full performance)" )
 	end
 	engineList["Ultra Engine"] = function()
-		DLabel:SetText( "Ultra Engine\nUltra engine for use in super heavy tanks.\n\nHealth:                  90\nArmor:                   90mm\nWeight:                 2500kg\nCrewed Speed:     400km/h with 10t contraption\nUncrewed Speed: 240km/h with 10t contraption\nPower:                  1200 HP\nFuel Required:      1440L (for full performance)" )
+		DLabel:SetText( "Ultra Engine\n\nUltra engine for use in super heavy tanks.\n\nEngine Stats:\nHealth:                  90\nArmor:                   90mm\nWeight:                 2500kg\nCrewed Speed:     400km/h with 10t contraption\nUncrewed Speed: 240km/h with 10t contraption\nPower:                  1200 HP\nFuel Required:      1440L (for full performance)" )
 	end
 	
 	--Table containing the description of the available gearboxes
 	local gearboxList = {}
 	gearboxList["Micro Gearbox"] = function()
-		DLabel:SetText( "Micro "..GearboxDirection.." Mount Gearbox\nTiny gearbox for tiny tanks.\n\nHealth:                 15\nArmor:                  15mm\nWeight:                150kg\nPower Rating:      150 HP\nTorque Multiplier: 0.85" )
+		DLabel:SetText( "Micro "..GearboxDirection.." Mount Gearbox\n\nTiny gearbox for tiny tanks.\n\nGearbox Stats:\nHealth:                 15\nArmor:                  15mm\nWeight:                150kg\nPower Rating:      150 HP\nTorque Multiplier: 0.85" )
 	end
 	gearboxList["Small Gearbox"] = function()
-		DLabel:SetText( "Small "..GearboxDirection.." Mount Gearbox\nSmall gearbox for small tanks.\n\nHealth:                 35\nArmor:                  35mm\nWeight:                350kg\nPower Rating:      330 HP\nTorque Multiplier: 0.95" )
+		DLabel:SetText( "Small "..GearboxDirection.." Mount Gearbox\n\nSmall gearbox for small tanks.\n\nGearbox Stats:\nHealth:                 35\nArmor:                  35mm\nWeight:                350kg\nPower Rating:      330 HP\nTorque Multiplier: 0.95" )
 	end
 	gearboxList["Standard Gearbox"] = function()
-		DLabel:SetText( "Standard "..GearboxDirection.." Mount Gearbox\nMedium gearbox for medium tanks.\n\nHealth:                 60\nArmor:                  60mm\nWeight:                625kg\nPower Rating:      600 HP\nTorque Multiplier: 1" )
+		DLabel:SetText( "Standard "..GearboxDirection.." Mount Gearbox\n\nMedium gearbox for medium tanks.\n\nGearbox Stats:\nHealth:                 60\nArmor:                  60mm\nWeight:                625kg\nPower Rating:      600 HP\nTorque Multiplier: 1" )
 	end
 	gearboxList["Large Gearbox"] = function()
-		DLabel:SetText( "Large "..GearboxDirection.." Mount Gearbox\nLarge gearbox for large tanks.\n\nHealth:                 95\nArmor:                  95mm\nWeight:                975kg\nPower Rating:      930 HP\nTorque Multiplier: 1.15" )
+		DLabel:SetText( "Large "..GearboxDirection.." Mount Gearbox\n\nLarge gearbox for large tanks.\n\nGearbox Stats:\nHealth:                 95\nArmor:                  95mm\nWeight:                975kg\nPower Rating:      930 HP\nTorque Multiplier: 1.15" )
 	end
 	gearboxList["Huge Gearbox"] = function()
-		DLabel:SetText( "Huge "..GearboxDirection.." Mount Gearbox\nHuge gearbox for huge tanks.\n\nHealth:                 140\nArmor:                  140mm\nWeight:                1400kg\nPower Rating:      1350 HP\nTorque Multiplier: 1.25" )
+		DLabel:SetText( "Huge "..GearboxDirection.." Mount Gearbox\n\nHuge gearbox for huge tanks.\n\nGearbox Stats:\nHealth:                 140\nArmor:                  140mm\nWeight:                1400kg\nPower Rating:      1350 HP\nTorque Multiplier: 1.25" )
 	end
 	gearboxList["Ultra Gearbox"] = function()
-		DLabel:SetText( "Ultra "..GearboxDirection.." Mount Gearbox\nUltra gearbox for landcruisers.\n\nHealth:                 250\nArmor:                  250mm\nWeight:                2500kg\nPower Rating:      2400 HP\nTorque Multiplier: 1.3" )
+		DLabel:SetText( "Ultra "..GearboxDirection.." Mount Gearbox\n\nUltra gearbox for landcruisers.\n\nGearbox Stats:\nHealth:                 250\nArmor:                  250mm\nWeight:                2500kg\nPower Rating:      2400 HP\nTorque Multiplier: 1.3" )
 	end
 	
 	--Table containing the description of the autoloader clips
 	local clipList = {}
 	clipList["Small Autoloader Clip"] = function()
-		DLabel:SetText( "Small Autoloader Clip\nSmall sized clip required to load an autoloader.\n\nArmor:   10mm\nWeight: 1000kg\nHealth:  50" )
+		DLabel:SetText( "Small Autoloader Clip\n\nSmall sized clip required to load an autoloader.\n\nClip Stats:\nArmor:   10mm\nWeight: 1000kg\nHealth:  50" )
 	end
 	clipList["Medium Autoloader Clip"] = function()
-		DLabel:SetText( "Medium Autoloader Clip\nMedium sized clip required to load an autoloader. Increases clip size and decreases reload times by 20% per shell\n\nArmor:   10mm\nWeight: 2000kg\nHealth:  75" )
+		DLabel:SetText( "Medium Autoloader Clip\n\nMedium sized clip required to load an autoloader. Increases clip size and decreases reload times by 20% per shell\n\nClip Stats:\nArmor:   10mm\nWeight: 2000kg\nHealth:  75" )
 	end
 	clipList["Large Autoloader Clip"] = function()
-		DLabel:SetText( "Large Autoloader Clip\nLarge sized clip required to load an autoloader. Increases clip size and decreases reload times by 40% per shell\n\nArmor:   10mm\nWeight: 3000kg\nHealth:  100" )
+		DLabel:SetText( "Large Autoloader Clip\n\nLarge sized clip required to load an autoloader. Increases clip size and decreases reload times by 40% per shell\n\nClip Stats:\nArmor:   10mm\nWeight: 3000kg\nHealth:  100" )
 	end
 	
-	--Table containing the description of the available ammo types
+	--Table containing the description of the available ammo types, called when spawning ammo crates
 	local selectedAmmo = {}
 	selectedAmmo["AP"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage: "..math.Round(Caliber*0.25,2).."\nVelocity: "..AmmoData[2].." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s" )
 	end
 	selectedAmmo["HE"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats\nPenetration: "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage: "..math.Round(Caliber*0.125,2).."\nSplash Damage: "..math.Round(Caliber*0.375,2).."\nBlast Radius: "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity: "..AmmoData[5].." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s" )
 	end
 	selectedAmmo["FL"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage: "..math.Round(Caliber*0.025,2).."\nPellets: 10\nVelocity: "..AmmoData[7].." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[7].." m/s" )
 	end
 	
 	--Table containing the description of the fuel tanks
 	local fuelList = {}
 	fuelList["Micro Fuel Tank"] = function()
-		DLabel:SetText( "Micro Fuel Tank\nTiny fuel tank to run light tanks and tankettes.\n\nHealth:    10\nWeight:   65kg\nCapacity: 45L" )
+		DLabel:SetText( "Micro Fuel Tank\n\nTiny fuel tank to run light tanks and tankettes.\n\nFuel Tank Stats:\nHealth:    10\nWeight:   65kg\nCapacity: 45L" )
 	end
 	fuelList["Small Fuel Tank"] = function()
-		DLabel:SetText( "Small Fuel Tank\nSmall fuel tank for light tanks and weak engined mediums.\n\nHealth:    20\nWeight:   120kg\nCapacity: 90L" )
+		DLabel:SetText( "Small Fuel Tank\n\nSmall fuel tank for light tanks and weak engined mediums.\n\nFuel Tank Stats:\nHealth:    20\nWeight:   120kg\nCapacity: 90L" )
 	end
 	fuelList["Standard Fuel Tank"] = function()
-		DLabel:SetText( "Standard Fuel Tank\nStandard medium tank fuel tank.\n\nHealth:    30\nWeight:   240kg\nCapacity: 180L" )
+		DLabel:SetText( "Standard Fuel Tank\n\nStandard medium tank fuel tank.\n\nFuel Tank Stats:\nHealth:    30\nWeight:   240kg\nCapacity: 180L" )
 	end
 	fuelList["Large Fuel Tank"] = function()
-		DLabel:SetText( "Large Fuel Tank\nLarge fuel tanks for heavies running mid sized engines.\n\nHealth:    40\nWeight:   475kg\nCapacity: 360L" )
+		DLabel:SetText( "Large Fuel Tank\n\nLarge fuel tanks for heavies running mid sized engines.\n\nFuel Tank Stats:\nHealth:    40\nWeight:   475kg\nCapacity: 360L" )
 	end
 	fuelList["Huge Fuel Tank"] = function()
-		DLabel:SetText( "Huge Fuel Tank\nHuge fuel tank for heavies running large gas guzzlers.\n\nHealth:    50\nWeight:   950kg\nCapacity: 720L" )
+		DLabel:SetText( "Huge Fuel Tank\n\nHuge fuel tank for heavies running large gas guzzlers.\n\nFuel Tank Stats:\nHealth:    50\nWeight:   950kg\nCapacity: 720L" )
 	end
 	fuelList["Ultra Fuel Tank"] = function()
-		DLabel:SetText( "Ultra Fuel Tank\nMassive fuel tank designed for super heavy tanks running the largest of engines.\n\nHealth:    60\nWeight:   1900kg\nCapacity: 1440L" )
+		DLabel:SetText( "Ultra Fuel Tank\n\nMassive fuel tank designed for super heavy tanks running the largest of engines.\n\nFuel Tank Stats:\nHealth:    60\nWeight:   1900kg\nCapacity: 1440L" )
 	end
 	
 	--Table containing the description of the available weapons
 	local gunList = {}
 	gunList["Autocannon"] = function()
-		DLabel:SetText( Caliber.."mm Autocannon\nLight guns with large clips and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round(2000/((50/Caliber)*(50/Caliber))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 25 seconds\nClip Size: "..math.Round(600/Caliber) )
+		DLabel:SetText( Caliber.."mm Autocannon\n\nLight guns with large clips and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(2000/((50/Caliber)*(50/Caliber))).." kg\nRate of Fire: 600rpm\nReload Time: 25 seconds\nClip Size:       "..math.Round(600/Caliber).." rounds" )
 	end
 	gunList["Autoloader"] = function()
-		DLabel:SetText( Caliber.."mm Autoloader\nCannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round(9000/((200/Caliber)*(200/Caliber))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)*0.2),2).."\nSmall Clip Size: "..math.Round(600/Caliber).."\nMedium Clip Size: "..math.Round((600/Caliber)*1.5).."\nLarge Clip Size: "..math.Round((600/Caliber)*2).."\nSmall Clip Reload Time: "..math.Round((Caliber/13 + Caliber/100)*math.Round(600/Caliber),2).."\nMedium Clip Reload Time: "..math.Round(((Caliber/13 + Caliber/100)*math.Round((600/Caliber)*1.5)*0.75),2).."\nLarge Clip Reload Time: "..math.Round(((Caliber/13 + Caliber/100)*math.Round((600/Caliber)*2)*0.5),2) )
+		DLabel:SetText( Caliber.."mm Autoloader\n\nCannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((200/Caliber)*(200/Caliber))).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.2)).."rpm\n\nSmall Clip Stats:\nClip Size:       "..math.Round(600/Caliber).." rounds\nReload Time: "..math.Round((Caliber/13)+(Caliber/100))*math.Round(600/Caliber).." seconds\n\nMedium Clip Stats:\nClip Size:       "..math.Round((600/Caliber)*1.5).." rounds\nReload Time: "..math.Round(math.Round((Caliber/13)+(Caliber/100))*math.Round(600/Caliber*1.5)*0.75).." seconds\n\nLarge Clip Stats:\nClip Size:       "..math.Round((600/Caliber)*2).." rounds\nReload Time: "..math.Round(math.Round((Caliber/13)+(Caliber/100))*math.Round(600/Caliber*2)*0.5).." seconds" )
 	end
 	gunList["Cannon"] = function()
-		DLabel:SetText( Caliber.."mm Cannon\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((9000/((200/Caliber)*(200/Caliber)))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed, "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed" )
+		DLabel:SetText( Caliber.."mm Cannon\n\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((200/Caliber)*(200/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5).." seconds uncrewed" )
 	end
 	gunList["Flamethrower"] = function()
 		DLabel:SetPos( 15, 380 )
-		DLabel:SetText( "Flamethrower\nFlamethrower capable of igniting infantry, softening armor and stalling engines.\n\nArmor:   50mm\nWeight: 50kg\nHealth:  10" )
+		DLabel:SetText( "Flamethrower\n\nFlamethrower capable of igniting infantry, softening armor and stalling engines.\n\nWeapon Stats:\nArmor:   50mm\nWeight: 50kg\nHealth:  10" )
 		DermaNumSlider:SetVisible( false )
 	end
 	gunList["HMG"] = function()
-		DLabel:SetText( Caliber.."mm Heavy Machine Gun\nMore light barreled autocannons than machine guns, these are somewhat useful against both armored targets and infantry. They can only use AP and HE HMG ammo.\n\nArmor: "..math.Round((Caliber*5),2).."mm\nWeight: "..math.Round((600/((40/Caliber)*(40/Caliber)))).." kg\nReload Time: 0.1 seconds\nClip Reload Time: 20 seconds\nClip Size: "..math.Round(800/Caliber) )
+		DLabel:SetText( Caliber.."mm Heavy Machine Gun\n\nMore light barreled autocannons than machine guns, these are somewhat useful against both armored targets and infantry. They can only use AP and HE HMG ammo.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(600/((40/Caliber)*(40/Caliber))).." kg\nRate of Fire: 600rpm\nReload Time: 20 seconds\nClip Size:       "..math.Round(800/Caliber).." rounds" )
 	end
 	gunList["Howitzer"] = function()
-		DLabel:SetText( Caliber.."mm Howitzer\nPowerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((9000/((240/Caliber)*(240/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)),2).." seconds crewed, "..math.Round(((Caliber/13 + Caliber/100))*1.5,2).." seconds uncrewed" )
+		DLabel:SetText( Caliber.."mm Howitzer\n\nPowerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((240/Caliber)*(240/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5).." seconds uncrewed" )
 	end
 	gunList["MG"] = function()
-		DLabel:SetText( Caliber.."mm Machine Gun\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nArmor: "..math.Round((Caliber*5),2).."mm\nWeight: "..math.Round((60/((14.5/Caliber)*(14.5/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)*0.1),2).." seconds" )
+		DLabel:SetText( Caliber.."mm Machine Gun\n\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(60/((14.5/Caliber)*(14.5/Caliber))).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.1)).."rpm" )
 	end
 	gunList["Mortar"] = function()
-		DLabel:SetText( Caliber.."mm Mortar\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber.\n\nArmor: "..math.Round(Caliber*5,2).."mm\nWeight: "..math.Round((4500/((280/Caliber)*(280/Caliber)))).." kg\nReload Time: "..math.Round(((Caliber/13 + Caliber/100)),2).." seconds crewed, "..math.Round(((Caliber/13 + Caliber/100)*1.5),2).." seconds uncrewed" )
+		DLabel:SetText( Caliber.."mm Mortar\n\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(4500/((280/Caliber)*(280/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5).." seconds uncrewed" )
 	end
 	
 	--Table containing information and settings for weapons, this is called by the Gun Type combobox
@@ -1399,7 +1399,7 @@ function TOOL.BuildCPanel( panel )
 	selection["Crew Member"] = function()
 		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_crew" )
 		RunConsoleCommand( "daktankspawner_SpawnSettings", "Crew" )
-		DLabel:SetText( "Crew Member\n\nHealth: 5\nWeight: 75kg\n\nAllows an entity to function up to their full potential when linked to it. Can be linked to engines, normal guns, autocannons, and HMGs, but not autoloaders or machine guns." )
+		DLabel:SetText( "Crew Member\n\nAllows an entity to function up to their full potential when linked to it. Can be linked to engines, normal guns, autocannons, and HMGs, but not autoloaders or machine guns.\n\nCrew Stats:\nHealth:  5\nWeight: 75kg" )
 		DLabel:SetVisible( true )
 	end
 	selection["Turret Controller"] = function()
@@ -1411,7 +1411,7 @@ function TOOL.BuildCPanel( panel )
 	selection["Turret Motor"] = function()
 		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_turretmotor" )
 		RunConsoleCommand( "daktankspawner_SpawnSettings", "TMotor" )
-		DLabel:SetText( "Turret Motor\n\nThis can be linked to a single turret controller, doubling the speed that the turret rotates. If destroyed turret speed will go back to normal." )
+		DLabel:SetText( "Turret Motor\n\nThis can be linked to a single turret controller, doubling the speed that the turret rotates. If destroyed turret speed will go back to normal.\n\nMotor Stats:\nHealth:  10\nWeight: 100kg" )
 		DLabel:SetVisible( true )
 	end
 	------------- Mobility -------------
