@@ -1144,7 +1144,7 @@ function TOOL.BuildCPanel( panel )
 	local GearboxModel	   = ""
 	local AmmoWeight	   = 0
 	local AmmoCount 	   = 0
-	local AmmoData		   = { 0, 0, 0, 0, 0, 0, 0, 0 } --1 = AP Pen Multiplier, 2 = AP Velocity, 3 = HE Pen Multiplier, 4 = HE Blast Multiplier, 5 = Frag Pen Multiplier, 6 = HE Velocity, 7 = FL Pen Multiplier, 8 = FL Velocity
+	local AmmoData		   = { 0, 0, 0, 0, 0, 0, 0 } --1 = AP Pen Multiplier, 2 = AP Velocity, 3 = HE Pen Multiplier, 4 = HE Blast and Frag Pen Multiplier, 5 = HE Velocity, 6 = FL Pen Multiplier, 7 = FL Velocity
 	
 	--Table containing the information of the available engines
 	local engineList = {}
@@ -1206,10 +1206,10 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s" )
 	end
 	selectedAmmo["HE"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[5],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[6].." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s" )
 	end
 	selectedAmmo["FL"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[7],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[8].." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[7].." m/s" )
 	end
 	
 	--Table containing the description of the fuel tanks
@@ -1236,13 +1236,13 @@ function TOOL.BuildCPanel( panel )
 	--Table containing the description of the available weapons
 	local gunList = {}
 	gunList["Autocannon"] = function()
-		DLabel:SetText( Caliber.."mm Autocannon\n\nLight guns with large clips and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(2000/((50/Caliber)*(50/Caliber))).." kg\nRate of Fire: 600 rpm\nReload Time: 25 seconds\nClip Size:       "..math.Round(600/Caliber).." rounds\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[5],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[6].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Autocannon\n\nLight guns with large clips and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(2000/((50/Caliber)*(50/Caliber))).." kg\nRate of Fire: 600 rpm\nReload Time: 25 seconds\nClip Size:       "..math.Round(600/Caliber).." rounds\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n" )
 	end
 	gunList["Autoloader"] = function()
-		DLabel:SetText( Caliber.."mm Autoloader\n\nCannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((200/Caliber)*(200/Caliber))).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.2)).." rpm\n\nSmall Clip Stats:\nClip Size:       "..math.Round(600/Caliber).." rounds\nReload Time: "..math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber,2).." seconds\n\nMedium Clip Stats:\nClip Size:       "..math.Round((600/Caliber)*1.5).." rounds\nReload Time: "..math.Round(math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber*1.5)*0.75,2).." seconds\n\nLarge Clip Stats:\nClip Size:       "..math.Round((600/Caliber)*2).." rounds\nReload Time: "..math.Round(math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber*2)*0.5,2).." seconds\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[5],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[6].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Autoloader\n\nCannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((200/Caliber)*(200/Caliber))).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.2)).." rpm\n\nSmall Clip Stats:\nClip Size:       "..math.Round(600/Caliber).." rounds\nReload Time: "..math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber,2).." seconds\n\nMedium Clip Stats:\nClip Size:       "..math.Round((600/Caliber)*1.5).." rounds\nReload Time: "..math.Round(math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber*1.5)*0.75,2).." seconds\n\nLarge Clip Stats:\nClip Size:       "..math.Round((600/Caliber)*2).." rounds\nReload Time: "..math.Round(math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber*2)*0.5,2).." seconds\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n" )
 	end
 	gunList["Cannon"] = function()
-		DLabel:SetText( Caliber.."mm Cannon\n\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((200/Caliber)*(200/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[5],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[6].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[7],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[8].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Cannon\n\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((200/Caliber)*(200/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[7].." m/s\n" )
 	end
 	gunList["Flamethrower"] = function()
 		DLabel:SetPos( 15, 380 )
@@ -1250,35 +1250,35 @@ function TOOL.BuildCPanel( panel )
 		DermaNumSlider:SetVisible( false )
 	end
 	gunList["HMG"] = function()
-		DLabel:SetText( Caliber.."mm Heavy Machine Gun\n\nMore light barreled autocannons than machine guns, these are somewhat useful against both armored targets and infantry. They can only use AP and HE HMG ammo.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(600/((40/Caliber)*(40/Caliber))).." kg\nRate of Fire: 600 rpm\nReload Time: 20 seconds\nClip Size:       "..math.Round(800/Caliber).." rounds\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[5],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[6].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Heavy Machine Gun\n\nMore light barreled autocannons than machine guns, these are somewhat useful against both armored targets and infantry. They can only use AP and HE HMG ammo.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(600/((40/Caliber)*(40/Caliber))).." kg\nRate of Fire: 600 rpm\nReload Time: 20 seconds\nClip Size:       "..math.Round(800/Caliber).." rounds\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n" )
 	end
 	gunList["Howitzer"] = function()
-		DLabel:SetText( Caliber.."mm Howitzer\n\nPowerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((240/Caliber)*(240/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[5],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[6].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[7],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[8].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Howitzer\n\nPowerful guns with high damage per shot and lower weights than cannons. They generally have longer reloads than cannons and have less velocity, but they also have higher bonuses on HE damage and radius.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(9000/((240/Caliber)*(240/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[7].." m/s\n" )
 	end
 	gunList["MG"] = function()
 		DLabel:SetText( Caliber.."mm Machine Gun\n\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(60/((14.5/Caliber)*(14.5/Caliber))).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.1)).." rpm\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n" )
 	end
 	gunList["Mortar"] = function()
-		DLabel:SetText( Caliber.."mm Mortar\n\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(4500/((280/Caliber)*(280/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[5],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[6].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[7],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[8].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Mortar\n\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius. They generally have longer reloads than howitzers, but higher listed HE damage, however due to the low penetration they deal less damage than a howitzer of equal caliber.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(4500/((280/Caliber)*(280/Caliber))).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round(Caliber*0.25,2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4],2).."mm\nDamage:               "..math.Round(Caliber*0.125,2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round(Caliber*0.025,2).."\nPellets:         10\nVelocity:       "..AmmoData[7].." m/s\n" )
 	end
 	
 	--Table containing information and settings for weapons, this is called by the Gun Type combobox
 	local gunData = {}
 	gunData["Autocannon"] = function()
 		EntType   = "dak_teautogun"
-		AmmoData  = { 2, 800, 0.6, 1.56, 0.4, 800 }
+		AmmoData  = { 2, 800, 0.6, 0.4, 800 }
 		AmmoTypes = { "Armor Piercing", "High Explosive" }
 		DermaNumSlider:SetMinMax( 20, 60 )
 	end
 	gunData["Autoloader"] = function()
 		EntType   = "dak_teautogun"
-		AmmoData  = { 2, 800, 0.6, 1.56, 0.4, 800 }
+		AmmoData  = { 2, 800, 0.6, 0.4, 800 }
 		AmmoTypes = { "Armor Piercing", "High Explosive" }
 		DermaNumSlider:SetMinMax( 75, 200 )
 	end
 	gunData["Cannon"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 2, 800, 0.6, 1.56, 0.4, 800, 1.5, 600 }
+		AmmoData  = { 2, 800, 0.6, 0.4, 800, 1.5, 600 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
@@ -1289,13 +1289,13 @@ function TOOL.BuildCPanel( panel )
 	gunData["Heavy Machine Gun"] = function()
 		GunType   = "HMG"
 		EntType   = "dak_teautogun"
-		AmmoData  = { 1.5, 400, 0.45, 1.56, 0.4, 600 }
+		AmmoData  = { 1.5, 400, 0.45, 0.4, 600 }
 		AmmoTypes = { "Armor Piercing", "High Explosive" }
 		DermaNumSlider:SetMinMax( 20, 40 )
 	end
 	gunData["Howitzer"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 2, 600, 0.45, 2.028, 0.52, 600, 1.125, 450 }
+		AmmoData  = { 2, 600, 0.45, 0.52, 600, 1.125, 450 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
 		DermaNumSlider:SetMinMax( 50, 240 )
 	end
@@ -1308,7 +1308,7 @@ function TOOL.BuildCPanel( panel )
 	end
 	gunData["Mortar"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 0.4, 160, 0.12, 1.794, 0.46, 160, 0.3, 120 }
+		AmmoData  = { 0.4, 160, 0.12, 0.46, 160, 0.3, 120 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette"}
 		DermaNumSlider:SetMinMax( 40, 280 )
 	end
