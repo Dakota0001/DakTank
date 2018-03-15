@@ -32,7 +32,7 @@ function EFFECT:Init( data )
 	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
 
 	local emitter = ParticleEmitter( self.StartPos )
-	for i = 1, 10 do
+	for i = 1, 3 do
 
 		local particle = emitter:Add( "dak/flamelet5", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
@@ -57,7 +57,7 @@ function EFFECT:Init( data )
 		end
 	end
 
-	for i = 1, 10 do
+	for i = 1, 3 do
 
 		local particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 

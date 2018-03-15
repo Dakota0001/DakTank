@@ -332,7 +332,7 @@ function ENT:Think()
 						effectdata:SetMagnitude(.5)
 
 						effectdata:SetScale(math.Clamp(self.DakMaxHealth,250,500))
-						util.Effect("dakscalingexplosion", effectdata)
+						util.Effect("daktescalingexplosion", effectdata)
 						
 
 					end

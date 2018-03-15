@@ -52,6 +52,7 @@ SWEP.PrimaryCooldown = 0.05
 SWEP.UseHands = true
 
 SWEP.HoldType = "ar2"
+SWEP.LastTime = CurTime()
 SWEP.CSMuzzleFlashes = true
 
 function SWEP:Initialize()
@@ -87,52 +88,43 @@ function SWEP:Reload()
 end
  
 function SWEP:Think()
-	for i = 1, #self.ShellList do
-		self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
-		self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
-
-		local trace = {}
-			trace.start = self.ShellList[i].Pos
-			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
-			trace.filter = self.ShellList[i].Filter
-			trace.mins = Vector(-1,-1,-1)
-			trace.maxs = Vector(1,1,1)
-		local ShellTrace = util.TraceHull( trace )
-
-		local effectdata = EffectData()
-		effectdata:SetStart(ShellTrace.StartPos)
-		effectdata:SetOrigin(ShellTrace.HitPos)
-		effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
-		util.Effect("dakballistictracer", effectdata)
-
-		if ShellTrace.Hit then
-			DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
-		end
-
-		if self.ShellList[i].DieTime then
-			--self.RemoveList[#self.RemoveList+1] = i
-			if self.ShellList[i].DieTime+1.5<CurTime()then
+	if self.LastTime+0.1 < CurTime() then
+		for i = 1, #self.ShellList do
+			self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
+			self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
+			local trace = {}
+				trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
+				trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
+				trace.filter = self.ShellList[i].Filter
+				trace.mins = Vector(-1,-1,-1)
+				trace.maxs = Vector(1,1,1)
+			local ShellTrace = util.TraceHull( trace )
+			local effectdata = EffectData()
+			effectdata:SetStart(ShellTrace.StartPos)
+			effectdata:SetOrigin(ShellTrace.HitPos)
+			effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
+			util.Effect("dakballistictracer", effectdata, true, true)
+			if ShellTrace.Hit then
+				DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+			end
+			if self.ShellList[i].DieTime then
+				--self.RemoveList[#self.RemoveList+1] = i
+				if self.ShellList[i].DieTime+1.5<CurTime()then
+					self.RemoveList[#self.RemoveList+1] = i
+				end
+			end
+			if self.ShellList[i].RemoveNow == 1 then
 				self.RemoveList[#self.RemoveList+1] = i
 			end
 		end
-
-		if self.ShellList[i].RemoveNow == 1 then
-			self.RemoveList[#self.RemoveList+1] = i
+		if #self.RemoveList > 0 then
+			for i = 1, #self.RemoveList do
+				table.remove( self.ShellList, self.RemoveList[i] )
+			end
 		end
-
-		self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
+		self.RemoveList = {}
+		self.LastTime = CurTime()
 	end
-	
-	if #self.RemoveList > 0 then
-		for i = 1, #self.RemoveList do
-			table.remove( self.ShellList, self.RemoveList[i] )
-		end
-	end
-
-	self.RemoveList = {}
-
-	self:NextThink( CurTime()+0.1 )
-    return true
 end
 
 function SWEP:PrimaryAttack()

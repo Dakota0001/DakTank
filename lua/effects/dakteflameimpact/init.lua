@@ -23,7 +23,7 @@ function EFFECT:Init( data )
 	
 	local emitter = ParticleEmitter( Pos )
 	
-	for i = 1,10 do
+	for i = 1,3 do
 
 		local particle = emitter:Add( "dak/smokey", Pos+Vector(math.random(-50,50),math.random(-50,50),math.random(-50,50)))  
 		 
@@ -49,7 +49,7 @@ function EFFECT:Init( data )
 		end
 	end
 
-	for i = 1,10 do
+	for i = 1,3 do
 
 		local particle = emitter:Add( "dak/flamelet5", Pos+Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25))) 
 		 
