@@ -17,3 +17,6 @@ E2Helper.Descriptions["daktankGetHEPenetration"] = "Returns average penetration 
 E2Helper.Descriptions["daktankGetAPDamage"] = "Returns average damage of gun's AP shell."
 E2Helper.Descriptions["daktankGetFLDamage"] = "Returns average damage of gun's FL shell."
 E2Helper.Descriptions["daktankGetHEDamage"] = "Returns average damage of gun's HE shell."
+E2Helper.Descriptions["daktankGetAPVelocity"] = "Returns average velocity of gun's AP shell."
+E2Helper.Descriptions["daktankGetFLVelocity"] = "Returns average velocity of gun's FL shell."
+E2Helper.Descriptions["daktankGetHEVelocity"] = "Returns average velocity of gun's HE shell."

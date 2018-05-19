@@ -277,3 +277,42 @@ e2function number entity:daktankGetHEDamage()
 	end
 	return 0
 end
+
+e2function number entity:daktankGetAPVelocity()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
+		if this.BaseDakShellVelocity == nil then
+			return 1
+		else
+			return this.BaseDakShellVelocity
+		end
+	end
+	return 0
+end
+
+e2function number entity:daktankGetHEVelocity()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
+		if this.BaseDakShellVelocity == nil then
+			return 1
+		else
+			return this.BaseDakShellVelocity
+		end
+	end
+	return 0
+end
+
+e2function number entity:daktankGetFLVelocity()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
+		if this.BaseDakShellVelocity == nil then
+			return 1
+		else
+			return this.BaseDakShellVelocity*0.75
+		end
+	end
+	return 0
+end

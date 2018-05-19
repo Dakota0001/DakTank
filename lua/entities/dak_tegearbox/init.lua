@@ -223,7 +223,9 @@ function ENT:Think()
 		end
 		if #self.DakTankCore.Fuel>0 then
 			for i=1, #self.DakTankCore.Fuel do
-				self.DakFuel = self.DakFuel + self.DakTankCore.Fuel[i].DakFuel
+				if self.DakFuel then
+					self.DakFuel = self.DakFuel + self.DakTankCore.Fuel[i].DakFuel
+				end
 			end
 		end
 	end

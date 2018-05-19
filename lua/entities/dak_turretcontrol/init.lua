@@ -104,9 +104,9 @@ end
 function ENT:Think()
 	local RotMult = 0
 	if not(self.DakTurretMotor) then
-		RotMult = 0.08
+		RotMult = 0.05
 	else
-		RotMult = 0.16
+		RotMult = 0.10
 	end
 
 	if #self.DakContraption > 0 then

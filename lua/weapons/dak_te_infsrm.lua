@@ -21,7 +21,7 @@ end
  
 SWEP.Author = "DakTank"
 SWEP.Purpose = "Shoots Things."
-SWEP.Instructions = "20mm average pen, 7m blast"
+SWEP.Instructions = "10mm average pen, 7m blast"
 
 SWEP.Category = "DakTank"
  
@@ -135,15 +135,16 @@ function SWEP:PrimaryAttack()
  				shell.Ang = shootDir:Angle() + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))
 				shell.DakTrail = "dakshelltrail"
 				shell.DakVelocity = 6000
-				shell.DakDamage = 2
+				shell.DakDamage = 5
 				shell.DakMass = 20
 				shell.DakIsPellet = false
-				shell.DakSplashDamage = 50
-				shell.DakPenetration = 20
+				shell.DakSplashDamage = 30
+				shell.DakPenetration = 10
+				shell.DakFragPen = 40
 				shell.DakExplosive = true
 				shell.DakBlastRadius = 275
 				shell.DakPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-				shell.DakBasePenetration = 20
+				shell.DakBasePenetration = 10
 				shell.DakCaliber = 80
 				shell.DakFireSound = ""
 				shell.DakFirePitch = 100
@@ -152,6 +153,7 @@ function SWEP:PrimaryAttack()
 				shell.Filter = {self.Owner}
 				shell.LifeTime = 0
 				shell.Gravity = 0
+				shell.DakPenLossPerMeter = 0.0005
 				if self.DakName == "Flamethrower" then
 					shell.DakIsFlame = 1
 				end

@@ -230,6 +230,7 @@ function ENT:Think()
 								shell.Filter = {self}
 								shell.LifeTime = 0
 								shell.Gravity = 0
+								shell.DakPenLossPerMeter = 0.0005
 								if self.DakName == "Flamethrower" then
 									shell.DakIsFlame = 1
 								end
