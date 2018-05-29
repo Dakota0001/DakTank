@@ -83,6 +83,7 @@ function ENT:Think()
 			self.DakAP = math.Round(self.DakCaliber,2).."mmSCAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmSCHEAmmo"
 			self.DakFL = math.Round(self.DakCaliber,2).."mmSCFLAmmo"
+			self.DakHVAP = math.Round(self.DakCaliber,2).."mmSCHVAPAmmo"
 
 			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*5))
 			--get the volume of shell and multiply by density of steel
@@ -150,6 +151,7 @@ function ENT:Think()
 			self.DakAP = math.Round(self.DakCaliber,2).."mmCAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmCHEAmmo"
 			self.DakFL = math.Round(self.DakCaliber,2).."mmCFLAmmo"
+			self.DakHVAP = math.Round(self.DakCaliber,2).."mmCHVAPAmmo"
 
 			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
 			--get the volume of shell and multiply by density of steel
@@ -217,6 +219,7 @@ function ENT:Think()
 			self.DakAP = math.Round(self.DakCaliber,2).."mmLCAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmLCHEAmmo"
 			self.DakFL = math.Round(self.DakCaliber,2).."mmLCFLAmmo"
+			self.DakHVAP = math.Round(self.DakCaliber,2).."mmLCHVAPAmmo"
 
 			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*9))
 			--get the volume of shell and multiply by density of steel
@@ -542,6 +545,24 @@ function ENT:DakTEAmmoCheck()
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
+	if self.CurrentAmmoType == 4 then
+		if self.DakGunType == "Howitzer" or self.DakGunType == "Mortar" then
+			self.CurrentAmmoType = 1
+		else
+			WireLib.TriggerOutput(self, "AmmoType", "High Velocity Armor Piercing")
+			self.DakAmmoType = self.DakHVAP
+			self.DakIsFlechette = false
+			self.DakShellExplosive = false
+			self.DakShellDamage = self.BaseDakShellDamage/8
+			self.DakShellMass = self.BaseDakShellMass/8
+			self.DakShellPenetration = self.BaseDakShellPenetration*1.5
+			self.DakShellVelocity = self.BaseDakShellVelocity*4/3
+			self.DakPenLossPerMeter = 0.001
+			WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
+			WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
+			WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
+		end
+	end
 	if IsValid(self.DakTankCore) then
 		self.AmmoCount = 0 
 		if not(self.DakTankCore.Ammoboxes == nil) then
@@ -637,7 +658,11 @@ function ENT:DakTEFire()
 					Shell.DakPenSounds = self.DakShellPenSounds
 					Shell.DakBasePenetration = self.BaseDakShellPenetration
 					Shell.DakFragPen = self.DakShellFragPen
-					Shell.DakCaliber = self.DakMaxHealth
+					if self.CurrentAmmoType == 4 then
+						Shell.DakCaliber = self.DakMaxHealth/2
+					else
+						Shell.DakCaliber = self.DakMaxHealth
+					end
 					Shell.DakFireSound = self.DakFireSound
 					Shell.DakFirePitch = self.DakFirePitch
 					Shell.DakGun = self
@@ -709,7 +734,7 @@ end
 function ENT:DakTEGunAmmoSwap()
 	if( self.AmmoSwap ) then
 		self.CurrentAmmoType = self.CurrentAmmoType+1
-		if self.CurrentAmmoType>3 then
+		if self.CurrentAmmoType>4 then
 			self.CurrentAmmoType = 1
 		end
 	else
@@ -753,6 +778,24 @@ function ENT:DakTEGunAmmoSwap()
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
+	end
+	if self.CurrentAmmoType == 4 then
+		if self.DakGunType == "Howitzer" or self.DakGunType == "Mortar" then
+			self.CurrentAmmoType = 1
+		else
+			WireLib.TriggerOutput(self, "AmmoType", "High Velocity Armor Piercing")
+			self.DakAmmoType = self.DakHVAP
+			self.DakIsFlechette = false
+			self.DakShellExplosive = false
+			self.DakShellDamage = self.BaseDakShellDamage/8
+			self.DakShellMass = self.BaseDakShellMass/8
+			self.DakShellPenetration = self.BaseDakShellPenetration*1.5
+			self.DakShellVelocity = self.BaseDakShellVelocity*4/3
+			self.DakPenLossPerMeter = 0.001
+			WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
+			WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
+			WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
+		end
 	end
 	if IsValid(self.DakTankCore) then
 		self.AmmoCount = 0 

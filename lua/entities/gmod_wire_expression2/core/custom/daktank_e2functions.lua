@@ -83,13 +83,16 @@ e2function string entity:daktankGetAmmoType()
 				return "Fuel"
 			else
 				if this.CurrentAmmoType == 1 then
-					return "Armor Piercing"
+					return "AP"
 				end
 				if this.CurrentAmmoType == 2 then
-					return "High Explosive"
+					return "HE"
 				end
 				if this.CurrentAmmoType == 3 then
-					return "Flechette"
+					return "FL"
+				end
+				if this.CurrentAmmoType == 4 then
+					return "HVAP"
 				end
 			end
 		end
@@ -200,6 +203,19 @@ e2function number entity:daktankGetAPPenetration()
 	return 0
 end
 
+e2function number entity:daktankGetHVAPPenetration()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
+		if this.BaseDakShellPenetration == nil then
+			return 1
+		else
+			return this.BaseDakShellPenetration*1.5
+		end
+	end
+	return 0
+end
+
 e2function number entity:daktankGetFLPenetration()
 	if not IsValid(this) then return 0 end
 
@@ -252,6 +268,19 @@ e2function number entity:daktankGetAPDamage()
 	return 0
 end
 
+e2function number entity:daktankGetHVAPDamage()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
+		if this.BaseDakShellDamage == nil then
+			return 1
+		else
+			return this.BaseDakShellDamage/8
+		end
+	end
+	return 0
+end
+
 e2function number entity:daktankGetFLDamage()
 	if not IsValid(this) then return 0 end
 
@@ -286,6 +315,19 @@ e2function number entity:daktankGetAPVelocity()
 			return 1
 		else
 			return this.BaseDakShellVelocity
+		end
+	end
+	return 0
+end
+
+e2function number entity:daktankGetHVAPVelocity()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
+		if this.BaseDakShellVelocity == nil then
+			return 1
+		else
+			return this.BaseDakShellVelocity*4/3
 		end
 	end
 	return 0

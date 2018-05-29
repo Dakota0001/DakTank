@@ -823,6 +823,10 @@ function TOOL:LeftClick( trace )
 			self.DakIsHE = false
 			self.AmmoType = "FL"
 		end
+		if self:GetClientInfo("SpawnSettings") == "MicroHVAPBox" or self:GetClientInfo("SpawnSettings") == "SmallHVAPBox" or self:GetClientInfo("SpawnSettings") == "StandardHVAPBox" or self:GetClientInfo("SpawnSettings") == "LargeHVAPBox" or self:GetClientInfo("SpawnSettings") == "HugeHVAPBox" or self:GetClientInfo("SpawnSettings") == "UltraHVAPBox" then
+			self.DakIsHE = false
+			self.AmmoType = "HVAP"
+		end
 		if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
 			self.GunType = "C"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
@@ -860,33 +864,9 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 		end
 		--huge if statement that checks to see if its an ammo crate of any type
-		if self:GetClientInfo("SpawnSettings") == "MicroAPBox" or self:GetClientInfo("SpawnSettings") == "SmallAPBox" or self:GetClientInfo("SpawnSettings") == "StandardAPBox" or self:GetClientInfo("SpawnSettings") == "LargeAPBox" or self:GetClientInfo("SpawnSettings") == "HugeAPBox" or self:GetClientInfo("SpawnSettings") == "UltraAPBox" or self:GetClientInfo("SpawnSettings") == "MicroHEBox" or self:GetClientInfo("SpawnSettings") == "SmallHEBox" or self:GetClientInfo("SpawnSettings") == "StandardHEBox" or self:GetClientInfo("SpawnSettings") == "LargeHEBox" or self:GetClientInfo("SpawnSettings") == "HugeHEBox" or self:GetClientInfo("SpawnSettings") == "UltraHEBox" or self:GetClientInfo("SpawnSettings") == "MicroFLBox" or self:GetClientInfo("SpawnSettings") == "SmallFLBox" or self:GetClientInfo("SpawnSettings") == "StandardFLBox" or self:GetClientInfo("SpawnSettings") == "LargeFLBox" or self:GetClientInfo("SpawnSettings") == "HugeFLBox" or self:GetClientInfo("SpawnSettings") == "UltraFLBox" then
+		if self:GetClientInfo("SpawnSettings") == "MicroAPBox" or self:GetClientInfo("SpawnSettings") == "SmallAPBox" or self:GetClientInfo("SpawnSettings") == "StandardAPBox" or self:GetClientInfo("SpawnSettings") == "LargeAPBox" or self:GetClientInfo("SpawnSettings") == "HugeAPBox" or self:GetClientInfo("SpawnSettings") == "UltraAPBox" or self:GetClientInfo("SpawnSettings") == "MicroHEBox" or self:GetClientInfo("SpawnSettings") == "SmallHEBox" or self:GetClientInfo("SpawnSettings") == "StandardHEBox" or self:GetClientInfo("SpawnSettings") == "LargeHEBox" or self:GetClientInfo("SpawnSettings") == "HugeHEBox" or self:GetClientInfo("SpawnSettings") == "UltraHEBox" or self:GetClientInfo("SpawnSettings") == "MicroFLBox" or self:GetClientInfo("SpawnSettings") == "SmallFLBox" or self:GetClientInfo("SpawnSettings") == "StandardFLBox" or self:GetClientInfo("SpawnSettings") == "LargeFLBox" or self:GetClientInfo("SpawnSettings") == "HugeFLBox" or self:GetClientInfo("SpawnSettings") == "UltraFLBox" or self:GetClientInfo("SpawnSettings") == "MicroHVAPBox" or self:GetClientInfo("SpawnSettings") == "SmallHVAPBox" or self:GetClientInfo("SpawnSettings") == "StandardHVAPBox" or self:GetClientInfo("SpawnSettings") == "LargeHVAPBox" or self:GetClientInfo("SpawnSettings") == "HugeHVAPBox" or self:GetClientInfo("SpawnSettings") == "UltraHVAPBox" then
 			self.DakIsExplosive = true
 			self.DakAmmoType = self.DakCaliber.."mm"..self.GunType..self.AmmoType.."Ammo"
-		end
-		--Micro--
-		if self:GetClientInfo("SpawnSettings") == "MicroAPBox" or self:GetClientInfo("SpawnSettings") == "MicroHEBox" or self:GetClientInfo("SpawnSettings") == "MicroFLBox" then
-			self.spawnedent:SetModel( "models/daktanks/ammo1.mdl" )
-		end
-		--Small--
-		if self:GetClientInfo("SpawnSettings") == "SmallAPBox" or self:GetClientInfo("SpawnSettings") == "SmallHEBox" or self:GetClientInfo("SpawnSettings") == "SmallFLBox" then
-			self.spawnedent:SetModel( "models/daktanks/ammo2.mdl" )
-		end
-		--Standard--
-		if self:GetClientInfo("SpawnSettings") == "StandardAPBox" or self:GetClientInfo("SpawnSettings") == "StandardHEBox" or self:GetClientInfo("SpawnSettings") == "StandardFLBox" then
-			self.spawnedent:SetModel( "models/daktanks/ammo3.mdl" )
-		end
-		--Large--
-		if self:GetClientInfo("SpawnSettings") == "LargeAPBox" or self:GetClientInfo("SpawnSettings") == "LargeHEBox" or self:GetClientInfo("SpawnSettings") == "LargeFLBox" then
-			self.spawnedent:SetModel( "models/daktanks/ammo4.mdl" )
-		end
-		--Huge--
-		if self:GetClientInfo("SpawnSettings") == "HugeAPBox" or self:GetClientInfo("SpawnSettings") == "HugeHEBox" or self:GetClientInfo("SpawnSettings") == "HugeFLBox" then
-			self.spawnedent:SetModel( "models/daktanks/ammo5.mdl" )
-		end
-		--Ultra--
-		if self:GetClientInfo("SpawnSettings") == "UltraAPBox" or self:GetClientInfo("SpawnSettings") == "UltraHEBox" or self:GetClientInfo("SpawnSettings") == "UltraFLBox" then
-			self.spawnedent:SetModel( "models/daktanks/ammo6.mdl" )
 		end
 		--Flamethrower--
 		if self:GetClientInfo("SpawnSettings") == "Flamethrower Fuel" then
@@ -903,7 +883,7 @@ function TOOL:LeftClick( trace )
 		if self:GetClientInfo("SpawnEnt") == "dak_tegun" or self:GetClientInfo("SpawnEnt") == "dak_teautogun" or self:GetClientInfo("SpawnEnt") == "dak_temachinegun" then
 			self.spawnedent.DakOwner = self:GetOwner()
 			self.spawnedent.DakGunType = self.DakGunType
-			self.spawnedent.DakCaliber = self.DakCaliber
+			self.spawnedent.DakCaliber = math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2)
 			self.spawnedent.DakMaxHealth = self.DakMaxHealth
 			self.spawnedent.DakName = self.DakName
 			self.spawnedent.DakModel = self.DakModel
@@ -927,6 +907,30 @@ function TOOL:LeftClick( trace )
 				self.spawnedent.DakAmmoType = self.DakAmmoType
 				self.spawnedent.DakOwner = self:GetOwner()
 				self.spawnedent.DakIsHE = self.DakIsHE
+						--Micro--
+				if self:GetClientInfo("SpawnSettings") == "MicroAPBox" or self:GetClientInfo("SpawnSettings") == "MicroHEBox" or self:GetClientInfo("SpawnSettings") == "MicroFLBox" or self:GetClientInfo("SpawnSettings") == "MicroHVAPBox" then
+					self.spawnedent:SetModel( "models/daktanks/ammo1.mdl" )
+				end
+				--Small--
+				if self:GetClientInfo("SpawnSettings") == "SmallAPBox" or self:GetClientInfo("SpawnSettings") == "SmallHEBox" or self:GetClientInfo("SpawnSettings") == "SmallFLBox" or self:GetClientInfo("SpawnSettings") == "SmallHVAPBox" then
+					self.spawnedent:SetModel( "models/daktanks/ammo2.mdl" )
+				end
+				--Standard--
+				if self:GetClientInfo("SpawnSettings") == "StandardAPBox" or self:GetClientInfo("SpawnSettings") == "StandardHEBox" or self:GetClientInfo("SpawnSettings") == "StandardFLBox" or self:GetClientInfo("SpawnSettings") == "StandardHVAPBox" then
+					self.spawnedent:SetModel( "models/daktanks/ammo3.mdl" )
+				end
+				--Large--
+				if self:GetClientInfo("SpawnSettings") == "LargeAPBox" or self:GetClientInfo("SpawnSettings") == "LargeHEBox" or self:GetClientInfo("SpawnSettings") == "LargeFLBox" or self:GetClientInfo("SpawnSettings") == "LargeHVAPBox" then
+					self.spawnedent:SetModel( "models/daktanks/ammo4.mdl" )
+				end
+				--Huge--
+				if self:GetClientInfo("SpawnSettings") == "HugeAPBox" or self:GetClientInfo("SpawnSettings") == "HugeHEBox" or self:GetClientInfo("SpawnSettings") == "HugeFLBox" or self:GetClientInfo("SpawnSettings") == "HugeHVAPBox" then
+					self.spawnedent:SetModel( "models/daktanks/ammo5.mdl" )
+				end
+				--Ultra--
+				if self:GetClientInfo("SpawnSettings") == "UltraAPBox" or self:GetClientInfo("SpawnSettings") == "UltraHEBox" or self:GetClientInfo("SpawnSettings") == "UltraFLBox" or self:GetClientInfo("SpawnSettings") == "UltraHVAPBox" then
+					self.spawnedent:SetModel( "models/daktanks/ammo6.mdl" )
+				end
 			end
 		end
 		if self:GetClientInfo("SpawnEnt") == "dak_teautoloadingmodule" then
@@ -1419,6 +1423,15 @@ function TOOL.BuildCPanel( panel )
 			DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s" )
 		end
 	end
+	selectedAmmo["HVAP"] = function()
+		if GunType == "Long Cannon" then
+			DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1]*1.5,2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*9)),2).."\nVelocity:        "..(AmmoData[2]*4/3).." m/s" )
+		elseif GunType == "Short Cannon" then
+			DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1]*1.5,2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*5)),2).."\nVelocity:        "..(AmmoData[2]*4/3).." m/s" )
+		else
+			DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1]*1.5,2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*6.5)),2).."\nVelocity:        "..(AmmoData[2]*4/3).." m/s" )
+		end	
+	end
 	
 	--Table containing the description of the fuel tanks
 	local fuelList = {}
@@ -1450,13 +1463,13 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm Autoloader\n\nCannons that fire a burst of shells before having to reload. Great for hit and runs. They can only use AP and HE cannon ammo and require a clip.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.2)).." rpm\n\nSmall Clip Stats:\nClip Size:       "..math.Round(600/Caliber).." rounds\nReload Time: "..math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber,2).." seconds\n\nMedium Clip Stats:\nClip Size:       "..math.Round((600/Caliber)*1.5).." rounds\nReload Time: "..math.Round(math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber*1.5)*0.75,2).." seconds\n\nLarge Clip Stats:\nClip Size:       "..math.Round((600/Caliber)*2).." rounds\nReload Time: "..math.Round(math.Round((Caliber/13)+(Caliber/100),2)*math.Round(600/Caliber*2)*0.5,2).." seconds\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n" )
 	end
 	gunList["Cannon"] = function()
-		DLabel:SetText( Caliber.."mm Cannon\n\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Cannon\n\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nReload Time: "..math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s\n\nHVAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1]*1.5,2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*6.5)),2).."\nVelocity:        "..(AmmoData[2]*4/3).." m/s" )
 	end
 	gunList["Long Cannon"] = function()
-		DLabel:SetText( Caliber.."mm Long Cannon\n\nExtended barrel cannon firing higher velocity and higher penetration shells at the cost of shell size and gun weight.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*9)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*70))-(math.pi*((Caliber/2)^2)*(Caliber*70)))*0.001*7.8125)/1000).." kg\nReload Time: "..1.4*math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..1.4*math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*9)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*9)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*9)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Long Cannon\n\nExtended barrel cannon firing higher velocity and higher penetration shells at the cost of shell size and gun weight.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*9)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*70))-(math.pi*((Caliber/2)^2)*(Caliber*70)))*0.001*7.8125)/1000).." kg\nReload Time: "..1.4*math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..1.4*math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*9)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*9)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*9)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s\n\nHVAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1]*1.5,2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*9)),2).."\nVelocity:        "..(AmmoData[2]*4/3).." m/s" )
 	end
 	gunList["Short Cannon"] = function()
-		DLabel:SetText( Caliber.."mm Short Cannon\n\nShort barrel cannon firing lower vel and lower penetration shells to save weight and fit more ammo per crate.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*40))-(math.pi*((Caliber/2)^2)*(Caliber*40)))*0.001*7.8125)/1000).." kg\nReload Time: "..0.8*math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..0.8*math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*5)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*5)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*5)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Short Cannon\n\nShort barrel cannon firing lower vel and lower penetration shells to save weight and fit more ammo per crate.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*40))-(math.pi*((Caliber/2)^2)*(Caliber*40)))*0.001*7.8125)/1000).." kg\nReload Time: "..0.8*math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..0.8*math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*5)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*5)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*5)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s\n\nHVAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1]*1.5,2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*5)),2).."\nVelocity:        "..(AmmoData[2]*4/3).." m/s" )
 	end
 	gunList["Flamethrower"] = function()
 		DLabel:SetPos( 15, 380 )
@@ -1470,7 +1483,7 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm Howitzer\n\nLower penetration and velocity than cannons, but also lower weight and better HE.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*4)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*30))-(math.pi*((Caliber/2)^2)*(Caliber*30)))*0.001*7.8125)/1000).." kg\nReload Time: "..0.6*math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..0.6*math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*4)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*4)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*4)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s\n" )
 	end
 	gunList["MG"] = function()
-		DLabel:SetText( Caliber.."mm Machine Gun\n\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..2*math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.1)).." rpm\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nVelocity:        "..AmmoData[2].." m/s\n" )
+		DLabel:SetText( Caliber.."mm Machine Gun\n\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..5+(2*math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000)).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.1)).." rpm\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nVelocity:        "..AmmoData[2].." m/s\n" )
 	end
 	gunList["Mortar"] = function()
 		DLabel:SetText( Caliber.."mm Mortar\n\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius.\n\nWeapon Stats:\nArmor:           "..(Caliber*5).."mm\nWeight:         "..math.Round(((((Caliber*2.75)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*15))-(math.pi*((Caliber/2)^2)*(Caliber*15)))*0.001*7.8125)/1000).." kg\nReload Time: "..0.3*math.Round(Caliber/13 + Caliber/100,2).." seconds crewed\n                      "..0.3*math.Round((Caliber/13 + Caliber/100)*1.5,2).." seconds uncrewed\n\nAP Stats:\nPenetration: "..math.Round(Caliber*AmmoData[1],2).."mm\nDamage:       "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*2.75)),2).."\nVelocity:        "..AmmoData[2].." m/s\n\nHE Stats:\nPenetration:         "..math.Round(Caliber*AmmoData[3],2).."mm\nFrag Penetration: "..math.Round(Caliber*AmmoData[4]*10,2).."mm\nDamage:               "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*2.75)),2).."\nSplash Damage:    "..math.Round(Caliber*0.375,2).."\nBlast Radius:         "..math.Round(Caliber*AmmoData[4],2).."m\nVelocity:                "..AmmoData[5].." m/s\n\nFL Stats:\nPenetration: "..math.Round(Caliber*AmmoData[6],2).."mm\nDamage:       "..math.Round((0.1*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*2.75)),2).." per projectile".."\nSpikes:         10\nVelocity:       "..AmmoData[7].." m/s\n" )
@@ -1494,19 +1507,19 @@ function TOOL.BuildCPanel( panel )
 	gunData["Cannon"] = function()
 		EntType   = "dak_tegun"
 		AmmoData  = { 2, 750, 0.2, 0.04, 750, 1.5, 750 }
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette", "High Velocity Armor Piercing" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Long Cannon"] = function()
 		EntType   = "dak_tegun"
 		AmmoData  = { 2.8, 1050, 0.2, 0.04, 1050, 2.1, 1050 }
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette", "High Velocity Armor Piercing" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Short Cannon"] = function()
 		EntType   = "dak_tegun"
 		AmmoData  = { 1.6, 600, 0.2, 0.04, 600, 1.2, 600 }
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Flechette", "High Velocity Armor Piercing" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Flamethrower"] = function()
@@ -1581,7 +1594,7 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: AP Ammunition"] = function()
-		DLabel:SetText( "DakTank Guide: AP Ammunition\n\nThere are 3 types of ammo, Armor Piercing (AP), High Explosive (HE), and Flechette (FL). Each type of ammo has its own purposes in the combat of daktek, it is a good idea to take at least some amount of each if your gun allows it.\n\nAP fires a single shell at a target, if it doesn't have enough penetration to go through the armor then it will only deal a quarter its specified damage and be deflected away.\n\nIf your shell does penetrate then it deals damage equal to its specified value multiplied by its own penetration value divided by the armor value of the prop it went through.\n\nThe damage is capped to the amount of armor the prop has, making extremely heavy cannons firing AP not the best tool for dealing with light tanks, however you'll still shoot a hole right through them and likely rip out many modules at once and still deal respectable damage." )
+		DLabel:SetText( "DakTank Guide: AP Ammunition\n\nThere are 4 types of ammo, Armor Piercing (AP), High Explosive (HE), Flechette (FL), and High Velocity Armor Piercing (HVAP). Each type of ammo has its own purposes in the combat of daktek, it is a good idea to take at least some amount of each if your gun allows it.\n\nAP fires a single shell at a target, if it doesn't have enough penetration to go through the armor then it will only deal a quarter its specified damage and be deflected away.\n\nIf your shell does penetrate then it deals damage equal to its specified value multiplied by its own penetration value divided by the armor value of the prop it went through.\n\nThe damage is capped to the amount of armor the prop has, making extremely heavy cannons firing AP not the best tool for dealing with light tanks, however you'll still shoot a hole right through them and likely rip out many modules at once and still deal respectable damage." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: HE Ammunition"] = function()
@@ -1590,6 +1603,10 @@ function TOOL.BuildCPanel( panel )
 	end
 	selection["DakTank Guide: FL Ammunition"] = function()
 		DLabel:SetText( "DakTank Guide: FL Ammunition\n\nFL fires a volley of 10 projectiles at once like a large shotgun. It has more spread than normal shells, has 75% less penetration and velocity than AP. Each projectile is equal to a tenth of the damage of an AP shell.\n\nWhere FL shines is attacking armor that it can overpenetrate by large margins. As I stated previously, AP's damage is capped to the total armor of a prop, but for FL each projectile is limited to doing damage equal to 20% of the total armor of a prop, though since you have 10 projectiles this brings your damage potential up to twice that of an AP shell, assuming that you can hit the caps.\n\nFL ammo is also more likely to tear apart modules if it penetrates, great for flankers." )
+		DLabel:SetVisible( true )
+	end
+	selection["DakTank Guide: HVAP Ammunition"] = function()
+		DLabel:SetText( "DakTank Guide: HVAP Ammunition\n\nHVAP, also known as APCR (Armor Piercing Composite Rigid) to the brits, has more penetration and velocity than AP at the cost of significantly lower damage and post pen effects. It also loses pen over distance faster." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Weaponry"] = function()
@@ -1875,7 +1892,9 @@ function TOOL.BuildCPanel( panel )
 	AmmoTypeSelect:SetSortItems( false )
 	AmmoTypeSelect.OnSelect = function( panel, index, value )
 		local String = string.Explode( " ", value )
-		if ( #String > 1 ) then
+		if ( #String > 2 ) then 
+			AmmoType = string.sub( String[1], 1, 1 )..string.sub( String[2], 1, 1 )..string.sub( String[3], 1, 1 )..string.sub( String[4], 1, 1 )
+		elseif ( #String > 1 ) then
 			AmmoType = string.sub( String[1], 1, 1 )..string.sub( String[2], 1, 1 )
 		else
 			AmmoType = string.upper( string.sub( String[1], 1, 2 ) )
@@ -1998,6 +2017,7 @@ function TOOL.BuildCPanel( panel )
 		DTTE_NodeList["Help4"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: AP Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help5"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HE Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help6"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: FL Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help12"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HVAP Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help7"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Weaponry", "icon16/page.png" )
 		DTTE_NodeList["Help8"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Flamethrowers", "icon16/page.png" )
 		DTTE_NodeList["Help9"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Mobility", "icon16/page.png" )
