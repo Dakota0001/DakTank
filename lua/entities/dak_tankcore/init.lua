@@ -38,6 +38,7 @@ function ENT:Initialize()
 	self.DakBurnStacks = 0
 end
 
+
 local function GetPhysCons( ent, Results )
 	local Results = Results or {}
 	if not IsValid( ent ) then return end
@@ -53,6 +54,24 @@ local function GetPhysCons( ent, Results )
 		end
 	return Results
 end
+--[[
+local function GetPhysCons( Ent, Table )
+    if not IsValid( Ent ) then return end
+
+    local Table = Table or {[Ent] = true}
+            if Table[Ent] then return end
+
+    for _, V in ipairs( constraint.GetTable(Ent) ) do
+        if V.Type ~= "NoCollide" then
+            for _, Ent in pairs(V.Entity) do
+                GetPhysCons(Ent.Entity, Table)
+            end
+        end
+    end
+
+    return Table
+end
+]]--
 
 local function GetParents( ent, Results )
 	local Results = Results or {}
@@ -63,7 +82,66 @@ local function GetParents( ent, Results )
 	end
 	return Results
 end
+--[[
+local function GetParents(Ent)
+    if not IsValid(Ent) then return end
+    
+    local Table  = {[Ent] = true}
+    local Parent = Ent:GetParent()
 
+    while IsValid(Parent:GetParent()) do
+        Table[Parent] = true
+        Parent = Parent:GetParent()
+    end
+
+    return Table
+end
+]]--
+
+local function GetPhysicalConstraints( Ent, Table )
+    if not IsValid( Ent ) then return end
+
+    local Table = Table or {}
+            if Table[Ent] then return end
+            Table[Ent] = true
+    for _, V in ipairs( constraint.GetTable(Ent) ) do
+        if V.Type ~= "NoCollide" then
+            for _, Ent in pairs(V.Entity) do
+                GetPhysicalConstraints(Ent.Entity, Table)
+            end
+        end
+    end
+
+    return Table
+end
+
+--[[
+local function GetContraption(Ent)
+    if not IsValid(Ent) then return {} end
+
+    -- Get our ancestor (Move to top of tree)
+    local Root = Ent
+    while IsValid(Root:GetParent()) do Root = Root:GetParent() end
+
+    -- Get everything constrained to it (Spread horizontally on tree)
+    local Entities = GetPhysicalConstraints(Root)
+    PrintTable(Entities)
+
+    -- Get all children (Move down all branches of tree)
+    local Children = {}
+
+    for Entity in pairs(Entities) do
+        for Child in pairs(Entity:GetChildren()) do
+            Children[Child] = true
+        end
+    end
+
+    table.Add(Entities, Children)
+    PrintTable(Children)
+    PrintTable(Entities)
+    return Entities --Mass
+end
+]]--
 function ENT:Think()
 	if not(self.Dead) then
 		if not(self.DakMaxHealth) then
@@ -80,6 +158,7 @@ function ENT:Think()
 			self:SetMoveType(MOVETYPE_VPHYSICS)
 			self:SetSolid(SOLID_VPHYSICS)
 		end
+		
 		
 		self.Contraption = {}
 		table.Add(self.Contraption,GetParents(self))
@@ -111,6 +190,9 @@ function ENT:Think()
 	   		end
 		end
 		self.Contraption=res
+		
+		--self.Contraption = GetContraption(self)
+
 		self.Ammoboxes={}
 		self.TurretControls={}
 		self.Guns={}

@@ -89,10 +89,14 @@ e2function string entity:daktankGetAmmoType()
 					return "HE"
 				end
 				if this.CurrentAmmoType == 3 then
-					return "FL"
+					return "HEAT"
 				end
 				if this.CurrentAmmoType == 4 then
-					return "HVAP"
+					if this.DakGunType == "Howitzer" or this.DakGunType == "Mortar" then
+						return "HESH"
+					else
+						return "HVAP"
+					end
 				end
 			end
 		end
@@ -216,14 +220,27 @@ e2function number entity:daktankGetHVAPPenetration()
 	return 0
 end
 
-e2function number entity:daktankGetFLPenetration()
+e2function number entity:daktankGetHEATPenetration()
 	if not IsValid(this) then return 0 end
 
 	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
 		if this.BaseDakShellPenetration == nil then
 			return 1
 		else
-			return this.BaseDakShellPenetration*0.75
+			return this.DakMaxHealth*1.20
+		end
+	end
+	return 0
+end
+
+e2function number entity:daktankGetHESHPenetration()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
+		if this.BaseDakShellPenetration == nil then
+			return 1
+		else
+			return this.DakMaxHealth*1.25
 		end
 	end
 	return 0
@@ -281,16 +298,20 @@ e2function number entity:daktankGetHVAPDamage()
 	return 0
 end
 
-e2function number entity:daktankGetFLDamage()
+e2function number entity:daktankGetHEATDamage()
 	if not IsValid(this) then return 0 end
 
 	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
 		if this.BaseDakShellDamage == nil then
 			return 1
 		else
-			return this.BaseDakShellDamage/10
+			return this.BaseDakShellDamage/8
 		end
 	end
+	return 0
+end
+
+e2function number entity:daktankGetHESHDamage()
 	return 0
 end
 
@@ -346,7 +367,7 @@ e2function number entity:daktankGetHEVelocity()
 	return 0
 end
 
-e2function number entity:daktankGetFLVelocity()
+e2function number entity:daktankGetHEATVelocity()
 	if not IsValid(this) then return 0 end
 
 	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
@@ -354,6 +375,19 @@ e2function number entity:daktankGetFLVelocity()
 			return 1
 		else
 			return this.BaseDakShellVelocity*0.75
+		end
+	end
+	return 0
+end
+
+e2function number entity:daktankGetHESHVelocity()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" or this:GetClass() == "dak_temachinegun" then
+		if this.BaseDakShellVelocity == nil then
+			return 1
+		else
+			return this.BaseDakShellVelocity*0.5
 		end
 	end
 	return 0

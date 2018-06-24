@@ -216,15 +216,19 @@ function ENT:Think()
 	if self.DakTankCore then
 		if #self.DakTankCore.Motors>0 then
 			for i=1, #self.DakTankCore.Motors do
-				self.DakSpeed = self.DakSpeed + self.DakTankCore.Motors[i].DakSpeed
-				self.DakFuelReq = self.DakFuelReq + self.DakTankCore.Motors[i].DakFuelReq
-				self.DakHP = self.DakHP + self.DakTankCore.Motors[i].DakHP
+				if IsValid(self.DakTankCore.Motors[i]) then
+					self.DakSpeed = self.DakSpeed + self.DakTankCore.Motors[i].DakSpeed
+					self.DakFuelReq = self.DakFuelReq + self.DakTankCore.Motors[i].DakFuelReq
+					self.DakHP = self.DakHP + self.DakTankCore.Motors[i].DakHP
+				end
 			end
 		end
 		if #self.DakTankCore.Fuel>0 then
 			for i=1, #self.DakTankCore.Fuel do
 				if self.DakFuel then
-					self.DakFuel = self.DakFuel + self.DakTankCore.Fuel[i].DakFuel
+					if IsValid(self.DakTankCore.Fuel[i]) then
+						self.DakFuel = self.DakFuel + self.DakTankCore.Fuel[i].DakFuel
+					end
 				end
 			end
 		end
@@ -283,7 +287,9 @@ function ENT:Think()
 	        if (self.Active>0) then
 	        	if #self.DakTankCore.Motors>0 then
 					for i=1, #self.DakTankCore.Motors do
-						self.DakTankCore.Motors[i].Sound:ChangeVolume( 1, 1 )
+						if IsValid(self.DakTankCore.Motors[i]) then
+							self.DakTankCore.Motors[i].Sound:ChangeVolume( 1, 1 )
+						end
 					end
 				end
 
@@ -294,7 +300,9 @@ function ENT:Think()
 		        	end
 		        	if #self.DakTankCore.Motors>0 then
 						for i=1, #self.DakTankCore.Motors do
-							self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+							if IsValid(self.DakTankCore.Motors[i]) then
+								self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+							end
 						end
 					end
 		        else
@@ -372,13 +380,17 @@ function ENT:Think()
 						if self.Speed<self.TopSpeed/3 then
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
-									self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/50),0,255), 3 )
+									if IsValid(self.DakTankCore.Motors[i]) then
+										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/50),0,255), 3 )
+									end
 								end
 							end
 						else
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
-									self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(self.Speed/self.TopSpeed),0,255), 1 )
+									if IsValid(self.DakTankCore.Motors[i]) then
+										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(self.Speed/self.TopSpeed),0,255), 1 )
+									end
 								end
 							end
 						end
@@ -404,7 +416,9 @@ function ENT:Think()
 							if self.MoveLeft>0 and self.MoveRight==0 then
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
-										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.TotalMass/10000)+3))),0,255), 1 )
+										if IsValid(self.DakTankCore.Motors[i]) then
+											self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.TotalMass/10000)+3))),0,255), 1 )
+										end
 									end
 								end
 								LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
@@ -415,7 +429,9 @@ function ENT:Think()
 							if self.MoveRight>0 and self.MoveLeft==0 then
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
-										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.TotalMass/10000)+3))),0,255), 1 )
+										if IsValid(self.DakTankCore.Motors[i]) then
+											self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.TotalMass/10000)+3))),0,255), 1 )
+										end
 									end
 								end
 								LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
@@ -448,7 +464,9 @@ function ENT:Think()
 							end
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
-									self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+									if IsValid(self.DakTankCore.Motors[i]) then
+										self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+									end
 								end
 							end
 						end
@@ -478,8 +496,10 @@ function ENT:Think()
 				end
 				if #self.DakTankCore.Motors>0 then
 					for i=1, #self.DakTankCore.Motors do
-						self.DakTankCore.Motors[i].Sound:ChangeVolume( 0, 2 )
-						self.DakTankCore.Motors[i].Sound:ChangePitch( 0, 2 )
+						if IsValid(self.DakTankCore.Motors[i]) then
+							self.DakTankCore.Motors[i].Sound:ChangeVolume( 0, 2 )
+							self.DakTankCore.Motors[i].Sound:ChangePitch( 0, 2 )
+						end
 					end
 				end
 	        	self.LastYaw = self:GetAngles().yaw
@@ -508,7 +528,9 @@ function ENT:Think()
     	if IsValid(self.DakTankCore) then
 	    	if #self.DakTankCore.Motors>0 then
 				for i=1, #self.DakTankCore.Motors do
-					self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+					if IsValid(self.DakTankCore.Motors[i]) then
+						self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+					end
 				end
 			end
 		end
