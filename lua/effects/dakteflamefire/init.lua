@@ -1,5 +1,4 @@
 /*
-
 This effect goes in lua/effects/<Your effect name>/init.lua
 
 How to use: Example Code:
@@ -18,42 +17,30 @@ You can use this in ENT:Think() or PrimaryEffect in an entity or hook.Add("Think
 
 Think is for animated effects
 */
-function EFFECT:Init( data )
-	local Pos = data:GetOrigin()
-	local Ent = data:GetEntity()
-	
-	local emitter = ParticleEmitter( Pos )
-	
-	if not(Ent==NULL) then
-	for i = 1,1 do
 
-		local particle = emitter:Add( "dak/smokey", Pos + Ent:GetForward()*math.random( -0, 0 )) 
-		 
-		if particle == nil then particle = emitter:Add( "dak/smokey", Pos + Ent:GetForward()*math.random( 0, 0 ))  end
-		
-		if (particle) then
-			particle:SetVelocity(Vector(Ent:GetUp()*math.random( -5, 5 ))+Vector(Ent:GetRight()*math.random( -5, 5 ))+Vector(Ent:GetForward()*math.random( 0, 25 )))
-			particle:SetLifeTime(0) 
-			particle:SetDieTime(5) 
-			particle:SetStartAlpha(75)
-			particle:SetEndAlpha(0)
-			particle:SetStartSize(0) 
-			particle:SetEndSize(25)
-			particle:SetAngles( Angle(0,0,0) )
-			particle:SetAngleVelocity( Angle(0,0,0) ) 
-			particle:SetRoll(math.Rand( 0, 360 ))
-			local CVal = math.random(50,100)
-			particle:SetColor(CVal,CVal,CVal,math.random(50,150))
-			particle:SetGravity( Vector(0,0,math.random(5,25)) ) 
-			particle:SetAirResistance(25)  
-			particle:SetCollide(false)
-			particle:SetBounce(0)
-		end
-	end
-	end
+function EFFECT:Init( Data )
+	local Pos = Data:GetOrigin()
+	local Ent = Data:GetEntity()
+	
+	if ( Ent == NULL ) then return end
+	
+	local Emitter = ParticleEmitter( Pos )
+	
+	local Velocity = Vector(Ent:GetRight()*math.random(-5,5) + Ent:GetForward()*math.random(0,25))
+	local Particle = Emitter:Add( "dak/smokey", Pos )
+	local Color = math.random(50,100)
 
-	emitter:Finish()
-		
+	Particle:SetVelocity( Ent:GetUp()*math.random(-5,5) + Velocity )
+	Particle:SetDieTime( 5 ) 
+	Particle:SetStartAlpha( 75 )
+	Particle:SetEndSize( 25 )
+	Particle:SetRoll( math.Rand(0,360) )
+	Particle:SetColor( Color,Color,Color,math.random(50,150) )
+	Particle:SetGravity( Vector(0,0,math.random(5,25)) ) 
+	Particle:SetAirResistance( 25 )  
+
+	Emitter:Finish()
+
 end
 
 function EFFECT:Think()		
