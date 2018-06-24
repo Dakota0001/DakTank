@@ -1,5 +1,4 @@
 /*
-
 This effect goes in lua/effects/<Your effect name>/init.lua
 
 How to use: Example Code:
@@ -18,69 +17,52 @@ You can use this in ENT:Think() or PrimaryEffect in an entity or hook.Add("Think
 
 Think is for animated effects
 */
-function EFFECT:Init( data )
-	local Pos = data:GetOrigin()
-	local Ent = data:GetEntity()
-	local size = data:GetScale()
+
+function EFFECT:Init( Data )
+
+	local Pos = Data:GetOrigin()
+	local Ent = Data:GetEntity()
+	local Size = Data:GetScale()
 	
-	local emitter = ParticleEmitter( Pos )
+	if ( Ent == NULL ) then return end
 	
-	if not(Ent==NULL) then
-	for i = 1,5 do
+	local Emitter = ParticleEmitter( Pos )
+	
+	for i = 1, 5 do
 
-		local particle = emitter:Add( "dak/smokey", Pos + Ent:GetForward()*math.random( -0, 0 )) 
-		 
-		if particle == nil then particle = emitter:Add( "dak/smokey", Pos + Ent:GetForward()*math.random( 0, 0 ))  end
+		local Particle = Emitter:Add( "dak/smokey", Pos )
+		local VelocityX = math.random(-(150+Size*100),150+(Size*100))
+		local VelocityY = math.random(-(150+Size*100),150+(Size*100))
+		local VelocityZ = math.random(-(150+Size*100),150+(Size*100))
 		
-		if (particle) then
-			particle:SetVelocity(Ent:GetForward()*math.Rand(750,6000+(size*1200)) + Vector(math.random(-(150+size*100),150+(size*100)),math.random(-(150+size*100),150+(size*100)),math.random(-(150+size*100),150+(size*100))))
-			particle:SetLifeTime(0) 
-			particle:SetDieTime((size/5)+math.Rand(0,0.5))
-			particle:SetStartAlpha(50)
-			particle:SetEndAlpha(0)
-			particle:SetStartSize(15+size) 
-			particle:SetEndSize((15+size)*3)
-			particle:SetAngles( Angle(0,0,0) )
-			particle:SetAngleVelocity( Angle(0,0,0) ) 
-			particle:SetRoll(math.Rand( 0, 360 ))
-			particle:SetColor(math.random(150,150),math.random(150,150),math.random(150,150),math.random(255,255))
-			particle:SetGravity( Vector(0,0,0) ) 
-			particle:SetAirResistance(1500) 
-			particle:SetCollide(false)
-			particle:SetBounce(0)
-		end
-	end
+		Particle:SetVelocity( Ent:GetForward()*math.Rand(750,6000+(Size*1200)) + Vector(VelocityX,VelocityY,VelocityZ) )
+		Particle:SetDieTime( math.Rand(Size/5, Size/5+0.5) )
+		Particle:SetStartAlpha( 50 )
+		Particle:SetStartSize( 15+Size ) 
+		Particle:SetEndSize( (15+Size)*3 )
+		Particle:SetRoll( math.Rand(0, 360) )
+		Particle:SetColor( 150, 150, 150, 255 )
+		Particle:SetAirResistance( 1500 ) 
 	end
 
-	if not(Ent==NULL) then
-		for i = 1,25 do
+	for i = 1,25 do
 
-		local particle = emitter:Add( "sprites/light_glow02_add.vmt", Pos + Ent:GetForward()*math.random( -0, 0 )) 
-		 
-		if particle == nil then particle = emitter:Add( "sprites/light_glow02_add.vmt", Pos + Ent:GetForward()*math.random( 0, 0 ))  end
-		
-		if (particle) then
-			particle:SetVelocity(Ent:GetForward()*math.Rand(250,3000+(size*600)) + Vector(math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20))))
-			particle:SetLifeTime(0) 
-			particle:SetDieTime(0.1+math.Rand(0,0.15)) 
-			particle:SetStartAlpha(200)
-			particle:SetEndAlpha(0)
-			particle:SetStartSize(20+size*5) 
-			particle:SetEndSize(0)
-			particle:SetAngles( Angle(0,0,0) )
-			particle:SetAngleVelocity( Angle(0,0,0) ) 
-			particle:SetRoll(math.Rand( 0, 360 ))
-			particle:SetColor(255,150,75,math.random(150,255))
-			particle:SetGravity( Vector(0,0,0) ) 
-			particle:SetAirResistance(1500)  
-			particle:SetCollide(false)
-			particle:SetBounce(0)
-		end
-	end
+		local Particle = Emitter:Add( "sprites/light_glow02_add.vmt", Pos + Ent:GetForward()*math.random( -0, 0 )) 
+		local VelocityX = math.random(-(50+Size*20),50+(Size*20))
+		local VelocityY = math.random(-(50+Size*20),50+(Size*20))
+		local VelocityZ = math.random(-(50+Size*20),50+(Size*20))
+
+		Particle:SetVelocity( Ent:GetForward()*math.Rand(250,3000+(Size*600)) + Vector(VelocityX,VelocityY,VelocityZ) )
+		Particle:SetDieTime( math.Rand(0.1,0.25) )
+		Particle:SetStartAlpha( 200 )
+		Particle:SetStartSize( 20+Size*5 )
+		Particle:SetRoll( math.Rand( 0, 360 ) )
+		Particle:SetColor( 255, 150, 75, math.random(150,255) )
+		Particle:SetAirResistance( 1500 )
 	end
 
-	emitter:Finish()
-		
+	Emitter:Finish()
+
 end
 
 function EFFECT:Think()		
