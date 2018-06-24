@@ -1,4 +1,5 @@
 /*
+
 This effect goes in lua/effects/<Your effect name>/init.lua
 
 How to use: Example Code:
@@ -17,50 +18,67 @@ You can use this in ENT:Think() or PrimaryEffect in an entity or hook.Add("Think
 
 Think is for animated effects
 */
+function EFFECT:Init( data )
+	local Pos = data:GetOrigin()
+	
+	local emitter = ParticleEmitter( Pos )
+	
+	for i = 1,3 do
 
-function EFFECT:Init( Data )
-
-	local Pos = Data:GetOrigin()
-
-	local Emitter = ParticleEmitter( Pos )
-
-	for i = 1, 3 do
-
-		local Position = Pos + Vector(math.random(-50,50),math.random(-50,50),math.random(-50,50))
-		local Velocity = Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25))
-		local Particle = Emitter:Add( "dak/smokey", Position )
-		local Color = math.random(50,100)
-
-		Particle:SetVelocity( Velocity )
-		Particle:SetDieTime( 5 )
-		Particle:SetStartAlpha( 150 )
-		Particle:SetEndSize( 100 )
-		Particle:SetRoll( math.Rand( 0, 360 ) )
-		Particle:SetColor( Color,Color,Color,50 )
-		Particle:SetGravity( Vector(0,0,math.random(5,50)) )
-		Particle:SetAirResistance( 20 )
+		local particle = emitter:Add( "dak/smokey", Pos+Vector(math.random(-50,50),math.random(-50,50),math.random(-50,50)))  
+		 
+		if particle == nil then particle = emitter:Add( "dak/smokey", Pos) end
+		
+		if (particle) then
+			particle:SetVelocity(Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(5) 
+			particle:SetStartAlpha(150)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(0) 
+			particle:SetEndSize(100)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			local CVal = math.random(50,100)
+			particle:SetColor(CVal,CVal,CVal,math.random(50,50))
+			particle:SetGravity( Vector(0,0,math.random(5,50)) ) 
+			particle:SetAirResistance(20)  
+			particle:SetCollide(false)
+			particle:SetBounce(0)
+		end
 	end
 
-	for i = 1, 3 do
+	for i = 1,3 do
 
-		local Position = Pos + Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25))
-		local Velocity = Vector(math.random(-50,50),math.random(-50,50),math.random(-25,25))
-		local Particle = Emitter:Add( "dak/flamelet5", Position )
-
-		Particle:SetVelocity( Velocity )
-		Particle:SetDieTime( 2.5 )
-		Particle:SetStartAlpha( 255 )
-		Particle:SetStartSize( 25 )
-		Particle:SetEndSize( 5 )
-		Particle:SetRoll( math.Rand( 0, 360 ) )
-		Particle:SetColor( 255,255,255,255 )
+		local particle = emitter:Add( "dak/flamelet5", Pos+Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25))) 
+		 
+		if particle == nil then particle = emitter:Add( "dak/flamelet5", Pos+Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25)))  end
+		
+		if (particle) then
+			particle:SetVelocity(Vector(math.random(-50,50),math.random(-50,50),math.random(-25,25)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(2.5) 
+			particle:SetStartAlpha(255)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(25) 
+			particle:SetEndSize(5)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
+			particle:SetGravity( Vector(0,0,math.random(0,0)) ) 
+			particle:SetAirResistance(0.0)  
+			particle:SetCollide(false)
+			particle:SetBounce(0)
+		end
 	end
 
-	Emitter:Finish()
-
+	emitter:Finish()
+		
 end
 
-function EFFECT:Think()
+function EFFECT:Think()		
 	return false
 end
 

@@ -1,10 +1,10 @@
 EFFECT.Mat = Material( "trails/smoke" )
 
-function EFFECT:Init( Data )
+function EFFECT:Init( data )
 
-	self.StartPos = Data:GetStart()
-	self.EndPos = Data:GetOrigin()
-	self.Caliber = Data:GetScale()
+	self.StartPos = data:GetStart()
+	self.EndPos = data:GetOrigin()
+	self.Caliber = data:GetScale()*1
 
 	self.Dir = (self.EndPos-self.StartPos):GetNormalized()
 	self.Dist = self.EndPos:Distance(self.StartPos)
@@ -14,34 +14,40 @@ function EFFECT:Init( Data )
 
 	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
 
-	local Emitter = ParticleEmitter( self.StartPos )
-	local Amount = math.Clamp(math.Round(self.Caliber/0.00393701),1,20) --Caliber / 0.0393701 / 10
-	
-	for i = 1, Amount do
-		
-		local Position = self.StartPos + self.Dir*math.Rand(0,self.Dist)
-		local Velocity = Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5))
-		local Particle = Emitter:Add( "dak/smokey", Position )
-		local Color = math.random(50,100)
+	local emitter = ParticleEmitter( self.StartPos )
 
-		Particle:SetVelocity( Velocity )
-		Particle:SetDieTime( 1.0 ) 
-		Particle:SetStartAlpha( 50 )
-		Particle:SetStartSize( Amount )
-		Particle:SetEndSize( Amount * 3 )
-		Particle:SetRoll( math.Rand(0, 360) )
-		Particle:SetColor( Color, Color, Color, 50 )
-		Particle:SetGravity( Vector(0,0,math.random(5,25)) ) 
-		Particle:SetAirResistance( 20 ) 
-		Particle:SetCollide( true )
+	for i = 1, math.Clamp(math.Round((self.Caliber/0.0393701)/10,0),1,20) do
+		local particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
+		 
+		if particle == nil then particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
+		
+		if (particle) then
+			particle:SetVelocity(Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(1.0) 
+			particle:SetStartAlpha(50)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(1*math.Clamp(math.Round((self.Caliber/0.0393701)/10,0),1,20))
+			particle:SetEndSize(3*math.Clamp(math.Round((self.Caliber/0.0393701)/10,0),1,20))
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			local CVal = math.random(50,100)
+			particle:SetColor(CVal,CVal,CVal,math.random(50,50))
+			particle:SetGravity( Vector(0,0,math.random(5,25)) ) 
+			particle:SetAirResistance(20) 
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+		end
 	end
-	
-	Emitter:Finish()
-	
+	emitter:Finish()
 end
 
 function EFFECT:Think()
-	return CurTime() <= self.DieTime
+	if ( CurTime() > self.DieTime ) then
+		return false
+	end
+	return true
 end
 
 function EFFECT:Render()

@@ -1,4 +1,5 @@
 /*
+
 This effect goes in lua/effects/<Your effect name>/init.lua
 
 How to use: Example Code:
@@ -17,56 +18,56 @@ You can use this in ENT:Think() or PrimaryEffect in an entity or hook.Add("Think
 
 Think is for animated effects
 */
+function EFFECT:Init( data )
+	local Pos = data:GetOrigin()
+	local Mult = data:GetScale()
+	local Target = data:GetEntity()
+	
+	if not(Target==NULL) then	
+		local emitter = ParticleEmitter( Pos )
+		
+		for i = 1,Mult do
 
-function EFFECT:Init( Data )
-	local Pos = Data:GetOrigin()
-	local Mult = Data:GetScale()
-	local Target = Data:GetEntity()
-	
-	if ( Target == NULL ) then return end
-	
-	local RotationX = math.random(Target:OBBMins().x,Target:OBBMaxs().x)
-	local RotationY = math.random(Target:OBBMins().y,Target:OBBMaxs().y)
-	local RotationZ = math.random(Target:OBBMins().z,Target:OBBMaxs().z)
-	local Rotation = Vector( RotationX, RotationZ, RotationZ )
-	Rotation:Rotate( Target:GetAngles() )
 
-	local Sparks = EffectData()
-	Sparks:SetOrigin( Pos+Rotation )
-	Sparks:SetMagnitude( math.Rand(0.1,0.5)*Mult )
-	Sparks:SetRadius( math.Rand(0.8,1.2)*Mult )
-	Sparks:SetScale( math.Rand(0.2,0.4)*Mult )
-	util.Effect( "Sparks", Sparks )
-	
-	local Emitter = ParticleEmitter( Pos )
-		
-	for i = 1, math.Round(Mult) do
-		
-		RotationX = math.random(Target:OBBMins().x,Target:OBBMaxs().x)
-		RotationY = math.random(Target:OBBMins().y,Target:OBBMaxs().y)
-		RotationZ = math.random(Target:OBBMins().z,Target:OBBMaxs().z)
-		Rotation = Vector( RotationX, RotationZ, RotationZ )
-		Rotation:Rotate( Target:GetAngles() )
-		
-		local Particle = Emitter:Add( "dak/smokey", Pos+Rotation  )
-		local VelocityX = math.random(-5*Mult,5*Mult)
-		local VelocityY = math.random(-5*Mult,5*Mult)
-		local VelocityZ = math.random(-5*Mult,5*Mult)
-		local Color = math.random(50,100)
+			local Rotation = (Vector(math.random(Target:OBBMins().x,Target:OBBMaxs().x),math.random(Target:OBBMins().y,Target:OBBMaxs().y),math.random(Target:OBBMins().z,Target:OBBMaxs().z)))
+			Rotation:Rotate(Target:GetAngles())
+			local particle = emitter:Add( "dak/smokey", Pos+Rotation  )  
+			 
+			if particle == nil then particle = emitter:Add( "dak/smokey", Pos) end
 			
-		Particle:SetVelocity( Vector(VelocityX,VelocityY,VelocityZ) )
-		Particle:SetDieTime( 2.5 ) 
-		Particle:SetStartAlpha( 75 )
-		Particle:SetStartSize( Target:OBBMins():Length()/2 ) 
-		Particle:SetEndSize( Target:OBBMins():Length() )
-		Particle:SetRoll(math.Rand( 0, 360 ))
-		Particle:SetColor( Color, Color, Color, 50 )
-		Particle:SetGravity( Vector(0,0,math.random(5,50)) ) 
-		Particle:SetAirResistance( 0.1 )
+			if (particle) then
+				particle:SetVelocity(Vector(math.random(-5*Mult,5*Mult),math.random(-5*Mult,5*Mult),math.random(-5*Mult,25*Mult)))
+				particle:SetLifeTime(0) 
+				particle:SetDieTime(2.5) 
+				particle:SetStartAlpha(75)
+				particle:SetEndAlpha(0)
+				particle:SetStartSize(Target:OBBMins():Length()/2) 
+				particle:SetEndSize(Target:OBBMins():Length())
+				particle:SetAngles( Angle(0,0,0) )
+				particle:SetAngleVelocity( Angle(0,0,0) ) 
+				particle:SetRoll(math.Rand( 0, 360 ))
+				local CVal = math.random(50,100)
+				particle:SetColor(CVal,CVal,CVal,math.random(50,50))
+				particle:SetGravity( Vector(0,0,math.random(5,50)) ) 
+				particle:SetAirResistance(0.1)  
+				particle:SetCollide(false)
+				particle:SetBounce(0)
+			end
+		end
+
+		local Rotation = (Vector(math.random(Target:OBBMins().x,Target:OBBMaxs().x),math.random(Target:OBBMins().y,Target:OBBMaxs().y),math.random(Target:OBBMins().z,Target:OBBMaxs().z)))
+		Rotation:Rotate(Target:GetAngles())
+		local Sparks = EffectData()
+			Sparks:SetOrigin( Pos+Rotation )
+			--Sparks:SetNormal( self.Normal )
+			Sparks:SetMagnitude( math.Rand(0.1*Mult,0.5*Mult) )
+			Sparks:SetScale( math.Rand(0.2*Mult,0.4*Mult) )
+			Sparks:SetRadius( math.Rand(0.8*Mult,1.2*Mult) )
+			util.Effect( "Sparks", Sparks )
+
+		emitter:Finish()
 	end
-
-	Emitter:Finish()
-
+		
 end
 
 function EFFECT:Think()		

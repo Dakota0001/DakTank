@@ -1,4 +1,5 @@
 /*
+
 This effect goes in lua/effects/<Your effect name>/init.lua
 
 How to use: Example Code:
@@ -17,67 +18,82 @@ You can use this in ENT:Think() or PrimaryEffect in an entity or hook.Add("Think
 
 Think is for animated effects
 */
-
-function EFFECT:Init( Data )
-
-	local Pos = Data:GetOrigin()
+function EFFECT:Init( data )
+	local Pos = data:GetOrigin()
 	
-	local Emitter = ParticleEmitter( Pos )
+	local emitter = ParticleEmitter( Pos )
 	
-	for i = 1, 15 do
+	for i = 1,15 do
+
+		local particle = emitter:Add( "dak/smokey", Pos + Vector( math.random(-10,10),math.random(-10,10),math.random(-10,10) ) ) 
+		 
+		if particle == nil then particle = emitter:Add( "dak/smokey", Pos + Vector(   math.random(0,0),math.random(0,0),math.random(0,0) ) ) end
 		
-		local Position = Pos + Vector(math.random(-10,10),math.random(-10,10),math.random(-10,10))
-		local Velocity = Vector(math.random(-200,200),math.random(-200,200),math.random(-200,200))
-		local Particle = Emitter:Add( "dak/smokey", Position ) 
-		local Color = math.random(10,100)
-		
-		Particle:SetVelocity( Velocity )
-		Particle:SetLifeTime( 0.5 ) 
-		Particle:SetDieTime( 1.0 ) 
-		Particle:SetStartAlpha( 255 )
-		Particle:SetStartSize( 10 ) 
-		Particle:SetEndSize( 50 )
-		Particle:SetRoll( math.Rand(0, 360) )
-		Particle:SetColor( Color, Color, Color, 255 )
-		Particle:SetGravity( Vector(0,0,5) ) 
-		Particle:SetAirResistance( 50 )  
-		Particle:SetBounce( 100 )
+		if (particle) then
+			particle:SetVelocity(Vector(math.random(-200,200),math.random(-200,200),math.random(-200,200)))
+			particle:SetLifeTime(0.5) 
+			particle:SetDieTime(1.0) 
+			particle:SetStartAlpha(255)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(10) 
+			particle:SetEndSize(50)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			local CVal = math.random(10,100)
+			particle:SetColor(CVal,CVal,CVal,math.random(255,255))
+			particle:SetGravity( Vector(0,0,5) ) 
+			particle:SetAirResistance(50)  
+			particle:SetCollide(false)
+			particle:SetBounce(100)
+		end
+	end
+	for i=1, 20 do
+	
+		local Debris = emitter:Add( "effects/fleck_tile"..math.random(1,2), Pos )
+		if (Debris) then
+			Debris:SetVelocity (Vector(math.random(-250,250),math.random(-250,250),math.random(-250,250)))
+			Debris:SetLifeTime( 0 )
+			Debris:SetDieTime( math.Rand( 0.5 , 1.5 ) )
+			Debris:SetStartAlpha( 255 )
+			Debris:SetEndAlpha( 0 )
+			Debris:SetStartSize( 2 )
+			Debris:SetEndSize( 2 )
+			Debris:SetRoll( math.Rand(0, 360) )
+			Debris:SetRollDelta( math.Rand(-3, 3) )			
+			Debris:SetAirResistance( 50 ) 			 
+			Debris:SetGravity( Vector( 0, 0, math.Rand(-500, -250) ) ) 			
+			Debris:SetColor( 50,50,50 )
+		end
 	end
 
-	for i = 1, 20 do
+	for i = 1,25 do
 
-		local Velocity = Vector(math.random(-250,250),math.random(-250,250),math.random(-250,250))
-		local Debris = Emitter:Add( "effects/fleck_tile"..math.random(1,2), Pos )
-
-		Debris:SetVelocity( Velocity )
-		Debris:SetDieTime( math.Rand( 0.5 , 1.5 ) )
-		Debris:SetStartAlpha( 255 )
-		Debris:SetStartSize( 2 )
-		Debris:SetEndSize( 2 )
-		Debris:SetRoll( math.Rand(0, 360) )
-		Debris:SetRollDelta( math.Rand(-3, 3) )
-		Debris:SetAirResistance( 50 )
-		Debris:SetGravity( Vector(0,0,-math.Rand(250,500)) )			
-		Debris:SetColor( 50, 50, 50 )
-	end
-
-	for i = 1, 25 do
+		local particle = emitter:Add( "sprites/light_glow02_add.vmt", Pos + Vector( math.random(-10,10),math.random(-10,10),math.random(-10,10) ) ) 
+		 
+		if particle == nil then particle = emitter:Add( "sprites/light_glow02_add.vmt", Pos + Vector(   math.random(0,0),math.random(0,0),math.random(0,0) ) ) end
 		
-		local Velocity = Vector(math.random(-200,200),math.random(-200,200),math.random(-200,200))
-		local Particle = Emitter:Add( "sprites/light_glow02_add.vmt", Pos + Vector( math.random(-10,10),math.random(-10,10),math.random(-10,10) ) ) 
-
-		Particle:SetVelocity( Velocity )
-		Particle:SetDieTime( math.Rand(0.01,0.16) ) 
-		Particle:SetStartAlpha( 200 )
-		Particle:SetStartSize( math.Rand(90,110) ) 
-		Particle:SetRoll( math.Rand(0,360) )
-		Particle:SetColor( 255, 150, 75, math.random(150,255) )
-		Particle:SetAirResistance( 1500 )  
-		Particle:SetBounce( 1000 )
+		if (particle) then
+			particle:SetVelocity(Vector(math.random(-200,200),math.random(-200,200),math.random(-200,200)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(0.01+math.Rand(0,0.15)) 
+			particle:SetStartAlpha(200)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(100*math.Rand(0.9,1.1)) 
+			particle:SetEndSize(0)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(255,150,75,math.random(150,255))
+			particle:SetGravity( Vector(0,0,0) ) 
+			particle:SetAirResistance(1500)  
+			particle:SetCollide(false)
+			particle:SetBounce(1000)
+		end
 	end
 
-	Emitter:Finish()
-
+	emitter:Finish()
+		
 end
 
 function EFFECT:Think()		
