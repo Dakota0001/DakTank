@@ -1,4 +1,5 @@
 local function CheckClip(Ent, HitPos)
+	if not Ent.EntityMods then return false end
     if not Ent.EntityMods.clipping_all_prop_clips or Ent:GetClass() ~= "prop_physics" then return false end
 
     for I = 1, #Ent.EntityMods.clipping_all_prop_clips do
