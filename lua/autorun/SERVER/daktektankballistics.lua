@@ -13,7 +13,7 @@ local function CheckClip(Ent, HitPos)
     return false
 end
 function DTShellHit(Start,End,HitEnt,Shell,Normal)
-	if hook.Run("DakTankDamageCheck", HitEnt, Shell.DakGun.DakOwner) ~= false then
+	if hook.Run("DakTankDamageCheck", HitEnt, Shell.DakGun.DakOwner, Shell.DakGun) ~= false then
 		if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt:GetClass()=="dak_bot") then
 			if (CheckClip(HitEnt,End)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" then
 				if HitEnt.DakArmor == nil then
@@ -554,7 +554,7 @@ function DTShellContinue(Start,Shell,Normal)
 	util.Effect("dakteballistictracer", effectdata, true, true)
 
 
-	if hook.Run("DakTankDamageCheck", HitEnt, Shell.DakGun.DakOwner) ~= false then
+	if hook.Run("DakTankDamageCheck", HitEnt, Shell.DakGun.DakOwner, Shell.DakGun) ~= false then
 		if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt:GetClass()=="dak_bot") then
 			if (CheckClip(HitEnt,End)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" then
 				if HitEnt.DakArmor == nil then
@@ -1092,7 +1092,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 			trace.maxs = Vector(1,1,1)
 		local ExpTrace = util.TraceHull( trace )
 
-		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
+		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 			--decals don't like using the adjusted by normal Pos
 			util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), HitEnt)
 			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
@@ -1220,7 +1220,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 		trace.maxs = Vector(1,1,1)
 	local ExpTrace = util.TraceHull( trace )
 
-	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
+	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 		--decals don't like using the adjusted by normal Pos
 		util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), IgnoreEnt)
 		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
@@ -1343,7 +1343,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 	if table.Count(Targets) > 0 then
 		for i = 1, #Targets do
 			if Targets[i]:IsValid() then
-				if hook.Run("DakTankDamageCheck", Targets[i], Owner) ~= false then
+				if hook.Run("DakTankDamageCheck", Targets[i], Owner, Shell.DakGun) ~= false then
 				else
 					table.insert(Shell.IgnoreList,Targets[i])
 				end
@@ -1481,7 +1481,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 			trace.maxs = Vector(1,1,1)
 		local SpallTrace = util.TraceHull( trace )
 
-		if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
+		if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
 			if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity:GetClass()=="dak_bot") then
 				if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
 					if SpallTrace.Entity.DakArmor == nil then
@@ -1611,7 +1611,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 		trace.maxs = Vector(1,1,1)
 	local SpallTrace = util.TraceHull( trace )
 
-	if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
+	if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
 		if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity:GetClass()=="dak_bot") then
 			if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
 				if SpallTrace.Entity.DakArmor == nil then
@@ -1745,7 +1745,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 		trace.maxs = Vector(1,1,1)
 	local HEATTrace = util.TraceHull( trace )
 
-	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
+	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner, Shell.DakGun) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
 		if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity:GetClass()=="dak_bot") then
 			if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 				if HEATTrace.Entity.DakArmor == nil then
@@ -1876,7 +1876,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 		trace.maxs = Vector(1,1,1)
 	local HEATTrace = util.TraceHull( trace )
 
-	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
+	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner, Shell.DakGun) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
 		if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity:GetClass()=="dak_bot") then
 			if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 				if HEATTrace.Entity.DakArmor == nil then

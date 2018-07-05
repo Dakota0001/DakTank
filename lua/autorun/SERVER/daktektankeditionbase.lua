@@ -65,16 +65,17 @@ if SERVER then
 			end
 		end
 	end
-
-	hook.Add( "DakTankDamageCheck", "DakTekTankEditionDamageCheck", function (Damaged,Damager)
-	end )
+	
+	--example hook add
+	--hook.Add( "DakTankDamageCheck", "DakTekTankEditionDamageCheck", function (Damaged,Damager)
+	--end )
 
 	function impactexplode(collider, col)
 		if collider.IsDakTekFutureTech == nil and col.HitEntity.IsDakTekFutureTech == nil then
 			if IsValid(collider.Controller) and IsValid(col.HitEntity.Controller) then
 				if not(collider.Controller==col.HitEntity.Controller) then
 					if col.HitEntity:GetPhysicsObject():IsMotionEnabled() then
-						if hook.Run("DakTankDamageCheck", col.HitEntity, collider.Controller.DakOwner) ~= false then
+						if hook.Run("DakTankDamageCheck", col.HitEntity, collider.Controller.DakOwner, collider.Controller) ~= false then
 							local Damage = ((col.OurOldVelocity-col.TheirOldVelocity):Length()/200)*(collider.DakMaxHealth/col.HitEntity.DakMaxHealth)
 							col.HitEntity.DakHealth = col.HitEntity.DakHealth - Damage
 							collider:EmitSound( "physics/metal/metal_large_debris2.wav" )

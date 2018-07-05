@@ -808,7 +808,7 @@ end
 
 
 function ENT:TriggerInput(iname, value)
-	if IsValid(self.DakTankCore) then
+	if IsValid(self.DakTankCore) and hook.Run("DakTankCanFire", self) ~= false then
 		self.Held = value
 		if (iname == "Fire") then
 			if value>0 then
