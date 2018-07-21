@@ -42,6 +42,7 @@ function ENT:Initialize()
  	self.ExtraTorque = 1
  	self.Vel = 1
  	self.DakBurnStacks = 0
+ 	self.RPM = 0
 end
 
 function ENT:Think()
@@ -285,6 +286,18 @@ function ENT:Think()
 				self.base = self
 			end
 	        if (self.Active>0) then
+	        	if not(self.MoveForward>0) and not(self.MoveReverse>0) and not(self.MoveLeft>0) and not(self.MoveRight>0) then
+					if self.RPM > 600 then
+		        		self.RPM = self.RPM - 10
+		        	end
+		        	if self.RPM < 600 then
+		        		self.RPM = 600
+		        	end
+		        else
+		        	if self.RPM < 2500 then
+		        		self.RPM = self.RPM + 1
+		        	end
+	        	end
 	        	if #self.DakTankCore.Motors>0 then
 					for i=1, #self.DakTankCore.Motors do
 						if IsValid(self.DakTankCore.Motors[i]) then
@@ -301,7 +314,7 @@ function ENT:Think()
 		        	if #self.DakTankCore.Motors>0 then
 						for i=1, #self.DakTankCore.Motors do
 							if IsValid(self.DakTankCore.Motors[i]) then
-								self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+								self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
 							end
 						end
 					end
@@ -381,7 +394,7 @@ function ENT:Think()
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
 									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/50),0,255), 3 )
+										self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500 , 0 )
 									end
 								end
 							end
@@ -389,55 +402,51 @@ function ENT:Think()
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
 									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(self.Speed/self.TopSpeed),0,255), 1 )
+										self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
 									end
 								end
 							end
 						end
 						local LForce = (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost*self.LBoost
 						local RForce = (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost*self.RBoost
-						LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
-						LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
-						RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
-						RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
+						
+						--(self.DakHP/(4.8*math.pi)/(self.RightDriveWheel:OBBMaxs().z/12))/2.20462 = KG = how much it moves in a minute
+						LPhys:ApplyTorqueCenter( -self:GetRight()*25000*self.Perc*self.Torque*(self.PhysicalMass/self.TotalMass) )
+						RPhys:ApplyTorqueCenter( -self:GetRight()*25000*self.Perc*self.Torque*(self.PhysicalMass/self.TotalMass) )
 					end
 
 					if math.abs(LPhys:GetAngleVelocity().y/6) < 1500 and math.abs(RPhys:GetAngleVelocity().y/6) < 1500 then
 						if self.CarTurning==0 then
-							--local TorqueBoost = math.Clamp(2/math.abs(self.LastYaw-self:GetAngles().yaw),1, 3+(((self.TotalMass/10000)+3)*(self.DakHealth/self.DakMaxHealth)) ) * (2*math.pow( 0.5,(self.TotalMass)/60000)) --make this last part log
 							local TorqueBoost = 0.15*self.DakHP/(self.TotalMass/1000) 
 							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 
-							self.turnmult = math.Clamp(15000*math.Clamp(((0.075*self.DakSpeed*self.Torque)/math.abs(self.LastYaw-self:GetAngles().yaw))*(0.15*self.DakHP/(self.TotalMass/1000)),0,1),0,15000)
-
+							self.turnmult = math.Clamp(250000*math.Clamp(((0.075*(self.DakSpeed/(10000/self.TotalMass))*self.Torque)/(4*math.abs(self.LastYaw-self:GetAngles().yaw)))*(0.15*self.DakHP/(self.TotalMass/1000)),0,1),0,250000)
 							local LForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.LeftDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							local RForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.RightDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							if self.MoveLeft>0 and self.MoveRight==0 then
+								self.RPM = 1000
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
 										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.TotalMass/10000)+3))),0,255), 1 )
+											self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
 										end
 									end
 								end
-								LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
-								LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
-								RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
-								RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
+								LPhys:ApplyTorqueCenter( self:GetRight()*1*self.turnmult*self.Torque*(self.PhysicalMass/self.TotalMass) )
+								RPhys:ApplyTorqueCenter( -self:GetRight()*1*self.turnmult*self.Torque*(self.PhysicalMass/self.TotalMass) )
 							end
 							if self.MoveRight>0 and self.MoveLeft==0 then
+								self.RPM = 1000
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
 										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(200*(TorqueBoost/(3+((self.TotalMass/10000)+3))),0,255), 1 )
+											self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
 										end
 									end
 								end
-								LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
-								LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
-								RPhys:ApplyForceOffset( -RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()+RPos)
-								RPhys:ApplyForceOffset( RForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.RightDriveWheel:GetPos()-RPos)
+								LPhys:ApplyTorqueCenter( -self:GetRight()*1*self.turnmult*self.Torque*(self.PhysicalMass/self.TotalMass) )
+								RPhys:ApplyTorqueCenter( self:GetRight()*1*self.turnmult*self.Torque*(self.PhysicalMass/self.TotalMass) )
 							end
 						end
 					end
@@ -465,7 +474,7 @@ function ENT:Think()
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
 									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+										self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
 									end
 								end
 							end
@@ -474,6 +483,9 @@ function ENT:Think()
 					self.LastYaw = self:GetAngles().yaw
 				end
 	        else
+	        	if self.RPM > 0 then
+	        		self.RPM = self.RPM - 10
+	        	end
 	        	if math.abs(LPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) and math.abs(RPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) then
 		        	self.Vel = ((self.phy:GetVelocity()*self:GetForward()).x+(self.phy:GetVelocity()*self:GetForward()).y)*100
 		        	local TorqueBoost = math.Clamp(math.abs(self.Vel/1000),1,10)
@@ -529,7 +541,7 @@ function ENT:Think()
 	    	if #self.DakTankCore.Motors>0 then
 				for i=1, #self.DakTankCore.Motors do
 					if IsValid(self.DakTankCore.Motors[i]) then
-						self.DakTankCore.Motors[i].Sound:ChangePitch( 75, 1 )
+						self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
 					end
 				end
 			end

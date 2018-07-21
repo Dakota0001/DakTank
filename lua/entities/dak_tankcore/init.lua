@@ -167,6 +167,7 @@ function ENT:Think()
 		end
 
 		local Mass = 0
+		local ParentMass = 0
 		local SA = 0
 
 		for i=1, #self.Contraption do
@@ -235,6 +236,9 @@ function ENT:Think()
 					self.Crew[#self.Crew+1]=res[i]
 				end
 				Mass = Mass + res[i]:GetPhysicsObject():GetMass()
+				if IsValid(res[i]:GetParent()) then
+					ParentMass = ParentMass + res[i]:GetPhysicsObject():GetMass()
+				end
 				if res[i]:GetPhysicsObject():GetSurfaceArea() then
 					if res[i]:GetPhysicsObject():GetMass()>1 then
 						SA = SA + res[i]:GetPhysicsObject():GetSurfaceArea()
@@ -246,6 +250,8 @@ function ENT:Think()
 		end
 		if self.Gearbox then
 			self.Gearbox.TotalMass = Mass
+			self.Gearbox.ParentMass = ParentMass
+			self.Gearbox.PhysicalMass = Mass-ParentMass
 		end
 
 		if IsValid(self.Tread[1]) then

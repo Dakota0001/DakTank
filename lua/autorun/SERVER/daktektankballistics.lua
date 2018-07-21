@@ -14,7 +14,7 @@ local function CheckClip(Ent, HitPos)
 end
 function DTShellHit(Start,End,HitEnt,Shell,Normal)
 	if hook.Run("DakTankDamageCheck", HitEnt, Shell.DakGun.DakOwner, Shell.DakGun) ~= false then
-		if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt:GetClass()=="dak_bot") then
+		if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") then
 			if (CheckClip(HitEnt,End)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" then
 				if HitEnt.DakArmor == nil then
 					DakTekTankEditionSetupNewEnt(HitEnt)
@@ -78,7 +78,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					else
 						HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor)
 					end
-					if(HitEnt:IsValid() and HitEnt:GetClass()~="dak_bot" and HitEnt:GetClass()~="prop_ragdoll") then
+					if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") then
 						if(HitEnt:GetParent():IsValid()) then
 							if(HitEnt:GetParent():GetParent():IsValid()) then
 								if HitEnt.Controller then
@@ -148,7 +148,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						DTShellContinue(Start,Shell,Normal)
 					end
 				else
-					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt:GetClass()~="dak_bot" then			
+					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt.Base ~= "base_nextbot" then			
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
 							HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.25
 						end
@@ -162,7 +162,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							end
 						end
 					end
-					if(HitEnt:IsValid() and HitEnt:GetClass()~="dak_bot" and HitEnt:GetClass()~="prop_ragdoll") then
+					if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") then
 						if(HitEnt:GetParent():IsValid()) then
 							if(HitEnt:GetParent():GetParent():IsValid()) then
 								if HitEnt.Controller then
@@ -222,7 +222,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 											end
 										end
 									end
-									if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
+									if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
 										if not(Targets[i]:IsOnFire()) then 
 											Targets[i]:Ignite(5,1)
 										end
@@ -283,7 +283,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 			end
 		end
 		if HitEnt:IsValid() then
-			if HitEnt:IsPlayer() or HitEnt:IsNPC() or HitEnt:GetClass() == "dak_bot" then
+			if HitEnt:IsPlayer() or HitEnt:IsNPC() or HitEnt.Base == "base_nextbot" then
 				if HitEnt:GetClass() == "dak_bot" then
 					HitEnt:SetHealth(HitEnt:Health() - Shell.DakDamage*500)
 					if HitEnt:Health() <= 0 and HitEnt.revenge==0 then
@@ -369,7 +369,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 										end
 									end
 								end
-								if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
+								if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
 									if not(Targets[i]:IsOnFire()) then 
 										Targets[i]:Ignite(5,1)
 									end
@@ -480,7 +480,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 										end
 									end
 								end
-								if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
+								if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
 									if not(Targets[i]:IsOnFire()) then 
 										Targets[i]:Ignite(5,1)
 									end
@@ -555,7 +555,7 @@ function DTShellContinue(Start,Shell,Normal)
 
 
 	if hook.Run("DakTankDamageCheck", HitEnt, Shell.DakGun.DakOwner, Shell.DakGun) ~= false then
-		if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt:GetClass()=="dak_bot") then
+		if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") then
 			if (CheckClip(HitEnt,End)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" then
 				if HitEnt.DakArmor == nil then
 					DakTekTankEditionSetupNewEnt(HitEnt)
@@ -621,7 +621,7 @@ function DTShellContinue(Start,Shell,Normal)
 					else
 						HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor)
 					end
-					if(HitEnt:IsValid() and HitEnt:GetClass()~="dak_bot" and HitEnt:GetClass()~="prop_ragdoll") then
+					if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") then
 						if(HitEnt:GetParent():IsValid()) then
 							if(HitEnt:GetParent():GetParent():IsValid()) then
 								if HitEnt.Controller then
@@ -693,7 +693,7 @@ function DTShellContinue(Start,Shell,Normal)
 						DTShellContinue(Start,Shell,Normal)
 					end
 				else
-					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt:GetClass()~="dak_bot" then			
+					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt.Base ~= "base_nextbot" then			
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then	
 							HitEnt.DakHealth = HitEnt.DakHealth-Shell.DakDamage*0.25
 						end
@@ -707,7 +707,7 @@ function DTShellContinue(Start,Shell,Normal)
 							end
 						end
 					end
-					if(HitEnt:IsValid() and HitEnt:GetClass()~="dak_bot" and HitEnt:GetClass()~="prop_ragdoll") then
+					if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") then
 						if(HitEnt:GetParent():IsValid()) then
 							if(HitEnt:GetParent():GetParent():IsValid()) then
 								if HitEnt.Controller then
@@ -767,7 +767,7 @@ function DTShellContinue(Start,Shell,Normal)
 											end
 										end
 									end
-									if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
+									if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
 										if not(Targets[i]:IsOnFire()) then 
 											Targets[i]:Ignite(5,1)
 										end
@@ -829,7 +829,7 @@ function DTShellContinue(Start,Shell,Normal)
 			end
 		end
 		if HitEnt:IsValid() then
-			if HitEnt:IsPlayer() or HitEnt:IsNPC() or HitEnt:GetClass() == "dak_bot" then
+			if HitEnt:IsPlayer() or HitEnt:IsNPC() or HitEnt.Base == "base_nextbot" then
 				if HitEnt:GetClass() == "dak_bot" then
 					HitEnt:SetHealth(HitEnt:Health() - Shell.DakDamage*500)
 					if HitEnt:Health() <= 0 and HitEnt.revenge==0 then
@@ -915,7 +915,7 @@ function DTShellContinue(Start,Shell,Normal)
 										end
 									end
 								end
-								if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
+								if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
 									if not(Targets[i]:IsOnFire()) then 
 										Targets[i]:Ignite(5,1)
 									end
@@ -1026,7 +1026,7 @@ function DTShellContinue(Start,Shell,Normal)
 										end
 									end
 								end
-								if Targets[i]:IsNPC() or (Targets[i]:GetClass()=="dak_bot" or Targets[i]:GetClass()=="dak_zombie") then
+								if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
 									if not(Targets[i]:IsOnFire()) then 
 										Targets[i]:Ignite(5,1)
 									end
@@ -1095,7 +1095,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 			--decals don't like using the adjusted by normal Pos
 			util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), HitEnt)
-			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
+			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Base == "base_nextbot") then
 				if (CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
 					if ExpTrace.Entity.DakArmor == nil then
 						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
@@ -1164,7 +1164,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 				end
 			end
 			if ExpTrace.Entity:IsValid() then
-				if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity:GetClass() == "dak_bot" then
+				if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Base == "base_nextbot" then
 					if ExpTrace.Entity:GetClass() == "dak_bot" then
 						ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
 						if ExpTrace.Entity:Health() <= 0 and ExpTrace.Entity.revenge==0 then
@@ -1195,7 +1195,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 				end
 			end
 
-			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
+			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Base == "base_nextbot") then
 				if(ExpTrace.Entity:GetParent():IsValid()) then
 					if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
 						ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*3.5*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
@@ -1223,7 +1223,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 		--decals don't like using the adjusted by normal Pos
 		util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), IgnoreEnt)
-		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
+		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Base == "base_nextbot") then
 			if (CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
 				if ExpTrace.Entity.DakArmor == nil then
 					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
@@ -1292,7 +1292,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 			end
 		end
 		if ExpTrace.Entity:IsValid() then
-			if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity:GetClass() == "dak_bot" then
+			if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Base == "base_nextbot" then
 				if ExpTrace.Entity:GetClass() == "dak_bot" then
 					ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
 					if ExpTrace.Entity:Health() <= 0 and ExpTrace.Entity.revenge==0 then
@@ -1409,7 +1409,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 		end
 		for i = 1, #Shell.DakDamageList do
 			if(Shell.DakDamageList[i]:IsValid()) then
-				if not(Shell.DakDamageList[i]:GetClass() == "dak_bot") then
+				if not(Shell.DakDamageList[i].Base == "base_nextbot") then
 					if(Shell.DakDamageList[i]:GetParent():IsValid()) then
 						if(Shell.DakDamageList[i]:GetParent():GetParent():IsValid()) then
 						Shell.DakDamageList[i]:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*1000*2*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000)) )
@@ -1482,7 +1482,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 		local SpallTrace = util.TraceHull( trace )
 
 		if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
-			if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity:GetClass()=="dak_bot") then
+			if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") then
 				if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
 					if SpallTrace.Entity.DakArmor == nil then
 						DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
@@ -1556,7 +1556,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 				end
 			end
 			if SpallTrace.Entity:IsValid() then
-				if SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() or SpallTrace.Entity:GetClass() == "dak_bot" then
+				if SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() or SpallTrace.Entity.Base == "base_nextbot" then
 					if SpallTrace.Entity:GetClass() == "dak_bot" then
 						SpallTrace.Entity:SetHealth(SpallTrace.Entity:Health() - (SpallDamage)*500)
 						if SpallTrace.Entity:Health() <= 0 and SpallTrace.Entity.revenge==0 then
@@ -1612,7 +1612,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 	local SpallTrace = util.TraceHull( trace )
 
 	if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
-		if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity:GetClass()=="dak_bot") then
+		if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") then
 			if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
 				if SpallTrace.Entity.DakArmor == nil then
 					DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
@@ -1686,7 +1686,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 			end
 		end
 		if SpallTrace.Entity:IsValid() then
-			if SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() or SpallTrace.Entity:GetClass() == "dak_bot" then
+			if SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() or SpallTrace.Entity.Base == "base_nextbot" then
 				if SpallTrace.Entity:GetClass() == "dak_bot" then
 					SpallTrace.Entity:SetHealth(SpallTrace.Entity:Health() - (Damage)*500)
 					if SpallTrace.Entity:Health() <= 0 and SpallTrace.Entity.revenge==0 then
@@ -1746,7 +1746,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 	local HEATTrace = util.TraceHull( trace )
 
 	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner, Shell.DakGun) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
-		if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity:GetClass()=="dak_bot") then
+		if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") then
 			if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 				if HEATTrace.Entity.DakArmor == nil then
 					DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
@@ -1822,7 +1822,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 			end
 		end
 		if HEATTrace.Entity:IsValid() then
-			if HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() or HEATTrace.Entity:GetClass() == "dak_bot" then
+			if HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() or HEATTrace.Entity.Base == "base_nextbot" then
 				if HEATTrace.Entity:GetClass() == "dak_bot" then
 					HEATTrace.Entity:SetHealth(HEATTrace.Entity:Health() - (HEATDamage)*500)
 					if HEATTrace.Entity:Health() <= 0 and HEATTrace.Entity.revenge==0 then
@@ -1877,7 +1877,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 	local HEATTrace = util.TraceHull( trace )
 
 	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner, Shell.DakGun) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
-		if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity:GetClass()=="dak_bot") then
+		if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") then
 			if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 				if HEATTrace.Entity.DakArmor == nil then
 					DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
@@ -1953,7 +1953,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 			end
 		end
 		if HEATTrace.Entity:IsValid() then
-			if HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() or HEATTrace.Entity:GetClass() == "dak_bot" then
+			if HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() or HEATTrace.Entity.Base == "base_nextbot" then
 				if HEATTrace.Entity:GetClass() == "dak_bot" then
 					HEATTrace.Entity:SetHealth(HEATTrace.Entity:Health() - (Damage)*500)
 					if HEATTrace.Entity:Health() <= 0 and HEATTrace.Entity.revenge==0 then
