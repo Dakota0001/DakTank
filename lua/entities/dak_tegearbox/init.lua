@@ -43,6 +43,7 @@ function ENT:Initialize()
  	self.Vel = 1
  	self.DakBurnStacks = 0
  	self.RPM = 0
+ 	self.turnperc = 0
 end
 
 function ENT:Think()
@@ -339,22 +340,7 @@ function ENT:Think()
 					end
 						
 					local ForwardVal = self:GetForward():Distance(self.phy:GetVelocity():GetNormalized()) --if it is below one you are going forward, if it is above one you are reversing
-					if self.Speed < self.TopSpeed and math.abs(LPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) and math.abs(RPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) then
-						if self.Perc > 0 then
-							if ForwardVal < 1 then
-								self.ExtraTorque = math.Clamp(self.TopSpeed/self.Speed,1,10)
-							else
-								self.ExtraTorque = 10
-							end		
-						end
-						if self.Perc < 0 then
-							if ForwardVal > 1 then
-								self.ExtraTorque = math.Clamp(self.TopSpeed/self.Speed,1,10)
-							else
-								self.ExtraTorque = 10
-							end		
-						end
-						local TorqueBoost = 2.5*self.Torque*self.ExtraTorque			
+					if self.Speed < self.TopSpeed and math.abs(LPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) and math.abs(RPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) then			
 						self.RBoost = 1
 					 	self.LBoost = 1
 						if self.MoveRight==0 and self.MoveLeft==0 then
@@ -407,12 +393,10 @@ function ENT:Think()
 								end
 							end
 						end
-						local LForce = (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost*self.LBoost
-						local RForce = (self.DakHealth/self.DakMaxHealth)*self.Perc*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost*self.RBoost
 						
 						--(self.DakHP/(4.8*math.pi)/(self.RightDriveWheel:OBBMaxs().z/12))/2.20462 = KG = how much it moves in a minute
-						LPhys:ApplyTorqueCenter( -self:GetRight()*25000*self.Perc*self.Torque*(self.PhysicalMass/self.TotalMass) )
-						RPhys:ApplyTorqueCenter( -self:GetRight()*25000*self.Perc*self.Torque*(self.PhysicalMass/self.TotalMass) )
+						LPhys:ApplyTorqueCenter( -self:GetRight()*25000*self.Perc*self.Torque*(self.PhysicalMass/self.TotalMass)*math.Clamp(self.TopSpeed/(self.Speed*2),0.5,3) )
+						RPhys:ApplyTorqueCenter( -self:GetRight()*25000*self.Perc*self.Torque*(self.PhysicalMass/self.TotalMass)*math.Clamp(self.TopSpeed/(self.Speed*2),0.5,3) )
 					end
 
 					if math.abs(LPhys:GetAngleVelocity().y/6) < 1500 and math.abs(RPhys:GetAngleVelocity().y/6) < 1500 then
@@ -420,8 +404,14 @@ function ENT:Think()
 							local TorqueBoost = 0.15*self.DakHP/(self.TotalMass/1000) 
 							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
-
-							self.turnmult = math.Clamp(250000*math.Clamp(((0.075*(self.DakSpeed/(10000/self.TotalMass))*self.Torque)/(4*math.abs(self.LastYaw-self:GetAngles().yaw)))*(0.15*self.DakHP/(self.TotalMass/1000)),0,1),0,250000)
+							if self.MoveLeft>0 or self.MoveRight>0 then
+								if self.turnperc < 1 then
+									self.turnperc = self.turnperc + 0.1
+								end
+							else
+								self.turnperc = 0
+							end
+							self.turnmult = self.turnperc*math.Clamp(250000*math.Clamp(((0.075*(self.DakSpeed/(10000/self.TotalMass))*self.Torque)/(4*math.abs(self.LastYaw-self:GetAngles().yaw)))*(0.15*self.DakHP/(self.TotalMass/1000)),0,1),0,250000)
 							local LForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.LeftDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							local RForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.RightDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							if self.MoveLeft>0 and self.MoveRight==0 then

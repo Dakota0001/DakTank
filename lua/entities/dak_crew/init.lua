@@ -6,7 +6,7 @@ include("shared.lua")
 ENT.DakEntity = NULL
 ENT.DakMaxHealth = 5
 ENT.DakHealth = 5
-ENT.DakArmor = 5
+ENT.DakArmor = 2.5
 ENT.DakName = "Crew"
 ENT.DakModel = "models/daktanks/crew.mdl"
 ENT.DakMass = 75
@@ -85,7 +85,7 @@ function ENT:Think()
 		self.SparkTime=CurTime()
 	end
 	self.DakMaxHealth = 5
-	self.DakArmor = 5
+	self.DakArmor = 2.5
 	self.DakMass = 75
 	self.DakModel = "models/daktanks/crew.mdl"	
 	if self.DakHealth > self.DakMaxHealth then

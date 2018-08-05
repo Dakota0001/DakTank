@@ -74,7 +74,6 @@ function ENT:Think()
 	if CurTime()>=self.SlowThinkTime+1 then
 		if self.DakGunType == "Short Cannon" then
 			self.DakName = self.DakCaliber.."mm Short Cannon"
-			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)*(40/50)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = math.Round(((((self.DakCaliber*5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*40))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*40)))*0.001*7.8125)/1000)
@@ -89,6 +88,7 @@ function ENT:Think()
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
+			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(40/50)
 			self.DakShellExplosive = false
@@ -141,7 +141,6 @@ function ENT:Think()
 		end
 		if self.DakGunType == "Cannon" then
 			self.DakName = self.DakCaliber.."mm Cannon"
-			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)*(50/50)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
@@ -156,6 +155,11 @@ function ENT:Think()
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*7700
+			--print((math.pi*((75*0.001*0.5)^2)*(75*0.001*6.5))*7700)
+			--print((math.pi*((200*0.001*0.5)^2)*(200*0.001*6.5))*7700)
+			
+			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
+
 			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(50/50)
 			self.DakShellExplosive = false
@@ -208,7 +212,6 @@ function ENT:Think()
 		end
 		if self.DakGunType == "Long Cannon" then
 			self.DakName = self.DakCaliber.."mm Long Cannon"
-			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)*(70/50)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = math.Round(((((self.DakCaliber*9)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*70))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*70)))*0.001*7.8125)/1000)
@@ -223,6 +226,7 @@ function ENT:Think()
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*9))*7700
+			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(70/50)
 			self.DakShellExplosive = false
@@ -276,7 +280,6 @@ function ENT:Think()
 
 		if self.DakGunType == "Howitzer" then
 			self.DakName = self.DakCaliber.."mm Howitzer"
-			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)*(30/50)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = math.Round(((((self.DakCaliber*4)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*30))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*30)))*0.001*7.8125)/1000)
@@ -291,6 +294,7 @@ function ENT:Think()
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*4))*7700
+			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(30/50)
 			self.DakShellExplosive = false
@@ -341,7 +345,6 @@ function ENT:Think()
 
 		if self.DakGunType == "Mortar" then
 			self.DakName = self.DakCaliber.."mm Mortar"
-			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)*(15/50)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = math.Round(((((self.DakCaliber*2.75)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*15))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*15)))*0.001*7.8125)/1000)
@@ -356,6 +359,7 @@ function ENT:Think()
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*2.75))*7700
+			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(15/50)
 			self.DakShellExplosive = false

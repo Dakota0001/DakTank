@@ -16,7 +16,7 @@ if (CLIENT) then
 language.Add( "Tool.daktanklinker.listname", "DakTek Tank Edition Linker" )
 language.Add( "Tool.daktanklinker.name", "DakTek Tank Edition Linker" )
 language.Add( "Tool.daktanklinker.desc", "Links stuff to things." )
-language.Add( "Tool.daktanklinker.0", "Left click to select the gearbox, AL clip, or turret motor. Right click on the fuel, gun, or turret control. Also links crew members to things." )
+language.Add( "Tool.daktanklinker.0", "Left click to select the gearbox, AL magazine, or turret motor. Right click on the fuel, gun, or turret control. Also links crew members to things." )
 end
 --TOOL.ClientConVar[ "myparameter" ] = "fubar"
  
@@ -168,7 +168,7 @@ function TOOL:RightClick( trace )
 							self:GetOwner():EmitSound("/items/ammocrate_close.wav")
 							if self:GetClientNumber( "DakChatFeedback" ) == 1 then
 								if #self.EntList > 1 then
-									self:GetOwner():ChatPrint("Only allows one clip, first selected linked.")
+									self:GetOwner():ChatPrint("Only allows one magazine, first selected linked.")
 								else
 									self:GetOwner():ChatPrint("Module linked.")
 								end
@@ -251,7 +251,7 @@ function TOOL:Reload()
 end
 
 function TOOL.BuildCPanel( panel )
-	panel:AddControl("Header",{Text = "DakTek Tank Edition Linker", Description	= "This tool just links clips to autoloaders, and turret motors to turret controls, also links crew to things. Ammo is automatically found on the contraption by the gun."})	
+	panel:AddControl("Header",{Text = "DakTek Tank Edition Linker", Description	= "This tool just links magazines to autoloaders, and turret motors to turret controls, also links crew to things. Ammo is automatically found on the contraption by the gun."})	
 	panel:AddControl("CheckBox", {Label = "Chat Feedback", Description ="Check for feedback in chat when actions are completed with this tool.", Command = "daktanklinker_DakChatFeedback"})
 end
  

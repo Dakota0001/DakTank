@@ -91,32 +91,32 @@ function ENT:Think()
 		self.SparkTime=CurTime()
 	end
 
-		if self.DakName == "Small Autoloader Clip" then
+		if self.DakName == "Small Autoloader Magazine" then
 			self.DakMass = 1000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakClip = math.Round(600/self.DakGun.DakCaliber)
-					self.DakGun.DakReloadTime = ((self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100)) * self.DakGun.DakClip
+					self.DakGun.DakMagazine = math.Round(600/self.DakGun.DakCaliber)
+					self.DakGun.DakReloadTime = math.sqrt(self.DakGun.BaseDakShellMass) * self.DakGun.DakMagazine * 1.2
 					self.DakGun.Loaded = 1
 				end
 			end
 		end
-		if self.DakName == "Medium Autoloader Clip" then
+		if self.DakName == "Medium Autoloader Magazine" then
 			self.DakMass = 2000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakClip = math.Round(600/self.DakGun.DakCaliber*1.5)
-					self.DakGun.DakReloadTime = ((self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100)) * self.DakGun.DakClip * 0.75
+					self.DakGun.DakMagazine = math.Round(600/self.DakGun.DakCaliber*1.5)
+					self.DakGun.DakReloadTime = math.sqrt(self.DakGun.BaseDakShellMass) * self.DakGun.DakMagazine * 1.2
 					self.DakGun.Loaded = 1
 				end
 			end
 		end
-		if self.DakName == "Large Autoloader Clip" then
+		if self.DakName == "Large Autoloader Magazine" then
 			self.DakMass = 3000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakClip = math.Round(600/self.DakGun.DakCaliber*2)
-					self.DakGun.DakReloadTime = ((self.DakGun.DakCaliber/13)+(self.DakGun.DakCaliber/100)) * self.DakGun.DakClip * 0.5
+					self.DakGun.DakMagazine = math.Round(600/self.DakGun.DakCaliber*2)
+					self.DakGun.DakReloadTime = math.sqrt(self.DakGun.BaseDakShellMass) * self.DakGun.DakMagazine * 1.2
 					self.DakGun.Loaded = 1
 				end
 			end

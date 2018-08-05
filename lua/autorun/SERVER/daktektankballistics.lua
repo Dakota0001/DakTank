@@ -73,10 +73,10 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				if EffArmor < (Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49))) and HitEnt.IsDakTekFutureTech == nil then
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then		
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
-							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor)
+							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor*2)
 						end
 					else
-						HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor)
+						HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor*2)
 					end
 					if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") then
 						if(HitEnt:GetParent():IsValid()) then
@@ -117,7 +117,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						checktrace.maxs = Vector(1,1,1)
 					local CheckShellTrace = util.TraceHull( checktrace )
 					Shell.Pos = End
-					Shell.LifeTime = 0
+					--Shell.LifeTime = 0
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(EffArmor/Shell.DakPenetration)
 					--soundhere penetrate sound
@@ -140,7 +140,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						Shell.LifeTime = 0
+						--Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -158,6 +158,9 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if Shell.DakIsFlame == 1 then
 						if SA then
 							if HitEnt.DakArmor > (7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA))*0.5 then
+								if HitEnt.DakBurnStacks == nil then
+									HitEnt.DakBurnStacks = 0
+								end
 								HitEnt.DakBurnStacks = HitEnt.DakBurnStacks+1
 							end
 						end
@@ -187,7 +190,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						Shell.LifeTime = 0
+						--Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -262,7 +265,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						Shell.LifeTime = 0
+						--Shell.LifeTime = 0
 						Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(HitEnt.DakArmor/Shell.DakPenetration)
 						Shell.DakDamage = 0
 						--soundhere bounce sound
@@ -402,7 +405,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if Shell.DakExplosive then
 						Shell.ExplodeNow = true
 					end
-					Shell.LifeTime = 0
+					--Shell.LifeTime = 0
 					Shell.DakVelocity = 0
 					Shell.DakDamage = 0
 				end
@@ -519,7 +522,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 			if Shell.DakExplosive then
 				Shell.ExplodeNow = true
 			end
-			Shell.LifeTime = 0
+			--Shell.LifeTime = 0
 			Shell.DakVelocity = 0
 			Shell.DakDamage = 0
 		else
@@ -616,10 +619,10 @@ function DTShellContinue(Start,Shell,Normal)
 				if EffArmor < (Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49))) and HitEnt.IsDakTekFutureTech == nil then
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then			
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then	
-							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor)
+							HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor*2)
 						end
 					else
-						HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor)
+						HitEnt.DakHealth = HitEnt.DakHealth- math.Clamp(Shell.DakDamage*((Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))/HitEnt.DakArmor),0,HitEnt.DakArmor*2)
 					end
 					if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") then
 						if(HitEnt:GetParent():IsValid()) then
@@ -662,7 +665,7 @@ function DTShellContinue(Start,Shell,Normal)
 						checktrace.maxs = Vector(1,1,1)
 					local CheckShellTrace = util.TraceHull( checktrace )
 					Shell.Pos = End
-					Shell.LifeTime = 0
+					--Shell.LifeTime = 0
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(EffArmor/Shell.DakPenetration)
 					--soundhere penetrate sound
@@ -685,7 +688,7 @@ function DTShellContinue(Start,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						Shell.LifeTime = 0
+						--Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -703,6 +706,9 @@ function DTShellContinue(Start,Shell,Normal)
 					if Shell.DakIsFlame == 1 then
 						if SA then
 							if HitEnt.DakArmor > (7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA))*0.5 then
+								if HitEnt.DakBurnStacks == nil then
+									HitEnt.DakBurnStacks = 0
+								end
 								HitEnt.DakBurnStacks = HitEnt.DakBurnStacks+1
 							end
 						end
@@ -732,7 +738,7 @@ function DTShellContinue(Start,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						Shell.LifeTime = 0
+						--Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -807,7 +813,7 @@ function DTShellContinue(Start,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						Shell.LifeTime = 0
+						--Shell.LifeTime = 0
 						Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(HitEnt.DakArmor/Shell.DakPenetration)
 						Shell.DakDamage = 0
 						--soundhere bounce sound
@@ -948,7 +954,7 @@ function DTShellContinue(Start,Shell,Normal)
 					if Shell.DakExplosive then
 						Shell.ExplodeNow = true
 					end
-					Shell.LifeTime = 0
+					--Shell.LifeTime = 0
 					Shell.DakVelocity = 0
 					Shell.DakDamage = 0
 				end
@@ -1065,7 +1071,7 @@ function DTShellContinue(Start,Shell,Normal)
 			if Shell.DakExplosive then
 				Shell.ExplodeNow = true
 			end
-			Shell.LifeTime = 0
+			--Shell.LifeTime = 0
 			Shell.DakVelocity = 0
 			Shell.DakDamage = 0
 		end	
@@ -1422,7 +1428,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 			end
 			local HPPerc = 0
 			if not(Shell.DakDamageList[i].SPPOwner==nil) then
-				if Shell.DakDamageList[i].SPPOwner:HasGodMode()==false then	
+				if Shell.DakDamageList[i].SPPOwner:HasGodMode()==false and not(Shell.DakDamageList[i].SPPOwner:IsWorld()) then	
 					if Shell.DakDamageList[i].DakIsTread==nil then
 						if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
 							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))
@@ -1529,10 +1535,10 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 
 					if not(SpallTrace.Entity.SPPOwner==nil) and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
 						if SpallTrace.Entity.SPPOwner:HasGodMode()==false and SpallTrace.Entity.DakIsTread == nil then	
-							SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(SpallDamage*(SpallPen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor)
+							SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(SpallDamage*(SpallPen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor*2)
 						end
 					else
-						SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(SpallDamage*(SpallPen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor)
+						SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(SpallDamage*(SpallPen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor*2)
 					end
 					if SpallTrace.Entity.DakHealth <= 0 and SpallTrace.Entity.DakPooled==0 then
 						local salvage = ents.Create( "dak_tesalvage" )
@@ -1659,10 +1665,10 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 
 				if not(SpallTrace.Entity.SPPOwner==nil) and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
 					if SpallTrace.Entity.SPPOwner:HasGodMode()==false and SpallTrace.Entity.DakIsTread == nil then	
-						SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(Damage*(Pen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor)
+						SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(Damage*(Pen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor*2)
 					end
 				else
-					SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(Damage*(Pen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor)
+					SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(Damage*(Pen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor*2)
 				end
 				if SpallTrace.Entity.DakHealth <= 0 and SpallTrace.Entity.DakPooled==0 then
 					local salvage = ents.Create( "dak_tesalvage" )
@@ -1794,10 +1800,10 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 				local HeatPenLoss = Pos:Distance(HEATTrace.HitPos)*2.54
 				if not(HEATTrace.Entity.SPPOwner==nil) and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
 					if HEATTrace.Entity.SPPOwner:HasGodMode()==false and HEATTrace.Entity.DakIsTread == nil then	
-						HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(HEATDamage*((HEATPen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor)
+						HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(HEATDamage*((HEATPen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor*2)
 					end
 				else
-					HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(HEATDamage*((HEATPen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor)
+					HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(HEATDamage*((HEATPen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor*2)
 				end
 				if HEATTrace.Entity.DakHealth <= 0 and HEATTrace.Entity.DakPooled==0 then
 					local salvage = ents.Create( "dak_tesalvage" )
@@ -1925,10 +1931,10 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 				local HeatPenLoss = Pos:Distance(HEATTrace.HitPos)*2.54
 				if not(HEATTrace.Entity.SPPOwner==nil) and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
 					if HEATTrace.Entity.SPPOwner:HasGodMode()==false and HEATTrace.Entity.DakIsTread == nil then	
-						HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(Damage*((Pen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor)
+						HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(Damage*((Pen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor*2)
 					end
 				else
-					HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(Damage*((Pen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor)
+					HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(Damage*((Pen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor*2)
 				end
 				if HEATTrace.Entity.DakHealth <= 0 and HEATTrace.Entity.DakPooled==0 then
 					local salvage = ents.Create( "dak_tesalvage" )

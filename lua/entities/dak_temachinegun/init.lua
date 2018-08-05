@@ -338,7 +338,7 @@ function ENT:DakTEFire()
 						self:SetNWBool("Firing",false)
 					end)
 				else
-					sound.Play( self.DakFireSound, self:GetPos(), 100, 100, 1 )
+					sound.Play( self.DakFireSound, self:GetPos(), 100, 100, 0.4 )
 				end
 								
 

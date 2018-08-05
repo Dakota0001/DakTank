@@ -32,7 +32,7 @@ ENT.DakArmor = 1
 ENT.DakTankCore = nil
 ENT.DakIsReloading = 0
 ENT.DakShotsCounter = 0
-ENT.DakClip = 2
+ENT.DakMagazine = 2
 ENT.DakReloadTime = 10
 ENT.IsAutoLoader = 0
 ENT.DakCrew = NULL
@@ -53,7 +53,7 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	self.Inputs = Wire_CreateInputs(self, { "Fire", "SwapAmmo","Reload" })
-	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "Ammo", "ClipRounds", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
+	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "Ammo", "MagazineRounds", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
  	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
@@ -63,7 +63,7 @@ function ENT:Initialize()
  	self.CurrentAmmoType = 1
  	self.DakIsReloading = 0
 	self.DakShotsCounter = 0
-	self.DakClip = 1
+	self.DakMagazine = 1
 	self.DakReloadTime = 20
 	self.DakLastReload = CurTime()
 	self.IsAutoLoader = 0
@@ -86,7 +86,6 @@ function ENT:Think()
 	if CurTime()>=self.SlowThinkTime+1 then
 		if self.DakGunType == "Autoloader" then
 			self.DakName = self.DakCaliber.."mm Autoloader"
-			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100),2)*0.2
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
@@ -99,6 +98,7 @@ function ENT:Think()
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*7700
+			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass) * 0.2
 			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(50/50)
 			self.DakShellExplosive = false
@@ -154,7 +154,6 @@ function ENT:Think()
 
 		if self.DakGunType == "HMG" then
 			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
-			self.DakCooldown = 0.1
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = 1.5*math.Round(((((self.DakCaliber*5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*40))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*40)))*0.001*7.8125)/1000)
@@ -162,11 +161,12 @@ function ENT:Think()
 			self.DakAP = math.Round(self.DakCaliber,2).."mmHMGAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmHMGHEAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*5))
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
-			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*7700
+			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
+			self.DakCooldown = math.sqrt(self.BaseDakShellMass) * 0.2
 			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(40/50)
 			self.DakShellExplosive = false
@@ -178,9 +178,8 @@ function ENT:Think()
 			self.DakShellTrail = "dakteballistictracer"
 			self.BaseDakShellVelocity = self.BasicVelocity*(40/50)
 			self.DakPellets = 10
-			self.DakReloadTime = 20
-			self.DakClip = math.Round(800/self.DakCaliber)
-
+			self.DakMagazine = math.Round(800/self.DakCaliber)
+			self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
 
 			if self.DakCaliber <= 75 then
 				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
@@ -207,7 +206,6 @@ function ENT:Think()
 
 		if self.DakGunType == "Autocannon" then
 			self.DakName = self.DakCaliber.."mm Autocannon"
-			self.DakCooldown = 0.1
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
 			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
@@ -220,6 +218,7 @@ function ENT:Think()
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*7700
+			self.DakCooldown = math.sqrt(self.BaseDakShellMass) * 0.2
 			self.DakShellSplashDamage = self.DakCaliber*0.375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(50/50)
 			self.DakShellExplosive = false
@@ -231,9 +230,8 @@ function ENT:Think()
 			self.DakShellTrail = "dakteballistictracer"
 			self.BaseDakShellVelocity = self.BasicVelocity*(50/50)
 			self.DakPellets = 10
-			self.DakReloadTime = 25
-			self.DakClip = math.Round(600/self.DakCaliber)
-
+			self.DakMagazine = math.Round(600/self.DakCaliber)
+			self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
 
 			if self.DakCaliber <= 75 then
 				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
@@ -293,7 +291,7 @@ function ENT:Think()
 	if CurTime()>=self.MidThinkTime+0.33 then
 		self:DakTEAutoAmmoCheck()
 
-		WireLib.TriggerOutput(self, "ClipRounds", self.DakClip - self.DakShotsCounter)
+		WireLib.TriggerOutput(self, "MagazineRounds", self.DakMagazine - self.DakShotsCounter)
 		if self.DakIsReloading == 0 then
 			WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
 			WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
@@ -477,7 +475,7 @@ function ENT:DakTEAutoFire()
 				end
 
 				self.DakShotsCounter = self.DakShotsCounter + 1
-				if self.DakShotsCounter >= self.DakClip then
+				if self.DakShotsCounter >= self.DakMagazine then
 					self.DakIsReloading = 1
 					self.DakShotsCounter = 0
 					self.DakLastReload = CurTime()

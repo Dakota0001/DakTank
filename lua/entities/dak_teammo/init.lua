@@ -6,7 +6,7 @@ include("shared.lua")
 ENT.DakName = "Base Ammo"
 ENT.DakIsExplosive = true
 --ENT.DakAmmo = 10
-ENT.DakArmor = 10
+ENT.DakArmor = 5
 --ENT.DakMaxAmmo = 10
 ENT.DakMaxHealth = 10
 ENT.DakHealth = 10
@@ -32,7 +32,7 @@ function ENT:Initialize()
  	self.SparkTime = CurTime()
  	self.DumpTime = CurTime()
  	self.SlowThinkTime = CurTime()
- 	self.DakArmor = 10
+ 	self.DakArmor = 5
  	self.DakMaxHealth = 30
 	self.DakHealth = 30
 	self.DakBurnStacks = 0
@@ -160,7 +160,7 @@ function ENT:Think()
 			end
 			self:GetPhysicsObject():SetMass(500)
 		else
-			self.DakArmor = 10
+			self.DakArmor = 5
 		 	self.DakMaxHealth = 10
 		 	if self.DakHealth >= self.DakMaxHealth then
 				self.DakHealth = 10
@@ -205,7 +205,25 @@ function ENT:Think()
 					self:Remove()
 				else
 					if self.CookingOff == nil then
-					timer.Create( "AmmoCookTimer"..self:EntIndex(), math.Clamp((1/math.pow((self.DakMaxAmmo),0.5)),0.075,1)*math.Rand(0.75,1.25), self.DakAmmo, function()
+					timer.Create( "AmmoDetTimer"..self:EntIndex(), math.Rand(0.5,2), self.DakAmmo, function()
+						if not(self.DakAmmo == nil) then
+							if self.DakAmmo > 0 then
+								local effectdata = EffectData()
+								effectdata:SetOrigin(self:GetPos())
+								effectdata:SetEntity(self)
+								effectdata:SetAttachment(1)
+								effectdata:SetMagnitude(.5)
+								effectdata:SetScale(500)
+								util.Effect("daktescalingexplosion", effectdata, true, true)
+
+								self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,200,100,self.DakOwner)
+
+								self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
+								self:Remove()
+							end
+						end
+					end)
+					timer.Create( "AmmoCookTimer"..self:EntIndex(), math.Clamp((1/math.pow((self.DakMaxAmmo),0.5)),0.075,2)*math.Rand(0.75,1.25), self.DakAmmo, function()
 						if not(self.DakAmmo == nil) then
 							if self.DakAmmo > 0 then
 								local shootOrigin = self:GetPos()
@@ -441,7 +459,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 					
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-					if not(ExpTrace.Entity.SPPOwner==nil) then			
+					if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
 							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
 						end
@@ -567,7 +585,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 				
 				ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-				if not(ExpTrace.Entity.SPPOwner==nil) then			
+				if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
 					end

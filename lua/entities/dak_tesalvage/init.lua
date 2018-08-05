@@ -19,7 +19,7 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetMaterial("models/props_buildings/plasterwall021a")
 	self:SetColor(Color(100,100,100,255))
-	self:SetCollisionGroup( COLLISION_GROUP_WORLD )
+	self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
 	local phys = self:GetPhysicsObject()
 	if(phys:IsValid()) then
 		phys:Wake()
@@ -41,7 +41,7 @@ end
 function ENT:Think()
 	self:SetMaterial("models/props_buildings/plasterwall021a")
 	self:SetColor(Color(100,100,100,255))
-	self:SetCollisionGroup( COLLISION_GROUP_WORLD )
+	self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
 	if self.SpawnTime+30 < CurTime() then
 		self:Remove()
 	end
