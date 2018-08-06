@@ -193,13 +193,17 @@ function TOOL:RightClick( trace )
 				end
 				if(Target:GetClass() == "dak_turretcontrol") then
 					if self.EntList[1]:GetClass() == "dak_turretmotor" then
-						self.Ent2 = Target
-						self.Ent2.DakTurretMotor = self.EntList[1]
+						for i = 1, #self.EntList do
+							if self.EntList[i]:GetClass() == "dak_turretmotor" then
+								self.EntList[i].TurretController = Target 
+							end
+						end
+						table.Add( Target.DakTurretMotors, self.EntList )
 						if (CLIENT) or (game.SinglePlayer()) then
 							self:GetOwner():EmitSound("/items/ammocrate_close.wav")
 							if self:GetClientNumber( "DakChatFeedback" ) == 1 then
 								if #self.EntList > 1 then
-									self:GetOwner():ChatPrint("Only allows one motor, first selected linked.")
+									self:GetOwner():ChatPrint("Turret motors linked.")
 								else
 									self:GetOwner():ChatPrint("Turret motor linked.")
 								end

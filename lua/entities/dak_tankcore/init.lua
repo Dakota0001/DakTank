@@ -419,7 +419,7 @@ function ENT:Think()
 						effectdata:SetAttachment(1)
 						effectdata:SetMagnitude(.5)
 
-						effectdata:SetScale(math.Clamp(self.DakMaxHealth,250,500))
+						effectdata:SetScale(math.Clamp(self.DakMaxHealth,100,500))
 						util.Effect("daktescalingexplosion", effectdata)
 						
 

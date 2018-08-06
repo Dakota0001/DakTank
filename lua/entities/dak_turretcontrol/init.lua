@@ -11,6 +11,7 @@ ENT.DakTurretMotor = nil
 ENT.SentError = 0
 ENT.SentError2 = 0
 ENT.DakCore = NULL
+ENT.DakTurretMotors = {}
 
 function ENT:toLocalAxis(worldAxis)
 	if not IsValid(self) then return Vector(0,0,0) end
@@ -99,15 +100,21 @@ function ENT:Initialize()
  	self.SentError2 = 0
  	self.LastHullAngles = self:GetAngles()
  	self.DakBurnStacks = 0
+ 	self.DakTurretMotors = {}
+end
+
+local function GetParents( ent, Results )
+	local Results = Results or {}
+	local Parent = ent:GetParent()
+	Results[ ent ] = ent
+	if IsValid(Parent) then
+		GetParents(Parent, Results)
+	end
+	return Results
 end
 
 function ENT:Think()
-	local RotMult = 0
-	if not(self.DakTurretMotor) then
-		RotMult = 0.05
-	else
-		RotMult = 0.10
-	end
+	local RotMult = 0.1
 
 	if #self.DakContraption > 0 then
 		local GunEnt = self.Inputs.Gun.Value
@@ -121,27 +128,57 @@ function ENT:Think()
 			local YawMax = self:GetYawMax()
 
 			self.DakActive = self.Inputs.Active.Value
-			if IsValid(GunEnt:GetParent()) then
-				if IsValid(GunEnt:GetParent():GetParent()) then
-					self.DakGun = GunEnt:GetParent():GetParent()
-					local GunMass = 0
-					local GunList = self.DakCore.Guns
-					for i=1, #GunList do
-						if IsValid(GunList[i]) then
-							if IsValid(GunList[i]:GetParent()) then
-								if IsValid(GunList[i]:GetParent():GetParent()) then
-									if GunList[i]:GetParent():GetParent() == GunEnt:GetParent():GetParent() then
-										GunMass = GunMass + GunList[i]:GetPhysicsObject():GetMass()
+			local DakTurret = self.Inputs.Turret.Value
+			if #self.DakTurretMotors > 0 then
+				for i = 1, #self.DakTurretMotors do
+					RotMult = RotMult + self.DakTurretMotors[i].DakRotMult
+				end
+			end
+
+			if not(self.DakParented==1) then
+				if IsValid(GunEnt:GetParent()) then
+					if IsValid(GunEnt:GetParent():GetParent()) then
+						self.DakGun = GunEnt:GetParent():GetParent()
+						local GunMass = 0
+						local GunList = self.DakCore.Guns
+						for i=1, #GunList do
+							if IsValid(GunList[i]) then
+								if IsValid(GunList[i]:GetParent()) then
+									if IsValid(GunList[i]:GetParent():GetParent()) then
+										if GunList[i]:GetParent():GetParent() == GunEnt:GetParent():GetParent() then
+											GunMass = GunMass + GunList[i]:GetPhysicsObject():GetMass()
+										end
 									end
 								end
 							end
 						end
+						if IsValid(DakTurret) then
+							GunMass = GunMass + GunEnt:GetPhysicsObject():GetMass()
+							GunMass = GunMass + DakTurret:GetPhysicsObject():GetMass()
+							local TurretEnts = DakTurret:GetChildren()
+							local TurretEnts2 = nil
+							for k, v in pairs(TurretEnts) do
+								if IsValid(v) then
+									if IsValid(v:GetPhysicsObject()) then
+										GunMass = GunMass + v:GetPhysicsObject():GetMass()
+										TurretEnts2 = v:GetChildren()
+										for l, b in pairs(TurretEnts2) do
+											if IsValid(b) then
+												if IsValid(b:GetPhysicsObject()) then
+													GunMass = GunMass + b:GetPhysicsObject():GetMass()
+												end
+											end
+										end
+									end
+								end
+							end
+						end
+						self.RotationSpeed = RotMult * (15000/GunMass)
 					end
-					self.RotationSpeed = RotMult * (3000/GunMass)
+					self.DakParented = 1
+				else
+					self.DakParented = 0
 				end
-				self.DakParented = 1
-			else
-				self.DakParented = 0
 			end
 			
 			if self.DakParented == 0 then
@@ -169,7 +206,6 @@ function ENT:Think()
 					end
 				end
 			end
-			local DakTurret = self.Inputs.Turret.Value
 			self.DakCamTrace = self.Inputs.CamTrace.Value
 			if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
 				
@@ -219,9 +255,12 @@ end
 function ENT:PreEntityCopy()
 	local info = {}
 	local entids = {}
+	info.TurretMotorIDs = {}
 
-	if IsValid(self.DakTurretMotor) then
-		info.TurretMotorID = self.DakTurretMotor:EntIndex()
+	if #self.DakTurretMotors > 0 then
+		for i = 1, #self.DakTurretMotors do
+			info.TurretMotorIDs[i] = self.DakTurretMotors[i]:EntIndex()
+		end
 	end
 
 	info.DakName = self.DakName
@@ -236,10 +275,12 @@ end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
-
-		local TurretMotor = CreatedEntities[ Ent.EntityMods.DakTek.TurretMotorID ]
-		if TurretMotor and IsValid(TurretMotor) then
-			self.DakTurretMotor = TurretMotor
+		if Ent.EntityMods.DakTek.TurretMotorIDs then
+			if #Ent.EntityMods.DakTek.TurretMotorIDs > 0 then
+				for i = 1, #Ent.EntityMods.DakTek.TurretMotorIDs do
+					self.DakTurretMotors[#self.DakTurretMotors+1] = CreatedEntities[ Ent.EntityMods.DakTek.TurretMotorIDs[i] ] 
+				end
+			end
 		end
 
 		self.DakName = Ent.EntityMods.DakTek.DakName

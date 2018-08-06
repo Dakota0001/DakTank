@@ -50,6 +50,25 @@ function TOOL:LeftClick( trace )
 			end
 		end
 	--MOBILITY--
+	    --Turret
+		if self:GetClientInfo("SpawnSettings") == "STMotor" then
+			self.DakMaxHealth = 10
+			self.DakHealth = 10
+			self.DakName = "Small Turret Motor"
+			self.DakModel = "models/xqm/hydcontrolbox.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "MTMotor" then
+			self.DakMaxHealth = 20
+			self.DakHealth = 20
+			self.DakName = "Medium Turret Motor"
+			self.DakModel = "models/props_c17/utilityconducter001.mdl"
+		end
+		if self:GetClientInfo("SpawnSettings") == "LTMotor" then 
+			self.DakMaxHealth = 50
+			self.DakHealth = 50
+			self.DakName = "Large Turret Motor"
+			self.DakModel = "models/props_c17/substation_transformer01d.mdl"
+		end
 		--Fuel
 		if self:GetClientInfo("SpawnSettings") == "MicroFuel" then
 			self.DakMaxHealth = 10
@@ -1007,6 +1026,46 @@ function TOOL:LeftClick( trace )
 				self.spawnedent:SetSolid(SOLID_VPHYSICS)
 			end
 		end
+		if self:GetClientInfo("SpawnEnt") == "dak_turretmotor" then
+			if trace.Entity then
+				if trace.Entity:GetClass() == "dak_turretmotor" then
+					trace.Entity.DakName = self.DakName
+					trace.Entity.DakOwner = self:GetOwner()
+					trace.Entity.DakModel = self.DakModel
+					trace.Entity.DakMaxHealth = self.DakMaxHealth
+					trace.Entity.DakHealth = self.DakMaxHealth
+					trace.Entity:PhysicsDestroy()
+					trace.Entity:SetModel(trace.Entity.DakModel)
+					trace.Entity:PhysicsInit(SOLID_VPHYSICS)
+					trace.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+					trace.Entity:SetSolid(SOLID_VPHYSICS)
+					self:GetOwner():ChatPrint("Turret motor updated.")
+				else
+					self.spawnedent.DakName = self.DakName
+					self.spawnedent.DakOwner = self:GetOwner()
+					self.spawnedent.DakModel = self.DakModel
+					self.spawnedent.DakMaxHealth = self.DakMaxHealth
+					self.spawnedent.DakHealth = self.DakMaxHealth
+					self.spawnedent:PhysicsDestroy()
+					self.spawnedent:SetModel(self.DakModel)
+					self.spawnedent:PhysicsInit(SOLID_VPHYSICS)
+					self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
+					self.spawnedent:SetSolid(SOLID_VPHYSICS)
+				end
+			end
+			if not(trace.Entity:IsValid()) then
+				self.spawnedent.DakName = self.DakName
+				self.spawnedent.DakOwner = self:GetOwner()
+				self.spawnedent.DakModel = self.DakModel
+				self.spawnedent.DakMaxHealth = self.DakMaxHealth
+				self.spawnedent.DakHealth = self.DakMaxHealth
+				self.spawnedent:PhysicsDestroy()
+				self.spawnedent:SetModel(self.DakModel)
+				self.spawnedent:PhysicsInit(SOLID_VPHYSICS)
+				self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
+				self.spawnedent:SetSolid(SOLID_VPHYSICS)
+			end
+		end
 		if self:GetClientInfo("SpawnEnt") == "dak_temotor" then
 			if trace.Entity then
 				if trace.Entity:GetClass() == "dak_temotor" then
@@ -1375,6 +1434,7 @@ function TOOL.BuildCPanel( panel )
 	local GearboxDirectionSelect = vgui.Create( "DComboBox", panel )
 	local GearboxModelSelect 	 = vgui.Create( "DComboBox", panel )
 	local AutoloaderMagazineSelect 	 = vgui.Create( "DComboBox", panel )
+	local TurretMotorSelect 	 = vgui.Create( "DComboBox", panel )
 	
 	--Variables
 	local CrateModel 	   = ""
@@ -1387,6 +1447,7 @@ function TOOL.BuildCPanel( panel )
 	local AmmoTypes 	   = {}
 	local AmmoTypeGun    = ""
 	local AutoloaderMagazine   = ""
+	local TurretMotor   = ""
 	local EngineModel	   = ""
 	local GearboxModel	   = ""
 	local AmmoWeight	   = 0
@@ -1447,6 +1508,18 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( "Large Autoloader Magazine\n\nLarge sized magazine required to load an autoloader.\n\nMagazine Stats:\nArmor:   10mm\nWeight: 3000kg\nHealth:  100" )
 	end
 	
+	--Table containing the description of the Turret Motors
+	local magazineList = {}
+	magazineList["Small Turret Motor"] = function()
+		DLabel:SetText( "Small Turret Motor\n\nThis can be linked to a single turret controller, increasing the speed it rotates by a flat amount, this small motor is useful for light turrets. If destroyed turret speed will go back to normal.\n\nMotor Stats:\nHealth:  10\nWeight: 250kg\nPower: x1 speed of unassisted turret" )
+	end
+	magazineList["Medium Turret Motor"] = function()
+		DLabel:SetText( "Medium Turret Motor\n\nThis can be linked to a single turret controller, increasing the speed it rotates by a flat amount, this small motor is useful for medium turrets. If destroyed turret speed will go back to normal.\n\nMotor Stats:\nHealth:  20\nWeight: 500kg\nPower: x2.5 speed of unassisted turret" )
+	end
+	magazineList["Large Turret Motor"] = function()
+		DLabel:SetText( "Large Turret Motor\n\nThis can be linked to a single turret controller, increasing the speed it rotates by a flat amount, this small motor is useful for heavy turrets. If destroyed turret speed will go back to normal.\n\nMotor Stats:\nHealth:  50\nWeight: 1000kg\nPower: x6 speed of unassisted turret" )
+	end
+
 	--Table containing the description of the available ammo types, called when spawning ammo crates
 	local selectedAmmo = {}
 	selectedAmmo["AP"] = function()
@@ -1735,10 +1808,17 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetVisible( true )
 	end
 	selection["Turret Motor"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_turretmotor" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "TMotor" )
-		DLabel:SetText( "Turret Motor\n\nThis can be linked to a single turret controller, doubling the speed that the turret rotates. If destroyed turret speed will go back to normal.\n\nMotor Stats:\nHealth:  10\nWeight: 100kg" )
-		DLabel:SetVisible( true )
+		TurretMotorSelect:SetVisible( true )
+		DLabel:SetVisible(true)
+		DLabel:SetPos( 15, 380 )
+		
+		if TurretMotorSelect:GetSelectedID() == nil then
+			DLabel:SetText( "Turret Motors\n\nThese are electric motors that help to turn the turret. They're very useful for heavier vehicles." )
+		else
+			magazineList[TurretMotor]()
+			RunConsoleCommand( "daktankspawner_SpawnSettings", string.sub( TurretMotor, 1, 1 ).."TMotor" )
+			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_turretmotor" )
+		end
 	end
 	------------- Mobility -------------
 	selection["Mobility"] = function()
@@ -1889,6 +1969,7 @@ function TOOL.BuildCPanel( panel )
 		RunConsoleCommand( "daktankspawner_SpawnSettings", "" )
 		DLabel:SetPos( 15, 355 )
 		DLabel:SetText( "" )
+		TurretMotorSelect:SetVisible( false )
 		AutoloaderMagazineSelect:SetVisible( false )
 		GearboxModelSelect:SetVisible( false )
 		GearboxDirectionSelect:SetVisible( false )
@@ -1921,6 +2002,7 @@ function TOOL.BuildCPanel( panel )
 		GearboxDirectionSelect:SetSize( PanelWidth, 20 )
 		GearboxModelSelect:SetSize( PanelWidth, 20 )
 		AutoloaderMagazineSelect:SetSize( PanelWidth, 20 )
+		TurretMotorSelect:SetSize( PanelWidth, 20 )
 		
 		self:PerformLayoutLegacy( Width, Height )
 	end
@@ -2070,6 +2152,19 @@ function TOOL.BuildCPanel( panel )
 	AutoloaderMagazineSelect:AddChoice( "Large Autoloader Magazine" )
 	AutoloaderMagazineSelect.OnSelect = function( panel, index, value )
 		AutoloaderMagazine = value
+
+		updateUI()
+	end
+
+	--Turret Motor Model Combo Box
+	TurretMotorSelect:SetPos( 15, 345 )
+	TurretMotorSelect:SetValue( "--Select Turret Motor--" )
+	TurretMotorSelect:SetSortItems( false )
+	TurretMotorSelect:AddChoice( "Small Turret Motor" )
+	TurretMotorSelect:AddChoice( "Medium Turret Motor" )
+	TurretMotorSelect:AddChoice( "Large Turret Motor" )
+	TurretMotorSelect.OnSelect = function( panel, index, value )
+		TurretMotor = value
 
 		updateUI()
 	end

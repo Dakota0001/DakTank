@@ -213,7 +213,7 @@ function ENT:Think()
 								effectdata:SetEntity(self)
 								effectdata:SetAttachment(1)
 								effectdata:SetMagnitude(.5)
-								effectdata:SetScale(500)
+								effectdata:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
 								util.Effect("daktescalingexplosion", effectdata, true, true)
 
 								self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,200,100,self.DakOwner)

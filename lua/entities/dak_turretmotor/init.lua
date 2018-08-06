@@ -6,9 +6,9 @@ include("shared.lua")
 ENT.DakEngine = NULL
 ENT.DakMaxHealth = 10
 ENT.DakHealth = 10
-ENT.DakName = "Turret Motor"
+ENT.DakName = "TMotor"
 ENT.DakModel = "models/xqm/hydcontrolbox.mdl"
-ENT.DakMass = 100
+ENT.DakMass = 250
 ENT.DakPooled=0
 
 
@@ -84,9 +84,30 @@ function ENT:Think()
 		end
 		self.SparkTime=CurTime()
 	end
-	self.DakMaxHealth = 10
-	self.DakMass = 100
-	self.DakModel = "models/xqm/hydcontrolbox.mdl"	
+
+	if self.DakName == "Turret Motor" then
+		self.DakName = "Small Turret Motor"
+	end
+
+	if self.DakName == "Small Turret Motor" then
+		self.DakMaxHealth = 10
+		self.DakMass = 250
+		self.DakModel = "models/xqm/hydcontrolbox.mdl"	
+		self.DakRotMult = 0.1
+	end
+	if self.DakName == "Medium Turret Motor" then
+		self.DakMaxHealth = 20
+		self.DakMass = 500
+		self.DakModel = "models/props_c17/utilityconducter001.mdl"	
+		self.DakRotMult = 0.25
+	end
+	if self.DakName == "Large Turret Motor" then
+		self.DakMaxHealth = 50
+		self.DakMass = 1000
+		self.DakModel = "models/props_c17/substation_transformer01d.mdl"	
+		self.DakRotMult = 0.6
+	end
+
 	if self:GetModel() ~= self.DakModel then
 		self:SetModel(self.DakModel)
 		self:PhysicsInit(SOLID_VPHYSICS)
@@ -106,7 +127,7 @@ function ENT:PreEntityCopy()
 	local info = {}
 	local entids = {}
 
-	info.EngineID = self.DakEngine:EntIndex()
+	info.TurretID = self.TurretController:EntIndex()
 	info.DakName = self.DakName
 	info.DakMass = self.DakMass
 	info.DakModel = self.DakModel
@@ -122,9 +143,9 @@ end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
-		local Eng = CreatedEntities[ Ent.EntityMods.DakTek.EngineID ]
+		local Eng = CreatedEntities[ Ent.EntityMods.DakTek.TurretID ]
 		if Eng and IsValid(Eng) then
-			self.DakEngine = Eng
+			self.TurretController = Eng
 		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakMass = Ent.EntityMods.DakTek.DakMass
