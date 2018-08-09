@@ -51,7 +51,6 @@ function ENT:Initialize()
 	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "Ammo", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
  	self.Soundtime = CurTime()
- 	self.SparkTime = CurTime()
  	self.SlowThinkTime = CurTime()
  	self.MidThinkTime = CurTime()
  	self.LastFireTime = CurTime()

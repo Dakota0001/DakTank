@@ -28,7 +28,6 @@ function ENT:Initialize()
 	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "LeftDriveWheel [ENTITY]" , "RightDriveWheel [ENTITY]", "CarTurning" })
 	self.YawAng = Angle(0,self:GetAngles().yaw,0)
 	self.Soundtime = CurTime()
- 	self.SparkTime = CurTime()
  	self.Perc = 0
  	self.TurnPerc = 0
  	self.LastYaw = self:GetAngles().yaw
@@ -44,6 +43,7 @@ function ENT:Initialize()
  	self.DakBurnStacks = 0
  	self.RPM = 0
  	self.turnperc = 0
+ 	self.SparkTime = CurTime()
 end
 
 function ENT:Think()
@@ -57,7 +57,7 @@ function ENT:Think()
 			effectdata:SetScale(1)
 			util.Effect("daktedamage", effectdata)
 			if CurTime()>=self.Soundtime+3 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.4, 6)
+				--self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.4, 6)
 				self.Soundtime=CurTime()
 			end
 		end
@@ -70,7 +70,7 @@ function ENT:Think()
 			effectdata:SetScale(2)
 			util.Effect("daktedamage", effectdata)
 			if CurTime()>=self.Soundtime+2 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.5, 6)
+				--self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.5, 6)
 				self.Soundtime=CurTime()
 			end
 		end
@@ -83,7 +83,7 @@ function ENT:Think()
 			effectdata:SetScale(3)
 			util.Effect("daktedamage", effectdata)
 			if CurTime()>=self.Soundtime+1 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.6, 6)
+				--self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.6, 6)
 				self.Soundtime=CurTime()
 			end
 		end
@@ -96,7 +96,7 @@ function ENT:Think()
 			effectdata:SetScale(4)
 			util.Effect("daktedamage", effectdata)
 			if CurTime()>=self.Soundtime+0.5 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.75, 6)
+				--self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.75, 6)
 				self.Soundtime=CurTime()
 			end
 		end
@@ -407,6 +407,15 @@ function ENT:Think()
 							if self.MoveLeft>0 or self.MoveRight>0 then
 								if self.turnperc < 1 then
 									self.turnperc = self.turnperc + 0.1
+								end
+								if self.MoveReverse > 0 then
+									if self.MoveLeft>0 and self.MoveRight==0 then
+										self.MoveRight = 1
+										self.MoveLeft = 0
+									elseif self.MoveRight>0 and self.MoveLeft==0 then
+										self.MoveLeft = 1
+										self.MoveRight = 0
+									end
 								end
 							else
 								self.turnperc = 0

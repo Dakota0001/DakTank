@@ -131,7 +131,9 @@ function ENT:Think()
 			local DakTurret = self.Inputs.Turret.Value
 			if #self.DakTurretMotors > 0 then
 				for i = 1, #self.DakTurretMotors do
-					RotMult = RotMult + self.DakTurretMotors[i].DakRotMult
+					if IsValid(self.DakTurretMotors[i]) then
+						RotMult = RotMult + self.DakTurretMotors[i].DakRotMult
+					end
 				end
 			end
 
