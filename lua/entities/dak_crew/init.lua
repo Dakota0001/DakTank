@@ -28,7 +28,7 @@ function ENT:Initialize()
  	self.DakBurnStacks = 0
  	self.LastHealth = 5
  	self.VO = self:GetVoice()
- 	if self.VO = 0 then
+ 	if self.VO == 0 then
 		self.VO = math.random(1,6)
 	end
 
@@ -87,7 +87,7 @@ function ENT:Think()
 	self:GetPhysicsObject():SetMass(self.DakMass)
 
 	self.VO = self:GetVoice()
- 	if self.VO = 0 then
+ 	if self.VO == 0 then
 		self.VO = math.random(1,6)
 	end
 
@@ -189,18 +189,18 @@ end
 function ENT:OnRemove()
 	if self.DakHealth <= 0 then
 		if self.VO == 1 then
-				sound.Play( "daktanks/crew/aus/"..self.VO1Death[math.random(1,#self.VO1Death)], self:GetPos(), 75, 100, 1 )
-			elseif self.VO == 2 then
-				sound.Play( "daktanks/crew/fre/"..self.VO2Death[math.random(1,#self.VO2Death)], self:GetPos(), 75, 100, 1 )
-			elseif self.VO == 3 then
-				sound.Play( "daktanks/crew/ger/"..self.VO3Death[math.random(1,#self.VO3Death)], self:GetPos(), 75, 100, 1 )
-			elseif self.VO == 4 then
-				sound.Play( "daktanks/crew/rus/"..self.VO4Death[math.random(1,#self.VO4Death)], self:GetPos(), 75, 100, 1 )
-			elseif self.VO == 5 then
-				sound.Play( "daktanks/crew/sco/"..self.VO5Death[math.random(1,#self.VO5Death)], self:GetPos(), 75, 100, 1 )
-			elseif self.VO == 6 then
-				sound.Play( "daktanks/crew/us/"..self.VO6Death[math.random(1,#self.VO6Death)], self:GetPos(), 75, 100, 1 )
-			end
+			sound.Play( "daktanks/crew/aus/"..self.VO1Death[math.random(1,#self.VO1Death)], self:GetPos(), 75, 100, 1 )
+		elseif self.VO == 2 then
+			sound.Play( "daktanks/crew/fre/"..self.VO2Death[math.random(1,#self.VO2Death)], self:GetPos(), 75, 100, 1 )
+		elseif self.VO == 3 then
+			sound.Play( "daktanks/crew/ger/"..self.VO3Death[math.random(1,#self.VO3Death)], self:GetPos(), 75, 100, 1 )
+		elseif self.VO == 4 then
+			sound.Play( "daktanks/crew/rus/"..self.VO4Death[math.random(1,#self.VO4Death)], self:GetPos(), 75, 100, 1 )
+		elseif self.VO == 5 then
+			sound.Play( "daktanks/crew/sco/"..self.VO5Death[math.random(1,#self.VO5Death)], self:GetPos(), 75, 100, 1 )
+		elseif self.VO == 6 then
+			sound.Play( "daktanks/crew/us/"..self.VO6Death[math.random(1,#self.VO6Death)], self:GetPos(), 75, 100, 1 )
+		end
 	end
 	if IsValid(self.DakEntity) then
 	    self.DakEntity.DakCrew = NULL
