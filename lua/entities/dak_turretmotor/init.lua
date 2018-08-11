@@ -88,6 +88,9 @@ function ENT:Think()
 	if self.DakName == "Turret Motor" then
 		self.DakName = "Small Turret Motor"
 	end
+	if self.DakName == "TMotor" then
+		self.DakName = "Small Turret Motor"
+	end
 
 	if self.DakName == "Small Turret Motor" then
 		self.DakMaxHealth = 10

@@ -1509,14 +1509,14 @@ function TOOL.BuildCPanel( panel )
 	end
 	
 	--Table containing the description of the Turret Motors
-	local magazineList = {}
-	magazineList["Small Turret Motor"] = function()
+	local turretmotorList = {}
+	turretmotorList["Small Turret Motor"] = function()
 		DLabel:SetText( "Small Turret Motor\n\nThis can be linked to a single turret controller, increasing the speed it rotates by a flat amount, this small motor is useful for light turrets. If destroyed turret speed will go back to normal.\n\nMotor Stats:\nHealth:  10\nWeight: 250kg\nPower: x1 speed of unassisted turret" )
 	end
-	magazineList["Medium Turret Motor"] = function()
+	turretmotorList["Medium Turret Motor"] = function()
 		DLabel:SetText( "Medium Turret Motor\n\nThis can be linked to a single turret controller, increasing the speed it rotates by a flat amount, this small motor is useful for medium turrets. If destroyed turret speed will go back to normal.\n\nMotor Stats:\nHealth:  20\nWeight: 500kg\nPower: x2.5 speed of unassisted turret" )
 	end
-	magazineList["Large Turret Motor"] = function()
+	turretmotorList["Large Turret Motor"] = function()
 		DLabel:SetText( "Large Turret Motor\n\nThis can be linked to a single turret controller, increasing the speed it rotates by a flat amount, this small motor is useful for heavy turrets. If destroyed turret speed will go back to normal.\n\nMotor Stats:\nHealth:  50\nWeight: 1000kg\nPower: x6 speed of unassisted turret" )
 	end
 
@@ -1815,7 +1815,7 @@ function TOOL.BuildCPanel( panel )
 		if TurretMotorSelect:GetSelectedID() == nil then
 			DLabel:SetText( "Turret Motors\n\nThese are electric motors that help to turn the turret. They're very useful for heavier vehicles." )
 		else
-			magazineList[TurretMotor]()
+			turretmotorList[TurretMotor]()
 			RunConsoleCommand( "daktankspawner_SpawnSettings", string.sub( TurretMotor, 1, 1 ).."TMotor" )
 			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_turretmotor" )
 		end

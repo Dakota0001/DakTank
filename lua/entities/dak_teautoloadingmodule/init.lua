@@ -90,7 +90,15 @@ function ENT:Think()
 		end
 		self.SparkTime=CurTime()
 	end
-
+		if self.DakName == "Small Autoloader Clip" then
+			self.DakName = "Small Autoloader Magazine" 
+		end
+		if self.DakName == "Medium Autoloader Clip" then
+			self.DakName = "Medium Autoloader Magazine" 
+		end
+		if self.DakName == "Large Autoloader Clip" then
+			self.DakName = "Large Autoloader Magazine" 
+		end
 		if self.DakName == "Small Autoloader Magazine" then
 			self.DakMass = 1000
 			if IsValid(self.DakGun) then
