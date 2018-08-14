@@ -380,6 +380,7 @@ function ENT:Think()
 				WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
 				if self.DakHealth then
 					if self.DakHealth <= 0 then
+					--if #self.Crew <= 0 then
 						for i=1, #self.Contraption do
 							if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
 								self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
