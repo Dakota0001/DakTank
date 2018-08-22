@@ -289,15 +289,23 @@ function ENT:Think()
 	        if (self.Active>0) then
 	        	if not(self.MoveForward>0) and not(self.MoveReverse>0) and not(self.MoveLeft>0) and not(self.MoveRight>0) then
 					if self.RPM > 600 then
-		        		self.RPM = self.RPM - 10
+		        		self.RPM = self.RPM - 100
 		        	end
 		        	if self.RPM < 600 then
 		        		self.RPM = 600
 		        	end
 		        else
-		        	if self.RPM < 2500 then
-		        		self.RPM = self.RPM + 1
-		        	end
+		        	if self.MoveReverse>0 then
+		        		self.RPM = 1000*math.Clamp(self.TopSpeed*0.5/(self.Speed*1.5),0.6,2.0)
+		        		if self.Speed*1.5>self.TopSpeed then
+			        		self.RPM = 2000*math.Clamp(self.Speed/self.TopSpeed*0.5,0.5,1)
+			        	end
+		        	else
+			        	self.RPM = 1000*math.Clamp(self.TopSpeed/(self.Speed*1.5),0.6,2.0)
+			        	if self.Speed*1.5>self.TopSpeed then
+			        		self.RPM = 2000*math.Clamp(self.Speed/self.TopSpeed,0.5,1)
+			        	end
+			        end
 	        	end
 	        	if #self.DakTankCore.Motors>0 then
 					for i=1, #self.DakTankCore.Motors do
@@ -315,7 +323,7 @@ function ENT:Think()
 		        	if #self.DakTankCore.Motors>0 then
 						for i=1, #self.DakTankCore.Motors do
 							if IsValid(self.DakTankCore.Motors[i]) then
-								self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
+								self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
 							end
 						end
 					end
@@ -376,27 +384,31 @@ function ENT:Think()
 						local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 						local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 
-						if self.Speed<self.TopSpeed/3 then
-							if #self.DakTankCore.Motors>0 then
-								for i=1, #self.DakTankCore.Motors do
-									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500 , 0 )
-									end
-								end
-							end
-						else
-							if #self.DakTankCore.Motors>0 then
-								for i=1, #self.DakTankCore.Motors do
-									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
-									end
+						
+
+						if #self.DakTankCore.Motors>0 then
+							for i=1, #self.DakTankCore.Motors do
+								if IsValid(self.DakTankCore.Motors[i]) then
+									self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500 , 0.5 )
 								end
 							end
 						end
 						
 						--(self.DakHP/(4.8*math.pi)/(self.RightDriveWheel:OBBMaxs().z/12))/2.20462 = KG = how much it moves in a minute
-						LPhys:ApplyTorqueCenter( -self:GetRight()*25000*self.Perc*self.Torque*(self.PhysicalMass/self.TotalMass)*math.Clamp(self.TopSpeed/(self.Speed*2),0.5,3) )
-						RPhys:ApplyTorqueCenter( -self:GetRight()*25000*self.Perc*self.Torque*(self.PhysicalMass/self.TotalMass)*math.Clamp(self.TopSpeed/(self.Speed*2),0.5,3) )
+						LPhys:ApplyTorqueCenter( -self:GetRight()*5750*self.Perc*self.Torque*math.Clamp(self.TopSpeed/(self.Speed*3),0.1,3)*(LPhys:GetMass()/150) )
+						RPhys:ApplyTorqueCenter( -self:GetRight()*5750*self.Perc*self.Torque*math.Clamp(self.TopSpeed/(self.Speed*3),0.1,3)*(RPhys:GetMass()/150) )
+					end
+					if self.Speed > self.TopSpeed then
+						if self.MoveForward>0 or self.MoveReverse>0 or self.MoveLeft>0 or self.MoveRight>0 then
+							self.RPM = 2000 * self.Speed/self.TopSpeed
+							if #self.DakTankCore.Motors>0 then
+								for i=1, #self.DakTankCore.Motors do
+									if IsValid(self.DakTankCore.Motors[i]) then
+										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(255*self.RPM/2500,0,255) , 0.5 )
+									end
+								end
+							end
+						end
 					end
 
 					if math.abs(LPhys:GetAngleVelocity().y/6) < 1500 and math.abs(RPhys:GetAngleVelocity().y/6) < 1500 then
@@ -424,28 +436,28 @@ function ENT:Think()
 							local LForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.LeftDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							local RForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.RightDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							if self.MoveLeft>0 and self.MoveRight==0 then
-								self.RPM = 1000
+								self.RPM = 2000*(self.turnmult*2/250000)
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
 										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
+											self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
 										end
 									end
 								end
-								LPhys:ApplyTorqueCenter( self:GetRight()*1*self.turnmult*self.Torque*(self.PhysicalMass/self.TotalMass) )
-								RPhys:ApplyTorqueCenter( -self:GetRight()*1*self.turnmult*self.Torque*(self.PhysicalMass/self.TotalMass) )
+								LPhys:ApplyTorqueCenter( self:GetRight()*0.23*self.turnmult*self.Torque*(LPhys:GetMass()/150) ) 
+								RPhys:ApplyTorqueCenter( -self:GetRight()*0.23*self.turnmult*self.Torque*(RPhys:GetMass()/150) )
 							end
 							if self.MoveRight>0 and self.MoveLeft==0 then
-								self.RPM = 1000
+								self.RPM = 2000*(self.turnmult*2/250000)
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
 										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
+											self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
 										end
 									end
 								end
-								LPhys:ApplyTorqueCenter( -self:GetRight()*1*self.turnmult*self.Torque*(self.PhysicalMass/self.TotalMass) )
-								RPhys:ApplyTorqueCenter( self:GetRight()*1*self.turnmult*self.Torque*(self.PhysicalMass/self.TotalMass) )
+								LPhys:ApplyTorqueCenter( -self:GetRight()*0.23*self.turnmult*self.Torque*(LPhys:GetMass()/150) )
+								RPhys:ApplyTorqueCenter( self:GetRight()*0.23*self.turnmult*self.Torque*(RPhys:GetMass()/150) )
 							end
 						end
 					end
@@ -473,7 +485,7 @@ function ENT:Think()
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
 									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
+										self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
 									end
 								end
 							end

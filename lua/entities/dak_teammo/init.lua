@@ -198,7 +198,7 @@ function ENT:Think()
 					effectdata:SetScale(500)
 					util.Effect("daktescalingexplosion", effectdata, true, true)
 
-					self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,200,100,self.DakOwner)
+					self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,600,300,self.DakOwner)
 
 					self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
 					self:Remove()
@@ -215,7 +215,7 @@ function ENT:Think()
 									effectdata:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
 									util.Effect("daktescalingexplosion", effectdata, true, true)
 
-									self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,200,100,self.DakOwner)
+									self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,400,200,self.DakOwner)
 
 									self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
 									self:Remove()
@@ -466,11 +466,13 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
 					end
 					if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
+						Filter[#Filter+1] = ExpTrace.Entity
 						self.salvage = ents.Create( "dak_tesalvage" )
 						self.salvage.DakModel = ExpTrace.Entity:GetModel()
 						self.salvage:SetPos( ExpTrace.Entity:GetPos())
 						self.salvage:SetAngles( ExpTrace.Entity:GetAngles())
 						self.salvage:Spawn()
+						Filter[#Filter+1] = self.salvage
 						ExpTrace.Entity:Remove()
 					end
 				end
@@ -592,11 +594,13 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 					ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
 				end
 				if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
+					Filter[#Filter+1] = ExpTrace.Entity
 					self.salvage = ents.Create( "dak_tesalvage" )
 					self.salvage.DakModel = ExpTrace.Entity:GetModel()
 					self.salvage:SetPos( ExpTrace.Entity:GetPos())
 					self.salvage:SetAngles( ExpTrace.Entity:GetAngles())
 					self.salvage:Spawn()
+					Filter[#Filter+1] = self.salvage
 					ExpTrace.Entity:Remove()
 				end
 			end

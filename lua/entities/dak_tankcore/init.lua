@@ -297,8 +297,8 @@ function ENT:Think()
 				for i=1, table.Count(self.HitBox) do
 					self.HitBoxMass = self.HitBoxMass + self.HitBox[i]:GetPhysicsObject():GetMass()
 				end
-				self.CurrentHealth = self.HitBoxMass*0.01*self.SizeMult
-				self.DakMaxHealth = self.HitBoxMass*0.01*self.SizeMult
+				self.CurrentHealth = self.HitBoxMass*0.01*self.SizeMult*5
+				self.DakMaxHealth = self.HitBoxMass*0.01*self.SizeMult*5
 				for i=1, table.Count(self.HitBox) do
 					DakTekTankEditionSetupNewEnt(self.HitBox[i])
 					self.HitBox[i].DakHealth = self.CurrentHealth
@@ -368,47 +368,77 @@ function ENT:Think()
 				end
 				for i = 1, table.Count(self.HitBox) do
 					if self.CurrentHealth >= self.DakMaxHealth then
-						self.DakMaxHealth = self.CurMass*0.01*self.SizeMult
-						self.CurrentHealth = self.CurMass*0.01*self.SizeMult
-						self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult
+						self.DakMaxHealth = self.CurMass*0.01*self.SizeMult*5
+						self.CurrentHealth = self.CurMass*0.01*self.SizeMult*5
+						self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult*5
 					end
 					self.HitBox[i].DakHealth = self.CurrentHealth
 				end
 				self.DakHealth = self.CurrentHealth
 				
+				local curvel = self:GetParent():GetParent():GetVelocity()
+				if self.LastVel == nil then
+					self.LastVel = curvel
+				end
+				if curvel:Distance(self.LastVel) > 1000 then
+					for i=1, #self.Crew do
+						self.Crew[i].DakHealth = self.Crew[i].DakHealth - ((curvel:Distance(self.LastVel)-1000)/100)
+						print(((curvel:Distance(self.LastVel)-1000)/100))
+
+						if self.Crew[i].DakHealth <= 0 then
+							local salvage = ents.Create( "dak_tesalvage" )
+							salvage.DakModel = self.Crew[i]:GetModel()
+							salvage:SetPos( self.Crew[i]:GetPos())
+							salvage:SetAngles( self.Crew[i]:GetAngles())
+							salvage:Spawn()
+							self.Crew[i]:Remove()
+						end
+
+					end
+				end
+				self.LastVel = curvel
+
+
 				WireLib.TriggerOutput(self, "Health", self.DakHealth)
 				WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
 				if self.DakHealth then
-					if self.DakHealth <= 0 then
-					--if #self.Crew <= 0 then
+					if (self.DakHealth <= 0 or #self.Crew <= 0) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
+						local DeathSounds = {"daktanks/closeexp1.wav","daktanks/closeexp2.wav","daktanks/closeexp3.wav"}
 						for i=1, #self.Contraption do
 							if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
 								self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
 								if self.Contraption[i] ~= self:GetParent():GetParent() and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self then
 									if math.random(1,6)>1 then
-									self.salvage = ents.Create( "dak_tesalvage" )
-									if ( !IsValid( self.salvage ) ) then return end
-									self.salvage.DakModel = self.Contraption[i]:GetModel()
-									self.salvage:SetPos( self.Contraption[i]:GetPos())
-									self.salvage:SetAngles( self.Contraption[i]:GetAngles())
-									self.salvage:Spawn()
-									self.salvage:SetParent( self:GetParent():GetParent(), -1 )
-									--self.salvage:PhysicsDestroy()
+										constraint.RemoveAll( self.Contraption[i] )
+										self.Contraption[i]:SetParent( self:GetParent(), -1 )
+										self.Contraption[i]:SetMoveType( MOVETYPE_NONE )
+										self.Contraption[i]:SetMaterial("models/props_buildings/plasterwall021a")
+										self.Contraption[i]:SetColor(Color(100,100,100,255))
+										self.Contraption[i]:SetCollisionGroup( COLLISION_GROUP_WORLD )
+										self.Contraption[i]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+										if math.random(0,4) == 0 then
+											self.Contraption[i]:Ignite(25,1)
+										end
 									else
 										self.salvage = ents.Create( "dak_tesalvage" )
 										if ( !IsValid( self.salvage ) ) then return end
 										self.salvage.launch = 1
-										self.salvage.DakModel = self.Contraption[i]:GetModel()
+										if self.Contraption[i]:GetClass() == "dak_crew" then
+											self.salvage.DakModel = "models/Humans/Charple01.mdl"
+										else
+											self.salvage.DakModel = self.Contraption[i]:GetModel()
+										end
 										self.salvage:SetPos( self.Contraption[i]:GetPos())
 										self.salvage:SetAngles( self.Contraption[i]:GetAngles())
 										self.salvage:Spawn()
+										self.Contraption[i]:Remove()
 									end
 									if self.Contraption[i]:IsVehicle() then
 										if IsValid(self.Contraption[i]:GetDriver()) then
 											self.Contraption[i]:GetDriver():Kill()
 										end
+										self.Contraption[i]:Remove()
 									end
-									self.Contraption[i]:Remove()
 								end
 							end
 						end
@@ -420,7 +450,7 @@ function ENT:Think()
 						effectdata:SetAttachment(1)
 						effectdata:SetMagnitude(.5)
 
-						effectdata:SetScale(math.Clamp(self.DakMaxHealth,100,500))
+						effectdata:SetScale(math.Clamp(self.DakMaxHealth*0.2,100,500))
 						util.Effect("daktescalingexplosion", effectdata)
 						
 

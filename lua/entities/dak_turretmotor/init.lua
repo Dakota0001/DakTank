@@ -130,7 +130,9 @@ function ENT:PreEntityCopy()
 	local info = {}
 	local entids = {}
 
-	info.TurretID = self.TurretController:EntIndex()
+	if IsValid(self.TurretController) then
+		info.TurretID = self.TurretController:EntIndex()
+	end
 	info.DakName = self.DakName
 	info.DakMass = self.DakMass
 	info.DakModel = self.DakModel
@@ -146,9 +148,11 @@ end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
-		local Eng = CreatedEntities[ Ent.EntityMods.DakTek.TurretID ]
-		if Eng and IsValid(Eng) then
-			self.TurretController = Eng
+		if Ent.EntityMods.DakTek.TurretID then
+			local Eng = CreatedEntities[ Ent.EntityMods.DakTek.TurretID ]
+			if Eng and IsValid(Eng) then
+				self.TurretController = Eng
+			end
 		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakMass = Ent.EntityMods.DakTek.DakMass

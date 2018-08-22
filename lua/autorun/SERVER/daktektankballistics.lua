@@ -117,7 +117,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						checktrace.maxs = Vector(1,1,1)
 					local CheckShellTrace = util.TraceHull( checktrace )
 					Shell.Pos = End
-					--Shell.LifeTime = 0
+					Shell.LifeTime = 0
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(EffArmor/Shell.DakPenetration)
 					--soundhere penetrate sound
@@ -140,7 +140,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						--Shell.LifeTime = 0
+						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -190,7 +190,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						--Shell.LifeTime = 0
+						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -265,19 +265,21 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						--Shell.LifeTime = 0
+						Shell.LifeTime = 0
 						Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(HitEnt.DakArmor/Shell.DakPenetration)
 						Shell.DakDamage = 0
 						--soundhere bounce sound
 					end
 				end
 				if HitEnt.DakHealth <= 0 and HitEnt.DakPooled==0 then
+					Shell.Filter[#Filter+1] = HitEnt
 					local salvage = ents.Create( "dak_tesalvage" )
 					Shell.salvage = salvage
 					salvage.DakModel = HitEnt:GetModel()
 					salvage:SetPos( HitEnt:GetPos())
 					salvage:SetAngles( HitEnt:GetAngles())
 					salvage:Spawn()
+					Shell.Filter[#Filter+1] = salvage
 					HitEnt:Remove()
 					if Shell.salvage then
 						Shell.Filter[#Shell.Filter+1] = Shell.salvage
@@ -405,7 +407,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if Shell.DakExplosive then
 						Shell.ExplodeNow = true
 					end
-					--Shell.LifeTime = 0
+					Shell.LifeTime = 0
 					Shell.DakVelocity = 0
 					Shell.DakDamage = 0
 				end
@@ -522,7 +524,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 			if Shell.DakExplosive then
 				Shell.ExplodeNow = true
 			end
-			--Shell.LifeTime = 0
+			Shell.LifeTime = 0
 			Shell.DakVelocity = 0
 			Shell.DakDamage = 0
 		else
@@ -665,7 +667,7 @@ function DTShellContinue(Start,Shell,Normal)
 						checktrace.maxs = Vector(1,1,1)
 					local CheckShellTrace = util.TraceHull( checktrace )
 					Shell.Pos = End
-					--Shell.LifeTime = 0
+					Shell.LifeTime = 0
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(EffArmor/Shell.DakPenetration)
 					--soundhere penetrate sound
@@ -688,7 +690,7 @@ function DTShellContinue(Start,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						--Shell.LifeTime = 0
+						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -738,7 +740,7 @@ function DTShellContinue(Start,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						--Shell.LifeTime = 0
+						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
 						Shell.ExplodeNow = true
@@ -813,7 +815,7 @@ function DTShellContinue(Start,Shell,Normal)
 							checktrace.maxs = Vector(1,1,1)
 						local CheckShellTrace = util.TraceHull( checktrace )
 						Shell.Pos = End
-						--Shell.LifeTime = 0
+						Shell.LifeTime = 0
 						Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(HitEnt.DakArmor/Shell.DakPenetration)
 						Shell.DakDamage = 0
 						--soundhere bounce sound
@@ -821,12 +823,14 @@ function DTShellContinue(Start,Shell,Normal)
 					end
 				end
 				if HitEnt.DakHealth <= 0 and HitEnt.DakPooled==0 then
+					Shell.Filter[#Filter+1] = HitEnt
 					local salvage = ents.Create( "dak_tesalvage" )
 					Shell.salvage = salvage
 					salvage.DakModel = HitEnt:GetModel()
 					salvage:SetPos( HitEnt:GetPos())
 					salvage:SetAngles( HitEnt:GetAngles())
 					salvage:Spawn()
+					Shell.Filter[#Filter+1] = salvage
 					HitEnt:Remove()
 					if Shell.salvage then
 						Shell.Filter[#Shell.Filter+1] = Shell.salvage
@@ -954,7 +958,7 @@ function DTShellContinue(Start,Shell,Normal)
 					if Shell.DakExplosive then
 						Shell.ExplodeNow = true
 					end
-					--Shell.LifeTime = 0
+					Shell.LifeTime = 0
 					Shell.DakVelocity = 0
 					Shell.DakDamage = 0
 				end
@@ -1071,7 +1075,7 @@ function DTShellContinue(Start,Shell,Normal)
 			if Shell.DakExplosive then
 				Shell.ExplodeNow = true
 			end
-			--Shell.LifeTime = 0
+			Shell.LifeTime = 0
 			Shell.DakVelocity = 0
 			Shell.DakDamage = 0
 		end	
@@ -1159,12 +1163,14 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 						ContEXP(Filter,ExpTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Radius,Caliber,Pen-EffArmor,Owner,Direction,Shell)
 					end
 					if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
+						Filter[#Filter+1] = ExpTrace.Entity
 						local salvage = ents.Create( "dak_tesalvage" )
 						Shell.salvage = salvage
 						salvage.DakModel = ExpTrace.Entity:GetModel()
 						salvage:SetPos( ExpTrace.Entity:GetPos())
 						salvage:SetAngles( ExpTrace.Entity:GetAngles())
 						salvage:Spawn()
+						Filter[#Filter+1] = salvage
 						ExpTrace.Entity:Remove()
 					end
 				end
@@ -1287,12 +1293,14 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 					ContEXP(Filter,ExpTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Radius,Caliber,Pen-EffArmor,Owner,Direction,Shell)
 				end
 				if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
+					Filter[#Filter+1] = ExpTrace.Entity
 					local salvage = ents.Create( "dak_tesalvage" )
 					Shell.salvage = salvage
 					salvage.DakModel = ExpTrace.Entity:GetModel()
 					salvage:SetPos( ExpTrace.Entity:GetPos())
 					salvage:SetAngles( ExpTrace.Entity:GetAngles())
 					salvage:Spawn()
+					Filter[#Filter+1] = salvage
 					ExpTrace.Entity:Remove()
 				end
 			end
@@ -1463,6 +1471,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 			Shell.salvage:SetAngles( Shell.RemoveList[i]:GetAngles())
 			Shell.salvage.DakLastDamagePos = Pos
 			Shell.salvage:Spawn()
+			Filter[#Filter+1] = salvage
 			Shell.RemoveList[i]:Remove()
 		end
 	end
@@ -1473,11 +1482,21 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 	local SpallMass = (SpallVolume*0.0078125) * 0.1
 	local SpallPen = Armor * 0.1
 	local SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.1
-
 	local traces = 10
+
+	if Shell.DakShellType == "HESH" then
+		SpallMass = (SpallVolume*0.0078125) * 0.05
+		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.05
+		SpallPen = Armor * 0.05
+		traces = 20
+	end
+
 	local Filter = {HitEnt}
 	for i=1, traces do
 		local Ang = 45*(Armor/Pen)
+		if Shell.DakShellType == "HESH" then
+			Ang = 80
+		end
 		local Direction = (Dir + Angle(math.Rand(-Ang,Ang),math.Rand(-Ang,Ang),math.Rand(-Ang,Ang))):Forward()
 		local trace = {}
 			trace.start = Pos
@@ -1532,7 +1551,6 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 					end
 					
 					SpallTrace.Entity.DakLastDamagePos = SpallTrace.HitPos
-
 					if not(SpallTrace.Entity.SPPOwner==nil) and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
 						if SpallTrace.Entity.SPPOwner:HasGodMode()==false and SpallTrace.Entity.DakIsTread == nil then	
 							SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(SpallDamage*(SpallPen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor*2)
@@ -1540,13 +1558,16 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 					else
 						SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(SpallDamage*(SpallPen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor*2)
 					end
+
 					if SpallTrace.Entity.DakHealth <= 0 and SpallTrace.Entity.DakPooled==0 then
+						Filter[#Filter+1] = SpallTrace.Entity
 						local salvage = ents.Create( "dak_tesalvage" )
 						Shell.salvage = salvage
 						salvage.DakModel = SpallTrace.Entity:GetModel()
 						salvage:SetPos( SpallTrace.Entity:GetPos())
 						salvage:SetAngles( SpallTrace.Entity:GetAngles())
 						salvage:Spawn()
+						Filter[#Filter+1] = salvage
 						SpallTrace.Entity:Remove()
 					end
 					local EffArmor = (SpallTrace.Entity.DakArmor/math.abs(SpallTrace.HitNormal:Dot(Direction)))
@@ -1662,7 +1683,6 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 				end
 				
 				SpallTrace.Entity.DakLastDamagePos = SpallTrace.HitPos
-
 				if not(SpallTrace.Entity.SPPOwner==nil) and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
 					if SpallTrace.Entity.SPPOwner:HasGodMode()==false and SpallTrace.Entity.DakIsTread == nil then	
 						SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(Damage*(Pen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor*2)
@@ -1671,12 +1691,14 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 					SpallTrace.Entity.DakHealth = SpallTrace.Entity.DakHealth- math.Clamp(Damage*(Pen/SpallTrace.Entity.DakArmor),0,SpallTrace.Entity.DakArmor*2)
 				end
 				if SpallTrace.Entity.DakHealth <= 0 and SpallTrace.Entity.DakPooled==0 then
+					Filter[#Filter+1] = SpallTrace.Entity
 					local salvage = ents.Create( "dak_tesalvage" )
 					Shell.salvage = salvage
 					salvage.DakModel = SpallTrace.Entity:GetModel()
 					salvage:SetPos( SpallTrace.Entity:GetPos())
 					salvage:SetAngles( SpallTrace.Entity:GetAngles())
 					salvage:Spawn()
+					Filter[#Filter+1] = salvage
 					SpallTrace.Entity:Remove()
 				end
 				local EffArmor = (SpallTrace.Entity.DakArmor/math.abs(SpallTrace.HitNormal:Dot(Direction)))
@@ -1806,12 +1828,14 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(HEATDamage*((HEATPen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor*2)
 				end
 				if HEATTrace.Entity.DakHealth <= 0 and HEATTrace.Entity.DakPooled==0 then
+					Filter[#Filter+1] = HEATTrace.Entity
 					local salvage = ents.Create( "dak_tesalvage" )
 					Shell.salvage = salvage
 					salvage.DakModel = HEATTrace.Entity:GetModel()
 					salvage:SetPos( HEATTrace.Entity:GetPos())
 					salvage:SetAngles( HEATTrace.Entity:GetAngles())
 					salvage:Spawn()
+					Filter[#Filter+1] = salvage
 					HEATTrace.Entity:Remove()
 				end
 				local EffArmor = (HEATTrace.Entity.DakArmor/math.abs(HEATTrace.HitNormal:Dot(Direction)))
@@ -1937,12 +1961,14 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 					HEATTrace.Entity.DakHealth = HEATTrace.Entity.DakHealth- math.Clamp(Damage*((Pen-HeatPenLoss)/HEATTrace.Entity.DakArmor),0,HEATTrace.Entity.DakArmor*2)
 				end
 				if HEATTrace.Entity.DakHealth <= 0 and HEATTrace.Entity.DakPooled==0 then
+					Filter[#Filter+1] = HEATTrace.Entity
 					local salvage = ents.Create( "dak_tesalvage" )
 					Shell.salvage = salvage
 					salvage.DakModel = HEATTrace.Entity:GetModel()
 					salvage:SetPos( HEATTrace.Entity:GetPos())
 					salvage:SetAngles( HEATTrace.Entity:GetAngles())
 					salvage:Spawn()
+					Filter[#Filter+1] = salvage
 					HEATTrace.Entity:Remove()
 				end
 				local EffArmor = (HEATTrace.Entity.DakArmor/math.abs(HEATTrace.HitNormal:Dot(Direction)))
