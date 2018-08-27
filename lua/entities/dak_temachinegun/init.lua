@@ -436,12 +436,6 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self:SetSubMaterial( 0, Ent.EntityMods.DakTek.DakMat0 )
 		self:SetSubMaterial( 1, Ent.EntityMods.DakTek.DakMat1 )
 
-		self:PhysicsDestroy()
-		self:SetModel(self.DakModel)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
-
 		self:Activate()
 
 		Ent.EntityMods.DakTek = nil

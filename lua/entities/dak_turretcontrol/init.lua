@@ -175,14 +175,14 @@ function ENT:Think()
 								end
 							end
 						end
-						self.RotationSpeed = RotMult * (15000/GunMass)
+						
+					self.GunMass = GunMass
 					end
 					self.DakParented = 1
 				else
 					self.DakParented = 0
 				end
 			end
-			
 			if IsValid(self.DakGun) then
 				if self.DakParented == 0 then
 					if self.SentError == 0 then
@@ -209,6 +209,7 @@ function ENT:Think()
 						end
 					end
 				end
+				self.RotationSpeed = RotMult * (15000/self.GunMass)
 				self.DakCamTrace = self.Inputs.CamTrace.Value
 				if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
 					

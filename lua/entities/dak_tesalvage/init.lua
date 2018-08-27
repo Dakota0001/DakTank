@@ -20,7 +20,9 @@ function ENT:Initialize()
 		salvage:SetModel("models/Humans/Charple0"..math.random(1,4)..".mdl")
 		salvage:SetPos( self:GetPos())
 		salvage:SetAngles( self:GetAngles())
+		salvage:SetCollisionGroup( COLLISION_GROUP_WORLD )
 		salvage:Spawn()
+		salvage.VO = math.random(1,6)
 		if self.launch == 1 then
 			salvage:GetPhysicsObject():ApplyForceCenter( VectorRand()*350*salvage:GetPhysicsObject():GetMass()*math.Rand(5,15))
 		end
@@ -32,6 +34,35 @@ function ENT:Initialize()
 		timer.Simple( 30, function()
 			salvage:Remove()
 		end )
+		if math.random(0,4) == 0 then
+			timer.Simple(1.0 + math.Rand(-0.5,0.5), function()
+				if IsValid(salvage) then
+					salvage:EmitSound( "daktanks/crew/us/suffer"..math.random(1,6)..".mp3", 100, 100, 0.25, 3)
+				end
+			end )
+			timer.Simple(2.0 + math.Rand(-0.5,0.5), function()
+				if IsValid(salvage) then
+				 	salvage:EmitSound( "daktanks/crew/us/suffer"..math.random(1,6)..".mp3", 100, 100, 0.25, 3)
+				end
+			end )
+			timer.Simple(3.0 + math.Rand(-0.5,0.5), function()
+				if IsValid(salvage) then
+				 	salvage:EmitSound( "daktanks/crew/us/suffer"..math.random(1,6)..".mp3", 100, 100, 0.25, 3)
+				end
+			end )
+			timer.Simple(4.0 + math.Rand(-0.5,0.5), function()
+				if IsValid(salvage) then
+				 	salvage:EmitSound( "daktanks/crew/us/suffer"..math.random(1,6)..".mp3", 100, 100, 0.25, 3)
+				end
+			end )
+			timer.Simple(5.0 + math.Rand(-0.5,0.5), function()
+				if IsValid(salvage) then
+				 	salvage:EmitSound( "daktanks/crew/us/suffer"..math.random(1,6)..".mp3", 100, 100, 0.25, 3)
+				end
+			end )
+		end
+
+
 		self:Remove()
 	end
 
@@ -47,8 +78,8 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	self.SpawnTime = CurTime()
-		local DeathSounds = {"daktanks/closeexp1.wav","daktanks/closeexp2.wav","daktanks/closeexp3.wav"}
-		self:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 1, 3)
+	local DeathSounds = {"daktanks/closeexp1.wav","daktanks/closeexp2.wav","daktanks/closeexp3.wav"}
+	self:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 1, 3)
 
 	if self.launch == 1 then
 		self:GetPhysicsObject():ApplyForceCenter( VectorRand()*70*self:GetPhysicsObject():GetMass()*math.Rand(5,15))

@@ -107,7 +107,7 @@ function ENT:Think()
 		self.DakArmor = 15
 		self.DakMass = 150
 		self.DakModel = "models/daktanks/gearbox1f1.mdl"
-		self.Torque = 0.85
+		self.Torque = 1
 		self.MaxHP = 150
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -116,7 +116,7 @@ function ENT:Think()
 		self.DakArmor = 35
 		self.DakMass = 350
 		self.DakModel = "models/daktanks/gearbox1f2.mdl"
-		self.Torque = 0.95
+		self.Torque = 1
 		self.MaxHP = 330
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -134,7 +134,7 @@ function ENT:Think()
 		self.DakArmor = 95
 		self.DakMass = 975
 		self.DakModel = "models/daktanks/gearbox1f4.mdl"
-		self.Torque = 1.15
+		self.Torque = 1
 		self.MaxHP = 930
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -143,7 +143,7 @@ function ENT:Think()
 		self.DakArmor = 140
 		self.DakMass = 1400
 		self.DakModel = "models/daktanks/gearbox1f5.mdl"
-		self.Torque = 1.25
+		self.Torque = 1
 		self.MaxHP = 1350
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -152,7 +152,7 @@ function ENT:Think()
 		self.DakArmor = 250
 		self.DakMass = 2500
 		self.DakModel = "models/daktanks/gearbox1f6.mdl"
-		self.Torque = 1.3
+		self.Torque = 1
 		self.MaxHP = 2400
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -161,7 +161,7 @@ function ENT:Think()
 		self.DakArmor = 15
 		self.DakMass = 150
 		self.DakModel = "models/daktanks/gearbox1r1.mdl"
-		self.Torque = 0.85
+		self.Torque = 1
 		self.MaxHP = 150
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -170,7 +170,7 @@ function ENT:Think()
 		self.DakArmor = 35
 		self.DakMass = 350
 		self.DakModel = "models/daktanks/gearbox1r2.mdl"
-		self.Torque = 0.95
+		self.Torque = 1
 		self.MaxHP = 330
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -188,7 +188,7 @@ function ENT:Think()
 		self.DakArmor = 95
 		self.DakMass = 975
 		self.DakModel = "models/daktanks/gearbox1r4.mdl"
-		self.Torque = 1.15
+		self.Torque = 1
 		self.MaxHP = 930
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -197,7 +197,7 @@ function ENT:Think()
 		self.DakArmor = 140
 		self.DakMass = 1400
 		self.DakModel = "models/daktanks/gearbox1r5.mdl"
-		self.Torque = 1.25
+		self.Torque = 1
 		self.MaxHP = 1350
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -206,7 +206,7 @@ function ENT:Think()
 		self.DakArmor = 250
 		self.DakMass = 2500
 		self.DakModel = "models/daktanks/gearbox1r6.mdl"
-		self.Torque = 1.3
+		self.Torque = 1
 		self.MaxHP = 2400
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
@@ -395,8 +395,8 @@ function ENT:Think()
 						end
 						
 						--(self.DakHP/(4.8*math.pi)/(self.RightDriveWheel:OBBMaxs().z/12))/2.20462 = KG = how much it moves in a minute
-						LPhys:ApplyTorqueCenter( -self:GetRight()*5750*self.Perc*self.Torque*math.Clamp(self.TopSpeed/(self.Speed*3),0.1,3)*(LPhys:GetMass()/150) )
-						RPhys:ApplyTorqueCenter( -self:GetRight()*5750*self.Perc*self.Torque*math.Clamp(self.TopSpeed/(self.Speed*3),0.1,3)*(RPhys:GetMass()/150) )
+						LPhys:ApplyTorqueCenter( -self:GetRight()*450*(self.DakHP/(self.TotalMass/1000))*self.Perc*self.Torque*math.Clamp(self.TopSpeed/(self.Speed*(3*(13/(self.DakHP/(self.TotalMass/1000))))),0.1,3)*(LPhys:GetMass()/150) )
+						RPhys:ApplyTorqueCenter( -self:GetRight()*450*(self.DakHP/(self.TotalMass/1000))*self.Perc*self.Torque*math.Clamp(self.TopSpeed/(self.Speed*(3*(13/(self.DakHP/(self.TotalMass/1000))))),0.1,3)*(RPhys:GetMass()/150) )
 					end
 					if self.Speed > self.TopSpeed then
 						if self.MoveForward>0 or self.MoveReverse>0 or self.MoveLeft>0 or self.MoveRight>0 then
@@ -432,11 +432,8 @@ function ENT:Think()
 							else
 								self.turnperc = 0
 							end
-							self.turnmult = self.turnperc*math.Clamp(250000*math.Clamp(((0.075*(self.DakSpeed/(10000/self.TotalMass))*self.Torque)/(4*math.abs(self.LastYaw-self:GetAngles().yaw)))*(0.15*self.DakHP/(self.TotalMass/1000)),0,1),0,250000)
-							local LForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.LeftDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
-							local RForce = (self.DakHealth/self.DakMaxHealth)*self.turnmult*(self.RightDriveWheel:OBBMaxs().z/22.5)*self:GetForward()
 							if self.MoveLeft>0 and self.MoveRight==0 then
-								self.RPM = 2000*(self.turnmult*2/250000)
+								self.RPM = 1000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
 										if IsValid(self.DakTankCore.Motors[i]) then
@@ -444,11 +441,11 @@ function ENT:Think()
 										end
 									end
 								end
-								LPhys:ApplyTorqueCenter( self:GetRight()*0.23*self.turnmult*self.Torque*(LPhys:GetMass()/150) ) 
-								RPhys:ApplyTorqueCenter( -self:GetRight()*0.23*self.turnmult*self.Torque*(RPhys:GetMass()/150) )
+								LPhys:ApplyTorqueCenter( self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(LPhys:GetMass()/150) ) 
+								RPhys:ApplyTorqueCenter( -self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(RPhys:GetMass()/150) )
 							end
 							if self.MoveRight>0 and self.MoveLeft==0 then
-								self.RPM = 2000*(self.turnmult*2/250000)
+								self.RPM = 1000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
 										if IsValid(self.DakTankCore.Motors[i]) then
@@ -456,8 +453,8 @@ function ENT:Think()
 										end
 									end
 								end
-								LPhys:ApplyTorqueCenter( -self:GetRight()*0.23*self.turnmult*self.Torque*(LPhys:GetMass()/150) )
-								RPhys:ApplyTorqueCenter( self:GetRight()*0.23*self.turnmult*self.Torque*(RPhys:GetMass()/150) )
+								LPhys:ApplyTorqueCenter( -self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(LPhys:GetMass()/150) ) 
+								RPhys:ApplyTorqueCenter( self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(RPhys:GetMass()/150) )
 							end
 						end
 					end

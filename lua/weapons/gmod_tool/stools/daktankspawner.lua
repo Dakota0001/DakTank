@@ -1311,9 +1311,9 @@ function TOOL:RightClick( trace )
 			if Target:GetClass() == "dak_tegearbox" then
 				if Target.DakHP and Target.TotalMass then
 					if Target.DakCrew == NULL then
-						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Uncrewed")
+						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Uncrewed")
 					else
-						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Crewed")
+						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Crewed")
 					end
 				end
 			end
@@ -1657,19 +1657,19 @@ function TOOL.BuildCPanel( panel )
 	end
 	gunData["Cannon"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 2, 750, 0.2, 0.04, 750, 1.2, 562.5 }
+		AmmoData  = { 2, 750, 0.2, 0.04, 750, 5.4, 562.5 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Velocity Armor Piercing" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Long Cannon"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 2.8, 1050, 0.2, 0.04, 1050, 1.2, 787.5 }
+		AmmoData  = { 2.8, 1050, 0.2, 0.04, 1050, 5.4, 787.5 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Velocity Armor Piercing" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Short Cannon"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 1.6, 600, 0.2, 0.04, 600, 1.2, 450 }
+		AmmoData  = { 1.6, 600, 0.2, 0.04, 600, 5.4, 450 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Velocity Armor Piercing" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
@@ -1686,7 +1686,7 @@ function TOOL.BuildCPanel( panel )
 	end
 	gunData["Howitzer"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 1.2, 450, 0.2, 0.052, 450, 1.2, 337.5, 1.25, 225 }
+		AmmoData  = { 1.2, 450, 0.2, 0.052, 450, 5.4, 337.5, 1.25, 225 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head" }
 		DermaNumSlider:SetMinMax( 50, 240 )
 	end
@@ -1699,7 +1699,7 @@ function TOOL.BuildCPanel( panel )
 	end
 	gunData["Mortar"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 0.6, 225, 0.2, 0.046, 225, 1.2, 168.75, 1.25, 112.5 }
+		AmmoData  = { 0.6, 225, 0.2, 0.046, 225, 5.4, 168.75, 1.25, 112.5 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head"}
 		DermaNumSlider:SetMinMax( 40, 280 )
 	end

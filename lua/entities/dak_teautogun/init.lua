@@ -69,6 +69,7 @@ function ENT:Initialize()
 	self.Loaded=0
 	self.DakBurnStacks = 0
 	self.BasicVelocity = 29527.6
+	self.AutoSwapStacks = 0
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
@@ -389,6 +390,13 @@ function ENT:DakTEAutoAmmoCheck()
 				end
 			end
 		end
+		if self.AmmoCount == 0 and self.AutoSwapStacks < 5 and IsValid(self) then
+			self.AutoSwapStacks = self.AutoSwapStacks + 1
+			self.AmmoSwap = true
+			self:DakTEGunAmmoSwap()
+		else
+			self.AutoSwapStacks = 0
+		end
 		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
 end
@@ -525,6 +533,13 @@ function ENT:DakTEAutoFire()
 				end
 			end
 		end
+		if self.AmmoCount == 0 and self.AutoSwapStacks < 5 and IsValid(self) then
+			self.AutoSwapStacks = self.AutoSwapStacks + 1
+			self.AmmoSwap = true
+			self:DakTEGunAmmoSwap()
+		else
+			self.AutoSwapStacks = 0
+		end
 		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
 end
@@ -574,6 +589,13 @@ function ENT:DakTEAutoGunAmmoSwap()
 					end
 				end
 			end
+		end
+		if self.AmmoCount == 0 and self.AutoSwapStacks < 5 and IsValid(self) then
+			self.AutoSwapStacks = self.AutoSwapStacks + 1
+			self.AmmoSwap = true
+			self:DakTEGunAmmoSwap()
+		else
+			self.AutoSwapStacks = 0
 		end
 		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
@@ -674,12 +696,6 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self:SetColor(Ent.EntityMods.DakTek.DakColor)
 		self:SetSubMaterial( 0, Ent.EntityMods.DakTek.DakMat0 )
 		self:SetSubMaterial( 1, Ent.EntityMods.DakTek.DakMat1 )
-
-		self:PhysicsDestroy()
-		self:SetModel(self.DakModel)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
 
 		self:Activate()
 
