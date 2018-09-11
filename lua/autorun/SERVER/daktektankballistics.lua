@@ -15,6 +15,53 @@ local function CheckClip(Ent, HitPos)
 end
 --this function seemingly only works with that one broken visclip twisted suggested I use once
 ]]--
+
+function DTCompositesTrace( Ent, StartPos, Dir )
+    local Phys = Ent:GetPhysicsObject()
+    local Obj = Phys:GetMeshConvexes()
+    for I in pairs( Obj ) do
+        local Mesh = Obj[ I ]
+        local H1
+        for K = 1, table.Count( Mesh ), 3 do
+            local P1 = Ent:LocalToWorld( Mesh[ K ].pos )
+            local P2 = Ent:LocalToWorld( Mesh[ K + 1 ].pos )
+            local P3 = Ent:LocalToWorld( Mesh[ K + 2 ].pos )
+            local S1 = P2 - P1
+            local S2 = P3 - P1
+            local Norm = S1:Cross( S2 ):GetNormalized()
+            local Pos = util.IntersectRayWithPlane( StartPos, Dir, P1, Norm ) --Thanks Garry
+            if Pos then
+                local S3 = Pos - P1
+                local D1 = S1:Dot(S1)
+                local D2 = S1:Dot(S2)
+                local D3 = S1:Dot(S3)
+                local D4 = S2:Dot(S2)
+                local D5 = S2:Dot(S3)
+                local ID = 1 / ( D1 * D4 - D2 * D2 )
+                local U = ( D4 * D3 - D2 * D5 ) * ID
+                local V = ( D1 * D5 - D2 * D3 ) * ID
+                if U >= 0 and V >= 0 and U + V < 1 then
+                    if H1 then 
+                    	--Only get the first example of entry/exit as the trace will be called again when the bullet hits the other side of the prop (thinking about it, the prop gets filtered out after first time touched, will revisit later)
+                		local checktrace = {}
+							checktrace.start = StartPos
+							checktrace.endpos = H1
+							checktrace.filter = {Ent}
+						local checkinternaltrace = util.TraceLine( checktrace )
+						if IsValid(checkinternaltrace.Entity) then
+							return Pos:Distance(checkinternaltrace.HitPos)
+						end
+                    	return Pos:Distance(H1)
+                    else
+                    	H1 = Pos
+                    end
+                end
+            end
+        end
+    end
+    return 0
+end
+
 function CheckClip(Ent, HitPos)
 	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
 	
@@ -85,8 +132,18 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				local EffArmor = 0
 				if Shell.DakShellType == "HESH" then
 					EffArmor = HitEnt.DakArmor
-				else
-					EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())))
+				else	
+					if Shell.DakShellType == "HEAT" then
+						EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())) )
+					else						
+						EffArmor = math.abs(HitEnt.DakArmor/math.cos(math.acos(math.abs(Normal:Dot(Vel:GetNormalized()))))^math.Clamp(HitEnt.DakArmor/Shell.DakCaliber, 1, 5000 ))
+					end	
+				end
+				if HitEnt.IsComposite == 1 then
+					EffArmor = DTCompositesTrace( HitEnt, End, Shell.Ang:Forward() )*15.5
+					if Shell.DakShellType == "HEAT" then
+						EffArmor = EffArmor*2
+					end
 				end
 				if EffArmor < (Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49))) and HitEnt.IsDakTekFutureTech == nil then
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then		
@@ -127,7 +184,17 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 					util.Decal( "Impact.Concrete", End+((End-Start):GetNormalized()*5), End-((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.DakVelocity = Shell.DakVelocity - (Shell.DakVelocity * (EffArmor/Shell.DakPenetration))
-					Shell.Pos = End
+					local HitVel = 0
+					if IsValid(HitEnt) then
+						HitVel = HitEnt:GetVelocity() 
+						if IsValid(HitEnt:GetParent()) then
+							HitVel = HitEnt:GetParent():GetVelocity() 
+							if IsValid(HitEnt:GetParent():GetParent()) then
+								HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+							end
+						end
+					end
+					Shell.Pos = End+(HitVel*0.1)
 					Shell.LifeTime = 0
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(EffArmor/Shell.DakPenetration)
@@ -143,7 +210,17 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							DTHEAT(End,HitEnt,Shell.DakCaliber,Shell.DakPenetration,Shell.DakDamage,Shell.DakGun.DakOwner,Shell)
 							Shell.HeatPen = true
 						end
-						Shell.Pos = End
+						local HitVel = 0
+						if IsValid(HitEnt) then
+							HitVel = HitEnt:GetVelocity() 
+							if IsValid(HitEnt:GetParent()) then
+								HitVel = HitEnt:GetParent():GetVelocity() 
+								if IsValid(HitEnt:GetParent():GetParent()) then
+									HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+								end
+							end
+						end
+						Shell.Pos = End+(HitVel*0.1)
 						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
@@ -186,7 +263,17 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 					if Shell.DakExplosive then
-						Shell.Pos = End
+						local HitVel = 0
+						if IsValid(HitEnt) then
+							HitVel = HitEnt:GetVelocity() 
+							if IsValid(HitEnt:GetParent()) then
+								HitVel = HitEnt:GetParent():GetVelocity() 
+								if IsValid(HitEnt:GetParent():GetParent()) then
+									HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+								end
+							end
+						end
+						Shell.Pos = End+(HitVel*0.1)
 						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
@@ -231,7 +318,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							end
 							sound.Play( "daktanks/flamerimpact.wav", End, 100, 100, 1 )
 						else
-							if Shell.DakDamage > 0 then
+							if Shell.DakDamage >= 0 then
 								effectdata:SetOrigin(End)
 								effectdata:SetEntity(Shell.DakGun)
 								effectdata:SetAttachment(1)
@@ -250,24 +337,42 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								else
 									sound.Play( BounceSounds[math.random(1,#BounceSounds)], End, 100, 100, 1 )
 								end
-								if math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))) < 75 then
+								--if (90-math.abs(math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))))) > 45 then
 									Shell.DakVelocity = Shell.DakVelocity*0.025
-									Shell.Ang = ((End-Start) - 1.25 * (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5))
-									Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(HitEnt.DakArmor/Shell.DakPenetration)
+									Shell.Ang = ((End-Start) - 1.25 * (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
+									Shell.DakPenetration = 0
 									Shell.DakDamage = 0
-									Shell.LifeTime = 0
-									Shell.Pos = End
-								else
-									local Energy = (math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))/90)
-									Shell.DakVelocity = Shell.DakVelocity*Energy
-									Shell.Ang = ((End-Start) - 1* (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-0.5,0.5),math.Rand(-0.5,0.5),math.Rand(-0.5,0.5))
-									Shell.DakPenetration = Shell.DakPenetration*Energy
-									Shell.DakDamage = Shell.DakDamage*Energy
-									Shell.Filter[#Shell.Filter+1] = HitEnt
-									Shell.LifeTime = 0
-									Shell.Pos = End
-								end		
+									Shell.LifeTime = 0.0
+									local HitVel = 0
+									if IsValid(HitEnt) then
+										HitVel = HitEnt:GetVelocity() 
+										if IsValid(HitEnt:GetParent()) then
+											HitVel = HitEnt:GetParent():GetVelocity() 
+											if IsValid(HitEnt:GetParent():GetParent()) then
+												HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+											end
+										end
+									end
+									Shell.Pos = End+(HitVel*0.1)
+								--else
+								--	local Energy = (math.abs(math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))))/90)
+								--	Shell.DakVelocity = Shell.DakVelocity*Energy
+								--	Shell.Ang = ((End-Start) - 1* (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-0.5,0.5),math.Rand(-0.5,0.5),math.Rand(-0.5,0.5))
+								--	Shell.DakPenetration = Shell.DakPenetration*Energy
+								--	Shell.DakDamage = Shell.DakDamage*Energy
+								--	Shell.Filter[#Shell.Filter+1] = HitEnt
+								--	Shell.LifeTime = 0.0
+								--	local HitVel = HitEnt:GetVelocity() 
+								--	if HitEnt:GetParent() then
+								--		HitVel = HitEnt:GetParent():GetVelocity() 
+								--	end
+								--	if HitEnt:GetParent():GetParent() then
+								--		HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+								--	end
+								--	Shell.Pos = End+(HitVel*0.1)
+								--end	
 							end
+							Shell.Filter[#Shell.Filter+1] = HitEnt
 						end
 						--soundhere bounce sound
 					end
@@ -519,7 +624,6 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 			Shell.DakVelocity = 0
 			Shell.DakDamage = 0
 		else
-
 		end	
 
 		if Shell.DakPenetration <= 0 then
@@ -607,7 +711,17 @@ function DTShellContinue(Start,Shell,Normal)
 				if Shell.DakShellType == "HESH" then
 					EffArmor = HitEnt.DakArmor
 				else
-					EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())))
+					if Shell.DakShellType == "HEAT" then
+						EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())))
+					else
+						EffArmor = math.abs(HitEnt.DakArmor/math.cos(math.acos(math.abs(Normal:Dot(Vel:GetNormalized()))))^math.Clamp(HitEnt.DakArmor/Shell.DakCaliber, 1, 5000 ))
+					end	
+				end
+				if HitEnt.IsComposite == 1 then
+					EffArmor = DTCompositesTrace( HitEnt, End, Shell.Ang:Forward() )*15.5
+					if Shell.DakShellType == "HEAT" then
+						EffArmor = EffArmor*2
+					end
 				end
 				if EffArmor < (Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49))) and HitEnt.IsDakTekFutureTech == nil then
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then			
@@ -650,7 +764,17 @@ function DTShellContinue(Start,Shell,Normal)
 					util.Decal( "Impact.Concrete", End-((End-Start):GetNormalized()*5), End+((End-Start):GetNormalized()*5), Shell.DakGun)
 					util.Decal( "Impact.Concrete", End+((End-Start):GetNormalized()*5), End-((End-Start):GetNormalized()*5), Shell.DakGun)
 					Shell.DakVelocity = Shell.DakVelocity - (Shell.DakVelocity * (EffArmor/Shell.DakPenetration))
-					Shell.Pos = End
+					local HitVel = 0
+					if IsValid(HitEnt) then
+						HitVel = HitEnt:GetVelocity() 
+						if IsValid(HitEnt:GetParent()) then
+							HitVel = HitEnt:GetParent():GetVelocity() 
+							if IsValid(HitEnt:GetParent():GetParent()) then
+								HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+							end
+						end
+					end
+					Shell.Pos = End+(HitVel*0.1)
 					Shell.LifeTime = 0
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(EffArmor/Shell.DakPenetration)
@@ -666,7 +790,17 @@ function DTShellContinue(Start,Shell,Normal)
 							DTHEAT(End,HitEnt,Shell.DakCaliber,Shell.DakPenetration,Shell.DakDamage,Shell.DakGun.DakOwner,Shell)
 							Shell.HeatPen = true
 						end
-						Shell.Pos = End
+						local HitVel = 0
+						if IsValid(HitEnt) then
+							HitVel = HitEnt:GetVelocity() 
+							if IsValid(HitEnt:GetParent()) then
+								HitVel = HitEnt:GetParent():GetVelocity() 
+								if IsValid(HitEnt:GetParent():GetParent()) then
+									HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+								end
+							end
+						end
+						Shell.Pos = End+(HitVel*0.1)
 						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
@@ -709,7 +843,17 @@ function DTShellContinue(Start,Shell,Normal)
 						end
 					end
 					if Shell.DakExplosive then
-						Shell.Pos = End
+						local HitVel = 0
+						if IsValid(HitEnt) then
+							HitVel = HitEnt:GetVelocity() 
+							if IsValid(HitEnt:GetParent()) then
+								HitVel = HitEnt:GetParent():GetVelocity() 
+								if IsValid(HitEnt:GetParent():GetParent()) then
+									HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+								end
+							end
+						end
+						Shell.Pos = End+(HitVel*0.1)
 						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
@@ -775,23 +919,40 @@ function DTShellContinue(Start,Shell,Normal)
 								end
 							end
 						end
-						if math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))) < 75 then
+						--if (90-math.abs(math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))))) > 45 then
 							Shell.DakVelocity = Shell.DakVelocity*0.025
-							Shell.Ang = ((End-Start) - 1.25 * (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5))
-							Shell.DakPenetration = Shell.DakPenetration-(Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)))*(HitEnt.DakArmor/Shell.DakPenetration)
+							Shell.Ang = ((End-Start) - 1.25 * (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
+							Shell.DakPenetration = 0
 							Shell.DakDamage = 0
-							Shell.LifeTime = 0
-							Shell.Pos = End
-						else
-							local Energy = (math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))/90)
-							Shell.DakVelocity = Shell.DakVelocity*Energy
-							Shell.Ang = ((End-Start) - 1* (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-0.5,0.5),math.Rand(-0.5,0.5),math.Rand(-0.5,0.5))
-							Shell.DakPenetration = Shell.DakPenetration*Energy
-							Shell.DakDamage = Shell.DakDamage*Energy
-							Shell.Filter[#Shell.Filter+1] = HitEnt
-							Shell.LifeTime = 0
-							Shell.Pos = End
-						end	
+							Shell.LifeTime = 0.0
+							local HitVel = 0
+							if IsValid(HitEnt) then
+								HitVel = HitEnt:GetVelocity() 
+								if IsValid(HitEnt:GetParent()) then
+									HitVel = HitEnt:GetParent():GetVelocity() 
+									if IsValid(HitEnt:GetParent():GetParent()) then
+										HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+									end
+								end
+							end
+							Shell.Pos = End+(HitVel*0.1)
+						--else
+						--	local Energy = (math.abs(math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))))/90)
+						--	Shell.DakVelocity = Shell.DakVelocity*Energy
+						--	Shell.Ang = ((End-Start) - 1* (Normal:Dot(End-Start) * Normal)):Angle() + Angle(math.Rand(-0.5,0.5),math.Rand(-0.5,0.5),math.Rand(-0.5,0.5))
+						--	Shell.DakPenetration = Shell.DakPenetration*Energy
+						--	Shell.DakDamage = Shell.DakDamage*Energy
+						--	Shell.Filter[#Shell.Filter+1] = HitEnt
+						--	Shell.LifeTime = 0.0
+						--	local HitVel = HitEnt:GetVelocity() 
+						--	if HitEnt:GetParent() then
+						--		HitVel = HitEnt:GetParent():GetVelocity() 
+						--	end
+						--	if HitEnt:GetParent():GetParent() then
+						--		HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
+						--	end
+						--	Shell.Pos = End+(HitVel*0.1)
+						--end		
 						--soundhere bounce sound
 					end
 				end
@@ -1121,6 +1282,9 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)
 					end
 					local EffArmor = (ExpTrace.Entity.DakArmor/math.abs(ExpTrace.HitNormal:Dot(Direction)))
+					if ExpTrace.Entity.IsComposite == 1 then
+						EffArmor = DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal )*15.5
+					end
 					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 						util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
 						ContEXP(Filter,ExpTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Radius,Caliber,Pen-EffArmor,Owner,Direction,Shell)
@@ -1251,6 +1415,9 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 					ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)
 				end
 				local EffArmor = (ExpTrace.Entity.DakArmor/math.abs(ExpTrace.HitNormal:Dot(Direction)))
+				if ExpTrace.Entity.IsComposite == 1 then
+					EffArmor = DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal )*15.5
+				end
 				if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 					util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
 					ContEXP(Filter,ExpTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Radius,Caliber,Pen-EffArmor,Owner,Direction,Shell)
@@ -1534,6 +1701,9 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 						SpallTrace.Entity:Remove()
 					end
 					local EffArmor = (SpallTrace.Entity.DakArmor/math.abs(SpallTrace.HitNormal:Dot(Direction)))
+					if SpallTrace.Entity.IsComposite == 1 then
+						EffArmor = DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal )*15.5
+					end
 					if EffArmor < SpallPen and SpallTrace.Entity.IsDakTekFutureTech == nil then
 						--decals don't like using the adjusted by normal Pos
 						util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
@@ -1665,6 +1835,9 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 					SpallTrace.Entity:Remove()
 				end
 				local EffArmor = (SpallTrace.Entity.DakArmor/math.abs(SpallTrace.HitNormal:Dot(Direction)))
+				if SpallTrace.Entity.IsComposite == 1 then
+					EffArmor = DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal )*15.5
+				end
 				if EffArmor < Pen and SpallTrace.Entity.IsDakTekFutureTech == nil then
 					--decals don't like using the adjusted by normal Pos
 					util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
@@ -1810,7 +1983,9 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					HEATTrace.Entity:Remove()
 				end
 				local EffArmor = (HEATTrace.Entity.DakArmor/math.abs(HEATTrace.HitNormal:Dot(Direction)))
-				
+				if HEATTrace.Entity.IsComposite == 1 then
+					EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal )*31
+				end
 				if EffArmor < (HEATPen-HeatPenLoss) and HEATTrace.Entity.IsDakTekFutureTech == nil then
 					--decals don't like using the adjusted by normal Pos
 					util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
@@ -1952,7 +2127,9 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 					HEATTrace.Entity:Remove()
 				end
 				local EffArmor = (HEATTrace.Entity.DakArmor/math.abs(HEATTrace.HitNormal:Dot(Direction)))
-
+				if HEATTrace.Entity.IsComposite == 1 then
+					EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal )*31
+				end
 				if EffArmor < (Pen-HeatPenLoss) and HEATTrace.Entity.IsDakTekFutureTech == nil then
 					--decals don't like using the adjusted by normal Pos
 					util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})

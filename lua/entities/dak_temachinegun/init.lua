@@ -11,9 +11,8 @@ ENT.DakMaxHealth = 1
 ENT.DakHealth = 1
 ENT.DakAmmo = 0
 ENT.DakMass = 1
-ENT.DakAmmoType = "a"
-ENT.DakFireEffect = "a"
-ENT.DakFireSound = "a"
+ENT.DakAmmoType = ""
+ENT.DakFireEffect = ""
 ENT.DakFirePitch = 100
 ENT.DakPellets = 1
 --shell definition
@@ -111,20 +110,22 @@ function ENT:Think()
 				self.ReloadSound = "daktanks/dakreloadheavy.wav"
 			end
 
-			if self.DakCaliber < 7.62 then
-				self.DakFireSound = "daktanks/5mm.wav"
-			end
-			if self.DakCaliber >= 7.62 and self.DakCaliber < 9 then
-				self.DakFireSound = "daktanks/7mm.wav"
-			end
-			if self.DakCaliber >= 9 and self.DakCaliber < 12.7 then
-				self.DakFireSound = "daktanks/9mm.wav"
-			end
-			if self.DakCaliber >= 12.7 and self.DakCaliber < 14.5 then
-				self.DakFireSound = "daktanks/12mm.wav"
-			end
-			if self.DakCaliber >= 14.5 then
-				self.DakFireSound = "daktanks/14mm.wav"
+			if self.DakFireSound == nil then
+				if self.DakCaliber < 7.62 then
+					self.DakFireSound = "daktanks/5mm.wav"
+				end
+				if self.DakCaliber >= 7.62 and self.DakCaliber < 9 then
+					self.DakFireSound = "daktanks/7mm.wav"
+				end
+				if self.DakCaliber >= 9 and self.DakCaliber < 12.7 then
+					self.DakFireSound = "daktanks/9mm.wav"
+				end
+				if self.DakCaliber >= 12.7 and self.DakCaliber < 14.5 then
+					self.DakFireSound = "daktanks/12mm.wav"
+				end
+				if self.DakCaliber >= 14.5 then
+					self.DakFireSound = "daktanks/14mm.wav"
+				end
 			end
 		end
 		--Machine Guns
@@ -153,7 +154,9 @@ function ENT:Think()
 			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
 			self.ReloadSound = "daktanks/dakreloadlight.wav"
 
-			self.DakFireSound = "daktanks/flamerfire.wav"
+			if self.DakFireSound == nil then
+				self.DakFireSound = "daktanks/flamerfire.wav"
+			end
 		end
 
 		if not(self:GetModel() == self.DakModel) then
@@ -201,8 +204,7 @@ function ENT:Think()
 		end
 
 		if self.ShellList[i].DieTime then
-			--self.RemoveList[#self.RemoveList+1] = i
-			if self.ShellList[i].DieTime+1.5<CurTime()then
+			if self.ShellList[i].DieTime<CurTime()then
 				self.RemoveList[#self.RemoveList+1] = i
 			end
 		end
@@ -408,6 +410,7 @@ function ENT:PreEntityCopy()
 	info.DakColor = self:GetColor()
 	info.DakCaliber = self.DakCaliber
 	info.DakGunType = self.DakGunType
+	info.DakFireSound = self.DakFireSound
 
 	--Materials
 	info.DakMat0 = self:GetSubMaterial(0)
@@ -430,6 +433,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.DakCaliber = Ent.EntityMods.DakTek.DakCaliber
 		self.DakGunType = Ent.EntityMods.DakTek.DakGunType
 		self.DakHealth = self.DakMaxHealth
+		self.DakFireSound = Ent.EntityMods.DakTek.DakFireSound
 
 		self.DakOwner = Player
 		self:SetColor(Ent.EntityMods.DakTek.DakColor)

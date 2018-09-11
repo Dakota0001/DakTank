@@ -375,6 +375,9 @@ function ENT:Think()
 							if self.CarTurning==0 then
 								self.LBoost = 0
 								self.RBoost = 0
+
+								self.Perc=self.Perc*0.2
+
 							else
 								self.LBoost = 0.1
 								self.RBoost = 0.1
@@ -441,8 +444,8 @@ function ENT:Think()
 										end
 									end
 								end
-								LPhys:ApplyTorqueCenter( self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(LPhys:GetMass()/150) ) 
-								RPhys:ApplyTorqueCenter( -self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(RPhys:GetMass()/150) )
+								LPhys:ApplyTorqueCenter( self.turnperc*self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(LPhys:GetMass()/150) ) 
+								RPhys:ApplyTorqueCenter( self.turnperc*-self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(RPhys:GetMass()/150) )
 							end
 							if self.MoveRight>0 and self.MoveLeft==0 then
 								self.RPM = 1000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)
@@ -453,8 +456,8 @@ function ENT:Think()
 										end
 									end
 								end
-								LPhys:ApplyTorqueCenter( -self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(LPhys:GetMass()/150) ) 
-								RPhys:ApplyTorqueCenter( self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(RPhys:GetMass()/150) )
+								LPhys:ApplyTorqueCenter( self.turnperc*-self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(LPhys:GetMass()/150) ) 
+								RPhys:ApplyTorqueCenter( self.turnperc*self:GetRight()*25000*math.Clamp( 0.5*(self.DakHP/(self.TotalMass/1000)/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)*self.Torque*(RPhys:GetMass()/150) )
 							end
 						end
 					end

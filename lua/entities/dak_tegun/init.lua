@@ -11,9 +11,8 @@ ENT.DakMaxHealth = 1
 ENT.DakHealth = 1
 ENT.DakAmmo = 0
 ENT.DakMass = 1
-ENT.DakAmmoType = "a"
-ENT.DakFireEffect = "a"
-ENT.DakFireSound = "a"
+ENT.DakAmmoType = ""
+ENT.DakFireEffect = ""
 ENT.DakFirePitch = 100
 ENT.DakPellets = 1
 --shell definition
@@ -47,7 +46,7 @@ function ENT:Initialize()
 	if(IsValid(phys)) then
 		phys:Wake()
 	end
-	self.Inputs = Wire_CreateInputs(self, { "Fire", "SwapAmmo" })
+	self.Inputs = Wire_CreateInputs(self, { "Fire", "SwapAmmo", "Indicator [ENTITY]" })
 	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "Ammo", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
  	self.Soundtime = CurTime()
@@ -81,7 +80,9 @@ function ENT:Think()
 			self.DakAP = math.Round(self.DakCaliber,2).."mmSCAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmSCHEAmmo"
 			self.DakHEAT = math.Round(self.DakCaliber,2).."mmSCHEATAmmo"
+			self.DakHESH = math.Round(self.DakCaliber,2).."mmSCHESHAmmo"
 			self.DakHVAP = math.Round(self.DakCaliber,2).."mmSCHVAPAmmo"
+			self.DakATGM = math.Round(self.DakCaliber,2).."mmSCATGMAmmo"
 
 			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*5))
 			--get the volume of shell and multiply by density of steel
@@ -114,29 +115,31 @@ function ENT:Think()
 				self.ReloadSound = "daktanks/dakreloadheavy.wav"
 			end
 
-			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
-			end
-			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
-			end
-			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
-			end
-			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
-			end
-			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
-			end
-			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
-			end
-			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+			if self.DakFireSound == nil then
+				if self.DakCaliber < 37 then
+					self.DakFireSound = "daktanks/c25.wav"
+				end
+				if self.DakCaliber >= 37 and self.DakCaliber < 50 then
+					self.DakFireSound = "daktanks/c37.wav"
+				end
+				if self.DakCaliber >= 50 and self.DakCaliber < 75 then
+					self.DakFireSound = "daktanks/c50.wav"
+				end
+				if self.DakCaliber >= 75 and self.DakCaliber < 100 then
+					self.DakFireSound = "daktanks/c75.wav"
+				end
+				if self.DakCaliber >= 100 and self.DakCaliber < 120 then
+					self.DakFireSound = "daktanks/c100.wav"
+				end
+				if self.DakCaliber >= 120 and self.DakCaliber < 152 then
+					self.DakFireSound = "daktanks/c120.wav"
+				end
+				if self.DakCaliber >= 152 and self.DakCaliber < 200 then
+					self.DakFireSound = "daktanks/c152.wav"
+				end
+				if self.DakCaliber >= 200 then
+					self.DakFireSound = "daktanks/c200.wav"
+				end
 			end
 		end
 		if self.DakGunType == "Cannon" then
@@ -148,7 +151,9 @@ function ENT:Think()
 			self.DakAP = math.Round(self.DakCaliber,2).."mmCAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmCHEAmmo"
 			self.DakHEAT = math.Round(self.DakCaliber,2).."mmCHEATAmmo"
+			self.DakHESH = math.Round(self.DakCaliber,2).."mmCHESHAmmo"
 			self.DakHVAP = math.Round(self.DakCaliber,2).."mmCHVAPAmmo"
+			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
 			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
 			--get the volume of shell and multiply by density of steel
@@ -185,29 +190,31 @@ function ENT:Think()
 				self.ReloadSound = "daktanks/dakreloadheavy.wav"
 			end
 
-			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
-			end
-			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
-			end
-			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
-			end
-			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
-			end
-			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
-			end
-			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
-			end
-			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+			if self.DakFireSound == nil then
+				if self.DakCaliber < 37 then
+					self.DakFireSound = "daktanks/c25.wav"
+				end
+				if self.DakCaliber >= 37 and self.DakCaliber < 50 then
+					self.DakFireSound = "daktanks/c37.wav"
+				end
+				if self.DakCaliber >= 50 and self.DakCaliber < 75 then
+					self.DakFireSound = "daktanks/c50.wav"
+				end
+				if self.DakCaliber >= 75 and self.DakCaliber < 100 then
+					self.DakFireSound = "daktanks/c75.wav"
+				end
+				if self.DakCaliber >= 100 and self.DakCaliber < 120 then
+					self.DakFireSound = "daktanks/c100.wav"
+				end
+				if self.DakCaliber >= 120 and self.DakCaliber < 152 then
+					self.DakFireSound = "daktanks/c120.wav"
+				end
+				if self.DakCaliber >= 152 and self.DakCaliber < 200 then
+					self.DakFireSound = "daktanks/c152.wav"
+				end
+				if self.DakCaliber >= 200 then
+					self.DakFireSound = "daktanks/c200.wav"
+				end
 			end
 		end
 		if self.DakGunType == "Long Cannon" then
@@ -219,7 +226,9 @@ function ENT:Think()
 			self.DakAP = math.Round(self.DakCaliber,2).."mmLCAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmLCHEAmmo"
 			self.DakHEAT = math.Round(self.DakCaliber,2).."mmLCHEATAmmo"
+			self.DakHESH = math.Round(self.DakCaliber,2).."mmLCHESHAmmo"
 			self.DakHVAP = math.Round(self.DakCaliber,2).."mmLCHVAPAmmo"
+			self.DakATGM = math.Round(self.DakCaliber,2).."mmLCATGMAmmo"
 
 			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*9))
 			--get the volume of shell and multiply by density of steel
@@ -251,30 +260,31 @@ function ENT:Think()
 				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
 				self.ReloadSound = "daktanks/dakreloadheavy.wav"
 			end
-
-			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
-			end
-			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
-			end
-			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
-			end
-			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
-			end
-			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
-			end
-			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
-			end
-			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+			if self.DakFireSound == nil then
+				if self.DakCaliber < 37 then
+					self.DakFireSound = "daktanks/c25.wav"
+				end
+				if self.DakCaliber >= 37 and self.DakCaliber < 50 then
+					self.DakFireSound = "daktanks/c37.wav"
+				end
+				if self.DakCaliber >= 50 and self.DakCaliber < 75 then
+					self.DakFireSound = "daktanks/c50.wav"
+				end
+				if self.DakCaliber >= 75 and self.DakCaliber < 100 then
+					self.DakFireSound = "daktanks/c75.wav"
+				end
+				if self.DakCaliber >= 100 and self.DakCaliber < 120 then
+					self.DakFireSound = "daktanks/c100.wav"
+				end
+				if self.DakCaliber >= 120 and self.DakCaliber < 152 then
+					self.DakFireSound = "daktanks/c120.wav"
+				end
+				if self.DakCaliber >= 152 and self.DakCaliber < 200 then
+					self.DakFireSound = "daktanks/c152.wav"
+				end
+				if self.DakCaliber >= 200 then
+					self.DakFireSound = "daktanks/c200.wav"
+				end
 			end
 		end
 
@@ -288,6 +298,7 @@ function ENT:Think()
 			self.DakHE = math.Round(self.DakCaliber,2).."mmHHEAmmo"
 			self.DakHEAT = math.Round(self.DakCaliber,2).."mmHHEATAmmo"
 			self.DakHESH = math.Round(self.DakCaliber,2).."mmHHESHAmmo"
+			self.DakATGM = math.Round(self.DakCaliber,2).."mmHATGMAmmo"
 
 			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*4))
 			--get the volume of shell and multiply by density of steel
@@ -320,26 +331,28 @@ function ENT:Think()
 				self.ReloadSound = "daktanks/dakreloadheavy.wav"
 			end
 
-			if self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/h50.wav"
-			end
-			if self.DakCaliber >= 75 and self.DakCaliber < 105 then
-				self.DakFireSound = "daktanks/h75.wav"
-			end
-			if self.DakCaliber >= 105 and self.DakCaliber < 122 then
-				self.DakFireSound = "daktanks/h105.wav"
-			end
-			if self.DakCaliber >= 122 and self.DakCaliber < 155 then
-				self.DakFireSound = "daktanks/h122.wav"
-			end
-			if self.DakCaliber >= 155 and self.DakCaliber < 203 then
-				self.DakFireSound = "daktanks/h155.wav"
-			end
-			if self.DakCaliber >= 203 and self.DakCaliber < 420 then
-				self.DakFireSound = "daktanks/h203.wav"
-			end
-			if self.DakCaliber >= 420 then
-				self.DakFireSound = "daktanks/h420.wav"
+			if self.DakFireSound == nil then
+				if self.DakCaliber < 75 then
+					self.DakFireSound = "daktanks/h50.wav"
+				end
+				if self.DakCaliber >= 75 and self.DakCaliber < 105 then
+					self.DakFireSound = "daktanks/h75.wav"
+				end
+				if self.DakCaliber >= 105 and self.DakCaliber < 122 then
+					self.DakFireSound = "daktanks/h105.wav"
+				end
+				if self.DakCaliber >= 122 and self.DakCaliber < 155 then
+					self.DakFireSound = "daktanks/h122.wav"
+				end
+				if self.DakCaliber >= 155 and self.DakCaliber < 203 then
+					self.DakFireSound = "daktanks/h155.wav"
+				end
+				if self.DakCaliber >= 203 and self.DakCaliber < 420 then
+					self.DakFireSound = "daktanks/h203.wav"
+				end
+				if self.DakCaliber >= 420 then
+					self.DakFireSound = "daktanks/h420.wav"
+				end
 			end
 		end
 
@@ -385,29 +398,31 @@ function ENT:Think()
 				self.ReloadSound = "daktanks/dakreloadheavy.wav"
 			end
 
-			if self.DakCaliber < 90 then
-				self.DakFireSound = "daktanks/m60.wav"
-			end
-			if self.DakCaliber >= 90 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/m90.wav"
-			end
-			if self.DakCaliber >= 120 and self.DakCaliber < 150 then
-				self.DakFireSound = "daktanks/m120.wav"
-			end
-			if self.DakCaliber >= 150 and self.DakCaliber < 240 then
-				self.DakFireSound = "daktanks/m150.wav"
-			end
-			if self.DakCaliber >= 240 and self.DakCaliber < 280 then
-				self.DakFireSound = "daktanks/m240.wav"
-			end
-			if self.DakCaliber >= 280 and self.DakCaliber < 420 then
-				self.DakFireSound = "daktanks/m280.wav"
-			end
-			if self.DakCaliber >= 420 and self.DakCaliber < 600 then
-				self.DakFireSound = "daktanks/m420.wav"
-			end
-			if self.DakCaliber >= 600 then
-				self.DakFireSound = "daktanks/m600.wav"
+			if self.DakFireSound == nil then
+				if self.DakCaliber < 90 then
+					self.DakFireSound = "daktanks/m60.wav"
+				end
+				if self.DakCaliber >= 90 and self.DakCaliber < 120 then
+					self.DakFireSound = "daktanks/m90.wav"
+				end
+				if self.DakCaliber >= 120 and self.DakCaliber < 150 then
+					self.DakFireSound = "daktanks/m120.wav"
+				end
+				if self.DakCaliber >= 150 and self.DakCaliber < 240 then
+					self.DakFireSound = "daktanks/m150.wav"
+				end
+				if self.DakCaliber >= 240 and self.DakCaliber < 280 then
+					self.DakFireSound = "daktanks/m240.wav"
+				end
+				if self.DakCaliber >= 280 and self.DakCaliber < 420 then
+					self.DakFireSound = "daktanks/m280.wav"
+				end
+				if self.DakCaliber >= 420 and self.DakCaliber < 600 then
+					self.DakFireSound = "daktanks/m420.wav"
+				end
+				if self.DakCaliber >= 600 then
+					self.DakFireSound = "daktanks/m600.wav"
+				end
 			end
 		end
 
@@ -459,8 +474,30 @@ function ENT:Think()
 		--self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
 		
 		local trace = {}
-			trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
-			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
+			if self.ShellList[i].IsGuided then
+				local indicatortrace = {}
+					indicatortrace.start = self.ShellList[i].Indicator:GetPos()
+					indicatortrace.endpos = self.ShellList[i].Indicator:GetPos() + self.ShellList[i].Indicator:GetForward()*1000000
+					indicatortrace.filter = self.ShellList[i].Filter
+				local indicator = util.TraceLine(indicatortrace)
+				if not(self.ShellList[i].SimPos) then
+					self.ShellList[i].SimPos = self.ShellList[i].Pos
+				end
+
+				local _, RotatedAngle =	WorldToLocal( Vector(0,0,0), (indicator.HitPos-self.ShellList[i].SimPos):GetNormalized():Angle(), self.ShellList[i].SimPos, self.ShellList[i].Ang )
+				local Pitch = math.Clamp(RotatedAngle.p,-10,10)
+				local Yaw = math.Clamp(RotatedAngle.y,-10,10)
+				local Roll = math.Clamp(RotatedAngle.r,-10,10)
+				local _, FlightAngle = LocalToWorld( self.ShellList[i].SimPos, Angle(Pitch,Yaw,Roll), Vector(0,0,0), Angle(0,0,0) )
+				self.ShellList[i].Ang = self.ShellList[i].Ang + FlightAngle
+				self.ShellList[i].SimPos = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1)
+
+				trace.start = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*-0.1)
+				trace.endpos = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1)
+			else
+				trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
+				trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
+			end
 			trace.filter = self.ShellList[i].Filter
 			trace.mins = Vector(-1,-1,-1)
 			trace.maxs = Vector(1,1,1)
@@ -470,17 +507,16 @@ function ENT:Think()
 		effectdata:SetStart(ShellTrace.StartPos)
 		effectdata:SetOrigin(ShellTrace.HitPos)
 		effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
-		util.Effect("dakteballistictracer", effectdata)
+		util.Effect(self.ShellList[i].DakTrail, effectdata, true, true)
 
 		if ShellTrace.Hit then
 			DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
 		end
 
 		if self.ShellList[i].DieTime then
-			self.RemoveList[#self.RemoveList+1] = i
-			--if self.ShellList[i].DieTime+1.5<CurTime()then
-			--	self.RemoveList[#self.RemoveList+1] = i
-			--end
+			if self.ShellList[i].DieTime<CurTime()then
+				self.RemoveList[#self.RemoveList+1] = i
+			end
 		end
 
 		if self.ShellList[i].RemoveNow == 1 then
@@ -546,33 +582,46 @@ function ENT:DakTEAmmoCheck()
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
 	if self.CurrentAmmoType == 4 then
-		if self.DakGunType == "Howitzer" or self.DakGunType == "Mortar" then
-			WireLib.TriggerOutput(self, "AmmoType", "High Explosive Squash Head")
-			self.DakAmmoType = self.DakHESH
-			self.DakShellAmmoType = "HESH"
-			self.DakShellExplosive = true
-			self.DakShellDamage = 0
-			self.DakShellMass = self.BaseDakShellMass
-			self.DakShellPenetration = self.DakMaxHealth*1.25
-			self.DakShellVelocity = self.BaseDakShellVelocity*0.5
-			self.DakPenLossPerMeter = 0.0
-			WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
-			WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
-			WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
-		else
-			WireLib.TriggerOutput(self, "AmmoType", "High Velocity Armor Piercing")
-			self.DakAmmoType = self.DakHVAP
-			self.DakShellAmmoType = "HVAP"
-			self.DakShellExplosive = false
-			self.DakShellDamage = self.BaseDakShellDamage/8
-			self.DakShellMass = self.BaseDakShellMass/8
-			self.DakShellPenetration = self.BaseDakShellPenetration*1.5
-			self.DakShellVelocity = self.BaseDakShellVelocity*4/3
-			self.DakPenLossPerMeter = 0.001
-			WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
-			WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
-			WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
-		end
+		WireLib.TriggerOutput(self, "AmmoType", "High Velocity Armor Piercing")
+		self.DakAmmoType = self.DakHVAP
+		self.DakShellAmmoType = "HVAP"
+		self.DakShellExplosive = false
+		self.DakShellDamage = self.BaseDakShellDamage/8
+		self.DakShellMass = self.BaseDakShellMass/8
+		self.DakShellPenetration = self.BaseDakShellPenetration*1.5
+		self.DakShellVelocity = self.BaseDakShellVelocity*4/3
+		self.DakPenLossPerMeter = 0.001
+		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
+		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
+		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
+	end
+	if self.CurrentAmmoType == 5 then
+		WireLib.TriggerOutput(self, "AmmoType", "High Explosive Squash Head")
+		self.DakAmmoType = self.DakHESH
+		self.DakShellAmmoType = "HESH"
+		self.DakShellExplosive = true
+		self.DakShellDamage = 0
+		self.DakShellMass = self.BaseDakShellMass
+		self.DakShellPenetration = self.DakMaxHealth*1.25
+		self.DakShellVelocity = self.BaseDakShellVelocity*0.5
+		self.DakPenLossPerMeter = 0.0
+		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
+		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
+		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
+	end
+	if self.CurrentAmmoType == 6 then
+		WireLib.TriggerOutput(self, "AmmoType", "Anti Tank Guided Missile")
+		self.DakAmmoType = self.DakATGM
+		self.DakShellAmmoType = "HEAT"
+		self.DakShellExplosive = true
+		self.DakShellDamage = self.BaseDakShellDamage/8
+		self.DakShellMass = self.BaseDakShellMass/8
+		self.DakShellPenetration = self.DakMaxHealth*6.40
+		self.DakShellVelocity = 12600
+		self.DakPenLossPerMeter = 0.0
+		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
+		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
+		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
 	if IsValid(self.DakTankCore) then
 		self.AmmoCount = 0 
@@ -665,6 +714,17 @@ function ENT:DakTEFire()
 				if self.DakName == "Flamethrower" then
 					Shell.DakIsFlame = 1
 				end
+
+				if self.DakAmmoType == self.DakATGM then
+					Shell.IsGuided = true
+					Shell.DakTrail = "daktemissiletracer"
+					if IsValid(self.Inputs.Indicator.Value) then
+						Shell.Indicator = self.Inputs.Indicator.Value
+					else
+						Shell.Indicator = self
+					end
+				end
+
 				self.ShellList[#self.ShellList+1] = Shell
 
 				self:SetNWString("FireSound",self.DakFireSound)
@@ -732,7 +792,7 @@ end
 function ENT:DakTEGunAmmoSwap()
 	if( self.AmmoSwap ) then
 		self.CurrentAmmoType = self.CurrentAmmoType+1
-		if self.CurrentAmmoType>4 then
+		if self.CurrentAmmoType>6 then
 			self.CurrentAmmoType = 1
 		end
 	else
@@ -773,7 +833,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
-		self.DakShellPenetration = self.DakMaxHealth*1.20
+		self.DakShellPenetration = self.DakMaxHealth*5.40
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
@@ -781,33 +841,46 @@ function ENT:DakTEGunAmmoSwap()
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
 	if self.CurrentAmmoType == 4 then
-		if self.DakGunType == "Howitzer" or self.DakGunType == "Mortar" then
-			WireLib.TriggerOutput(self, "AmmoType", "High Explosive Squash Head")
-			self.DakAmmoType = self.DakHESH
-			self.DakShellAmmoType = "HESH"
-			self.DakShellExplosive = true
-			self.DakShellDamage = 0
-			self.DakShellMass = self.BaseDakShellMass
-			self.DakShellPenetration = self.DakMaxHealth*1.25
-			self.DakShellVelocity = self.BaseDakShellVelocity*0.5
-			self.DakPenLossPerMeter = 0.0
-			WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
-			WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
-			WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
-		else
-			WireLib.TriggerOutput(self, "AmmoType", "High Velocity Armor Piercing")
-			self.DakAmmoType = self.DakHVAP
-			self.DakShellAmmoType = "HVAP"
-			self.DakShellExplosive = false
-			self.DakShellDamage = self.BaseDakShellDamage/8
-			self.DakShellMass = self.BaseDakShellMass/8
-			self.DakShellPenetration = self.BaseDakShellPenetration*1.5
-			self.DakShellVelocity = self.BaseDakShellVelocity*4/3
-			self.DakPenLossPerMeter = 0.001
-			WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
-			WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
-			WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
-		end
+		WireLib.TriggerOutput(self, "AmmoType", "High Velocity Armor Piercing")
+		self.DakAmmoType = self.DakHVAP
+		self.DakShellAmmoType = "HVAP"
+		self.DakShellExplosive = false
+		self.DakShellDamage = self.BaseDakShellDamage/8
+		self.DakShellMass = self.BaseDakShellMass/8
+		self.DakShellPenetration = self.BaseDakShellPenetration*1.5
+		self.DakShellVelocity = self.BaseDakShellVelocity*4/3
+		self.DakPenLossPerMeter = 0.001
+		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
+		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
+		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
+	end
+	if self.CurrentAmmoType == 5 then
+		WireLib.TriggerOutput(self, "AmmoType", "High Explosive Squash Head")
+		self.DakAmmoType = self.DakHESH
+		self.DakShellAmmoType = "HESH"
+		self.DakShellExplosive = true
+		self.DakShellDamage = 0
+		self.DakShellMass = self.BaseDakShellMass
+		self.DakShellPenetration = self.DakMaxHealth*1.25
+		self.DakShellVelocity = self.BaseDakShellVelocity*0.5
+		self.DakPenLossPerMeter = 0.0
+		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
+		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
+		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
+	end
+	if self.CurrentAmmoType == 6 then
+		WireLib.TriggerOutput(self, "AmmoType", "Anti Tank Guided Missile")
+		self.DakAmmoType = self.DakATGM
+		self.DakShellAmmoType = "HEAT"
+		self.DakShellExplosive = true
+		self.DakShellDamage = self.BaseDakShellDamage/8
+		self.DakShellMass = self.BaseDakShellMass/8
+		self.DakShellPenetration = self.DakMaxHealth*6.40
+		self.DakShellVelocity = 12600
+		self.DakPenLossPerMeter = 0.0
+		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
+		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
+		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
 	if IsValid(self.DakTankCore) then
 		self.AmmoCount = 0 
@@ -869,6 +942,7 @@ function ENT:PreEntityCopy()
 	info.DakColor = self:GetColor()
 	info.DakCaliber = self.DakCaliber
 	info.DakGunType = self.DakGunType
+	info.DakFireSound = self.DakFireSound
 
 	--Materials
 	info.DakMat0 = self:GetSubMaterial(0)
@@ -895,6 +969,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.DakCaliber = Ent.EntityMods.DakTek.DakCaliber
 		self.DakGunType = Ent.EntityMods.DakTek.DakGunType
 		self.DakHealth = self.DakMaxHealth
+		self.DakFireSound = Ent.EntityMods.DakTek.DakFireSound
 
 		self.DakOwner = Player
 		self:SetColor(Ent.EntityMods.DakTek.DakColor)

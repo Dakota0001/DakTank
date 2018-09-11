@@ -13,23 +13,25 @@ language.Add( "Tool.daktanksoundreplacer.name", "DakTank Sound Replacer" )
 language.Add( "Tool.daktanksoundreplacer.desc", "Changes the sounds for DakTank guns and engines." )
 language.Add( "Tool.daktanksoundreplacer.0", "Left click to apply sound. Right click to get target's current sound." )
 end
-TOOL.ClientConVar[ "DakSound" ] = ""
+TOOL.ClientConVar[ "DakTankSound" ] = ""
 --TOOL.ClientConVar[ "myparameter" ] = "fubar"
  
 function TOOL:LeftClick( trace )
 	if CurTime()>self.LastLeftClick then
 		local Target = trace.Entity
 		if Target:GetClass() == "dak_temotor" then
-			Target.DakSound = self:GetClientInfo("DakSound")
+			Target.DakSound = self:GetClientInfo("DakTankSound")
 			if (CLIENT) or (game.SinglePlayer()) then
 				self:GetOwner():ChatPrint("Sound Replaced.")
 			end
-		elseif Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun" or Target:GetClass() == "dak_temachinegun" then
-			Target.DakFireSound = self:GetClientInfo("DakSound")
+		end
+		if Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun" or Target:GetClass() == "dak_temachinegun" then
+			Target.DakFireSound = self:GetClientInfo("DakTankSound")
 			if (CLIENT) or (game.SinglePlayer()) then
 				self:GetOwner():ChatPrint("Sound Replaced.")
 			end
-		else
+		end
+		if not(Target:GetClass() == "dak_temotor") and not(Target:GetClass() == "dak_tegun") and not(Target:GetClass() == "dak_teautogun") and not(Target:GetClass() == "dak_temachinegun") then
 			if (CLIENT) or (game.SinglePlayer()) then
 				self:GetOwner():ChatPrint("Entity not valid for sound replacement.")
 			end
@@ -42,19 +44,21 @@ function TOOL:RightClick( trace )
 	if CurTime()>self.LastRightClick then
 		local Target = trace.Entity
 		if Target:GetClass() == "dak_temotor" then
-			if not(Target.DakSound == nil) then
-				if (CLIENT) or (game.SinglePlayer()) then
+			if not(Target.DakSound == nil) or not(Target.DakSound == "") then
+				if (SERVER) or (game.SinglePlayer()) then
 					self:GetOwner():ChatPrint(Target.DakSound)
 				end
 			end
-		elseif Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun" or Target:GetClass() == "dak_temachinegun" then
-			if not(Target.DakFireSound == nil) then
-				if (CLIENT) or (game.SinglePlayer()) then
+		end
+		if Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun" or Target:GetClass() == "dak_temachinegun" then
+			if not(Target.DakFireSound == nil) or not(Target.DakFireSound == "") then
+				if (SERVER) or (game.SinglePlayer()) then
 					self:GetOwner():ChatPrint(Target.DakFireSound)
 				end
 			end
-		else
-			if (CLIENT) or (game.SinglePlayer()) then
+		end
+		if not(Target:GetClass() == "dak_temotor") and not(Target:GetClass() == "dak_tegun") and not(Target:GetClass() == "dak_teautogun") and not(Target:GetClass() == "dak_temachinegun") then
+			if (SERVER) or (game.SinglePlayer()) then
 				self:GetOwner():ChatPrint("Select a motor or gun to read sound.")
 			end
 		end
@@ -118,7 +122,7 @@ function TOOL.BuildCPanel(panel)
 	SoundSet:SetTall(20)
 	SoundSet:SetVisible(true)
 	SoundSet.DoClick = function()
-		RunConsoleCommand("daksoundreplacer_DakSound", GetConVar("wire_soundemitter_sound"):GetString())
+		RunConsoleCommand("daktanksoundreplacer_DakTankSound", GetConVar("wire_soundemitter_sound"):GetString())
 	end
 
 	panel:AddItem(SoundPre)

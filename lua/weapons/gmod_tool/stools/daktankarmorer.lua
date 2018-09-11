@@ -1,5 +1,5 @@
  
-TOOL.Category = "DakTek Tank Edition"
+TOOL.Category = "DakTank"
 TOOL.Name = "#Tool.daktankarmorer.listname"
 TOOL.Command = nil
 TOOL.ConfigName = "" --Setting this means that you do not have to create external configuration files to define the layout of the tool config-hud 
@@ -7,8 +7,8 @@ TOOL.LastLeftClick = CurTime()
 TOOL.LastRightClick = CurTime()
 
 if (CLIENT) then
-language.Add( "Tool.daktankarmorer.listname", "DakTek Tank Edition Armorer" )
-language.Add( "Tool.daktankarmorer.name", "DakTek Tank Edition Armorer" )
+language.Add( "Tool.daktankarmorer.listname", "DakTank Armorer" )
+language.Add( "Tool.daktankarmorer.name", "DakTank Armorer" )
 language.Add( "Tool.daktankarmorer.desc", "Armors stuff and gives info." )
 language.Add( "Tool.daktankarmorer.0", "Left click to set armor. Right click to get info." )
 end
@@ -45,7 +45,7 @@ function TOOL:LeftClick( trace )
 						trace.Entity.DakArmor = trace.Entity:OBBMaxs().x/2
 						trace.Entity.DakIsTread = 1
 					else
-						if trace.Entity:GetClass()=="prop_physics" then 
+						if trace.Entity:GetClass()=="prop_physics" and not(trace.Entity.IsComposite == 1) then 
 							if not(trace.Entity.DakArmor == 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25) then
 								trace.Entity.DakArmor = 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25
 							end
@@ -97,7 +97,7 @@ function TOOL:RightClick( trace )
 						trace.Entity.DakArmor = trace.Entity:OBBMaxs().x/2
 						trace.Entity.DakIsTread = 1
 					else
-						if trace.Entity:GetClass()=="prop_physics" then 
+						if trace.Entity:GetClass()=="prop_physics" and not(trace.Entity.IsComposite == 1) then 
 							if not(trace.Entity.DakArmor == 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25) then
 								trace.Entity.DakArmor = 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25
 							end
@@ -115,14 +115,22 @@ function TOOL:RightClick( trace )
 				local Weight = math.Round(Target:GetPhysicsObject():GetMass(),1)
 				local HitAng = math.deg(math.acos(trace.HitNormal:Dot( -trace.Normal )))
 				local EffArmor = (Target.DakArmor/math.abs(trace.HitNormal:Dot(trace.Normal)))
-				local Multiplier = (EffArmor/Target.DakArmor)
-			
 
-				ply:ChatPrint("Raw Armor: "..math.Round(Target.DakArmor,2).."(mm)")
-				ply:ChatPrint("Effective Armor: "..math.Round(EffArmor,2).."(mm)")
-				ply:ChatPrint("Angle: "..math.Round(90-HitAng,2).."(degrees)")
-				ply:ChatPrint("Multiplier: "..math.Round(Multiplier,2))
-				ply:ChatPrint("Weight: "..math.Round(Weight,2).."(kg)")
+				local Multiplier = (EffArmor/Target.DakArmor)
+				
+				if trace.Entity.IsComposite == 1 then
+					ply:ChatPrint("Composite")
+					ply:ChatPrint(math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*15.5),2).." Armor(mm) vs KE")
+					ply:ChatPrint(math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*31),2).." Armor(mm) vs HEAT")
+					ply:ChatPrint("Weight: "..math.Round(Weight,2).."(kg)")
+				else
+					ply:ChatPrint("Raw Armor: "..math.Round(Target.DakArmor,2).."(mm)")
+					ply:ChatPrint("LOS Armor: "..math.Round(EffArmor,2).."(mm)")
+					ply:ChatPrint("Effective Armor: "..math.Round(Target.DakArmor/math.cos(HitAng*0.0174533)^math.Clamp(Target.DakArmor/self:GetClientInfo("DakArmor"),1,9999999999),2).."(mm), use armor input value in Q menu as shell diameter")
+					ply:ChatPrint("Angle: "..math.Round(90-HitAng,2).."(degrees)")
+					ply:ChatPrint("Multiplier: "..math.Round(Multiplier,2))
+					ply:ChatPrint("Weight: "..math.Round(Weight,2).."(kg)")
+				end
 			end
 		end
 	self.LastRightClick = CurTime()

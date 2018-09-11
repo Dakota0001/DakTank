@@ -318,6 +318,17 @@ function ENT:Think()
 
 		if self.DakActive == 1 and table.Count(self.HitBox)~=0 and self.CurrentHealth then
 			if table.Count(self.HitBox) > 0 then
+
+				if self.Composites then
+					if table.Count(self.Composites) > 0 then
+						for i = 1, table.Count(self.Composites) do
+							self.Composites[i].IsComposite = 1
+							self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*2000) )
+							self.Composites[i].DakArmor = math.sqrt(math.sqrt(self.Composites[i]:GetPhysicsObject():GetVolume()))*15.5
+						end
+					end
+				end
+
 				self.DamageCycle = 0
 				if self.DakHealth < self.CurrentHealth then
 					self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.DakHealth)
@@ -383,7 +394,6 @@ function ENT:Think()
 				if curvel:Distance(self.LastVel) > 1000 then
 					for i=1, #self.Crew do
 						self.Crew[i].DakHealth = self.Crew[i].DakHealth - ((curvel:Distance(self.LastVel)-1000)/100)
-						print(((curvel:Distance(self.LastVel)-1000)/100))
 
 						if self.Crew[i].DakHealth <= 0 then
 							local salvage = ents.Create( "dak_tesalvage" )
@@ -483,18 +493,57 @@ end
 function ENT:PreEntityCopy()
 	local info = {}
 	local entids = {}
+
+	local CompositesIDs = {}
+	if table.Count(self.Composites)>0 then
+		for i = 1, table.Count(self.Composites) do
+			if not(self.Composites[i]==nil) then
+				table.insert(CompositesIDs,self.Composites[i]:EntIndex())
+			end
+		end
+	end
+	info.CompositesCount = table.Count(self.Composites)
+
 	info.DakName = self.DakName
 	info.DakHealth = self.DakHealth
 	info.DakMaxHealth = self.DakBaseMaxHealth
 	info.DakMass = self.DakMass
 	info.DakOwner = self.DakOwner
 	duplicator.StoreEntityModifier( self, "DakTek", info )
+	duplicator.StoreEntityModifier( self, "DTComposites", CompositesIDs )
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
+		if Ent.EntityMods.DakTek.CompositesCount == nil then
+			self.NewComposites = {}
+			if Ent.EntityMods.DTComposites then
+				for i = 1, table.Count(Ent.EntityMods.DTComposites) do
+					self.Ent = CreatedEntities[ Ent.EntityMods.DTComposites[i]]
+					if self.Ent and IsValid(self.Ent) then
+						table.insert(self.NewComposites,self.Ent)
+					end
+				end
+			end
+			self.Composites = self.NewComposites
+		else
+			if Ent.EntityMods.DakTek.CompositesCount > 0 then
+				self.NewComposites = {}
+				if Ent.EntityMods.DTComposites then
+					for i = 1, Ent.EntityMods.DakTek.CompositesCount do
+						local hitEnt = CreatedEntities[ Ent.EntityMods.DTComposites[i]]
+						if IsValid(hitEnt) then
+							table.insert(self.NewComposites,hitEnt)
+						end
+					end
+				end
+				self.Composites = self.NewComposites
+			else
+				self.Composites = {}
+			end
+		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth

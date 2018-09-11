@@ -1,5 +1,5 @@
  
-TOOL.Category = "DakTek Tank Edition"
+TOOL.Category = "DakTank"
 TOOL.Name = "#Tool.daktanklinker.listname"
 TOOL.Command = nil
 TOOL.ConfigName = "" --Setting this means that you do not have to create external configuration files to define the layout of the tool config-hud 
@@ -13,8 +13,8 @@ TOOL.LastReload = CurTime()
 TOOL.ClientConVar[ "DakChatFeedback" ] = 1
 
 if (CLIENT) then
-language.Add( "Tool.daktanklinker.listname", "DakTek Tank Edition Linker" )
-language.Add( "Tool.daktanklinker.name", "DakTek Tank Edition Linker" )
+language.Add( "Tool.daktanklinker.listname", "DakTank Linker" )
+language.Add( "Tool.daktanklinker.name", "DakTank Linker" )
 language.Add( "Tool.daktanklinker.desc", "Links stuff to things." )
 language.Add( "Tool.daktanklinker.0", "Left click to select the gearbox, AL magazine, or turret motor. Right click on the fuel, gun, or turret control. Also links crew members to things." )
 end
@@ -24,6 +24,49 @@ function TOOL:LeftClick( trace )
 	if CurTime()>self.LastLeftClick then
 		local Target = trace.Entity
 		if(string.Explode("_",Target:GetClass(),false)[1] == "dak") then
+			if Target:GetClass()=="dak_tankcore" then
+				if (SERVER) or (game.SinglePlayer()) then
+					for i = 1, table.Count(Target.Composites) do
+						table.insert( self.EntList, table.Count(self.EntList)+1, Target.Composites[i] )
+						table.insert( self.ColorList, table.Count(self.ColorList)+1, Target.Composites[i]:GetColor() )
+						Target.Composites[i]:SetColor(Color(0,255,0,255))
+					end
+				end
+			else
+				if table.HasValue( self.EntList, Target ) then
+					self.Ent1 = Target
+					if (CLIENT) or (game.SinglePlayer()) then
+						self:GetOwner():EmitSound("/items/ammocrate_open.wav")
+						if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+							self:GetOwner():ChatPrint("Entity deselected.")
+						end
+					end
+					self.Key = table.KeyFromValue( self.EntList, self.Ent1 )
+					self.Ent1:SetColor(self.ColorList[self.Key])
+					table.remove( self.EntList, self.Key )
+					table.remove( self.ColorList, self.Key )
+				else
+					if Target:GetClass() == "dak_teautoloadingmodule" or Target:GetClass() == "dak_turretmotor" or Target:GetClass() == "dak_crew" and (#self.EntList==0 or self.EntList[1]:GetClass()==Target:GetClass()) then
+						self.Ent1 = Target
+						if (CLIENT) or (game.SinglePlayer()) then
+							self:GetOwner():EmitSound("/items/ammocrate_open.wav")
+							if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+								self:GetOwner():ChatPrint("Entity selected.")
+							end
+						end
+						table.insert( self.EntList, table.Count(self.EntList)+1, self.Ent1 )
+						table.insert( self.ColorList, table.Count(self.ColorList)+1, self.Ent1:GetColor() )
+						self.Ent1:SetColor(Color(0,255,0,255))
+					else
+						self:GetOwner():EmitSound("items/medshotno1.wav")
+						if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+							self:GetOwner():ChatPrint("Entity cannot be linked to anything.")
+						end
+					end
+				end
+			end
+		end
+		if Target:GetClass() == "prop_physics" then
 			if table.HasValue( self.EntList, Target ) then
 				self.Ent1 = Target
 				if (CLIENT) or (game.SinglePlayer()) then
@@ -37,7 +80,16 @@ function TOOL:LeftClick( trace )
 				table.remove( self.EntList, self.Key )
 				table.remove( self.ColorList, self.Key )
 			else
-				if Target:GetClass() == "dak_teautoloadingmodule" or Target:GetClass() == "dak_turretmotor" or Target:GetClass() == "dak_crew" and (#self.EntList==0 or self.EntList[1]:GetClass()==Target:GetClass()) then
+				if IsValid(self.EntList[1]) and IsValid(Target) then
+					if self.EntList[1]:GetClass()==Target:GetClass() then
+						self.SameClass = true
+					else
+						self.SameClass = false
+					end
+				else
+					self.SameClass = false
+				end
+				if (#self.EntList==0 or self.EntList[1]:GetClass()==Target:GetClass()) then
 					self.Ent1 = Target
 					if (CLIENT) or (game.SinglePlayer()) then
 						self:GetOwner():EmitSound("/items/ammocrate_open.wav")
@@ -51,7 +103,7 @@ function TOOL:LeftClick( trace )
 				else
 					self:GetOwner():EmitSound("items/medshotno1.wav")
 					if self:GetClientNumber( "DakChatFeedback" ) == 1 then
-						self:GetOwner():ChatPrint("Entity cannot be linked to anything.")
+						self:GetOwner():ChatPrint("Do not select multiple entity types when selecting composites.")
 					end
 				end
 			end
@@ -160,6 +212,29 @@ function TOOL:RightClick( trace )
 					end
 				end
 			else	
+				if(Target:GetClass() == "dak_tankcore") then
+					if self.EntList[1]:GetClass() == "prop_physics" then
+						Target.Composites = self.EntList
+						self:GetOwner():EmitSound("/items/ammocrate_close.wav")
+						if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+							self:GetOwner():ChatPrint("Composite armor hitpool set, select tankcore to select all composites if you wish to edit them.")
+						end
+						if table.Count(self.EntList)>0 then
+							for i = 1, table.Count(self.EntList) do
+								self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
+								if self.EntList[self.Key]:IsValid() then
+									self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
+								end
+							end
+						end
+						self.EntList = {}
+						self.ColorList = {}
+					else
+						if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+							self:GetOwner():ChatPrint("Armor can only be linked to tankcore.")
+						end
+					end
+				end
 				if(Target:GetClass() == "dak_teautogun") then
 					if self.EntList[1]:GetClass() == "dak_teautoloadingmodule" then
 						self.Ent2 = Target
@@ -255,7 +330,7 @@ function TOOL:Reload()
 end
 
 function TOOL.BuildCPanel( panel )
-	panel:AddControl("Header",{Text = "DakTek Tank Edition Linker", Description	= "This tool just links magazines to autoloaders, and turret motors to turret controls, also links crew to things. Ammo is automatically found on the contraption by the gun."})	
+	panel:AddControl("Header",{Text = "DakTank Linker", Description	= "This tool just links magazines to autoloaders, and turret motors to turret controls, also links crew to things. Ammo is automatically found on the contraption by the gun."})	
 	panel:AddControl("CheckBox", {Label = "Chat Feedback", Description ="Check for feedback in chat when actions are completed with this tool.", Command = "daktanklinker_DakChatFeedback"})
 end
  

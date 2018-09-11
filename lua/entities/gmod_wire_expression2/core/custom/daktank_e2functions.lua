@@ -92,11 +92,13 @@ e2function string entity:daktankGetAmmoType()
 					return "HEAT"
 				end
 				if this.CurrentAmmoType == 4 then
-					if this.DakGunType == "Howitzer" or this.DakGunType == "Mortar" then
-						return "HESH"
-					else
-						return "HVAP"
-					end
+					return "HVAP"
+				end
+				if this.CurrentAmmoType == 5 then
+					return "HESH"
+				end
+				if this.CurrentAmmoType == 6 then
+					return "ATGM"
 				end
 			end
 		end
