@@ -75,5 +75,10 @@ function EFFECT:Think()
 	return true
 end
 
-function EFFECT:Render()
+function EFFECT:Render( )
+	local model = {}
+		model.model = "models/daktanks/test/lrmrocket.mdl"
+		model.pos = self.EndPos
+		model.angle = self.Dir:Angle()
+	render.Model( model )
 end

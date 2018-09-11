@@ -297,8 +297,8 @@ function ENT:Think()
 				for i=1, table.Count(self.HitBox) do
 					self.HitBoxMass = self.HitBoxMass + self.HitBox[i]:GetPhysicsObject():GetMass()
 				end
-				self.CurrentHealth = self.HitBoxMass*0.01*self.SizeMult*5
-				self.DakMaxHealth = self.HitBoxMass*0.01*self.SizeMult*5
+				self.CurrentHealth = self.HitBoxMass*0.01*self.SizeMult*25
+				self.DakMaxHealth = self.HitBoxMass*0.01*self.SizeMult*25
 				for i=1, table.Count(self.HitBox) do
 					DakTekTankEditionSetupNewEnt(self.HitBox[i])
 					self.HitBox[i].DakHealth = self.CurrentHealth
@@ -379,9 +379,9 @@ function ENT:Think()
 				end
 				for i = 1, table.Count(self.HitBox) do
 					if self.CurrentHealth >= self.DakMaxHealth then
-						self.DakMaxHealth = self.CurMass*0.01*self.SizeMult*5
-						self.CurrentHealth = self.CurMass*0.01*self.SizeMult*5
-						self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult*5
+						self.DakMaxHealth = self.CurMass*0.01*self.SizeMult*25
+						self.CurrentHealth = self.CurMass*0.01*self.SizeMult*25
+						self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult*25
 					end
 					self.HitBox[i].DakHealth = self.CurrentHealth
 				end

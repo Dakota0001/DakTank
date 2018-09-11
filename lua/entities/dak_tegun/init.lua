@@ -88,10 +88,11 @@ function ENT:Think()
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
+			self.ShellLengthMult = (40/50)
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
 			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
-			self.BaseDakShellPenetration = (self.DakCaliber*2)*(40/50)
+			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)
 			self.DakShellFragPen = (self.DakCaliber/2.5)
@@ -99,7 +100,7 @@ function ENT:Think()
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakteballistictracer"
-			self.BaseDakShellVelocity = self.BasicVelocity*(40/50)
+			self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
@@ -164,9 +165,9 @@ function ENT:Think()
 			--print((math.pi*((200*0.001*0.5)^2)*(200*0.001*6.5))*7700)
 			
 			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
-
+			self.ShellLengthMult = (50/50)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
-			self.BaseDakShellPenetration = (self.DakCaliber*2)*(50/50)
+			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)
 			self.DakShellFragPen = (self.DakCaliber/2.5)
@@ -174,7 +175,7 @@ function ENT:Think()
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakteballistictracer"
-			self.BaseDakShellVelocity = self.BasicVelocity*(50/50)
+			self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
@@ -234,10 +235,11 @@ function ENT:Think()
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
+			self.ShellLengthMult = (70/50)
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*9))*7700
 			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
-			self.BaseDakShellPenetration = (self.DakCaliber*2)*(70/50)
+			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)
 			self.DakShellFragPen = (self.DakCaliber/2.5)
@@ -245,7 +247,7 @@ function ENT:Think()
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakteballistictracer"
-			self.BaseDakShellVelocity = self.BasicVelocity*(70/50)
+			self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
@@ -304,10 +306,11 @@ function ENT:Think()
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
+			self.ShellLengthMult = (30/50)
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*4))*7700
 			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
-			self.BaseDakShellPenetration = (self.DakCaliber*2)*(30/50)
+			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)*1.3
 			self.DakShellFragPen = (self.DakCaliber/2.5)*1.3
@@ -315,7 +318,7 @@ function ENT:Think()
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakteballistictracer"
-			self.BaseDakShellVelocity = self.BasicVelocity*(30/50)
+			self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
@@ -371,10 +374,11 @@ function ENT:Think()
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
+			self.ShellLengthMult = (15/50)
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*2.75))*7700
 			self.DakCooldown = 4*math.sqrt(self.BaseDakShellMass)
 			self.DakShellSplashDamage = self.DakCaliber*0.375
-			self.BaseDakShellPenetration = (self.DakCaliber*2)*(15/50)
+			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)*1.15
 			self.DakShellFragPen = (self.DakCaliber/2.5)*1.15
@@ -382,7 +386,7 @@ function ENT:Think()
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
 			self.DakShellTrail = "dakteballistictracer"
-			self.BaseDakShellVelocity = self.BasicVelocity*(15/50)
+			self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
@@ -574,7 +578,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
-		self.DakShellPenetration = self.DakMaxHealth*5.40
+		self.DakShellPenetration = self.DakMaxHealth*5.40*self.ShellLengthMult
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
@@ -616,7 +620,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
-		self.DakShellPenetration = self.DakMaxHealth*6.40
+		self.DakShellPenetration = self.DakMaxHealth*6.40*self.ShellLengthMult
 		self.DakShellVelocity = 12600
 		self.DakPenLossPerMeter = 0.0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
@@ -833,7 +837,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
-		self.DakShellPenetration = self.DakMaxHealth*5.40
+		self.DakShellPenetration = self.DakMaxHealth*5.40*self.ShellLengthMult
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
@@ -875,7 +879,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
-		self.DakShellPenetration = self.DakMaxHealth*6.40
+		self.DakShellPenetration = self.DakMaxHealth*6.40*self.ShellLengthMult
 		self.DakShellVelocity = 12600
 		self.DakPenLossPerMeter = 0.0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
