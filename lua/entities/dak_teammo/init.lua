@@ -198,7 +198,7 @@ function ENT:Think()
 					effectdata:SetScale(500)
 					util.Effect("daktescalingexplosion", effectdata, true, true)
 
-					self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,600,300,self.DakOwner)
+					self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,600,300,self.DakOwner)
 
 					self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
 					self:Remove()
@@ -215,7 +215,7 @@ function ENT:Think()
 									effectdata:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
 									util.Effect("daktescalingexplosion", effectdata, true, true)
 
-									self:DTExplosion(self:GetPos(),200*(self.DakAmmo/self.DakMaxAmmo),500,400,200,self.DakOwner)
+									self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,400,200,self.DakOwner)
 
 									self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
 									self:Remove()
@@ -510,11 +510,11 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
 				if(ExpTrace.Entity:GetParent():IsValid()) then
 					if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-						ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+						ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( 0.1*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 					end
 				end
 				if not(ExpTrace.Entity:GetParent():IsValid()) then
-					ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+					ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( 0.1*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 				end
 			end		
 		end
@@ -637,11 +637,11 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 		if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
 			if(ExpTrace.Entity:GetParent():IsValid()) then
 				if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-					ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+					ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( 0.1*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 				end
 			end
 			if not(ExpTrace.Entity:GetParent():IsValid()) then
-				ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+				ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( 0.1*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 			end
 		end		
 	end

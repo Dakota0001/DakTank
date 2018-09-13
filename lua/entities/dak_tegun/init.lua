@@ -503,8 +503,8 @@ function ENT:Think()
 				trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
 			end
 			trace.filter = self.ShellList[i].Filter
-			trace.mins = Vector(-1,-1,-1)
-			trace.maxs = Vector(1,1,1)
+			trace.mins = Vector(-self.ShellList[i].DakCaliber*0.02,-self.ShellList[i].DakCaliber*0.02,-self.ShellList[i].DakCaliber*0.02)
+			trace.maxs = Vector(self.ShellList[i].DakCaliber*0.02,self.ShellList[i].DakCaliber*0.02,self.ShellList[i].DakCaliber*0.02)
 		local ShellTrace = util.TraceHull( trace )
 
 		local effectdata = EffectData()

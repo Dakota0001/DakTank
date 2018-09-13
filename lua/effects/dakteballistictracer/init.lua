@@ -16,6 +16,31 @@ function EFFECT:Init( data )
 
 	local emitter = ParticleEmitter( self.StartPos )
 
+	for i = 1,10 do
+		local frontmult = math.Rand(0,self.Dist)
+		local particle = emitter:Add( "sprites/light_glow02_add.vmt", self.StartPos + self.Dir*frontmult) 
+		 
+		if particle == nil then particle = emitter:Add( "sprites/light_glow02_add.vmt", self.StartPos)  end
+		
+		if (particle) then
+			particle:SetVelocity(self.Dir*12600 + Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(0.2) 
+			particle:SetStartAlpha(200)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(frontmult*0.005*math.Clamp(math.Round((self.Caliber/0.0393701)/10,0),1,20)) 
+			particle:SetEndSize(0)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(255,125,0,math.random(150,255))
+			particle:SetGravity( Vector(0,0,0) ) 
+			particle:SetAirResistance(1500)  
+			particle:SetCollide(false)
+			particle:SetBounce(0)
+		end
+	end
+
 	for i = 1, math.Clamp(math.Round((self.Caliber/0.0393701)/10,0),1,20) do
 		local particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 

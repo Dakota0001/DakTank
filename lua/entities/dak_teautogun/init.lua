@@ -161,7 +161,7 @@ function ENT:Think()
 			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 1.5*math.Round(((((self.DakCaliber*5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*40))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*40)))*0.001*7.8125)/1000)
+			self.DakMass = math.Round(1.5*((((self.DakCaliber*5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*40))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*40)))*0.001*7.8125)/1000)
 
 			self.DakAP = math.Round(self.DakCaliber,2).."mmHMGAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmHMGHEAmmo"
@@ -218,7 +218,7 @@ function ENT:Think()
 			self.DakName = self.DakCaliber.."mm Autocannon"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = math.Round(2*((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
 
 			self.DakAP = math.Round(self.DakCaliber,2).."mmACAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmACHEAmmo"
@@ -272,10 +272,11 @@ function ENT:Think()
 		end
 
 		if self.DakGunType == "2G100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 2xLauncher Ground Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 100
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -317,10 +318,11 @@ function ENT:Think()
 			self.Loaded=1
 		end
 		if self.DakGunType == "3G100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 3xLauncher Ground Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 150
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -362,10 +364,11 @@ function ENT:Think()
 			self.Loaded=1
 		end
 		if self.DakGunType == "5G100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 5xLauncher Ground Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 250
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -407,10 +410,11 @@ function ENT:Think()
 			self.Loaded=1
 		end
 		if self.DakGunType == "6G100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 6xLauncher Ground Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 300
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -452,10 +456,11 @@ function ENT:Think()
 			self.Loaded=1
 		end
 		if self.DakGunType == "10G100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 10xLauncher Ground Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 500
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -496,11 +501,12 @@ function ENT:Think()
 
 			self.Loaded=1
 		end
-				if self.DakGunType == "3A100" then
+		if self.DakGunType == "3A100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 3xLauncher Air Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 150
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -542,10 +548,11 @@ function ENT:Think()
 			self.Loaded=1
 		end
 		if self.DakGunType == "5A100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 5xLauncher Air Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 250
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -587,10 +594,11 @@ function ENT:Think()
 			self.Loaded=1
 		end
 		if self.DakGunType == "6A100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 6xLauncher Air Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 300
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -632,10 +640,11 @@ function ENT:Think()
 			self.Loaded=1
 		end
 		if self.DakGunType == "10A100" then
+			self.DakCaliber = 100
 			self.DakName = self.DakCaliber.."mm 10xLauncher Air Model"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = 2*math.Round(((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = 500
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
@@ -696,6 +705,7 @@ function ENT:Think()
 					else
 						self.DakReloadTime = self.DakReloadTime*(1/math.pow((self.Loaders),0.4))
 					end
+					self.DakReloadTime = self.DakReloadTime/(2*math.pow( 0.0005,(0.09/(self.DakTankCore.SizeMult))))
 				end
 			end
 		end
@@ -756,8 +766,8 @@ function ENT:Think()
 				trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
 			end
 			trace.filter = self.ShellList[i].Filter
-			trace.mins = Vector(-1,-1,-1)
-			trace.maxs = Vector(1,1,1)
+			trace.mins = Vector(-self.ShellList[i].DakCaliber*0.02,-self.ShellList[i].DakCaliber*0.02,-self.ShellList[i].DakCaliber*0.02)
+			trace.maxs = Vector(self.ShellList[i].DakCaliber*0.02,self.ShellList[i].DakCaliber*0.02,self.ShellList[i].DakCaliber*0.02)
 		local ShellTrace = util.TraceHull( trace )
 
 		local effectdata = EffectData()

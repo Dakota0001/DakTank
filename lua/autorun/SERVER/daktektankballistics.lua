@@ -640,8 +640,8 @@ function DTShellContinue(Start,Shell,Normal)
 		newtrace.start = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * (Shell.LifeTime-0.1)) - (-physenv.GetGravity()*((Shell.LifeTime-0.1)^2)/2)
 		newtrace.endpos = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * Shell.LifeTime) - (-physenv.GetGravity()*(Shell.LifeTime^2)/2)
 		newtrace.filter = Shell.Filter
-		newtrace.mins = Vector(-1,-1,-1)
-		newtrace.maxs = Vector(1,1,1)
+		newtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+		newtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
 	local ContShellTrace = util.TraceHull( newtrace )
 
 	local HitEnt = ContShellTrace.Entity
@@ -1222,8 +1222,8 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 			trace.start = Pos
 			trace.endpos = Pos + Direction*Radius*10
 			trace.filter = Filter
-			trace.mins = Vector(-1,-1,-1)
-			trace.maxs = Vector(1,1,1)
+			trace.mins = Vector(-(Caliber/traces)*0.02,-(Caliber/traces)*0.02,-(Caliber/traces)*0.02)
+			trace.maxs = Vector((Caliber/traces)*0.02,(Caliber/traces)*0.02,(Caliber/traces)*0.02)
 		local ExpTrace = util.TraceHull( trace )
 
 		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
@@ -1355,8 +1355,8 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 		trace.endpos = Pos + Direction*Radius*10
 		Filter[#Filter+1] = IgnoreEnt
 		trace.filter = Filter
-		trace.mins = Vector(-1,-1,-1)
-		trace.maxs = Vector(1,1,1)
+		trace.mins = Vector(-(Caliber/traces)*0.02,-(Caliber/traces)*0.02,-(Caliber/traces)*0.02)
+		trace.maxs = Vector((Caliber/traces)*0.02,(Caliber/traces)*0.02,(Caliber/traces)*0.02)
 	local ExpTrace = util.TraceHull( trace )
 
 	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
@@ -1510,8 +1510,8 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 				trace.start = Pos
 				trace.endpos = Targets[i]:LocalToWorld( Targets[i]:OBBCenter() )
 				trace.filter = Shell.IgnoreList
-				trace.mins = Vector(-1,-1,-1)
-				trace.maxs = Vector(1,1,1)
+				trace.mins = Vector(-0.1,-0.1,-0.1)
+				trace.maxs = Vector(0.1,0.1,0.1)
 				local ExpTrace = util.TraceHull( trace )
 				if ExpTrace.Entity == Targets[i] then
 					if not(string.Explode("_",Targets[i]:GetClass(),false)[2] == "wire") and not(Targets[i]:IsVehicle()) and not(Targets[i]:GetClass() == "dak_salvage") and not(Targets[i]:GetClass() == "dak_tesalvage") and Targets[i]:GetPhysicsObject():GetMass()>1 and Targets[i].DakIsTread==nil and not(Targets[i]:GetClass() == "dak_turretcontrol") then
@@ -1632,8 +1632,8 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 			trace.start = Pos
 			trace.endpos = Pos + Direction*1000
 			trace.filter = Filter
-			trace.mins = Vector(-1,-1,-1)
-			trace.maxs = Vector(1,1,1)
+			trace.mins = Vector(-Caliber*0.002,-Caliber*0.002,-Caliber*0.002)
+			trace.maxs = Vector(Caliber*0.002,Caliber*0.002,Caliber*0.002)
 		local SpallTrace = util.TraceHull( trace )
 
 		if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
@@ -1767,8 +1767,8 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 		trace.endpos = Pos + Direction*1000
 		Filter[#Filter+1] = IgnoreEnt
 		trace.filter = Filter
-		trace.mins = Vector(-1,-1,-1)
-		trace.maxs = Vector(1,1,1)
+		trace.mins = Vector(-Shell.DakCaliber*0.002,-Shell.DakCaliber*0.002,-Shell.DakCaliber*0.002)
+		trace.maxs = Vector(Shell.DakCaliber*0.002,Shell.DakCaliber*0.002,Shell.DakCaliber*0.002)
 	local SpallTrace = util.TraceHull( trace )
 
 	if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
@@ -1905,8 +1905,8 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 		trace.start = Pos
 		trace.endpos = Pos + Direction*1000
 		trace.filter = Filter
-		trace.mins = Vector(-1,-1,-1)
-		trace.maxs = Vector(1,1,1)
+		trace.mins = Vector(-Caliber*0.02,-Caliber*0.02,-Caliber*0.02)
+		trace.maxs = Vector(Caliber*0.02,Caliber*0.02,Caliber*0.02)
 	local HEATTrace = util.TraceHull( trace )
 
 	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner, Shell.DakGun) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
@@ -2048,8 +2048,8 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 		trace.endpos = Pos + Direction*1000
 		Filter[#Filter+1] = IgnoreEnt
 		trace.filter = Filter
-		trace.mins = Vector(-1,-1,-1)
-		trace.maxs = Vector(1,1,1)
+		trace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+		trace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
 	local HEATTrace = util.TraceHull( trace )
 
 	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner, Shell.DakGun) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
