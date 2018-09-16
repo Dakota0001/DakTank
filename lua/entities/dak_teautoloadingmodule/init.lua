@@ -144,6 +144,7 @@ function ENT:Think()
 		effectdata:SetAttachment(1)
 		effectdata:SetMagnitude(.5)
 		effectdata:SetScale(500)
+		effectdata:SetNormal( Vector(0,0,-1) )
 		util.Effect("daktescalingexplosion", effectdata, true, true)
 
 		self:DTExplosion(self:GetPos(),200,500,200,100,self.DakOwner)

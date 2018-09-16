@@ -13,6 +13,48 @@ ENT.SentError2 = 0
 ENT.DakCore = NULL
 ENT.DakTurretMotors = {}
 
+local function GetTurretParents( ent, Results )
+	local Results = Results or {}
+	local Parent = ent:GetParent()
+	Results[ ent ] = ent
+	if IsValid(Parent) then
+		GetTurretParents(Parent, Results)
+	end
+	return Results
+end
+--[[
+local function GetParents(Ent)
+    if not IsValid(Ent) then return end
+    
+    local Table  = {[Ent] = true}
+    local Parent = Ent:GetParent()
+
+    while IsValid(Parent:GetParent()) do
+        Table[Parent] = true
+        Parent = Parent:GetParent()
+    end
+
+    return Table
+end
+]]--
+
+local function GetTurretPhysCons( ent, Results )
+	local Results = Results or {}
+	if not IsValid( ent ) then return end
+		if Results[ ent ] then return end
+		Results[ ent ] = ent
+		local Constraints = constraint.GetTable( ent )
+		for k, v in ipairs( Constraints ) do
+			if (v.Type ~= "NoCollide") and (v.Type ~= "Axis") and (v.Type ~= "Ballsocket") and (v.Type ~= "AdvBallsocket") then
+				for i, Ent in pairs( v.Entity ) do
+					GetTurretPhysCons( Ent.Entity, Results )
+				end
+			end
+		end
+	return Results
+end
+
+
 function ENT:toLocalAxis(worldAxis)
 	if not IsValid(self) then return Vector(0,0,0) end
 	return self:WorldToLocal(Vector(worldAxis[1],worldAxis[2],worldAxis[3])+self:GetPos())
@@ -141,44 +183,47 @@ function ENT:Think()
 				if IsValid(GunEnt:GetParent()) then
 					if IsValid(GunEnt:GetParent():GetParent()) then
 						self.DakGun = GunEnt:GetParent():GetParent()
-						local GunMass = 0
-						local GunList = self.DakCore.Guns
-						for i=1, #GunList do
-							if IsValid(GunList[i]) then
-								if IsValid(GunList[i]:GetParent()) then
-									if IsValid(GunList[i]:GetParent():GetParent()) then
-										if GunList[i]:GetParent():GetParent() == GunEnt:GetParent():GetParent() then
-											GunMass = GunMass + GunList[i]:GetPhysicsObject():GetMass()
-										end
-									end
-								end
-							end
-						end
-						if IsValid(DakTurret) then
-							GunMass = GunMass + GunEnt:GetPhysicsObject():GetMass()
-							GunMass = GunMass + DakTurret:GetPhysicsObject():GetMass()
-							local TurretEnts = DakTurret:GetChildren()
-							local TurretEnts2 = nil
-							for k, v in pairs(TurretEnts) do
-								if IsValid(v) then
-									if IsValid(v:GetPhysicsObject()) then
-										GunMass = GunMass + v:GetPhysicsObject():GetMass()
-										TurretEnts2 = v:GetChildren()
-										for l, b in pairs(TurretEnts2) do
-											if IsValid(b) then
-												if IsValid(b:GetPhysicsObject()) then
-													GunMass = GunMass + b:GetPhysicsObject():GetMass()
-												end
-											end
-										end
-									end
-								end
-							end
-						end
-						
-					self.GunMass = GunMass
 					end
-					self.DakParented = 1
+					self.Turret = {}
+					table.Add(self.Turret,GetTurretParents(GunEnt))
+					for k, v in pairs(GetTurretParents(GunEnt)) do
+						table.Add(self.Turret,GetTurretPhysCons(v))
+					end
+					if IsValid(DakTurret) then
+						table.Add(self.Turret,GetTurretParents(DakTurret))
+						for k, v in pairs(GetTurretParents(DakTurret)) do
+							table.Add(self.Turret,GetTurretPhysCons(v))
+						end
+					end
+					for i=1, #self.Turret do
+						table.Add( self.Turret, self.Turret[i]:GetChildren() )
+						table.Add( self.Turret, self.Turret[i]:GetParent() )
+					end
+					local Children = {}
+					for i2=1, #self.Turret do
+						if table.Count(self.Turret[i2]:GetChildren()) > 0 then
+						table.Add( Children, self.Turret[i2]:GetChildren() )
+						end
+					end
+					table.Add( self.Turret, Children )
+					local hash = {}
+					local res = {}
+					for _,v in ipairs(self.Turret) do
+				   		if (not hash[v]) then
+				    		res[#res+1] = v
+				       		hash[v] = true
+				   		end
+					end
+					self.Turret = res
+					self.TurretBase = DakTurret
+					local Mass = 0
+
+					for i=1, #res do
+						if res[i]:IsSolid() then
+							Mass = Mass + res[i]:GetPhysicsObject():GetMass()
+						end
+					end
+					self.GunMass = Mass
 				else
 					self.DakParented = 0
 				end

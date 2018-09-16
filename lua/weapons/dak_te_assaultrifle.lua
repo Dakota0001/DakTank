@@ -103,7 +103,7 @@ function SWEP:Think()
 			effectdata:SetStart(ShellTrace.StartPos)
 			effectdata:SetOrigin(ShellTrace.HitPos)
 			effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
-			util.Effect("dakballistictracer", effectdata, true, true)
+			util.Effect("dakteballistictracer", effectdata, true, true)
 			if ShellTrace.Hit then
 				DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
 			end
@@ -136,7 +136,7 @@ function SWEP:PrimaryAttack()
 				local shell = {}
  				shell.Pos = self.Owner:EyePos()
  				shell.Ang = shootDir:Angle() + Angle(math.Rand(-0.15,0.15),math.Rand(-0.15,0.15),math.Rand(-0.15,0.15))
-				shell.DakTrail = "dakshelltrail"
+				shell.DakTrail = "dakteballistictracer"
 				shell.DakVelocity = 35000
 				shell.DakDamage = 0.075
 				shell.DakMass = 1

@@ -229,6 +229,7 @@ function ENT:Think()
 					self.Guns[#self.Guns+1] = res[i]
 				end
 				if res[i]:GetClass()=="dak_turretcontrol" then
+					self.TurretControls[#self.TurretControls+1]=res[i]
 					res[i].DakContraption = res
 					res[i].DakCore = self
 				end
@@ -414,20 +415,70 @@ function ENT:Think()
 				if self.DakHealth then
 					if (self.DakHealth <= 0 or #self.Crew <= 0) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
 						local DeathSounds = {"daktanks/closeexp1.wav","daktanks/closeexp2.wav","daktanks/closeexp3.wav"}
+
+						self.RemoveTurretList = {}
+
+						if math.random(1,3) == 1 then
+							for j=1, #self.TurretControls do
+								table.RemoveByValue( self.Contraption, self.TurretControls[j].TurretBase )
+								self.TurretControls[j].TurretBase:SetMaterial("models/props_buildings/plasterwall021a")
+								self.TurretControls[j].TurretBase:SetColor(Color(100,100,100,255))
+								self.TurretControls[j].TurretBase:SetCollisionGroup( COLLISION_GROUP_WORLD )
+								self.TurretControls[j].TurretBase:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+								if math.random(0,9) == 0 then
+									self.TurretControls[j].TurretBase:Ignite(25,1)
+								end
+								constraint.RemoveAll( self:GetParent():GetParent() )
+								for l=1, #self.TurretControls[j].Turret do
+									if self.TurretControls[j].Turret[l] ~= self.TurretControls[j].TurretBase then
+										table.RemoveByValue( self.Contraption, self.TurretControls[j].Turret[l] )
+										self.TurretControls[j].Turret[l]:SetParent( self.TurretControls[j].TurretBase, -1 )
+										self.TurretControls[j].Turret[l]:SetMoveType( MOVETYPE_NONE )
+
+										self.TurretControls[j].Turret[l]:SetMaterial("models/props_buildings/plasterwall021a")
+										self.TurretControls[j].Turret[l]:SetColor(Color(100,100,100,255))
+										self.TurretControls[j].Turret[l]:SetCollisionGroup( COLLISION_GROUP_WORLD )
+										self.TurretControls[j].Turret[l]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+										if math.random(0,9) == 0 then
+											self.TurretControls[j].Turret[l]:Ignite(25,1)
+										end
+
+									end
+								end
+								self.TurretControls[j].TurretBase:SetAngles(self.TurretControls[j].TurretBase:GetAngles() + Angle(math.Rand(-45,45),math.Rand(-45,45),math.Rand(-45,45)))
+								self.TurretControls[j].TurretBase:GetPhysicsObject():ApplyForceCenter(self.TurretControls[j].TurretBase:GetUp()*2500*self.TurretControls[j].TurretBase:GetPhysicsObject():GetMass())
+								self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].TurretBase
+							end
+						end
+
 						for i=1, #self.Contraption do
 							if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
 								self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
 								if self.Contraption[i] ~= self:GetParent():GetParent() and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self then
 									if math.random(1,6)>1 then
-										constraint.RemoveAll( self.Contraption[i] )
-										self.Contraption[i]:SetParent( self:GetParent(), -1 )
-										self.Contraption[i]:SetMoveType( MOVETYPE_NONE )
-										self.Contraption[i]:SetMaterial("models/props_buildings/plasterwall021a")
-										self.Contraption[i]:SetColor(Color(100,100,100,255))
-										self.Contraption[i]:SetCollisionGroup( COLLISION_GROUP_WORLD )
-										self.Contraption[i]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
-										if math.random(0,4) == 0 then
-											self.Contraption[i]:Ignite(25,1)
+										if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or (string.Explode("_",self.Contraption[i]:GetClass(),false)[1] == "gmod") then
+											self.salvage = ents.Create( "dak_tesalvage" )
+											if ( !IsValid( self.salvage ) ) then return end
+											if self.Contraption[i]:GetClass() == "dak_crew" then
+												self.salvage.DakModel = "models/Humans/Charple01.mdl"
+											else
+												self.salvage.DakModel = self.Contraption[i]:GetModel()
+											end
+											self.salvage:SetPos( self.Contraption[i]:GetPos())
+											self.salvage:SetAngles( self.Contraption[i]:GetAngles())
+											self.salvage:Spawn()
+											self.Contraption[i]:Remove()
+										else
+											constraint.RemoveAll( self.Contraption[i] )
+											self.Contraption[i]:SetParent( self:GetParent(), -1 )
+											self.Contraption[i]:SetMoveType( MOVETYPE_NONE )
+											self.Contraption[i]:SetMaterial("models/props_buildings/plasterwall021a")
+											self.Contraption[i]:SetColor(Color(100,100,100,255))
+											self.Contraption[i]:SetCollisionGroup( COLLISION_GROUP_WORLD )
+											self.Contraption[i]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+											if math.random(0,9) == 0 then
+												self.Contraption[i]:Ignite(25,1)
+											end
 										end
 									else
 										self.salvage = ents.Create( "dak_tesalvage" )
@@ -459,10 +510,9 @@ function ENT:Think()
 						effectdata:SetEntity(self)
 						effectdata:SetAttachment(1)
 						effectdata:SetMagnitude(.5)
-
+						effectdata:SetNormal( Vector(0,0,-1) )
 						effectdata:SetScale(math.Clamp(self.DakMaxHealth*0.2,100,500))
 						util.Effect("daktescalingexplosion", effectdata)
-						
 
 					end
 				else
@@ -474,6 +524,11 @@ function ENT:Think()
 	else
 		if self.DeathTime then
 			if self.DeathTime+30<CurTime() then
+				for j=1, #self.RemoveTurretList do
+					if IsValid(self.RemoveTurretList[j]) then
+						self.RemoveTurretList[j]:Remove()
+					end
+				end
 				if IsValid(self) then
 					self:Remove()
 				end

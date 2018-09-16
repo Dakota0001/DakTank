@@ -1927,7 +1927,7 @@ function TOOL.BuildCPanel( panel )
 	local gunData = {}
 	gunData["Launcher"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 2, 750, 0.2, 0.04, 750, 5.4*(50/50), 562.5, 1.25, 375 }
+		AmmoData  = { 2, 750, 0.2, 0.04, 750, 6.4*(50/50), 562.5, 1.25, 375 }
 		AmmoTypes = { "Anti Tank Guided Missile" }
 		DermaNumSlider:SetMinMax( 100, 100 )
 	end
@@ -1974,7 +1974,7 @@ function TOOL.BuildCPanel( panel )
 	end
 	gunData["Howitzer"] = function()
 		EntType   = "dak_tegun"
-		AmmoData  = { 1.2, 450, 0.2, 0.052, 450, 5.4*(40/50), 337.5, 1.25, 225 }
+		AmmoData  = { 1.2, 450, 0.2, 0.052, 450, 5.4*(30/50), 337.5, 1.25, 225 }
 		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head", "Anti Tank Guided Missile" }
 		DermaNumSlider:SetMinMax( 50, 240 )
 	end
