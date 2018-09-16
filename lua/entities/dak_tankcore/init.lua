@@ -38,7 +38,6 @@ function ENT:Initialize()
 	self.DakBurnStacks = 0
 end
 
-
 local function GetPhysCons( ent, Results )
 	local Results = Results or {}
 	if not IsValid( ent ) then return end
