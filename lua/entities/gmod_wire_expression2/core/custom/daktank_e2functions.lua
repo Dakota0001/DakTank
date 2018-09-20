@@ -100,6 +100,12 @@ e2function string entity:daktankGetAmmoType()
 				if this.CurrentAmmoType == 6 then
 					return "ATGM"
 				end
+				if this.CurrentAmmoType == 7 then
+					return "HEATFS"
+				end
+				if this.CurrentAmmoType == 8 then
+					return "APFSDS"
+				end
 			end
 		end
 	else

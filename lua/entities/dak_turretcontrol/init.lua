@@ -162,112 +162,133 @@ function ENT:Think()
 		local GunEnt = self.Inputs.Gun.Value
 
 		if IsValid(GunEnt) then
-			
-
-			local Elevation = self:GetElevation()
-			local Depression = self:GetDepression()
-			local YawMin = self:GetYawMin()
-			local YawMax = self:GetYawMax()
-
-			self.DakActive = self.Inputs.Active.Value
-			local DakTurret = self.Inputs.Turret.Value
-			if #self.DakTurretMotors > 0 then
-				for i = 1, #self.DakTurretMotors do
-					if IsValid(self.DakTurretMotors[i]) then
-						RotMult = RotMult + self.DakTurretMotors[i].DakRotMult
-					end
-				end
-			end
-
-			if not(self.DakParented==1) then
-				if IsValid(GunEnt:GetParent()) then
-					if IsValid(GunEnt:GetParent():GetParent()) then
-						self.DakGun = GunEnt:GetParent():GetParent()
-					end
-					self.Turret = {}
-					table.Add(self.Turret,GetTurretParents(GunEnt))
-					for k, v in pairs(GetTurretParents(GunEnt)) do
-						table.Add(self.Turret,GetTurretPhysCons(v))
-					end
-					if IsValid(DakTurret) then
-						table.Add(self.Turret,GetTurretParents(DakTurret))
-						for k, v in pairs(GetTurretParents(DakTurret)) do
-							table.Add(self.Turret,GetTurretPhysCons(v))
-						end
-					end
-					for i=1, #self.Turret do
-						table.Add( self.Turret, self.Turret[i]:GetChildren() )
-						table.Add( self.Turret, self.Turret[i]:GetParent() )
-					end
-					local Children = {}
-					for i2=1, #self.Turret do
-						if table.Count(self.Turret[i2]:GetChildren()) > 0 then
-						table.Add( Children, self.Turret[i2]:GetChildren() )
-						end
-					end
-					table.Add( self.Turret, Children )
-					local hash = {}
-					local res = {}
-					for _,v in ipairs(self.Turret) do
-				   		if (not hash[v]) then
-				    		res[#res+1] = v
-				       		hash[v] = true
-				   		end
-					end
-					self.Turret = res
-					self.TurretBase = DakTurret
-					local Mass = 0
-
-					for i=1, #res do
-						if res[i]:IsSolid() then
-							Mass = Mass + res[i]:GetPhysicsObject():GetMass()
-						end
-					end
-					self.GunMass = Mass
-				else
-					self.DakParented = 0
+			if IsValid(GunEnt:GetParent()) then
+				if IsValid(GunEnt:GetParent():GetParent()) then
+					self.DakGun = GunEnt:GetParent():GetParent()
 				end
 			end
 			if IsValid(self.DakGun) then
-				if self.DakParented == 0 then
-					if self.SentError == 0 then
-						self.SentError = 1
-						self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: Gun must be parented to an aimer prop." )
-						self.ErrorTime=CurTime()
+
+
+
+				local Elevation = self:GetElevation()
+				local Depression = self:GetDepression()
+				local YawMin = self:GetYawMin()
+				local YawMax = self:GetYawMax()
+
+				self.DakActive = self.Inputs.Active.Value
+				local DakTurret = self.Inputs.Turret.Value
+				if #self.DakTurretMotors > 0 then
+					for i = 1, #self.DakTurretMotors do
+						if IsValid(self.DakTurretMotors[i]) then
+							RotMult = RotMult + self.DakTurretMotors[i].DakRotMult
+						end
+					end
+				end
+
+				if not(self.DakParented==1) then
+					if IsValid(GunEnt:GetParent()) then
+						if IsValid(GunEnt:GetParent():GetParent()) then
+							self.DakGun = GunEnt:GetParent():GetParent()
+						end
+						self.Turret = {}
+						table.Add(self.Turret,GetTurretParents(GunEnt))
+						for k, v in pairs(GetTurretParents(GunEnt)) do
+							table.Add(self.Turret,GetTurretPhysCons(v))
+						end
+						if IsValid(DakTurret) then
+							table.Add(self.Turret,GetTurretParents(DakTurret))
+							for k, v in pairs(GetTurretParents(DakTurret)) do
+								table.Add(self.Turret,GetTurretPhysCons(v))
+							end
+						end
+						for i=1, #self.Turret do
+							table.Add( self.Turret, self.Turret[i]:GetChildren() )
+							table.Add( self.Turret, self.Turret[i]:GetParent() )
+						end
+						local Children = {}
+						for i2=1, #self.Turret do
+							if table.Count(self.Turret[i2]:GetChildren()) > 0 then
+							table.Add( Children, self.Turret[i2]:GetChildren() )
+							end
+						end
+						table.Add( self.Turret, Children )
+						local hash = {}
+						local res = {}
+						for _,v in ipairs(self.Turret) do
+					   		if (not hash[v]) then
+					    		res[#res+1] = v
+					       		hash[v] = true
+					   		end
+						end
+						self.Turret = res
+						self.TurretBase = DakTurret
+						local Mass = 0
+
+						for i=1, #res do
+							if res[i]:IsSolid() then
+								Mass = Mass + res[i]:GetPhysicsObject():GetMass()
+							end
+						end
+						self.GunMass = Mass
 					else
-						if CurTime()>=self.ErrorTime+10 then
+						self.DakParented = 0
+					end
+				end
+				if IsValid(self.DakGun) then
+					if self.DakParented == 0 then
+						if self.SentError == 0 then
+							self.SentError = 1
 							self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: Gun must be parented to an aimer prop." )
 							self.ErrorTime=CurTime()
+						else
+							if CurTime()>=self.ErrorTime+10 then
+								self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: Gun must be parented to an aimer prop." )
+								self.ErrorTime=CurTime()
+							end
 						end
 					end
-				end
-				local Class = GunEnt:GetClass()
-				if Class ~= "dak_tegun" and Class ~= "dak_teautogun" and Class ~= "dak_temachinegun" then
-					if self.SentError2 == 0 then
-						self.SentError2 = 1
-						self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: You must wire the gun input to the gun entity, not an aimer prop." )
-						self.ErrorTime2=CurTime()
-					else
-						if CurTime()>=self.ErrorTime2+10 then
+					local Class = GunEnt:GetClass()
+					if Class ~= "dak_tegun" and Class ~= "dak_teautogun" and Class ~= "dak_temachinegun" then
+						if self.SentError2 == 0 then
+							self.SentError2 = 1
 							self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: You must wire the gun input to the gun entity, not an aimer prop." )
 							self.ErrorTime2=CurTime()
+						else
+							if CurTime()>=self.ErrorTime2+10 then
+								self.DakOwner:PrintMessage( HUD_PRINTTALK, "Turret Controller Error: You must wire the gun input to the gun entity, not an aimer prop." )
+								self.ErrorTime2=CurTime()
+							end
 						end
 					end
-				end
-				self.RotationSpeed = RotMult * (15000/self.GunMass)
-				self.DakCamTrace = self.Inputs.CamTrace.Value
-				if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
-					
-					if not(self.Inertia) then
-						self.Inertia = Angle(self.DakGun:GetPhysicsObject():GetInertia().y,self.DakGun:GetPhysicsObject():GetInertia().z,self.DakGun:GetPhysicsObject():GetInertia().x)
-					end
-					if not(self.GunAng) then
-						self.GunAng = self:WorldToLocalAngles(self.DakGun:GetAngles())
-					end
+					self.RotationSpeed = RotMult * (15000/self.GunMass)
+					self.DakCamTrace = self.Inputs.CamTrace.Value
+					if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
+						
+						if not(self.Inertia) then
+							self.Inertia = Angle(self.DakGun:GetPhysicsObject():GetInertia().y,self.DakGun:GetPhysicsObject():GetInertia().z,self.DakGun:GetPhysicsObject():GetInertia().x)
+						end
+						if not(self.GunAng) then
+							self.GunAng = self:WorldToLocalAngles(self.DakGun:GetAngles())
+						end
 
-					if self.DakActive > 0 then
-						if self.DakCamTrace then
-						    local GunDir = normalizedVector(self.DakCamTrace.HitPos - self.DakGun:GetPos())
+						if self.DakActive > 0 then
+							if self.DakCamTrace then
+							    local GunDir = normalizedVector(self.DakCamTrace.HitPos - self.DakGun:GetPos())
+							    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
+							    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
+							    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
+							    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
+							    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
+							    Ang = Angle((Ang.pitch - AngVelAng.pitch),(Ang.yaw - AngVelAng.yaw),(Ang.roll - AngVelAng.roll))
+							    Ang = Angle((Ang.pitch*self.Inertia.pitch),(Ang.yaw*self.Inertia.yaw),(Ang.roll*self.Inertia.roll))
+							    self:ApplyForce(self.DakGun, Ang)
+								if IsValid(DakTurret) then
+									self:ApplyForce(DakTurret, Angle(0,Ang.yaw,0))
+								end
+							end
+						else
+							local GunDir = self:GetForward()
 						    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
 						    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
 						    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
@@ -279,19 +300,6 @@ function ENT:Think()
 							if IsValid(DakTurret) then
 								self:ApplyForce(DakTurret, Angle(0,Ang.yaw,0))
 							end
-						end
-					else
-						local GunDir = self:GetForward()
-					    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-					    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
-					    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
-					    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
-					    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
-					    Ang = Angle((Ang.pitch - AngVelAng.pitch),(Ang.yaw - AngVelAng.yaw),(Ang.roll - AngVelAng.roll))
-					    Ang = Angle((Ang.pitch*self.Inertia.pitch),(Ang.yaw*self.Inertia.yaw),(Ang.roll*self.Inertia.roll))
-					    self:ApplyForce(self.DakGun, Ang)
-						if IsValid(DakTurret) then
-							self:ApplyForce(DakTurret, Angle(0,Ang.yaw,0))
 						end
 					end
 				end
