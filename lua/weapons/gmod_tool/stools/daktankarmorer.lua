@@ -104,8 +104,6 @@ function TOOL:RightClick( trace )
 						end
 					end
 				end
-			
-
 				local Target = trace.Entity
 				local ply = self:GetOwner()
 				local TarName = Target.DakName

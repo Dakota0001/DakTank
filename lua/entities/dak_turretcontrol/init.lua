@@ -231,6 +231,7 @@ function ENT:Think()
 							end
 						end
 						self.GunMass = Mass
+						self.DakParented = 1
 					else
 						self.DakParented = 0
 					end

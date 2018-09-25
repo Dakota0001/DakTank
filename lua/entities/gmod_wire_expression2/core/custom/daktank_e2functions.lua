@@ -106,6 +106,9 @@ e2function string entity:daktankGetAmmoType()
 				if this.CurrentAmmoType == 8 then
 					return "APFSDS"
 				end
+				if this.CurrentAmmoType == 9 then
+					return "APHE"
+				end
 			end
 		end
 	else
@@ -399,4 +402,30 @@ e2function number entity:daktankGetHESHVelocity()
 		end
 	end
 	return 0
+end
+
+e2function number entity:daktankGetMaxCooldown()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_temachinegun" or this:GetClass() == "dak_teautogun" then
+		if this.DakCooldown == nil then
+			return 1
+		else
+			return this.DakCooldown
+		end
+	end
+	return 0
+end
+
+e2function number daktankHitCrit(vector Start, vector End, string ShellType, Caliber, array Filter)
+	local Armor, Ent = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
+	if Ent:IsWorld() and Armor > 0 then
+		Armor = 1000000
+	end
+	return Armor
+end
+
+e2function number daktankRecurseArmor(vector Start, vector End, string ShellType, Caliber, array Filter)
+	local Armor, Ent = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
+	return Armor
 end

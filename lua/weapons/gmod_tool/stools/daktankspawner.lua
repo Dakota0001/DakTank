@@ -1580,6 +1580,11 @@ function TOOL:LeftClick( trace )
 			self.DakIsHE = true
 			self.AmmoType = "HEATFS"
 		end
+		if Selection == "MicroAPHEBox" or Selection == "SmallAPHEBox" or Selection == "StandardAPHEBox" or Selection == "LargeAPHEBox" or Selection == "HugeAPHEBox" or Selection == "UltraAPHEBox" then
+			self.IsAmmoCrate = 1
+			self.DakIsHE = true
+			self.AmmoType = "APHE"
+		end
 		if Selection == "MicroATGMBox" or Selection == "SmallATGMBox" or Selection == "StandardATGMBox" or Selection == "LargeATGMBox" or Selection == "HugeATGMBox" or Selection == "UltraATGMBox" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = true
@@ -2296,16 +2301,19 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*2*ShellLength,2).."mm\nDamage:        "..math.Round((math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )
 	end
 	selectedAmmo["HE"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*0.2,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.375,2).."\nBlast Radius:  "..math.Round(Caliber/25,2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )	
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*0.2*ShellLength,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.375,2).."\nBlast Radius:  "..math.Round(Caliber/25,2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )	
+	end
+	selectedAmmo["APHE"] = function()
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.65*ShellLength,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.375,2).."\nBlast Radius:  "..math.Round(Caliber/25,2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )	
 	end
 	selectedAmmo["HEAT"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.2*ShellLength,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.1875,2).."\nBlast Radius:  "..math.Round(Caliber/25*0.5,2).."m\nVelocity:         "..math.Round(29527.6*0.75*ShellLength*0.0254).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.2,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.1875,2).."\nBlast Radius:  "..math.Round(Caliber/25*0.5,2).."m\nVelocity:         "..math.Round(29527.6*0.75*ShellLength*0.0254).." m/s" )
 	end
 	selectedAmmo["HEATFS"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*5.4*ShellLength,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.1875,2).."\nBlast Radius:  "..math.Round(Caliber/25*0.5,2).."m\nVelocity:         "..math.Round(29527.6*ShellLength*0.0254*1.3333).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*5.4,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.1875,2).."\nBlast Radius:  "..math.Round(Caliber/25*0.5,2).."m\nVelocity:         "..math.Round(29527.6*ShellLength*0.0254*1.3333).." m/s" )
 	end
 	selectedAmmo["ATGM"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*6.4*ShellLength,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.1875,2).."\nBlast Radius:  "..math.Round(Caliber/25*0.5,2).."m\nVelocity:         "..math.Round(12600*0.0254).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*6.4,2).."mm\nFrag Pen:      "..math.Round(Caliber/2.5,2).."mm\nDamage:        "..math.Round((0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.1875,2).."\nBlast Radius:  "..math.Round(Caliber/25*0.5,2).."m\nVelocity:         "..math.Round(12600*0.0254).." m/s" )
 	end
 	selectedAmmo["HVAP"] = function()
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*3*ShellLength,2).."mm\nDamage:        "..math.Round((math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*6.5)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*4/3).." m/s" )
@@ -2411,55 +2419,55 @@ function TOOL.BuildCPanel( panel )
 	gunData["Autocannon"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 50/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Fin Stabilized Discarding Sabot" }
 		DermaNumSlider:SetMinMax( 20, 60 )
 	end
 	gunData["Autoloader"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 50/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Long Autoloader"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 70/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Short Autoloader"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 40/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Autoloading Howitzer"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 30/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile" }
-		DermaNumSlider:SetMinMax( 50, 200 )
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile" }
+		DermaNumSlider:SetMinMax( 50, 240 )
 	end
 	gunData["Autoloading Mortar"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 15/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head" }
-		DermaNumSlider:SetMinMax( 40, 200 )
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head" }
+		DermaNumSlider:SetMinMax( 40, 280 )
 	end
 	gunData["Cannon"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 50/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Long Cannon"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 70/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Short Cannon"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 40/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Flamethrower"] = function()
@@ -2470,13 +2478,13 @@ function TOOL.BuildCPanel( panel )
 		GunType   = "HMG"
 		EntType   = "dak_teautogun"
 		ShellLength = 40/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Fin Stabilized Discarding Sabot" }
 		DermaNumSlider:SetMinMax( 20, 40 )
 	end
 	gunData["Howitzer"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 30/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile" }
 		DermaNumSlider:SetMinMax( 50, 240 )
 	end
 	gunData["Machine Gun"] = function()
@@ -2488,7 +2496,7 @@ function TOOL.BuildCPanel( panel )
 	gunData["Mortar"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 15/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head"}
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head"}
 		DermaNumSlider:SetMinMax( 40, 280 )
 	end
 	
@@ -2537,23 +2545,35 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Health"] = function()
-		DLabel:SetText( "DakTank Guide: Health\n\nHealth determines just how much damage your tank can take and is totalled up by the tank core, health is based mainly on the armor weight of the vehicle in tons multiplied by 10, so two tanks can be the same total weight but have different health, the more armored one being stronger.\n\nHowever, health is modified further by size multipliers, which also affect rate of fire of cannons, howitzers, mortars, autocannons, and HMGs, if your tank is large for its weight it gains bonus health to improve its durability due to the higher cost to armor it, if a tank is small for its weight it will lose health but have an easy time armoring itself.\n\nRamming damage is calculated based on max health of a tank, it finds the total mass involved in the collision then each tank takes a percentage of the damage equal to the other tank's percentage of the weight, so a 5 ton tank ramming a 50 ton tank would take 11 times the damage that the 50 ton tank took. Each module has its own health value." )
+		DLabel:SetText( "DakTank Guide: Health\n\nHealth determines just how much damage your tank can take and is totalled up by the tank core, health is based mainly on the armor weight of the vehicle in tons multiplied by 250, so two tanks can be the same total weight but have different health, the more armored one being stronger.\n\nHowever, health is modified further by size multipliers, which also affect rate of fire of cannons, howitzers, mortars, autocannons, and HMGs, if your tank is large for its weight it gains bonus health to improve its durability due to the higher cost to armor it, if a tank is small for its weight it will lose health but have an easy time armoring itself.\n\nRamming damage is calculated based on max health of a tank, it finds the total mass involved in the collision then each tank takes a percentage of the damage equal to the other tank's percentage of the weight, so a 5 ton tank ramming a 50 ton tank would take 11 times the damage that the 50 ton tank took. Each module has its own health value." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: AP Ammunition"] = function()
-		DLabel:SetText( "DakTank Guide: AP Ammunition\n\nThere are 5 types of ammo, Armor Piercing (AP), High Explosive (HE), High Explosive Anti Tank (HEAT), High Velocity Armor Piercing (HVAP), and High Explosive Squash Head (HESH). Each type of ammo has its own purposes in the combat of daktek, it is a good idea to take at least some amount of each if your gun allows it.\n\nAP fires a single shell at a target, if it doesn't have enough penetration to go through the armor then it will only deal a quarter its specified damage and be deflected away.\n\nIf your shell does penetrate then it deals damage equal to its specified value multiplied by its own penetration value divided by the armor value of the prop it went through.\n\nThe damage is capped to the amount of armor the prop has, making extremely heavy cannons firing AP not the best tool for dealing with light tanks, however you'll still shoot a hole right through them and likely rip out many modules at once and still deal respectable damage." )
+		DLabel:SetText( "DakTank Guide: AP Ammunition\n\nAP rounds are your most basic type of shell, on pen they will go through armor plates until they run out of penetration then will be blocked or deflected away. Each time the shell penetrates something it will deal damage equal to its base damage value multiplied by its penetration divided by the effective armor value it went through capped at double the armor value.\n\nIt also will create spalling with penetration equal to one tenth of the armor it penetrated and damage based off the armor penetrated in a cone of 90 degrees multiplied by the armor divided by pen. This spalling cone is often deadly to crew and damages modules and may lead to killing tanks that lack spall liners in one shot.\n\nKE rounds aside from APFSDS suffer from T/D ratios influencing the effective armor of what they shoot, causing spall caliber rounds to have more trouble against angled armor that has a raw armor value higher than their caliber." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: HE Ammunition"] = function()
 		DLabel:SetText( "DakTank Guide: HE Ammunition\n\nHE fires an explosive shell at its target. It has penetration equal to 30% of an AP round's penetration and acts as an AP until it finds something it cannot penetrate, at which point it explodes, creating fragments equal to half the caliber. Each fragment acts as an AP shell with no damage cap, making HE extremely powerful against low armor and very effective if you get a penetrating shot and explode inside.\n\nHE is also very effective against low thickness but highly angled armor. HE's fragmentation based nature can be very random with lower chances to hit targets further from the Blast Radius, you'll do much more damage on direct hits than splashes. Shots to thin armor may allow harmful fragmentation to damage internals." )
 		DLabel:SetVisible( true )
 	end
+	selection["DakTank Guide: APHE Ammunition"] = function()
+		DLabel:SetText( "DakTank Guide: APHE Ammunition\n\nAPHE rounds act as an AP round until after their first penetration at which point it will explode after its fuse distance of 25 units expires. Since the APHE round is still traveling when it explodes the fragments travel in a cone in the direction of the shell give or take 45 degrees rather than exploding radially in the case of regular HE, however in the case of the APHE round hitting something and being unable to pen it acts like an HE shell with half the blast radius." )
+		DLabel:SetVisible( true )
+	end
 	selection["DakTank Guide: HEAT Ammunition"] = function()
-		DLabel:SetText( "DakTank Guide: HEAT Ammunition\n\nHEAT shells lose no penetration over range and may offer better penetration than AP in howitzers and mortars. On impact the shell propels an explosively formed rod towards the enemy armor in an attempt to penetrate it. On penetration the shell will deal damage in a beam forward, with penetration quickly falling off, spalling is created equal to an HVAP shell penetration with an explosion half the power of an HE shell's on the exterior. In cases where there is no penetration the shell acts like a low powered HE shell." )
+		DLabel:SetText( "DakTank Guide: HEAT Ammunition\n\nHEAT shells lose no penetration over range and may offer better penetration than AP in howitzers and mortars. On impact the shell propels an explosively formed rod towards the enemy armor in an attempt to penetrate it. On penetration due to the rotation of the shell its copper jet is dispersed, causing lines of damage within a cone in the direction of the shell with penetration quickly falling off, spalling is created equal to an HVAP shell penetration with an explosion half the power of an HE shell's on the exterior. In cases where there is no penetration the shell acts like a low powered HE shell." )
+		DLabel:SetVisible( true )
+	end
+	selection["DakTank Guide: HEATFS Ammunition"] = function()
+		DLabel:SetText( "DakTank Guide: HEATFS Ammunition\n\nHEATFS shells lose no penetration over range and have extremely high penetration but are more susceptable to composites than APFSDS. On impact the shell propels an explosively formed rod towards the enemy armor in an attempt to penetrate it. On penetration the shell will deal damage in a beam forward, with penetration quickly falling off, spalling is created equal to an HVAP shell penetration with an explosion half the power of an HE shell's on the exterior. In cases where there is no penetration the shell acts like a low powered HE shell." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: HVAP Ammunition"] = function()
 		DLabel:SetText( "DakTank Guide: HVAP Ammunition\n\nHVAP, also known as APCR (Armor Piercing Composite Rigid) to the brits, has more penetration and velocity than AP at the cost of significantly lower damage, post pen effects, and much worse slope modifiers. It also loses pen over distance faster." )
+		DLabel:SetVisible( true )
+	end
+	selection["DakTank Guide: APFSDS Ammunition"] = function()
+		DLabel:SetText( "DakTank Guide: APFSDS Ammunition\n\nAPFSDS rounds have the highest penetration values of any KE round but have rather low shell diameters resulting in rather low post pen effects, a compound issue of extremely thin spall cone due to overpenetration of armor and low shell diameters makes it nearly useless against light armor aside from sniping crew out directly." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: HESH Ammunition"] = function()
@@ -3068,9 +3088,12 @@ function TOOL.BuildCPanel( panel )
 		DTTE_NodeList["Help3"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Health", "icon16/page.png" )
 		DTTE_NodeList["Help4"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: AP Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help5"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HE Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help17"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: APHE Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help6"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HEAT Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help12"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HVAP Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help13"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HESH Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help18"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: HEATFS Ammunition", "icon16/page.png" )
+		DTTE_NodeList["Help19"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: APFSDS Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help14"] = DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: ATGM Ammunition", "icon16/page.png" )
 		DTTE_NodeList["Help7"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Weaponry", "icon16/page.png" )
 		DTTE_NodeList["Help8"] 	= DTTE_NodeList["Guide"]:AddNode( "DakTank Guide: Flamethrowers", "icon16/page.png" )

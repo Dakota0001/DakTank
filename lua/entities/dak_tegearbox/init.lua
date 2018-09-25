@@ -424,8 +424,8 @@ function ENT:Think()
 						end
 						
 						--(self.DakHP/(4.8*math.pi)/(self.RightDriveWheel:OBBMaxs().z/12))/2.20462 = KG = how much it moves in a minute
-						LPhys:ApplyTorqueCenter( self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(LPhys:GetMass()/150)*self.HPperTon*math.Clamp(self.TopSpeed/(self.Speed*2),0,3)*450 )
-						RPhys:ApplyTorqueCenter( self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(RPhys:GetMass()/150)*self.HPperTon*math.Clamp(self.TopSpeed/(self.Speed*2),0,3)*450 )
+						LPhys:ApplyTorqueCenter( self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(LPhys:GetMass()/150)*self.HPperTon*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,3)*450 )
+						RPhys:ApplyTorqueCenter( self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(RPhys:GetMass()/150)*self.HPperTon*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,3)*450 )
 
 					end
 					if self.Speed > self.TopSpeed then
@@ -480,8 +480,8 @@ function ENT:Think()
 								end
 								local Lmult = 1--125/math.abs(LPhys:GetAngleVelocity().y)
 								local Rmult = 1--125/math.abs(RPhys:GetAngleVelocity().y)
-								LPhys:ApplyTorqueCenter( self.turnperc*(LPhys:GetMass()/150)*self:GetRight()*50000*math.Clamp( Lmult ,0.5,2)*math.Clamp( (0.013*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,5))
-								RPhys:ApplyTorqueCenter( self.turnperc*(RPhys:GetMass()/150)*-self:GetRight()*50000*math.Clamp( Rmult ,0.5,2)*math.Clamp( (0.013*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,5))
+								LPhys:ApplyTorqueCenter( self.turnperc*(LPhys:GetMass()/150)*self:GetRight()*50000*math.Clamp( Lmult ,0.5,2)*math.Clamp( (0.013*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2))
+								RPhys:ApplyTorqueCenter( self.turnperc*(RPhys:GetMass()/150)*-self:GetRight()*50000*math.Clamp( Rmult ,0.5,2)*math.Clamp( (0.013*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2))
 							end
 							if self.MoveRight>0 and self.MoveLeft==0 then
 								self.RPM = 1000*math.Clamp( 0.5*(self.HPperTon/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)
@@ -494,8 +494,8 @@ function ENT:Think()
 								end
 								local Lmult = 1--125/math.abs(LPhys:GetAngleVelocity().y)
 								local Rmult = 1--125/math.abs(RPhys:GetAngleVelocity().y)
-								LPhys:ApplyTorqueCenter( self.turnperc*(LPhys:GetMass()/150)*-self:GetRight()*50000*math.Clamp( Lmult ,0.5,2)*math.Clamp( (0.013*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,5))
-								RPhys:ApplyTorqueCenter( self.turnperc*(RPhys:GetMass()/150)*self:GetRight()*50000*math.Clamp( Rmult ,0.5,2)*math.Clamp( (0.013*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,5))
+								LPhys:ApplyTorqueCenter( self.turnperc*(LPhys:GetMass()/150)*-self:GetRight()*50000*math.Clamp( Lmult ,0.5,2)*math.Clamp( (0.013*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2))
+								RPhys:ApplyTorqueCenter( self.turnperc*(RPhys:GetMass()/150)*self:GetRight()*50000*math.Clamp( Rmult ,0.5,2)*math.Clamp( (0.013*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2))
 							end
 						end
 					end

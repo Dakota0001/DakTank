@@ -26,3 +26,6 @@ E2Helper.Descriptions["daktankGetHVAPVelocity"] = "Returns average velocity of g
 E2Helper.Descriptions["daktankGetHEATVelocity"] = "Returns average velocity of gun's HEAT shell."
 E2Helper.Descriptions["daktankGetHESHVelocity"] = "Returns average velocity of gun's HESH shell."
 E2Helper.Descriptions["daktankGetHEVelocity"] = "Returns average velocity of gun's HE shell."
+E2Helper.Descriptions["daktankGetMaxCooldown"] = "Returns gun's cooldown time."
+E2Helper.Descriptions["daktankHitCrit"] = "Recursively checks armor in a given direction and length until hitting vital component and returns extremely high armor value in cases where nothing of value is hit."
+E2Helper.Descriptions["daktankRecurseArmor"] = "Recursively checks armor in a given direction and length until hitting vital component."
