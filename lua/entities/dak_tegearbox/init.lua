@@ -512,11 +512,13 @@ function ENT:Think()
 					        	if constraint.FindConstraint( self.RightDriveWheel, "Weld" ) then
 					        		constraint.RemoveConstraints( self.RightDriveWheel, "Weld" )
 					        	end
-								self.RPM = 1000*math.Clamp( 0.5*(self.HPperTon/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)
-								if #self.DakTankCore.Motors>0 then
-									for i=1, #self.DakTankCore.Motors do
-										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
+					        	if self.MoveLeft>0 or self.MoveRight>0 then
+									self.RPM = 1000*math.Clamp( 0.5*(self.HPperTon/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)
+									if #self.DakTankCore.Motors>0 then
+										for i=1, #self.DakTankCore.Motors do
+											if IsValid(self.DakTankCore.Motors[i]) then
+												self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
+											end
 										end
 									end
 								end

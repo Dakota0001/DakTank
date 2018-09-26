@@ -268,7 +268,6 @@ function ENT:Think()
 						if not(self.GunAng) then
 							self.GunAng = self:WorldToLocalAngles(self.DakGun:GetAngles())
 						end
-
 						if self.DakActive > 0 then
 							if self.Inputs.Lock.Value > 0 then
 								if IsValid(self.DakCore.Base) then
@@ -281,13 +280,13 @@ function ENT:Think()
 					        		constraint.RemoveConstraints( self.DakGun, "Weld" )
 					        	end
 								if self.DakCamTrace then
-
-								    local GunDir = normalizedVector(self.DakCamTrace.HitPos - self.DakGun:GetPos())
-								    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-								    if self.GunAng.pitch==-Elevation or self.GunAng.pitch==Depression then
-								    	GunDir = normalizedVector(self.DakCamTrace.HitPos - self.DakCamTrace.StartPos)
-								    	self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-								    end
+									local trace = {}
+										trace.start = self.DakCamTrace.StartPos
+										trace.endpos = self.DakCamTrace.StartPos + self.DakCamTrace.Normal*9999999999
+										trace.filter = self.DakContraption
+									local CamTrace = util.TraceLine( trace )
+							    	GunDir = normalizedVector(CamTrace.HitPos - CamTrace.StartPos+Vector(0,0,CamTrace.StartPos.z-self.DakGun:GetPos().z))
+							    	self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
 								    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
 								    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
 								    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
