@@ -43,7 +43,7 @@ function EFFECT:Init( data )
 				if (particle) then
 					particle:SetVelocity(Vector(0,0,math.Rand(size*75,size*125)))
 					particle:SetLifeTime(0) 
-					particle:SetDieTime((size/5)+math.Rand(0,5))
+					particle:SetDieTime(2.5)
 					particle:SetStartAlpha(50)
 					particle:SetEndAlpha(0)
 					particle:SetStartSize(15+size*3) 

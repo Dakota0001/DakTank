@@ -131,7 +131,7 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 
-	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]" })
+	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]", "Lock" })
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.ErrorTime = CurTime()
@@ -168,14 +168,10 @@ function ENT:Think()
 				end
 			end
 			if IsValid(self.DakGun) then
-
-
-
 				local Elevation = self:GetElevation()
 				local Depression = self:GetDepression()
 				local YawMin = self:GetYawMin()
 				local YawMax = self:GetYawMax()
-
 				self.DakActive = self.Inputs.Active.Value
 				local DakTurret = self.Inputs.Turret.Value
 				if #self.DakTurretMotors > 0 then
@@ -274,18 +270,34 @@ function ENT:Think()
 						end
 
 						if self.DakActive > 0 then
-							if self.DakCamTrace then
-							    local GunDir = normalizedVector(self.DakCamTrace.HitPos - self.DakGun:GetPos())
-							    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-							    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
-							    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
-							    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
-							    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
-							    Ang = Angle((Ang.pitch - AngVelAng.pitch),(Ang.yaw - AngVelAng.yaw),(Ang.roll - AngVelAng.roll))
-							    Ang = Angle((Ang.pitch*self.Inertia.pitch),(Ang.yaw*self.Inertia.yaw),(Ang.roll*self.Inertia.roll))
-							    self:ApplyForce(self.DakGun, Ang)
-								if IsValid(DakTurret) then
-									self:ApplyForce(DakTurret, Angle(0,Ang.yaw,0))
+							if self.Inputs.Lock.Value > 0 then
+								if IsValid(self.DakCore.Base) then
+									if not(constraint.FindConstraint( self.DakGun, "Weld" )) then
+										constraint.Weld( self.DakGun, self.DakCore.Base, 0, 0, 0, false, false )
+									end
+								end
+							else
+								if constraint.FindConstraint( self.DakGun, "Weld" ) then
+					        		constraint.RemoveConstraints( self.DakGun, "Weld" )
+					        	end
+								if self.DakCamTrace then
+
+								    local GunDir = normalizedVector(self.DakCamTrace.HitPos - self.DakGun:GetPos())
+								    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
+								    if self.GunAng.pitch==-Elevation or self.GunAng.pitch==Depression then
+								    	GunDir = normalizedVector(self.DakCamTrace.HitPos - self.DakCamTrace.StartPos)
+								    	self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
+								    end
+								    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
+								    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
+								    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
+								    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
+								    Ang = Angle((Ang.pitch - AngVelAng.pitch),(Ang.yaw - AngVelAng.yaw),(Ang.roll - AngVelAng.roll))
+								    Ang = Angle((Ang.pitch*self.Inertia.pitch),(Ang.yaw*self.Inertia.yaw),(Ang.roll*self.Inertia.roll))
+								    self:ApplyForce(self.DakGun, Ang)
+									if IsValid(DakTurret) then
+										self:ApplyForce(DakTurret, Angle(0,Ang.yaw,0))
+									end
 								end
 							end
 						else
