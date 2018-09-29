@@ -330,7 +330,7 @@ function ENT:Think()
 									for i = 1, table.Count(self.Composites) do
 										self.Composites[i].IsComposite = 1
 										self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*2000) )
-										self.Composites[i].DakArmor = math.sqrt(math.sqrt(self.Composites[i]:GetPhysicsObject():GetVolume()))*15.5
+										self.Composites[i].DakArmor = math.sqrt(math.sqrt(self.Composites[i]:GetPhysicsObject():GetVolume()))*9.2
 									end
 								end
 							end

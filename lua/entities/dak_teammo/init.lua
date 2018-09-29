@@ -121,23 +121,24 @@ function ENT:Think()
 				if string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "C" then
 					self.DakMaxAmmo = math.floor( ((self.BoxLength/(self.DakCaliber*0.0393701))^2)/5 )
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*10)
-					self.ShellMass = self.ShellVolume*0.044
 				end
 				if string.Split( self.DakName, "m" )[3][1] == "L" and string.Split( self.DakName, "m" )[3][2] == "C" then
 					self.DakMaxAmmo = math.floor( ((self.BoxLength/(self.DakCaliber*0.0393701))^2)/9 )
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*18)
-					self.ShellMass = self.ShellVolume*0.044
 				end
 				if string.Split( self.DakName, "m" )[3][1] == "H" and string.Split( self.DakName, "m" )[3][2] ~= "M" then
 					self.DakMaxAmmo = math.floor( ((self.BoxLength/(self.DakCaliber*0.0393701))^2)/4 )
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*8)
-					self.ShellMass = self.ShellVolume*0.044
 				end
 				if string.Split( self.DakName, "m" )[3][1] == "M" and string.Split( self.DakName, "m" )[3][2] ~= "G" then
 					self.DakMaxAmmo = math.floor( ((self.BoxLength/(self.DakCaliber*0.0393701))^2)/2.75 )
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*5.25)
-					self.ShellMass = self.ShellVolume*0.044
 				end
+				if (string.Split( self.DakName, "m" )[3][2]..string.Split( self.DakName, "m" )[3][3]..string.Split( self.DakName, "m" )[3][4]..string.Split( self.DakName, "m" )[3][5]) == "ATGM" then
+					self.DakMaxAmmo = math.Round(self.DakMaxAmmo*(1/1.5))
+					self.ShellVolume = self.ShellVolume*1.5
+				end
+				self.ShellMass = self.ShellVolume*0.044
 				if self.DakAmmo == nil then 
 					self.DakAmmo = self.DakMaxAmmo
 				end

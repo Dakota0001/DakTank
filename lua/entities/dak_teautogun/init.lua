@@ -398,6 +398,7 @@ function ENT:Think()
 			self.DakHESH = math.Round(self.DakCaliber,2).."mmMHESHAmmo"
 			self.DakHEATFS = math.Round(self.DakCaliber,2).."mmMHEATFSAmmo"
 			self.DakAPHE = math.Round(self.DakCaliber,2).."mmMAPHEAmmo"
+			self.DakATGM = math.Round(self.DakCaliber,2).."mmMATGMAmmo"
 
 			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*2.75))
 			--get the volume of shell and multiply by density of steel
@@ -1351,14 +1352,12 @@ function ENT:DakTEAutoFire()
 				self:SetNWInt("FirePitch",self.DakFirePitch)
 				self:SetNWFloat("Caliber",self.DakCaliber)
 
-				if self.DakCaliber>=75 then
-					self:SetNWBool("Firing",true)
-					timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
-						self:SetNWBool("Firing",false)
-					end)
-				else
-					sound.Play( self.DakFireSound, self:GetPos(), 100, 100, 1 )
-				end
+				self:SetNWFloat("Cooldown",self.DakCooldown)
+				self:SetNWFloat("Timer",CurTime())
+				self:SetNWBool("Firing",true)
+				timer.Create( "ResoundTimer"..self:EntIndex(), self.DakCooldown/2, 1, function()
+					self:SetNWBool("Firing",false)
+				end)
 
 				self.DakShotsCounter = self.DakShotsCounter + 1
 				if self.DakShotsCounter >= self.DakMagazine then

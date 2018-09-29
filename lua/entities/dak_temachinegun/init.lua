@@ -333,14 +333,12 @@ function ENT:DakTEFire()
 				self:SetNWInt("FirePitch",self.DakFirePitch)
 				self:SetNWFloat("Caliber",self.DakCaliber)
 
-				if self.DakCaliber>=75 then
-					self:SetNWBool("Firing",true)
-					timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
-						self:SetNWBool("Firing",false)
-					end)
-				else
-					sound.Play( self.DakFireSound, self:GetPos(), 100, 100, 0.4 )
-				end
+				self:SetNWFloat("Cooldown",self.DakCooldown)
+				self:SetNWFloat("Timer",CurTime())
+				self:SetNWBool("Firing",true)
+				timer.Create( "ResoundTimer"..self:EntIndex(), self.DakCooldown/2, 1, function()
+					self:SetNWBool("Firing",false)
+				end)
 								
 
 				local effectdata = EffectData()

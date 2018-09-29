@@ -2074,7 +2074,7 @@ function TOOL:RightClick( trace )
 			local MHP = math.Round(Target.DakMaxHealth, 1 )
 			local PHP = math.Round((HP/MHP)*100, 1 )
 			if trace.Entity.IsComposite == 1 then
-				ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*15.5),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*31),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+				ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*9.2),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*18.4),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
 			else
 				ply:ChatPrint(TarName..", ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
 			end
@@ -2449,7 +2449,7 @@ function TOOL.BuildCPanel( panel )
 	gunData["Autoloading Mortar"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 15/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile" }
 		DermaNumSlider:SetMinMax( 40, 280 )
 	end
 	gunData["Cannon"] = function()
@@ -2496,7 +2496,7 @@ function TOOL.BuildCPanel( panel )
 	gunData["Mortar"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 15/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head"}
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head", "Anti Tank Guided Missile"}
 		DermaNumSlider:SetMinMax( 40, 280 )
 	end
 	
@@ -2840,6 +2840,13 @@ function TOOL.BuildCPanel( panel )
 				local ShellMass = ShellVol * 0.044
 				AmmoWeight 		= math.Round(ShellMass*math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)+10)
 				AmmoCount 		= math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)
+
+				if AmmoType == "ATGM" then
+					ShellMass = ShellMass * 1.5
+					ShellVol = ShellVol * 1.5
+					AmmoWeight 		= math.Round(ShellMass*math.Round(math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)*(1/1.5))+10)
+					AmmoCount 		= math.Round(math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)*(1/1.5))
+				end
 
 				selectedAmmo[AmmoType]()
 				RunConsoleCommand( "daktankspawner_DTTE_AmmoType", GunType )

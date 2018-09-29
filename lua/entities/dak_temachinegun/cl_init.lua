@@ -7,11 +7,12 @@ function ENT:Draw()
 end
 
 function ENT:Think()
-	if self:GetNWFloat("Caliber") >= 75 then
-		if (self:GetNWBool("Firing")) == true and self:GetNWBool("Firing")~=self.LastFire then
-			sound.Play( self:GetNWString("FireSound"), LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, self:GetNWInt("FirePitch"), math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/5000 ),0,1) )
-		end
-		self.LastFire = self:GetNWBool("Firing")
+	if not(self.LastFire) then
+		self.LastFire = 0
+	end
+	if (self:GetNWBool("Firing")) == true and self.LastFire+self:GetNWFloat("Cooldown") < CurTime() then
+		self.LastFire = CurTime()
+		sound.Play( self:GetNWString("FireSound"), LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, self:GetNWInt("FirePitch"), 0.5*math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/5000 ),0,1) )
 	end
 	if self:GetNWFloat("Caliber") >= 75 then
 		if (self:GetNWBool("Exploding")) == true and self:GetNWBool("Exploding")~=self.LastExp then

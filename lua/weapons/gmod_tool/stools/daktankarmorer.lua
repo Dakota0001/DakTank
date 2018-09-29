@@ -118,8 +118,8 @@ function TOOL:RightClick( trace )
 				
 				if trace.Entity.IsComposite == 1 then
 					ply:ChatPrint("Composite")
-					ply:ChatPrint(math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*15.5),2).." Armor(mm) vs KE")
-					ply:ChatPrint(math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*31),2).." Armor(mm) vs HEAT")
+					ply:ChatPrint(math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*9.2),2).." Armor(mm) vs KE")
+					ply:ChatPrint(math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*18.4),2).." Armor(mm) vs HEAT")
 					ply:ChatPrint("Weight: "..math.Round(Weight,2).."(kg)")
 				else
 					ply:ChatPrint("Raw Armor: "..math.Round(Target.DakArmor,2).."(mm)")
