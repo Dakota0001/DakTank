@@ -2496,7 +2496,7 @@ function TOOL.BuildCPanel( panel )
 	gunData["Mortar"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 15/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head", "Anti Tank Guided Missile"}
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile"}
 		DermaNumSlider:SetMinMax( 40, 280 )
 	end
 	
