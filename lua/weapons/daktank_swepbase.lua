@@ -153,62 +153,63 @@ function SWEP:Initialize()
 end
 
 function SWEP:Think()
+	if SERVER then
 
-	if self.LastTime+0.1 >= CurTime() then return end
-	
-	for i = #self.ShellList, 1, -1 do
-		local Shell = self.ShellList[i]
+		if self.LastTime+0.1 >= CurTime() then return end
+		
+		for i = #self.ShellList, 1, -1 do
+			local Shell = self.ShellList[i]
 
-		Shell.LifeTime = Shell.LifeTime + 0.1
-		Shell.Gravity = Gravity()*Shell.LifeTime
+			Shell.LifeTime = Shell.LifeTime + 0.1
+			Shell.Gravity = Gravity()*Shell.LifeTime
 
-		local Trace = {
-			filter = Shell.Filter,
-			mins = -Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02),
-			maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
-		}
+			local Trace = {
+				filter = Shell.Filter,
+				mins = -Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02),
+				maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+			}
 
-		if Shell.IsGuided then			
-			if not Shell.SimPos then
-				Shell.SimPos = Shell.Pos
+			if Shell.IsGuided then			
+				if not Shell.SimPos then
+					Shell.SimPos = Shell.Pos
+				end
+
+				local AimPos = Shell.Indicator:GetEyeTraceNoCursor().HitPos
+
+				local _, RotatedAngle = WorldToLocal(Vector(), (AimPos-Shell.SimPos):GetNormalized():Angle(), Shell.SimPos, Shell.Ang)
+				local Pitch = Clamp(RotatedAngle.p,-1,1)
+				local Yaw = Clamp(RotatedAngle.y,-1,1)
+				local Roll = Clamp(RotatedAngle.r,-1,1)
+				local _, FlightAngle = LocalToWorld(Shell.SimPos, Angle(Pitch,Yaw,Roll), Vector(), Angle())
+					
+				Shell.Ang = Shell.Ang + FlightAngle
+				Shell.SimPos = Shell.SimPos + (Shell.DakVelocity * Shell.Ang:Forward()*0.1)
+
+				Trace.start = Shell.SimPos + (Shell.DakVelocity * Shell.Ang:Forward()*-0.1)
+				Trace.endpos = Shell.SimPos + (Shell.DakVelocity * Shell.Ang:Forward()*0.1)
+			else
+				Trace.start = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * (Shell.LifeTime-0.1)) - (-Gravity()*((Shell.LifeTime-0.1)^2)/2)
+				Trace.endpos = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * Shell.LifeTime) - (-Gravity()*(Shell.LifeTime^2)/2)
 			end
+					
+			local ShellTrace = TraceHull( Trace )
 
-			local AimPos = Shell.Indicator:GetEyeTraceNoCursor().HitPos
-
-			local _, RotatedAngle = WorldToLocal(Vector(), (AimPos-Shell.SimPos):GetNormalized():Angle(), Shell.SimPos, Shell.Ang)
-			local Pitch = Clamp(RotatedAngle.p,-1,1)
-			local Yaw = Clamp(RotatedAngle.y,-1,1)
-			local Roll = Clamp(RotatedAngle.r,-1,1)
-			local _, FlightAngle = LocalToWorld(Shell.SimPos, Angle(Pitch,Yaw,Roll), Vector(), Angle())
+			local Data = EffectData()
+				  Data:SetStart(ShellTrace.StartPos)
+				  Data:SetOrigin(ShellTrace.HitPos)
+				  Data:SetScale(Shell.DakCaliber*0.0393701)
+			Effect(Shell.DakTrail, Data, true, true)
 				
-			Shell.Ang = Shell.Ang + FlightAngle
-			Shell.SimPos = Shell.SimPos + (Shell.DakVelocity * Shell.Ang:Forward()*0.1)
-
-			Trace.start = Shell.SimPos + (Shell.DakVelocity * Shell.Ang:Forward()*-0.1)
-			Trace.endpos = Shell.SimPos + (Shell.DakVelocity * Shell.Ang:Forward()*0.1)
-		else
-			Trace.start = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * (Shell.LifeTime-0.1)) - (-Gravity()*((Shell.LifeTime-0.1)^2)/2)
-			Trace.endpos = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * Shell.LifeTime) - (-Gravity()*(Shell.LifeTime^2)/2)
-		end
+			if ShellTrace.Hit then
+				DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,Shell,ShellTrace.HitNormal)
+			end
 				
-		local ShellTrace = TraceHull( Trace )
-
-		local Data = EffectData()
-			  Data:SetStart(ShellTrace.StartPos)
-			  Data:SetOrigin(ShellTrace.HitPos)
-			  Data:SetScale(Shell.DakCaliber*0.0393701)
-		Effect(Shell.DakTrail, Data, true, true)
-			
-		if ShellTrace.Hit then
-			DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,Shell,ShellTrace.HitNormal)
-		end
-			
-		if Shell.DieTime and Shell.DieTime+1.5 < CurTime()
-		or Shell.RemoveNow == 1 then
-			remove( self.ShellList, i )
+			if Shell.DieTime and Shell.DieTime+1.5 < CurTime()
+			or Shell.RemoveNow == 1 then
+				remove( self.ShellList, i )
+			end
 		end
 	end
-
 	self.LastTime = CurTime()
 end
 
