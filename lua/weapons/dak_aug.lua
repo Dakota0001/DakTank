@@ -100,6 +100,7 @@ function SWEP:Reload()
 		if self.Owner:GetFOV()==self.Zoom then
 			self.Owner:SetFOV( 0, 0.1 )
 		end
+		self.SpreadStacks = 0
 	end
 end
  
