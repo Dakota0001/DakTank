@@ -53,7 +53,7 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 			if ShellType == "HESH" then
 				EffArmor = HitEnt.DakArmor
 			else	
-				if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "APFSDS" then
+				if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "APFSDS" or ShellType == "ATGM" then
 					EffArmor = (HitEnt.DakArmor/math.abs(ShellSimTrace.HitNormal:Dot(ShellSimTrace.Normal)) )
 				else						
 					EffArmor = math.abs(HitEnt.DakArmor/math.cos(math.acos(math.abs(ShellSimTrace.HitNormal:Dot(ShellSimTrace.Normal))))^math.Clamp(HitEnt.DakArmor/Caliber, 1, 5000 ))
@@ -61,7 +61,7 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 			end
 			if HitEnt.IsComposite == 1 then
 				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos-ShellSimTrace.Normal, ShellSimTrace.Normal, Filter )*9.2
-				if ShellType == "HEAT" or ShellType == "HEATFS" then
+				if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
 					EffArmor = EffArmor*2
 				end
 			end
@@ -93,7 +93,7 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 			Go = 0
 		end
 		if Go == 0 then
-			if ShellType == "HEAT" or ShellType == "HEATFS" then
+			if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
 				Armor = Armor + (FirstPenPos:Distance(LastPenPos)*2.54)
 			end
 			return Armor, newEnt
@@ -159,7 +159,6 @@ end
 
 function CheckClip(Ent, HitPos)
 	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
-	
 	local HitClip = false
 	local normal
 	local origin
@@ -228,7 +227,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				if Shell.DakShellType == "HESH" then
 					EffArmor = HitEnt.DakArmor
 				else	
-					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "APFSDS" then
+					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "APFSDS" or Shell.DakShellType == "ATGM" then
 						EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())) )
 					else						
 						EffArmor = math.abs(HitEnt.DakArmor/math.cos(math.acos(math.abs(Normal:Dot(Vel:GetNormalized()))))^math.Clamp(HitEnt.DakArmor/Shell.DakCaliber, 1, 5000 ))
@@ -236,10 +235,11 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				if HitEnt.IsComposite == 1 then
 					EffArmor = DTCompositesTrace( HitEnt, End, Shell.Ang:Forward() )*9.2
-					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" then
+					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 						EffArmor = EffArmor*2
 					end
 				end
+
 				if EffArmor < (Shell.DakPenetration-(Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49))) and HitEnt.IsDakTekFutureTech == nil then
 					if not(HitEnt.SPPOwner==nil) and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then		
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
@@ -300,8 +300,8 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						sound.Play( Shell.DakPenSounds[math.random(1,#Shell.DakPenSounds)], End, 100, 100, 1 )
 					end
 					Shell.Filter[#Shell.Filter+1] = HitEnt
-					if Shell.DakShellType == "HESH" or Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" then
-						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" then
+					if Shell.DakShellType == "HESH" or Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
+						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 							DTHEAT(End,HitEnt,Shell.DakCaliber,Shell.DakPenetration,Shell.DakDamage,Shell.DakGun.DakOwner,Shell)
 							Shell.HeatPen = true
 						end
@@ -510,6 +510,13 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end )
 					end
 				else
+					local checkhitboxtrace = {}
+						checkhitboxtrace.start = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * (Shell.LifeTime-0.1)) - (-physenv.GetGravity()*((Shell.LifeTime-0.1)^2)/2)
+						checkhitboxtrace.endpos = Shell.Pos + (Shell.DakVelocity * Shell.Ang:Forward() * Shell.LifeTime) - (-physenv.GetGravity()*(Shell.LifeTime^2)/2)
+						checkhitboxtrace.filter = Shell.Filter
+						checkhitboxtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+						checkhitboxtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+					local HitboxTrace = util.TraceHull( checkhitboxtrace )
 					local Pain = DamageInfo()
 					Pain:SetDamageForce( Shell.Ang:Forward()*Shell.DakDamage*Shell.DakMass*Shell.DakVelocity )
 					Pain:SetDamage( Shell.DakDamage*500 )
@@ -842,7 +849,7 @@ function DTShellContinue(Start,Shell,Normal,HitNonHitable)
 					if Shell.DakShellType == "HESH" then
 						EffArmor = HitEnt.DakArmor
 					else
-						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "APFSDS" then
+						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "APFSDS" or Shell.DakShellType == "ATGM" then
 							EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())))
 						else
 							EffArmor = math.abs(HitEnt.DakArmor/math.cos(math.acos(math.abs(Normal:Dot(Vel:GetNormalized()))))^math.Clamp(HitEnt.DakArmor/Shell.DakCaliber, 1, 5000 ))
@@ -850,7 +857,7 @@ function DTShellContinue(Start,Shell,Normal,HitNonHitable)
 					end
 					if HitEnt.IsComposite == 1 then
 						EffArmor = DTCompositesTrace( HitEnt, End, Shell.Ang:Forward() )*9.2
-						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" then
+						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 							EffArmor = EffArmor*2
 						end
 					end
@@ -1810,7 +1817,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 								ExpPain:SetAttacker( Owner )
 								ExpPain:SetInflictor( Shell.DakGun )
 								ExpPain:SetReportedPosition( Shell.DakGun:GetPos() )
-								ExpPain:SetDamagePosition( ExpTrace.Entity:GetPhysicsObject():GetMassCenter() )
+								ExpPain:SetDamagePosition( ExpTrace.Entity:WorldSpaceCenter() )
 								ExpPain:SetDamageType(DMG_BLAST)
 								ExpTrace.Entity:TakeDamageInfo( ExpPain )
 							end
@@ -1834,7 +1841,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 			end
 			local HPPerc = 0
 			if not(Shell.DakDamageList[i].SPPOwner==nil) then
-				if Shell.DakDamageList[i].SPPOwner:HasGodMode()==false and not(Shell.DakDamageList[i].SPPOwner:IsWorld()) then	
+				if Shell.DakDamageList[i].SPPOwner:IsWorld() then
 					if Shell.DakDamageList[i].DakIsTread==nil then
 						if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
 							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))
@@ -1845,6 +1852,20 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 					Shell.DakDamageList[i].DakLastDamagePos = Pos
 					if Shell.DakDamageList[i].DakHealth <= 0 and Shell.DakDamageList[i].DakPooled==0 then
 						table.insert(Shell.RemoveList,Shell.DakDamageList[i])
+					end
+				else
+					if Shell.DakDamageList[i].SPPOwner:HasGodMode()==false and not(Shell.DakDamageList[i].SPPOwner:IsWorld()) then	
+						if Shell.DakDamageList[i].DakIsTread==nil then
+							if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
+								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))
+							else
+								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )
+							end
+						end
+						Shell.DakDamageList[i].DakLastDamagePos = Pos
+						if Shell.DakDamageList[i].DakHealth <= 0 and Shell.DakDamageList[i].DakPooled==0 then
+							table.insert(Shell.RemoveList,Shell.DakDamageList[i])
+						end
 					end
 				end
 			else
@@ -2163,7 +2184,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 end
 
 function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
-	if Shell.DakShellType == "HEATFS" then
+	if Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 		local HEATPen = Pen
 		local HEATDamage = Damage
 		local Filter = {HitEnt}
@@ -2258,7 +2279,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
 						util.Decal( "Impact.Concrete", HEATTrace.HitPos+(Direction*5), Pos, {Shell.DakGun})
 						DTSpall(Pos,EffArmor,HEATTrace.Entity,Shell.DakCaliber*0.25,math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen),Owner,Shell, Direction:Angle())
-						ContHEAT(Filter,HEATTrace.Entity,Pos,HEATDamage*(1-EffArmor/math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)),math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)-EffArmor,Owner,Direction,Shell,true)
+						ContHEAT(Filter,HEATTrace.Entity,Pos,HEATDamage*(1-EffArmor/math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)),math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)-EffArmor,Owner,Direction:Angle(),Shell,true)
 					else
 						--decals don't like using the adjusted by normal Pos
 						util.Decal( "Impact.Glass", Pos, Pos+(Direction*1000), {Shell.DakGun,HitEnt})
@@ -2405,7 +2426,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 							util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
 							util.Decal( "Impact.Concrete", HEATTrace.HitPos+(Direction*5), Pos, {Shell.DakGun})
 							DTSpall(Pos,EffArmor,HEATTrace.Entity,Shell.DakCaliber*0.25,math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen),Owner,Shell, Direction:Angle())
-							ContHEAT(Filter,HEATTrace.Entity,Pos,HEATDamage*(1-EffArmor/math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)),math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)-EffArmor,Owner,Direction,Shell,true)
+							ContHEAT(Filter,HEATTrace.Entity,Pos,HEATDamage*(1-EffArmor/math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)),math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)-EffArmor,Owner,Direction:Angle(),Shell,true)
 						else
 							--decals don't like using the adjusted by normal Pos
 							util.Decal( "Impact.Glass", Pos, Pos+(Direction*1000), {Shell.DakGun,HitEnt})
@@ -2460,6 +2481,9 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 end
 
 function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggered)
+	if isangle(Direction) then
+		Direction = Direction:Forward()
+	end
 	local trace = {}
 		trace.start = Pos
 		trace.endpos = Pos + Direction*1000
@@ -2519,7 +2543,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 
 				if not(Triggered) then
 					local StandoffCalibers = 0
-					if Shell.DakShellType == "HEATFS" then
+					if Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 						StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 1.65
 					end
 					if Shell.DakShellType == "HEAT" then
@@ -2557,7 +2581,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 					--decals don't like using the adjusted by normal Pos
 					util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
 					util.Decal( "Impact.Concrete", HEATTrace.HitPos+(Direction*5), Pos, {Shell.DakGun})
-					DTSpall(Pos,EffArmor,HEATTrace.Entity,Shell.DakCaliber*0.25,math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen),Owner,Shell, Direction)
+					DTSpall(Pos,EffArmor,HEATTrace.Entity,Shell.DakCaliber*0.25,math.Clamp(Pen-HeatPenLoss,Pen*0.05,Pen),Owner,Shell, Direction:Angle())
 					ContHEAT(Filter,HEATTrace.Entity,Pos,Damage*(1-EffArmor/(Pen-HeatPenLoss)),(Pen-HeatPenLoss)-EffArmor,Owner,Direction,Shell,true)
 				else
 					--decals don't like using the adjusted by normal Pos
