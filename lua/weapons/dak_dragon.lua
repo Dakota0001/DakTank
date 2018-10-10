@@ -107,7 +107,7 @@ end
 function SWEP:Think()
 	if self.LastTime+0.1 < CurTime() then
 		if self.SpreadStacks>0 then
-			self.SpreadStacks = self.SpreadStacks - 0.05
+			self.SpreadStacks = self.SpreadStacks - (0.1*self.SpreadStacks)
 		end
 		for i = 1, #self.ShellList do
 			self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1

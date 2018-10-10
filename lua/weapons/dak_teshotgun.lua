@@ -107,7 +107,7 @@ end
 function SWEP:Think()
 	if self.LastTime+0.1 < CurTime() then
 		if self.SpreadStacks>0 then
-			self.SpreadStacks = self.SpreadStacks - 0.05
+			self.SpreadStacks = self.SpreadStacks - (0.1*self.SpreadStacks)
 		end
 		for i = 1, #self.ShellList do
 			self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
@@ -187,7 +187,9 @@ function SWEP:PrimaryAttack()
 					self.ShellList[#self.ShellList+1] = shell
 				end
 			end
-			self.SpreadStacks = self.SpreadStacks + (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*77000
+			if self.SpreadStacks<5 then
+				self.SpreadStacks = self.SpreadStacks + (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*77000
+			end
 			local ActualSpeed = self.Owner:GetVelocity():Length()
 			local MaxSpeed = self.Owner:GetRunSpeed()
 			local IsMoving = math.max(0.5, ActualSpeed/MaxSpeed)

@@ -77,7 +77,7 @@ if SERVER then
 					if col.HitEntity:GetPhysicsObject():IsMotionEnabled() then
 						if hook.Run("DakTankDamageCheck", col.HitEntity, collider.Controller.DakOwner, collider.Controller) ~= false then
 							local Damage = ((col.OurOldVelocity-col.TheirOldVelocity):Length()/200)*(collider.DakMaxHealth/col.HitEntity.DakMaxHealth)
-							col.HitEntity.DakHealth = col.HitEntity.DakHealth - Damage
+							col.HitEntity.DakHealth = col.HitEntity.DakHealth - Damage*25
 							collider:EmitSound( "physics/metal/metal_large_debris2.wav" )
 							local effectdata = EffectData()
 							effectdata:SetOrigin(col.HitPos)

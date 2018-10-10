@@ -39,7 +39,7 @@ ENT.ShellList = {}
 ENT.BasicVelocity = 29527.6
 
 function ENT:Initialize()
-	self:SetModel(self.DakModel)
+	--self:SetModel(self.DakModel)
 	self.DakHealth = self.DakMaxHealth
 	
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -466,7 +466,7 @@ function ENT:Think()
 			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = math.Round(1.5*((((self.DakCaliber*5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*40))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*40)))*0.001*7.8125)/1000)
+			self.DakMass = math.Round(2.33*((((self.DakCaliber*5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*40))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*40)))*0.001*7.8125)/1000)
 
 			self.DakAP = math.Round(self.DakCaliber,2).."mmHMGAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmHMGHEAmmo"
@@ -526,7 +526,7 @@ function ENT:Think()
 			self.DakName = self.DakCaliber.."mm Autocannon"
 			self.DakMaxHealth = self.DakCaliber
 			self.DakArmor = self.DakCaliber*5
-			self.DakMass = math.Round(2*((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
+			self.DakMass = math.Round(3.1*((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*50))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*50)))*0.001*7.8125)/1000)
 
 			self.DakAP = math.Round(self.DakCaliber,2).."mmACAPAmmo"
 			self.DakHE = math.Round(self.DakCaliber,2).."mmACHEAmmo"
@@ -1303,11 +1303,11 @@ function ENT:DakTEAutoFire()
  				Shell.Ang = shootAngles + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))
 				Shell.DakTrail = self.DakShellTrail
 				Shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.99, 1.01 )
-				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.75, 1.25 )
+				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakMass = self.DakShellMass
 				Shell.DakIsPellet = false
-				Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.75, 1.25 )
-				Shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.75, 1.25 )
+				Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 )
+				Shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.99, 1.01 )
 				Shell.DakExplosive = self.DakShellExplosive
 				Shell.DakBlastRadius = self.DakShellBlastRadius
 				Shell.DakPenSounds = self.DakShellPenSounds
@@ -1330,7 +1330,7 @@ function ENT:DakTEAutoFire()
 				Shell.DakShellType = self.DakShellAmmoType
 				if self.DakShellAmmoType == "HESH" or self.DakShellAmmoType == "HEAT" or self.DakShellAmmoType == "HEATFS" or self.DakShellAmmoType == "APHE" then
 					Shell.DakBlastRadius = self.DakShellBlastRadius * 0.5
-					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.75, 1.25 ) * 0.5
+					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 ) * 0.5
 				end
 				if self.DakName == "Flamethrower" then
 					Shell.DakIsFlame = 1

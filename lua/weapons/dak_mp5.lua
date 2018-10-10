@@ -107,7 +107,7 @@ end
 function SWEP:Think()
 	if self.LastTime+0.1 < CurTime() then
 		if self.SpreadStacks>0 then
-			self.SpreadStacks = self.SpreadStacks - 0.05
+			self.SpreadStacks = self.SpreadStacks - (0.1*self.SpreadStacks)
 		end
 		for i = 1, #self.ShellList do
 			self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
@@ -187,7 +187,6 @@ function SWEP:PrimaryAttack()
 					self.ShellList[#self.ShellList+1] = shell
 				end
 			end
-			self.SpreadStacks = self.SpreadStacks + (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*77000
 			local ActualSpeed = self.Owner:GetVelocity():Length()
 			local MaxSpeed = self.Owner:GetRunSpeed()
 			local IsMoving = math.max(0.5, ActualSpeed/MaxSpeed)
@@ -197,6 +196,9 @@ function SWEP:PrimaryAttack()
 			local FinalRecoil = BaseRecoil * self.ShotCount * ShotForce * IsMoving * IsCrouch * (self.SpreadStacks/1) --have spread stacks so first few shots are sorta accurate
 			if self.IsPistol == true then
 				FinalRecoil = FinalRecoil * 3
+			end
+			if self.SpreadStacks<5 then
+				self.SpreadStacks = self.SpreadStacks + (ShotForce/10000)
 			end
 			if CLIENT or game.SinglePlayer() then
 				self.Owner:SetEyeAngles( self.Owner:EyeAngles() + FinalRecoil )

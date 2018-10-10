@@ -17,7 +17,7 @@ ENT.DakHP = 0
 
 
 function ENT:Initialize()
-	self:SetModel(self.DakModel)
+	--self:SetModel(self.DakModel)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)

@@ -115,7 +115,7 @@ function TOOL:RightClick( trace )
 				local EffArmor = (Target.DakArmor/math.abs(trace.HitNormal:Dot(trace.Normal)))
 
 				local Multiplier = (EffArmor/Target.DakArmor)
-				
+
 				if trace.Entity.IsComposite == 1 then
 					ply:ChatPrint("Composite")
 					ply:ChatPrint(math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*9.2),2).." Armor(mm) vs KE")
@@ -124,9 +124,18 @@ function TOOL:RightClick( trace )
 				else
 					ply:ChatPrint("Raw Armor: "..math.Round(Target.DakArmor,2).."(mm)")
 					ply:ChatPrint("LOS Armor: "..math.Round(EffArmor,2).."(mm)")
-					ply:ChatPrint("Effective Armor: "..math.Round(Target.DakArmor/math.cos(HitAng*0.0174533)^math.Clamp(Target.DakArmor/self:GetClientInfo("DakArmor"),1,9999999999),2).."(mm), use armor input value in Q menu as shell diameter")
+					local APArmor, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "AP", self:GetClientInfo("DakArmor"), self:GetOwner())
+					local HEATArmor, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HEAT", self:GetClientInfo("DakArmor"), self:GetOwner())
+					local HVAPArmor, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HVAP", self:GetClientInfo("DakArmor"), self:GetOwner())
+					local HESHArmor, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HESH", self:GetClientInfo("DakArmor"), self:GetOwner())
+					local APFSDSArmor, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "APFSDS", self:GetClientInfo("DakArmor"), self:GetOwner())
+					ply:ChatPrint("Effective Armor vs AP: "..math.Round(APArmor,2).."(mm)")
+					ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm)")
+					ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm)")
+					ply:ChatPrint("Effective Armor vs HESH: "..math.Round(HESHArmor,2).."(mm)")
+					ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm)")
+					ply:ChatPrint("Use armor input value in Q menu as shell diameter")
 					ply:ChatPrint("Angle: "..math.Round(90-HitAng,2).."(degrees)")
-					ply:ChatPrint("Multiplier: "..math.Round(Multiplier,2))
 					ply:ChatPrint("Weight: "..math.Round(Weight,2).."(kg)")
 				end
 			end

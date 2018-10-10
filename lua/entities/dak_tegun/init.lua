@@ -34,7 +34,7 @@ ENT.ShellList = {}
 ENT.BasicVelocity = 29527.6
 
 function ENT:Initialize()
-	self:SetModel(self.DakModel)
+	--self:SetModel(self.DakModel)
 	self.DakHealth = self.DakMaxHealth
 	
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -744,11 +744,11 @@ function ENT:DakTEFire()
  				Shell.Ang = shootAngles + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))
 				Shell.DakTrail = self.DakShellTrail
 				Shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.99, 1.01 )
-				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.75, 1.25 )
+				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakMass = self.DakShellMass
 				Shell.DakIsPellet = false
-				Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.75, 1.25 )
-				Shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.75, 1.25 )
+				Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 )
+				Shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.99, 1.01 )
 				Shell.DakExplosive = self.DakShellExplosive
 				Shell.DakBlastRadius = self.DakShellBlastRadius
 				Shell.DakPenSounds = self.DakShellPenSounds
@@ -771,7 +771,7 @@ function ENT:DakTEFire()
 				Shell.DakShellType = self.DakShellAmmoType
 				if self.DakShellAmmoType == "HESH" or self.DakShellAmmoType == "HEAT" or self.DakShellAmmoType == "HEATFS" or self.DakShellAmmoType == "APHE" then
 					Shell.DakBlastRadius = self.DakShellBlastRadius * 0.5
-					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.75, 1.25 ) * 0.5
+					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 ) * 0.5
 				end
 				if self.DakName == "Flamethrower" then
 					Shell.DakIsFlame = 1
