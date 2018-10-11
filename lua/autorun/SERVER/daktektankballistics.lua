@@ -240,6 +240,9 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 
 				local TDRatio = HitEnt.DakArmor/Shell.DakCaliber
 				local PenRatio = CurrentPen/HitEnt.DakArmor
+				if HitEnt.IsComposite == 1 then
+					PenRatio = CurrentPen/DTCompositesTrace( HitEnt, End, Shell.Ang:Forward() )*9.2
+				end
 				--shattering occurs when TD ratio is above 0.8 and pen is 1.05 to 1.25 times more than the armor
 				--random chance to pen happens between 0.9 and 1.2 pen to armor ratio
 				--if pen to armor ratio is 0.9 or below round fails
@@ -922,6 +925,9 @@ function DTShellContinue(Start,Shell,Normal,HitNonHitable)
 
 					local TDRatio = HitEnt.DakArmor/Shell.DakCaliber
 					local PenRatio = CurrentPen/HitEnt.DakArmor
+					if HitEnt.IsComposite == 1 then
+						PenRatio = CurrentPen/DTCompositesTrace( HitEnt, End, Shell.Ang:Forward() )*9.2
+					end
 					--shattering occurs when TD ratio is above 0.8 and pen is 1.05 to 1.25 times more than the armor
 					--random chance to pen happens between 0.9 and 1.2 pen to armor ratio
 					--if pen to armor ratio is 0.9 or below round fails
