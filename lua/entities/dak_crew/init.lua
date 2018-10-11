@@ -78,11 +78,13 @@ function ENT:Think()
 	if self.DakHealth > self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end
-	if not(self:GetModel() == self.DakModel) then
-		self:SetModel(self.DakModel)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
+	if self.DakModel then
+		if not(self:GetModel() == self.DakModel) then
+			self:SetModel(self.DakModel)
+			self:PhysicsInit(SOLID_VPHYSICS)
+			self:SetMoveType(MOVETYPE_VPHYSICS)
+			self:SetSolid(SOLID_VPHYSICS)
+		end
 	end
 	self:GetPhysicsObject():SetMass(self.DakMass)
 
