@@ -71,6 +71,25 @@ function TOOL:LeftClick( trace )
 			self.DakName = "Large Turret Motor"
 			self.DakModel = "models/props_c17/substation_transformer01d.mdl"
 		end
+		--Crew
+		if Selection == "CrewSitting" then
+			self.DakMaxHealth = 5
+			self.DakHealth = 5
+			self.DakName = "Crew"
+			self.DakModel = "models/daktanks/crew.mdl"
+		end
+		if Selection == "CrewStanding" then
+			self.DakMaxHealth = 5
+			self.DakHealth = 5
+			self.DakName = "Crew"
+			self.DakModel = "models/daktanks/crewstand.mdl"
+		end
+		if Selection == "CrewDriver" then
+			self.DakMaxHealth = 5
+			self.DakHealth = 5
+			self.DakName = "Crew"
+			self.DakModel = "models/daktanks/crewdriver.mdl"
+		end
 		--Fuel
 		if Selection == "MicroFuel" then
 			self.DakMaxHealth = 10
@@ -1837,6 +1856,46 @@ function TOOL:LeftClick( trace )
 				self.spawnedent:SetSolid(SOLID_VPHYSICS)
 			end
 		end
+		if self:GetClientInfo("SpawnEnt") == "dak_crew" then
+			if trace.Entity then
+				if trace.Entity:GetClass() == "dak_crew" then
+					trace.Entity.DakName = self.DakName
+					trace.Entity.DakOwner = self:GetOwner()
+					trace.Entity.DakModel = self.DakModel
+					trace.Entity.DakMaxHealth = self.DakMaxHealth
+					trace.Entity.DakHealth = self.DakMaxHealth
+					trace.Entity:PhysicsDestroy()
+					trace.Entity:SetModel(trace.Entity.DakModel)
+					trace.Entity:PhysicsInit(SOLID_VPHYSICS)
+					trace.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+					trace.Entity:SetSolid(SOLID_VPHYSICS)
+					self:GetOwner():ChatPrint("Crew updated.")
+				else
+					self.spawnedent.DakName = self.DakName
+					self.spawnedent.DakOwner = self:GetOwner()
+					self.spawnedent.DakModel = self.DakModel
+					self.spawnedent.DakMaxHealth = self.DakMaxHealth
+					self.spawnedent.DakHealth = self.DakMaxHealth
+					self.spawnedent:PhysicsDestroy()
+					self.spawnedent:SetModel(self.DakModel)
+					self.spawnedent:PhysicsInit(SOLID_VPHYSICS)
+					self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
+					self.spawnedent:SetSolid(SOLID_VPHYSICS)
+				end
+			end
+			if not(trace.Entity:IsValid()) then
+				self.spawnedent.DakName = self.DakName
+				self.spawnedent.DakOwner = self:GetOwner()
+				self.spawnedent.DakModel = self.DakModel
+				self.spawnedent.DakMaxHealth = self.DakMaxHealth
+				self.spawnedent.DakHealth = self.DakMaxHealth
+				self.spawnedent:PhysicsDestroy()
+				self.spawnedent:SetModel(self.DakModel)
+				self.spawnedent:PhysicsInit(SOLID_VPHYSICS)
+				self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
+				self.spawnedent:SetSolid(SOLID_VPHYSICS)
+			end
+		end
 		if self:GetClientInfo("SpawnEnt") == "dak_temotor" then
 			if trace.Entity then
 				if trace.Entity:GetClass() == "dak_temotor" then
@@ -2615,9 +2674,21 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( "Tank Core\n\nThis is the tank's automated health pooling system, just parent one onto your tank and it will combine the HP of all attached props and have them act as one. They will still each have their own unique armor values though, load weight into pieces that need it." )
 		DLabel:SetVisible( true )
 	end
-	selection["Crew Member"] = function()
+	selection["Sitting Crew Member"] = function()
 		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_crew" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "Crew" )
+		RunConsoleCommand( "daktankspawner_SpawnSettings", "CrewSitting" )
+		DLabel:SetText( "Crew Member\n\nAllows an entity to function up to their full potential when linked to it. Can be linked to engines, normal guns, autocannons, and HMGs, but not autoloaders or machine guns.\n\nCrew Stats:\nHealth:  5\nWeight: 75kg" )
+		DLabel:SetVisible( true )
+	end
+	selection["Standing Crew Member"] = function()
+		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_crew" )
+		RunConsoleCommand( "daktankspawner_SpawnSettings", "CrewStanding" )
+		DLabel:SetText( "Crew Member\n\nAllows an entity to function up to their full potential when linked to it. Can be linked to engines, normal guns, autocannons, and HMGs, but not autoloaders or machine guns.\n\nCrew Stats:\nHealth:  5\nWeight: 75kg" )
+		DLabel:SetVisible( true )
+	end
+	selection["Driver Position Crew Member"] = function()
+		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_crew" )
+		RunConsoleCommand( "daktankspawner_SpawnSettings", "CrewDriver" )
 		DLabel:SetText( "Crew Member\n\nAllows an entity to function up to their full potential when linked to it. Can be linked to engines, normal guns, autocannons, and HMGs, but not autoloaders or machine guns.\n\nCrew Stats:\nHealth:  5\nWeight: 75kg" )
 		DLabel:SetVisible( true )
 	end
@@ -3110,7 +3181,9 @@ function TOOL.BuildCPanel( panel )
 
 	DTTE_NodeList["Utilities"] 	  = ctrl:AddNode( "Utilities", "icon16/folder_brick.png" )
 		DTTE_NodeList["Core"] 	  = DTTE_NodeList["Utilities"]:AddNode( "Tank Core", "icon16/cog.png" )
-		DTTE_NodeList["Crew"] 	  = DTTE_NodeList["Utilities"]:AddNode( "Crew Member", "icon16/cog.png" )	
+		DTTE_NodeList["Crew1"] 	  = DTTE_NodeList["Utilities"]:AddNode( "Standing Crew Member", "icon16/cog.png" )	
+		DTTE_NodeList["Crew2"] 	  = DTTE_NodeList["Utilities"]:AddNode( "Sitting Crew Member", "icon16/cog.png" )	
+		DTTE_NodeList["Crew3"] 	  = DTTE_NodeList["Utilities"]:AddNode( "Driver Position Crew Member", "icon16/cog.png" )	
 		DTTE_NodeList["TControl"] = DTTE_NodeList["Utilities"]:AddNode( "Turret Controller", "icon16/cog.png" )
 		DTTE_NodeList["TMotor"]   = DTTE_NodeList["Utilities"]:AddNode( "Turret Motor", "icon16/cog.png" )
 

@@ -8,13 +8,13 @@ ENT.DakMaxHealth = 5
 ENT.DakHealth = 5
 ENT.DakArmor = 2.5
 ENT.DakName = "Crew"
-ENT.DakModel = "models/daktanks/crew.mdl"
+--ENT.DakModel = "models/daktanks/crew.mdl"
 ENT.DakMass = 75
 ENT.DakPooled=0
 
 
 function ENT:Initialize()
-	self:SetModel(self.DakModel)
+	--self:SetModel(self.DakModel)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
@@ -74,7 +74,7 @@ function ENT:Think()
 	self.DakMaxHealth = 5
 	self.DakArmor = 2.5
 	self.DakMass = 75
-	self.DakModel = "models/daktanks/crew.mdl"	
+	--self.DakModel = "models/daktanks/crew.mdl"	
 	if self.DakHealth > self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end
