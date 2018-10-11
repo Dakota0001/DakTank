@@ -6,8 +6,8 @@ include("shared.lua")
 ENT.DakEngine = NULL
 ENT.DakMaxHealth = 10
 ENT.DakHealth = 10
-ENT.DakName = "TMotor"
-ENT.DakModel = "models/xqm/hydcontrolbox.mdl"
+--ENT.DakName = "TMotor"
+--ENT.DakModel = "models/xqm/hydcontrolbox.mdl"
 ENT.DakMass = 250
 ENT.DakPooled=0
 
@@ -110,17 +110,35 @@ function ENT:Think()
 		self.DakModel = "models/props_c17/substation_transformer01d.mdl"	
 		self.DakRotMult = 0.6
 	end
-
-	if self:GetModel() ~= self.DakModel then
-		self:SetModel(self.DakModel)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
+	if self.DakModel then
+		if self:GetModel() ~= self.DakModel then
+			self:SetModel(self.DakModel)
+			self:PhysicsInit(SOLID_VPHYSICS)
+			self:SetMoveType(MOVETYPE_VPHYSICS)
+			self:SetSolid(SOLID_VPHYSICS)
+		end
 	end
 	if self.DakHealth > self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end
+	if self.DakRotMult then
+		self.DakRotMult = self.DakRotMult * self.DakHealth/self.DakMaxHealth
+	end
+
 	self:GetPhysicsObject():SetMass(self.DakMass)
+
+	if self:IsOnFire() then
+		self.DakHealth = self.DakHealth - 1*0.33
+		if self.DakHealth <= 0 then
+			local salvage = ents.Create( "dak_tesalvage" )
+			salvage.DakModel = self:GetModel()
+			salvage:SetPos( self:GetPos())
+			salvage:SetAngles( self:GetAngles())
+			salvage:Spawn()
+			self:Remove()
+		end
+	end
+
     self:NextThink(CurTime()+0.33)
     return true
 end
@@ -166,11 +184,11 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 			self:SetColor(Ent.EntityMods.DakTek.DakColor)
 		end
 
-		self:PhysicsDestroy()
+		--self:PhysicsDestroy()
 		--self:SetModel(self.DakModel)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
+		--self:PhysicsInit(SOLID_VPHYSICS)
+		--self:SetMoveType(MOVETYPE_VPHYSICS)
+		--self:SetSolid(SOLID_VPHYSICS)
 
 		self:Activate()
 

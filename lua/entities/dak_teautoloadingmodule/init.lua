@@ -153,6 +153,18 @@ function ENT:Think()
 		self:Remove()
 	end
 
+	if self:IsOnFire() then
+		self.DakHealth = self.DakHealth - 5
+		if self.DakHealth <= 0 then
+			local salvage = ents.Create( "dak_tesalvage" )
+			salvage.DakModel = self:GetModel()
+			salvage:SetPos( self:GetPos())
+			salvage:SetAngles( self:GetAngles())
+			salvage:Spawn()
+			self:Remove()
+		end
+	end
+
 	self:NextThink(CurTime()+1)
     return true
 end

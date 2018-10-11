@@ -6,8 +6,8 @@ include("shared.lua")
 ENT.DakFuel = NULL
 ENT.DakMaxHealth = 25
 ENT.DakHealth = 25
-ENT.DakName = "Light Motor"
-ENT.DakModel = "models/daktanks/engine1.mdl"
+--ENT.DakName = "Light Motor"
+--ENT.DakModel = "models/daktanks/engine1.mdl"
 ENT.DakSpeed = 1.1725
 ENT.DakMass = 1000
 ENT.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
@@ -168,13 +168,27 @@ function ENT:Think()
 		self.Sound:ChangePitch( 0, 0 )
 		self.Sound:ChangeVolume( 0, 0 )
 	end
-	if self:GetModel() ~= self.DakModel then
-		self:SetModel(self.DakModel)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
+	if self.DakModel then
+		if self:GetModel() ~= self.DakModel then
+			self:SetModel(self.DakModel)
+			self:PhysicsInit(SOLID_VPHYSICS)
+			self:SetMoveType(MOVETYPE_VPHYSICS)
+			self:SetSolid(SOLID_VPHYSICS)
+		end
 	end
 	self:GetPhysicsObject():SetMass(self.DakMass)
+
+	if self:IsOnFire() then
+		self.DakHealth = self.DakHealth - self.DakMaxHealth*0.025*0.25
+		if self.DakHealth <= 0 then
+			local salvage = ents.Create( "dak_tesalvage" )
+			salvage.DakModel = self:GetModel()
+			salvage:SetPos( self:GetPos())
+			salvage:SetAngles( self:GetAngles())
+			salvage:Spawn()
+			self:Remove()
+		end
+	end
 
     self:NextThink(CurTime()+0.25)
     return true
@@ -232,7 +246,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		--self:SetMoveType(MOVETYPE_VPHYSICS)
 		--self:SetSolid(SOLID_VPHYSICS)
 
-		self:Activate()
+		--self:Activate()
 
 		Ent.EntityMods.DakTek = nil
 	end
