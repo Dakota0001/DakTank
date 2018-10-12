@@ -793,12 +793,14 @@ function ENT:DakTEFire()
 				self:SetNWInt("FirePitch",self.DakFirePitch)
 				self:SetNWFloat("Caliber",self.DakCaliber)
 
-				self:SetNWFloat("Cooldown",self.DakCooldown)
-				self:SetNWFloat("Timer",CurTime())
-				self:SetNWBool("Firing",true)
-				timer.Create( "ResoundTimer"..self:EntIndex(), self.DakCooldown/2, 1, function()
-					self:SetNWBool("Firing",false)
-				end)
+				if self.DakCaliber>=40 then
+					self:SetNWBool("Firing",true)
+					timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
+						self:SetNWBool("Firing",false)
+					end)
+				else
+					sound.Play( self.DakFireSound, self:GetPos(), 100, 100, 1 )
+				end
 
 				timer.Create( "ReloadFinishTimer"..self:EntIndex()..CurTime(), self.DakCooldown-SoundDuration(self.ReloadSound), 1, function()
 					if IsValid(self) then
