@@ -359,7 +359,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							end
 						end
 					end
-					Shell.Pos = End+(HitVel*0.1)
+					Shell.Pos = End
 					Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 					Shell.DakPenetration = Shell.DakPenetration-(CurrentPen)*(EffArmor/Shell.DakPenetration)
 					if Shattered == 1 then
@@ -389,7 +389,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								end
 							end
 						end
-						Shell.Pos = End+(HitVel*0.1)
+						Shell.Pos = End
 						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
@@ -443,7 +443,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								end
 							end
 						end
-						Shell.Pos = End+(HitVel*0.1)
+						Shell.Pos = End
 						Shell.LifeTime = 0
 						Shell.DakVelocity = 0
 						Shell.DakDamage = 0
@@ -523,7 +523,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 											end
 										end
 									end
-									Shell.Pos = End+(HitVel*0.1)
+									Shell.Pos = End
 								--else
 								--	local Energy = (math.abs(math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))))/90)
 								--	Shell.DakVelocity = Shell.DakVelocity*Energy
@@ -539,7 +539,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								--	if HitEnt:GetParent():GetParent() then
 								--		HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
 								--	end
-								--	Shell.Pos = End+(HitVel*0.1)
+								--	Shell.Pos = End
 								--end	
 							end
 							Shell.Filter[#Shell.Filter+1] = HitEnt
@@ -1046,7 +1046,7 @@ function DTShellContinue(Start,Shell,Normal,HitNonHitable)
 								end
 							end
 						end
-						Shell.Pos = End+(HitVel*0.1)
+						Shell.Pos = End
 						
 						Shell.DakDamage = Shell.DakDamage-Shell.DakDamage*(EffArmor/Shell.DakPenetration)
 						Shell.DakPenetration = Shell.DakPenetration-(CurrentPen)*(EffArmor/Shell.DakPenetration)
@@ -1077,7 +1077,7 @@ function DTShellContinue(Start,Shell,Normal,HitNonHitable)
 									end
 								end
 							end
-							Shell.Pos = End+(HitVel*0.1)
+							Shell.Pos = End
 							Shell.LifeTime = 0
 							Shell.DakVelocity = 0
 							Shell.DakDamage = 0
@@ -1131,7 +1131,7 @@ function DTShellContinue(Start,Shell,Normal,HitNonHitable)
 									end
 								end
 							end
-							Shell.Pos = End+(HitVel*0.1)
+							Shell.Pos = End
 							Shell.LifeTime = 0
 							Shell.DakVelocity = 0
 							Shell.DakDamage = 0
@@ -1213,7 +1213,7 @@ function DTShellContinue(Start,Shell,Normal,HitNonHitable)
 										end
 									end
 								end
-								Shell.Pos = End+(HitVel*0.1)
+								Shell.Pos = End
 							--else
 							--	local Energy = (math.abs(math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))))/90)
 							--	Shell.DakVelocity = Shell.DakVelocity*Energy
@@ -1229,7 +1229,7 @@ function DTShellContinue(Start,Shell,Normal,HitNonHitable)
 							--	if HitEnt:GetParent():GetParent() then
 							--		HitVel = HitEnt:GetParent():GetParent():GetVelocity() 
 							--	end
-							--	Shell.Pos = End+(HitVel*0.1)
+							--	Shell.Pos = End
 							--end		
 							--soundhere bounce sound
 						end

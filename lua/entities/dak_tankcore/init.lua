@@ -435,33 +435,33 @@ function ENT:Think()
 													if math.random(0,9) == 0 then
 														self.TurretControls[j].TurretBase:Ignite(25,1)
 													end
-												end
-												constraint.RemoveAll( self:GetParent():GetParent() )
-												for l=1, #self.TurretControls[j].Turret do
-													if self.TurretControls[j].Turret[l] ~= self.TurretControls[j].TurretBase then
-														if IsValid(self.TurretControls[j].Turret[l]) then
-															table.RemoveByValue( self.Contraption, self.TurretControls[j].Turret[l] )
-															self.TurretControls[j].Turret[l]:SetParent( self.TurretControls[j].TurretBase, -1 )
-															self.TurretControls[j].Turret[l]:SetMoveType( MOVETYPE_NONE )
-															self.TurretControls[j].Turret[l]:SetMaterial("models/props_buildings/plasterwall021a")
-															self.TurretControls[j].Turret[l]:SetColor(Color(100,100,100,255))
-															self.TurretControls[j].Turret[l]:SetCollisionGroup( COLLISION_GROUP_WORLD )
-															self.TurretControls[j].Turret[l]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
-															if self.TurretControls[j].Turret[l]:IsVehicle() then
-																if IsValid(self.TurretControls[j].Turret[l]:GetDriver()) then
-																	self.TurretControls[j].Turret[l]:GetDriver():Kill()
+													constraint.RemoveAll( self:GetParent():GetParent() )
+													for l=1, #self.TurretControls[j].Turret do
+														if self.TurretControls[j].Turret[l] ~= self.TurretControls[j].TurretBase then
+															if IsValid(self.TurretControls[j].Turret[l]) then
+																table.RemoveByValue( self.Contraption, self.TurretControls[j].Turret[l] )
+																self.TurretControls[j].Turret[l]:SetParent( self.TurretControls[j].TurretBase, -1 )
+																self.TurretControls[j].Turret[l]:SetMoveType( MOVETYPE_NONE )
+																self.TurretControls[j].Turret[l]:SetMaterial("models/props_buildings/plasterwall021a")
+																self.TurretControls[j].Turret[l]:SetColor(Color(100,100,100,255))
+																self.TurretControls[j].Turret[l]:SetCollisionGroup( COLLISION_GROUP_WORLD )
+																self.TurretControls[j].Turret[l]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+																if self.TurretControls[j].Turret[l]:IsVehicle() then
+																	if IsValid(self.TurretControls[j].Turret[l]:GetDriver()) then
+																		self.TurretControls[j].Turret[l]:GetDriver():Kill()
+																	end
+																	self.TurretControls[j].Turret[l]:Remove()
 																end
-																self.TurretControls[j].Turret[l]:Remove()
-															end
-															if math.random(0,9) == 0 then
-																self.TurretControls[j].Turret[l]:Ignite(25,1)
+																if math.random(0,9) == 0 then
+																	self.TurretControls[j].Turret[l]:Ignite(25,1)
+																end
 															end
 														end
 													end
+													self.TurretControls[j].TurretBase:SetAngles(self.TurretControls[j].TurretBase:GetAngles() + Angle(math.Rand(-45,45),math.Rand(-45,45),math.Rand(-45,45)))
+													self.TurretControls[j].TurretBase:GetPhysicsObject():ApplyForceCenter(self.TurretControls[j].TurretBase:GetUp()*2500*self.TurretControls[j].TurretBase:GetPhysicsObject():GetMass())
+													self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].TurretBase
 												end
-												self.TurretControls[j].TurretBase:SetAngles(self.TurretControls[j].TurretBase:GetAngles() + Angle(math.Rand(-45,45),math.Rand(-45,45),math.Rand(-45,45)))
-												self.TurretControls[j].TurretBase:GetPhysicsObject():ApplyForceCenter(self.TurretControls[j].TurretBase:GetUp()*2500*self.TurretControls[j].TurretBase:GetPhysicsObject():GetMass())
-												self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].TurretBase
 											end
 										end
 									end
