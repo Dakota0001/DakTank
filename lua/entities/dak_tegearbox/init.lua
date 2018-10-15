@@ -226,6 +226,8 @@ function ENT:Think()
 					self.DakHP = self.DakHP + self.DakTankCore.Motors[i].DakHP
 				end
 			end
+		else
+			self.DakHP = 0
 		end
 		if #self.DakTankCore.Fuel>0 then
 			for i=1, #self.DakTankCore.Fuel do
@@ -235,6 +237,8 @@ function ENT:Think()
 					end
 				end
 			end
+		else
+			self.DakHP = 0
 		end
 	end
 
@@ -497,13 +501,13 @@ function ENT:Think()
 									if not(constraint.FindConstraint( self.LeftDriveWheel, "Weld" )) then
 										constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
 									end
-									RPhys:ApplyTorqueCenter( -self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*((self.TopSpeed - self.Speed)/self.TopSpeed) )
+									RPhys:ApplyTorqueCenter( -self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 								end
 								if self.MoveRight>0 and self.MoveLeft==0 then
 									if not(constraint.FindConstraint( self.RightDriveWheel, "Weld" )) then
 										constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
 									end
-									LPhys:ApplyTorqueCenter( -self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*((self.TopSpeed - self.Speed)/self.TopSpeed) )
+									LPhys:ApplyTorqueCenter( -self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 								end
 							else
 								if constraint.FindConstraint( self.LeftDriveWheel, "Weld" ) then
@@ -522,13 +526,25 @@ function ENT:Think()
 										end
 									end
 								end
-								if self.MoveLeft>0 and self.MoveRight==0 then
-									RPhys:ApplyTorqueCenter( self.Turn*-self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450 )
-									LPhys:ApplyTorqueCenter( self.Turn*self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450 )
-								end
-								if self.MoveRight>0 and self.MoveLeft==0 then
-									RPhys:ApplyTorqueCenter( self.Turn*self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450 )
-									LPhys:ApplyTorqueCenter( self.Turn*-self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450 )
+
+								if self.MoveReverse>0 then
+									if self.MoveLeft>0 and self.MoveRight==0 then
+										RPhys:ApplyTorqueCenter( self.Turn*self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
+										LPhys:ApplyTorqueCenter( self.Turn*-self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
+									end
+									if self.MoveRight>0 and self.MoveLeft==0 then
+										RPhys:ApplyTorqueCenter( self.Turn*-self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
+										LPhys:ApplyTorqueCenter( self.Turn*self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
+									end
+								else
+									if self.MoveLeft>0 and self.MoveRight==0 then
+										RPhys:ApplyTorqueCenter( self.Turn*-self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
+										LPhys:ApplyTorqueCenter( self.Turn*self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
+									end
+									if self.MoveRight>0 and self.MoveLeft==0 then
+										RPhys:ApplyTorqueCenter( self.Turn*self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
+										LPhys:ApplyTorqueCenter( self.Turn*-self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
+									end
 								end
 							end
 						end

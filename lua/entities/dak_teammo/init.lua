@@ -430,7 +430,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 			util.Decal( "Impact.Concrete", self:GetPos(), self:GetPos()+(Direction*Radius), self)
 			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
 				if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
-					if ExpTrace.Entity.DakArmor == nil then
+					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 					end
 					local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
@@ -451,7 +451,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 					end
 					self:DamageEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
 				else
-					if ExpTrace.Entity.DakArmor == nil then
+					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 					end
 					local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
@@ -558,7 +558,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 		util.Decal( "Impact.Concrete", self:GetPos(), self:GetPos()+(Direction*Radius), self)
 		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") then
 			if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
-				if ExpTrace.Entity.DakArmor == nil then
+				if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
 					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 				end
 				local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
@@ -579,7 +579,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 				end
 				self:DamageEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
 			else
-				if ExpTrace.Entity.DakArmor == nil then
+				if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
 					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 				end
 				local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()

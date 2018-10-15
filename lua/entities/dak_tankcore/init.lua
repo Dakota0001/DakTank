@@ -435,7 +435,13 @@ function ENT:Think()
 													if math.random(0,9) == 0 then
 														self.TurretControls[j].TurretBase:Ignite(25,1)
 													end
-													constraint.RemoveAll( self:GetParent():GetParent() )
+													if IsValid(self) then
+														if IsValid(self:GetParent()) then
+															if IsValid(self:GetParent():GetParent()) then
+																constraint.RemoveAll( self:GetParent():GetParent() )
+															end
+														end
+													end
 													for l=1, #self.TurretControls[j].Turret do
 														if self.TurretControls[j].Turret[l] ~= self.TurretControls[j].TurretBase then
 															if IsValid(self.TurretControls[j].Turret[l]) then

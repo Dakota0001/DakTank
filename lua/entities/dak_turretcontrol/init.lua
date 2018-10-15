@@ -300,6 +300,9 @@ function ENT:Think()
 								end
 							end
 						else
+							if constraint.FindConstraint( self.DakGun, "Weld" ) then
+				        		constraint.RemoveConstraints( self.DakGun, "Weld" )
+				        	end
 							local GunDir = self:GetForward()
 						    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
 						    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
