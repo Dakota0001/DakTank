@@ -2381,7 +2381,7 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*5.3*ShellLength,2).."mm\nDamage:        "..math.Round((math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.25*0.02*6.5)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*2.227).." m/s" )
 	end
 	selectedAmmo["HESH"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.25*ShellLength,2).."mm\nDamage:        0\nSplash Dmg:   "..math.Round(Caliber*0.375,2).."\nBlast Radius:  "..math.Round(Caliber/25,2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*0.5).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.25,2).."mm\nDamage:        0\nSplash Dmg:   "..math.Round(Caliber*0.375,2).."\nBlast Radius:  "..math.Round(Caliber/25,2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*0.5).." m/s" )
 	end
 	
 	--Table containing the description of the fuel tanks

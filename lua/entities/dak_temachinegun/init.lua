@@ -200,7 +200,11 @@ function ENT:Think()
 		util.Effect(self.DakShellTrail, effectdata, true, true)
 
 		if ShellTrace.Hit then
-			DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+			if self.ShellList[i].IsGuided then
+				DTShellHit(ShellTrace.StartPos,self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1),ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+			else
+				DTShellHit(ShellTrace.StartPos,self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2),ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+			end
 		end
 
 		if self.ShellList[i].DieTime then

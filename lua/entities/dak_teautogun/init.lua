@@ -1088,7 +1088,11 @@ function ENT:Think()
 		util.Effect(self.ShellList[i].DakTrail, effectdata, true, true)
 
 		if ShellTrace.Hit then
-			DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+			if self.ShellList[i].IsGuided then
+				DTShellHit(ShellTrace.StartPos,self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1),ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+			else
+				DTShellHit(ShellTrace.StartPos,self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2),ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
+			end
 		end
 
 		if self.ShellList[i].DieTime then
@@ -1389,14 +1393,27 @@ function ENT:DakTEAutoFire()
 				util.Effect( self.DakFireEffect, effectdata, true, true )
 				--self:EmitSound( self.DakFireSound, 100, self.DakFirePitch, 1, 6)
 				self.timer = CurTime()
-				if(self:IsValid()) then
-					if(self:GetParent():IsValid()) then
-						if(self:GetParent():GetParent():IsValid()) then
-							self:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20 )
+				if self.DakAmmoType == self.DakATGM then
+					if(self:IsValid()) then
+						if(self:GetParent():IsValid()) then
+							if(self:GetParent():GetParent():IsValid()) then
+								self:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20 )
+							end
+						end
+						if not(self:GetParent():IsValid()) then
+							self:GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20 )
 						end
 					end
-					if not(self:GetParent():IsValid()) then
-						self:GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20 )
+				else
+					if(self:IsValid()) then
+						if(self:GetParent():IsValid()) then
+							if(self:GetParent():GetParent():IsValid()) then
+								self:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/200 )
+							end
+						end
+						if not(self:GetParent():IsValid()) then
+							self:GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/200 )
+						end
 					end
 				end
 			end
