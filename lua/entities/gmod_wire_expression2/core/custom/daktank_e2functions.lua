@@ -418,7 +418,7 @@ e2function number entity:daktankGetMaxCooldown()
 end
 
 e2function number daktankHitCrit(vector Start, vector End, string ShellType, Caliber, array Filter)
-	local Armor, Ent = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
+	local Armor, Ent, _ = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
 	if Ent:IsWorld() and Armor > 0 then
 		Armor = 1000000
 	end
@@ -426,6 +426,6 @@ e2function number daktankHitCrit(vector Start, vector End, string ShellType, Cal
 end
 
 e2function number daktankRecurseArmor(vector Start, vector End, string ShellType, Caliber, array Filter)
-	local Armor, Ent = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
+	local Armor, Ent, _ = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
 	return Armor
 end

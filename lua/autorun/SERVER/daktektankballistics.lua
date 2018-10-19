@@ -25,6 +25,7 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 
 	local HitEnt = ShellSimTrace.Entity
 	local EffArmor = 0
+	local Shatter = 0
 	if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") then
 		if not((CheckClip(HitEnt,End)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
 			if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
@@ -53,11 +54,17 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 			local TDRatio = HitEnt.DakArmor/Caliber
 			local HitAng = math.deg(math.acos(ShellSimTrace.HitNormal:Dot(-ShellSimTrace.Normal)))
 			if HitEnt.IsComposite == 1 then
-				EffArmor = DTCompositesTrace( HitEnt, End, ShellSimTrace.Normal )*9.2
+				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal )*9.2
+				if EffArmor/Caliber >= 0.8 then
+					Shatter = 1
+				end
 				if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
 					EffArmor = EffArmor*2
 				end
 			else
+				if TDRatio >= 0.8 then
+					Shatter = 1
+				end
 				if ShellType == "HESH" then
 					EffArmor = HitEnt.DakArmor
 				end
@@ -83,19 +90,21 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 	else
 		EndPos = End
 	end
-	return EffArmor, HitEnt, EndPos
+	return EffArmor, HitEnt, EndPos, Shatter
 end
 
 function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
-	local Armor, Ent, FirstPenPos = DTGetArmor(Start, End, ShellType, Caliber, Filter)
+	local Armor, Ent, FirstPenPos, Shattered = DTGetArmor(Start, End, ShellType, Caliber, Filter)
 	local Recurse = 1
 	local NewFilter = Filter
 	local newEnt = Ent
 	local newArmor = 0
 	local Go = 1
 	local LastPenPos = FirstPenPos
+	local Shatters = Shattered
 	while Go == 1 and Recurse<25 do
-		local newArmor, newEnt, LastPenPos = DTGetArmor(Start, End, ShellType, Caliber, NewFilter)
+		local newArmor, newEnt, LastPenPos, Shattered = DTGetArmor(Start, End, ShellType, Caliber, NewFilter)
+		Shatters = Shatters + Shattered
 		if newEnt:IsValid() then
 			if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
 				Go = 0
@@ -107,15 +116,13 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 			if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
 				Armor = Armor + (FirstPenPos:Distance(LastPenPos)*2.54)
 			end
-			return Armor, newEnt
+			return Armor, newEnt, Shatters
 		end
 		NewFilter[#NewFilter+1] = newEnt
 		Armor = Armor + newArmor
 		Recurse = Recurse + 1
 	end
 end
-
-
 
 function DTCompositesTrace( Ent, StartPos, Dir, Filter )
     local Phys = Ent:GetPhysicsObject()
