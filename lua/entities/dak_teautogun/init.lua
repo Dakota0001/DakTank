@@ -52,7 +52,7 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	self.Inputs = Wire_CreateInputs(self, { "Fire", "SwapAmmo","Reload", "Indicator [ENTITY]" })
-	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "Ammo", "MagazineRounds", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
+	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "MaxCooldown", "ReloadTime", "Ammo", "MagazineRounds", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
  	self.Soundtime = CurTime()
  	self.SlowThinkTime = CurTime()
@@ -1037,6 +1037,8 @@ function ENT:Think()
 		self:DakTEAutoAmmoCheck()
 
 		WireLib.TriggerOutput(self, "MagazineRounds", self.DakMagazine - self.DakShotsCounter)
+		WireLib.TriggerOutput(self, "MaxCooldown",self.DakCooldown)
+		WireLib.TriggerOutput(self, "ReloadTime",self.DakReloadTime)
 		if self.DakIsReloading == 0 then
 			WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
 			WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))

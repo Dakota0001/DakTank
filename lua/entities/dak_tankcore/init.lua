@@ -24,7 +24,7 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 
-	self.Outputs = WireLib.CreateOutputs( self, { "Health","HealthPercent" } )
+	self.Outputs = WireLib.CreateOutputs( self, { "Health","HealthPercent","Crew" } )
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.SlowThinkTime = CurTime()
@@ -254,6 +254,8 @@ function ENT:Think()
 							end
 						end
 					end
+					self.CrewCount = #self.Crew
+					WireLib.TriggerOutput(self, "Crew", self.CrewCount)
 					if self.Gearbox then
 						self.Gearbox.TotalMass = Mass
 						self.Gearbox.ParentMass = ParentMass

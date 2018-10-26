@@ -47,7 +47,7 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	self.Inputs = Wire_CreateInputs(self, { "Fire" })
-	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "Ammo", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
+	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "MaxCooldown", "Ammo", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
  	self.Soundtime = CurTime()
  	self.SlowThinkTime = CurTime()
@@ -178,6 +178,7 @@ function ENT:Think()
 
 		WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
 		WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
+		WireLib.TriggerOutput(self, "MaxCooldown",self.DakCooldown)
 		self.MidThinkTime = CurTime()
 	end
 

@@ -29,3 +29,6 @@ E2Helper.Descriptions["daktankGetHEVelocity"] = "Returns average velocity of gun
 E2Helper.Descriptions["daktankGetMaxCooldown"] = "Returns gun's cooldown time."
 E2Helper.Descriptions["daktankHitCrit"] = "Recursively checks armor in a given direction and length until hitting vital component and returns extremely high armor value in cases where nothing of value is hit."
 E2Helper.Descriptions["daktankRecurseArmor"] = "Recursively checks armor in a given direction and length until hitting vital component."
+E2Helper.Descriptions["daktankGetSpeed"] = "Returns current speed of tank when linked to gearbox, otherwise returns 0"
+E2Helper.Descriptions["daktankGetTopSpeed"] = "Returns top speed of tank when linked to gearbox, otherwise returns 0"
+E2Helper.Descriptions["daktankGetCrewCount"] = "Returns current crew count of tank when linked to tank core, otherwise returns 0"

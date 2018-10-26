@@ -429,3 +429,42 @@ e2function number daktankRecurseArmor(vector Start, vector End, string ShellType
 	local Armor, Ent, _ = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
 	return Armor
 end
+
+e2function number entity:daktankGetSpeed()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegearbox" then
+		if this.Speed == nil then
+			return 0
+		else
+			return this.Speed
+		end
+	end
+	return 0
+end
+
+e2function number entity:daktankGetTopSpeed()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tegearbox" then
+		if this.TopSpeed == nil then
+			return 0
+		else
+			return this.TopSpeed
+		end
+	end
+	return 0
+end
+
+e2function number entity:daktankGetCrewCount()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tankcore" then
+		if this.CrewCount == nil then
+			return 0
+		else
+			return this.CrewCount
+		end
+	end
+	return 0
+end

@@ -181,7 +181,6 @@ function ENT:Think()
 						end
 					end
 				end
-
 				if not(self.DakParented==1) then
 					if IsValid(GunEnt:GetParent()) then
 						if IsValid(GunEnt:GetParent():GetParent()) then
@@ -228,6 +227,9 @@ function ENT:Think()
 						end
 						self.GunMass = Mass
 						self.DakParented = 1
+						if IsValid(DakTurret) then
+							self.YawDiff = DakTurret:GetAngles().yaw-self.DakGun:GetAngles().yaw
+						end
 					else
 						self.DakParented = 0
 					end
@@ -268,6 +270,14 @@ function ENT:Think()
 						if not(self.GunAng) then
 							self.GunAng = self:WorldToLocalAngles(self.DakGun:GetAngles())
 						end
+						if IsValid(DakTurret) then
+							if not(self.TurInertia) then
+								self.TurInertia = Angle(DakTurret:GetPhysicsObject():GetInertia().y,DakTurret:GetPhysicsObject():GetInertia().z,DakTurret:GetPhysicsObject():GetInertia().x)
+							end
+							if not(self.TurAng) then
+								self.TurAng = self:WorldToLocalAngles(DakTurret:GetAngles())
+							end
+						end
 						if self.DakActive > 0 then
 							if self.Inputs.Lock.Value > 0 then
 								if IsValid(self.DakCore.Base) then
@@ -293,9 +303,19 @@ function ENT:Think()
 								    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
 								    Ang = Angle((Ang.pitch - AngVelAng.pitch),(Ang.yaw - AngVelAng.yaw),(Ang.roll - AngVelAng.roll))
 								    Ang = Angle((Ang.pitch*self.Inertia.pitch),(Ang.yaw*self.Inertia.yaw),(Ang.roll*self.Inertia.roll))
-								    self:ApplyForce(self.DakGun, Ang)
 									if IsValid(DakTurret) then
-										self:ApplyForce(DakTurret, Angle(0,Ang.yaw,0))
+										TurDir = normalizedVector(CamTrace.HitPos - CamTrace.StartPos+Vector(0,0,CamTrace.StartPos.z-DakTurret:GetPos().z))
+								    	self.TurAng = angnorm(angClamp(self.TurAng - angNumClamp(heading(Vector(0,0,0), self.TurAng, self:toLocalAxis(TurDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
+									    local TurAng = -heading(Vector(0,0,0), DakTurret:GetAngles(), self:LocalToWorldAngles(self.TurAng+Angle(0,self.YawDiff,0)):Forward())
+									    TurAng = Angle(TurAng.pitch*250,TurAng.yaw*250,TurAng.roll*250)
+									    local TurAngVel = DakTurret:GetPhysicsObject():GetAngleVelocity()
+									    local TurAngVelAng = Angle( TurAngVel.y*30, TurAngVel.z*30, TurAngVel.x*30 )
+									    TurAng = Angle((TurAng.pitch - TurAngVelAng.pitch),(TurAng.yaw - TurAngVelAng.yaw),(TurAng.roll - TurAngVelAng.roll))
+									    TurAng = Angle((TurAng.pitch*self.TurInertia.pitch),(TurAng.yaw*self.TurInertia.yaw),(TurAng.roll*self.TurInertia.roll))
+										self:ApplyForce(DakTurret, Angle(TurAng.pitch,0,0))
+										self:ApplyForce(self.DakGun, Angle(Ang.pitch,0,0))
+									else
+										self:ApplyForce(self.DakGun, Ang)
 									end
 								end
 							end
