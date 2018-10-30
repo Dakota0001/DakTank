@@ -98,7 +98,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)
-			self.DakShellFragPen = (self.DakCaliber/2.5)
+			self.DakBaseShellFragPen = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4850
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -176,7 +176,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)
-			self.DakShellFragPen = (self.DakCaliber/2.5)
+			self.DakBaseShellFragPen = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4850
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -251,7 +251,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)
-			self.DakShellFragPen = (self.DakCaliber/2.5)
+			self.DakBaseShellFragPen = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4850
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -325,7 +325,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)*1.3
-			self.DakShellFragPen = (self.DakCaliber/2.5)*1.3
+			self.DakBaseShellFragPen = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4850*1.3
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -396,7 +396,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)*1.15
-			self.DakShellFragPen = (self.DakCaliber/2.5)*1.15
+			self.DakBaseShellFragPen = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4850*1.15
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -573,6 +573,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.BaseDakShellPenetration
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
+		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -587,6 +588,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.DakMaxHealth*0.2
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
+		self.DakShellFragPen = self.DakBaseShellFragPen
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -601,6 +603,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.DakMaxHealth*1.20
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -615,6 +618,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.BaseDakShellPenetration*1.5
 		self.DakShellVelocity = self.BaseDakShellVelocity*4/3
 		self.DakPenLossPerMeter = 0.001
+		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -629,6 +633,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.DakMaxHealth*1.25
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.5
 		self.DakPenLossPerMeter = 0.0
+		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -643,6 +648,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.DakMaxHealth*6.40
 		self.DakShellVelocity = 12600
 		self.DakPenLossPerMeter = 0.0
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -657,6 +663,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.DakMaxHealth*5.40
 		self.DakShellVelocity = self.BaseDakShellVelocity*1.3333
 		self.DakPenLossPerMeter = 0.0
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -671,6 +678,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.BaseDakShellPenetration*5.3*0.5
 		self.DakShellVelocity = self.BaseDakShellVelocity*2.227
 		self.DakPenLossPerMeter = 0.001
+		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -685,6 +693,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.DakMaxHealth*1.65
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.1
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -888,6 +897,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.BaseDakShellPenetration
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
+		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -902,6 +912,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.DakMaxHealth*0.2
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
+		self.DakShellFragPen = self.DakBaseShellFragPen
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -916,6 +927,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.DakMaxHealth*5.40*self.ShellLengthMult
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -930,6 +942,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.BaseDakShellPenetration*1.5
 		self.DakShellVelocity = self.BaseDakShellVelocity*4/3
 		self.DakPenLossPerMeter = 0.001
+		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -944,6 +957,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.DakMaxHealth*1.25
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.5
 		self.DakPenLossPerMeter = 0.0
+		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -958,6 +972,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.DakMaxHealth*6.40*self.ShellLengthMult
 		self.DakShellVelocity = 12600
 		self.DakPenLossPerMeter = 0.0
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -972,6 +987,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.DakMaxHealth*5.40*self.ShellLengthMult
 		self.DakShellVelocity = self.BaseDakShellVelocity*1.3333
 		self.DakPenLossPerMeter = 0.0
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -986,6 +1002,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.BaseDakShellPenetration*5.3*0.5
 		self.DakShellVelocity = self.BaseDakShellVelocity*2.227
 		self.DakPenLossPerMeter = 0.001
+		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -1000,6 +1017,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.DakMaxHealth*1.65
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.1
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)

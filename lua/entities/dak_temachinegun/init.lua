@@ -89,7 +89,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(50/50)
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/25*39)
-			self.DakShellFragPen = (self.DakCaliber/2.5)
+			self.DakBaseShellFragPen = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4850
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -314,7 +314,7 @@ function ENT:DakTEFire()
 				Shell.DakBlastRadius = self.DakShellBlastRadius
 				Shell.DakPenSounds = self.DakShellPenSounds
 				Shell.DakBasePenetration = self.BaseDakShellPenetration
-				Shell.DakFragPen = self.DakShellFragPen
+				Shell.DakFragPen = self.DakBaseShellFragPen
 				Shell.DakCaliber = self.DakMaxHealth
 				Shell.DakFireSound = self.DakFireSound
 				Shell.DakFirePitch = self.DakFirePitch
@@ -325,7 +325,7 @@ function ENT:DakTEFire()
 				Shell.DakPenLossPerMeter = self.DakPenLossPerMeter
 				Shell.DakShellType = self.DakShellAmmoType
 				if self.DakShellAmmoType == "HESH" or self.DakShellAmmoType == "HEAT" then
-					Shell.DakFragPen = self.DakShellFragPen * 0.5
+					Shell.DakFragPen = self.DakBaseShellFragPen * 0.5
 					Shell.DakBlastRadius = self.DakShellBlastRadius * 0.5
 					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 ) * 0.5
 				end

@@ -791,11 +791,12 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 end
 
 function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
+	local Fuze = 25
 	local newtrace = {}
 		if Shell.DakShellType == "APHE" and not(HitNonHitable) then
 			newtrace.start = Shell.Pos
 			---fuze is set to 25 units distance
-			newtrace.endpos = Shell.Pos + (25 * Shell.Ang:Forward())
+			newtrace.endpos = Shell.Pos + (Fuze * Shell.Ang:Forward())
 		else
 			newtrace.start = Start
 			newtrace.endpos = End
@@ -809,7 +810,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			Shell.DieTime = CurTime()
 		end
 		local effectdata = EffectData()
-		effectdata:SetOrigin(Shell.Pos + (25 * Shell.Ang:Forward()))
+		effectdata:SetOrigin(Shell.Pos + (Fuze * Shell.Ang:Forward()))
 		effectdata:SetEntity(Shell.DakGun)
 		effectdata:SetAttachment(1)
 		effectdata:SetMagnitude(.5)
@@ -829,9 +830,9 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			else
 				ExpSounds = {"daktanks/dakexp1.wav","daktanks/dakexp2.wav","daktanks/dakexp3.wav","daktanks/dakexp4.wav"}
 			end
-			sound.Play( ExpSounds[math.random(1,#ExpSounds)], Shell.Pos + (25 * Shell.Ang:Forward()), 100, 100, 1 )	
+			sound.Play( ExpSounds[math.random(1,#ExpSounds)], Shell.Pos + (Fuze * Shell.Ang:Forward()), 100, 100, 1 )	
 		end
-		DTAPHE(Shell.Pos + (25 * Shell.Ang:Forward()),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+		DTAPHE(Shell.Pos + (Fuze * Shell.Ang:Forward()),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
 	else
 		local HitEnt = ContShellTrace.Entity
 		--local End = ContShellTrace.HitPos
@@ -1583,7 +1584,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 	local traces = math.Round(Caliber/2)
 	local Filter = {HitEnt}
 	for i=1, traces do
-		local Direction = (Shell.Ang + Angle(math.Rand(-45,45),math.Rand(-45,45),math.Rand(-45,45))):Forward()
+		local Direction = (Shell.Ang + Angle(math.Rand(-Caliber*0.75,Caliber*0.75),math.Rand(-Caliber*0.75,Caliber*0.75),math.Rand(-Caliber*0.75,Caliber*0.75))):Forward()
 		local trace = {}
 			trace.start = Pos
 			trace.endpos = Pos + Direction*Radius*10

@@ -312,7 +312,12 @@ function ENT:Think()
 									    local TurAngVelAng = Angle( TurAngVel.y*30, TurAngVel.z*30, TurAngVel.x*30 )
 									    TurAng = Angle((TurAng.pitch - TurAngVelAng.pitch),(TurAng.yaw - TurAngVelAng.yaw),(TurAng.roll - TurAngVelAng.roll))
 									    TurAng = Angle((TurAng.pitch*self.TurInertia.pitch),(TurAng.yaw*self.TurInertia.yaw),(TurAng.roll*self.TurInertia.roll))
-										self:ApplyForce(DakTurret, Angle(TurAng.pitch,0,0))
+									    --find yaw axis
+									   	if (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll > 1 or (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll < -1 then
+											self:ApplyForce(DakTurret, Angle(TurAng.pitch,0,0))
+										else
+											self:ApplyForce(DakTurret, Angle(0,TurAng.yaw,0))
+										end
 										self:ApplyForce(self.DakGun, Angle(Ang.pitch,0,0))
 									else
 										self:ApplyForce(self.DakGun, Ang)
