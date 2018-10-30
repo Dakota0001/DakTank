@@ -295,7 +295,7 @@ function ENT:Think()
 										trace.endpos = self.DakCamTrace.StartPos + self.DakCamTrace.Normal*9999999999
 										trace.filter = self.DakContraption
 									local CamTrace = util.TraceLine( trace )
-							    	GunDir = normalizedVector(CamTrace.HitPos - CamTrace.StartPos+Vector(0,0,CamTrace.StartPos.z-self.DakGun:GetPos().z))
+							    	GunDir = normalizedVector(CamTrace.HitPos - CamTrace.StartPos+(CamTrace.StartPos-self.DakGun:GetPos()))
 							    	self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
 								    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
 								    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
@@ -304,7 +304,7 @@ function ENT:Think()
 								    Ang = Angle((Ang.pitch - AngVelAng.pitch),(Ang.yaw - AngVelAng.yaw),(Ang.roll - AngVelAng.roll))
 								    Ang = Angle((Ang.pitch*self.Inertia.pitch),(Ang.yaw*self.Inertia.yaw),(Ang.roll*self.Inertia.roll))
 									if IsValid(DakTurret) then
-										TurDir = normalizedVector(CamTrace.HitPos - CamTrace.StartPos+Vector(0,0,CamTrace.StartPos.z-DakTurret:GetPos().z))
+										TurDir = normalizedVector(CamTrace.HitPos - CamTrace.StartPos+(CamTrace.StartPos-DakTurret:GetPos()))
 								    	self.TurAng = angnorm(angClamp(self.TurAng - angNumClamp(heading(Vector(0,0,0), self.TurAng, self:toLocalAxis(TurDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
 									    local TurAng = -heading(Vector(0,0,0), DakTurret:GetAngles(), self:LocalToWorldAngles(self.TurAng+Angle(0,self.YawDiff,0)):Forward())
 									    TurAng = Angle(TurAng.pitch*250,TurAng.yaw*250,TurAng.roll*250)
