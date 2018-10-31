@@ -463,6 +463,11 @@ function ENT:Think()
 																if math.random(0,9) == 0 then
 																	self.TurretControls[j].Turret[l]:Ignite(25,1)
 																end
+																if self.TurretControls[j].Turret[l]:GetClass() == "dak_teammo" then
+																	if math.random(0,1) == 0 then
+																		self.TurretControls[j].Turret[l]:Ignite(25,1)
+																	end
+																end
 															end
 														end
 													end
@@ -503,6 +508,11 @@ function ENT:Think()
 															if math.random(0,9) == 0 then
 																self.Contraption[i]:Ignite(25,1)
 															end
+															if self.Contraption[i]:GetClass() == "dak_teammo" then
+																if math.random(0,1) == 0 then
+																	self.Contraption[i]:Ignite(25,1)
+																end
+															end
 														end
 													else
 														self.salvage = ents.Create( "dak_tesalvage" )
@@ -536,9 +546,8 @@ function ENT:Think()
 									effectdata:SetAttachment(1)
 									effectdata:SetMagnitude(.5)
 									effectdata:SetNormal( Vector(0,0,-1) )
-									effectdata:SetScale(math.Clamp(self.DakMaxHealth*0.2,100,500))
+									effectdata:SetScale(math.Clamp(self.DakMaxHealth*0.04,100,500))
 									util.Effect("daktescalingexplosion", effectdata)
-
 								end
 							else
 								self:Remove()

@@ -199,11 +199,27 @@ function ENT:Think()
 					effectdata:SetScale(500)
 					effectdata:SetNormal( Vector(0,0,-1) )
 					util.Effect("daktescalingexplosion", effectdata, true, true)
-
+					timer.Create( "AmmoBurnTimer"..self:EntIndex(), 0.1, 5, function()
+						if not(self.DakAmmo == nil) then
+							if self.DakAmmo > 0 then
+								local effectdata2 = EffectData()
+								effectdata2:SetOrigin(self:GetPos())
+								effectdata2:SetEntity(self)
+								effectdata2:SetAttachment(1)
+								effectdata2:SetMagnitude(.5)
+								effectdata2:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
+								effectdata2:SetNormal( Vector(0,0,1) )
+								util.Effect("dakteammocook", effectdata2, true, true)
+							end
+						end
+					end )
 					self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,600,300,self.DakOwner)
-
 					self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
-					self:Remove()
+					timer.Create( "RemoveTimer"..self:EntIndex(), 0.5, 1, function()
+						if self:IsValid() then
+							self:Remove()
+						end
+					end)
 				else
 					if self.CookingOff == nil then
 						timer.Create( "AmmoDetTimer"..self:EntIndex(), math.Rand(0.5,2), self.DakAmmo, function()
@@ -224,7 +240,21 @@ function ENT:Think()
 									self:Remove()
 								end
 							end
-						end)
+						end)		
+						timer.Create( "AmmoBurnTimer"..self:EntIndex(), 0.25, 100, function()
+							if not(self.DakAmmo == nil) then
+								if self.DakAmmo > 0 then
+									local effectdata2 = EffectData()
+									effectdata2:SetOrigin(self:GetPos())
+									effectdata2:SetEntity(self)
+									effectdata2:SetAttachment(1)
+									effectdata2:SetMagnitude(.5)
+									effectdata2:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
+									effectdata2:SetNormal( Vector(0,0,1) )
+									util.Effect("dakteammocook", effectdata2, true, true)
+								end
+							end
+						end )
 						timer.Create( "AmmoCookTimer"..self:EntIndex(), math.Clamp((1/math.pow((self.DakMaxAmmo),0.5)),0.075,2)*math.Rand(0.75,1.25), self.DakAmmo, function()
 							if not(self.DakAmmo == nil) then
 								if self.DakAmmo > 0 then
@@ -428,7 +458,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 			--decals don't like using the adjusted by normal Pos
 			util.Decal( "Impact.Concrete", self:GetPos(), self:GetPos()+(Direction*Radius), self)
-			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") and not(ExpTrace.Entity.DakHealth <= 0) then
+			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0)) then
 				if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
 					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
@@ -556,7 +586,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 		--decals don't like using the adjusted by normal Pos
 		util.Decal( "Impact.Concrete", self:GetPos(), self:GetPos()+(Direction*Radius), self)
-		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") and not(ExpTrace.Entity.DakHealth <= 0) then
+		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0)) then
 			if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
 				if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
 					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)

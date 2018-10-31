@@ -14,7 +14,7 @@ ENT.LastHP = 0
 
 function ENT:Initialize()
 
-	if self.DakModel == "models/daktanks/crew.mdl" or self.DakModel == "models/daktanks/crewstand.mdl" or self.DakModel == "models/daktanks/crewdriver.mdl" then
+	if self.DakModel == "models/daktanks/crew.mdl" or self.DakModel == "models/daktanks/crewstand.mdl" or self.DakModel == "models/daktanks/crewdriver.mdl" or self.DakModel == "models/Humans/Charple01.mdl" or self.DakModel == "models/Humans/Charple02.mdl" or self.DakModel == "models/Humans/Charple03.mdl" or self.DakModel == "models/Humans/Charple04.mdl" then
 		local salvage = ents.Create( "prop_ragdoll" )
 
 		salvage:SetModel("models/Humans/Charple0"..math.random(1,4)..".mdl")
