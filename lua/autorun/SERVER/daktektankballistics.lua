@@ -839,7 +839,6 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			sound.Play( ExpSounds[math.random(1,#ExpSounds)], Shell.Pos + (Fuze * Shell.Ang:Forward()), 100, 100, 1 )	
 		end
 		if Shell.DakShellType == "APHE" then
-			print("APHE EXPLOSION")
 			DTAPHE(Shell.Pos + (Fuze * Shell.Ang:Forward()),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
 		else
 			DTShockwave(Shell.Pos + (Fuze * Shell.Ang:Forward()),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
@@ -2029,8 +2028,8 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 	if Shell.DakShellType == "HESH" then
 		SpallMass = (SpallVolume*0.0078125) * 0.05
 		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.05
-		SpallPen = Armor * 0.05
-		traces = 20
+		SpallPen = Caliber * 0.1
+		traces = 20 * math.Clamp((Pen/Armor),1,3)
 	end
 
 	local newtrace = {}
@@ -2046,7 +2045,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 	for i=1, traces do
 		local Ang = 45*(Armor/Pen)
 		if Shell.DakShellType == "HESH" then
-			Ang = 80
+			Ang = 30 * math.Clamp((Pen/Armor),1,3)
 		end
 		local Direction = (Dir + Angle(math.Rand(-Ang,Ang),math.Rand(-Ang,Ang),math.Rand(-Ang,Ang))):Forward()
 		local trace = {}
