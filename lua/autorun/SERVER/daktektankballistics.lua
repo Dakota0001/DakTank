@@ -97,6 +97,7 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	local Armor, Ent, FirstPenPos, Shattered = DTGetArmor(Start, End, ShellType, Caliber, Filter)
 	local Recurse = 1
 	local NewFilter = Filter
+	NewFilter[#NewFilter+1] = Ent
 	local newEnt = Ent
 	local newArmor = 0
 	local Go = 1
