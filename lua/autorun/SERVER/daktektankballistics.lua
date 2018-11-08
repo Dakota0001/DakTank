@@ -105,6 +105,9 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	local Shatters = Shattered
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered = DTGetArmor(Start, End, ShellType, Caliber, NewFilter)
+		if Armor == 0 or newArmor == 0 then
+			FirstPenPos = LastPenPos
+		end
 		Shatters = Shatters + Shattered
 		if newEnt:IsValid() then
 			if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
@@ -184,7 +187,7 @@ function CheckClip(Ent, HitPos)
 	for i=1, #Ent.ClipData do
 		normal = Ent:LocalToWorldAngles(Ent.ClipData[i]["n"]):Forward()
 		origin = Ent:LocalToWorld(Ent.ClipData[i]["n"]:Forward()*Ent.ClipData[i]["d"])
-		HitClip = HitClip or normal:Dot((origin - HitPos):GetNormalized()) > 0.25
+		HitClip = HitClip or normal:Dot((origin - HitPos):GetNormalized()) > 0
 		if HitClip then return true end
 	end
 	return HitClip

@@ -750,7 +750,7 @@ function ENT:DakTEFire()
 				self.LastFireTime = CurTime()
 				local Attachment = self:GetAttachment( 1 )
 				local shootOrigin = Attachment.Pos
-				local shootAngles = self:GetAngles()
+				local shootAngles = (self:GetParent():GetParent():GetVelocity()+self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
 				local shootDir = shootAngles:Forward()
 				
  				local Shell = {}
