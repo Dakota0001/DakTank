@@ -1406,24 +1406,24 @@ function ENT:DakTEAutoFire()
 				self.timer = CurTime()
 				if self.DakAmmoType == self.DakATGM then
 					if(self:IsValid()) then
-						if(self:GetParent():IsValid()) then
-							if(self:GetParent():GetParent():IsValid()) then
-								self:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20 )
+						if(self.DakTankCore:GetParent():IsValid()) then
+							if(self.DakTankCore:GetParent():GetParent():IsValid()) then
+								self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass*0.1/(self.DakTankCore.TotalMass/self.DakTankCore.PhysMass), self:GetPos() )
 							end
 						end
-						if not(self:GetParent():IsValid()) then
-							self:GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20 )
+						if not(self.DakTankCore:GetParent():IsValid()) then
+							self:GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20/(self.DakTankCore.TotalMass/self.DakTankCore.PhysMass) )
 						end
 					end
 				else
-					if(self:IsValid()) then
-						if(self:GetParent():IsValid()) then
-							if(self:GetParent():GetParent():IsValid()) then
-								self:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/200 )
+					if (self:IsValid()) then
+						if(self.DakTankCore:GetParent():IsValid()) then
+							if(self.DakTankCore:GetParent():GetParent():IsValid()) then
+								self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/(self.DakTankCore.TotalMass/self.DakTankCore.PhysMass), self:GetPos() )
 							end
 						end
-						if not(self:GetParent():IsValid()) then
-							self:GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/200 )
+						if not(self.DakTankCore:GetParent():IsValid()) then
+							self:GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20/(self.DakTankCore.TotalMass/self.DakTankCore.PhysMass) )
 						end
 					end
 				end

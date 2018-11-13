@@ -275,7 +275,7 @@ function ENT:Think()
 								self.TurInertia = Angle(DakTurret:GetPhysicsObject():GetInertia().y,DakTurret:GetPhysicsObject():GetInertia().z,DakTurret:GetPhysicsObject():GetInertia().x)
 							end
 							if not(self.TurAng) then
-								self.TurAng = self:WorldToLocalAngles(DakTurret:GetAngles())
+								self.TurAng = self:WorldToLocalAngles(DakTurret:GetAngles())-Angle(0,self.YawDiff,0)
 							end
 						end
 						if self.DakActive > 0 then
@@ -306,7 +306,7 @@ function ENT:Think()
 									if IsValid(DakTurret) then
 										TurDir = normalizedVector(CamTrace.HitPos - CamTrace.StartPos+(CamTrace.StartPos-DakTurret:GetPos()))
 								    	self.TurAng = angnorm(angClamp(self.TurAng - angNumClamp(heading(Vector(0,0,0), self.TurAng, self:toLocalAxis(TurDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-									    local TurAng = -heading(Vector(0,0,0), DakTurret:GetAngles(), self:LocalToWorldAngles(self.TurAng+Angle(0,self.YawDiff,0)):Forward())
+									    local TurAng = -heading(Vector(0,0,0), DakTurret:GetAngles()-Angle(0,self.YawDiff,0), self:LocalToWorldAngles(self.TurAng):Forward())
 									    TurAng = Angle(TurAng.pitch*250,TurAng.yaw*250,TurAng.roll*250)
 									    local TurAngVel = DakTurret:GetPhysicsObject():GetAngleVelocity()
 									    local TurAngVelAng = Angle( TurAngVel.y*30, TurAngVel.z*30, TurAngVel.x*30 )

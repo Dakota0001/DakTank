@@ -2146,11 +2146,13 @@ function TOOL:RightClick( trace )
 				if Target.DakHP and Target.TotalMass then
 					if Target.DakCrew == NULL then
 						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Uncrewed")
+						ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
 					else
 						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Crewed")
 					end
 				end
 			end
+			
 			if Target:GetClass() == "dak_temotor" then
 				if Target.DakHP then
 					ply:ChatPrint("HP: "..Target.DakHP)

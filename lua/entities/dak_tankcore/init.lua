@@ -271,6 +271,8 @@ function ENT:Think()
 					end
 
 					self.TotalMass = Mass
+					self.ParMass = ParentMass
+					self.PhysMass = Mass-ParentMass
 					self.SurfaceArea = SA
 					self.SizeMult = (SA/Mass)*0.18
 
