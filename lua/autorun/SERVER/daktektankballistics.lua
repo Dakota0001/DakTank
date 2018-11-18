@@ -1951,7 +1951,6 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 				end
 			end
 		end
-		PrintTable(Shell.DakDamageList)
 		for i = 1, #Shell.DakDamageList do
 			if(Shell.DakDamageList[i]:IsValid()) then
 				if not(Shell.DakDamageList[i].Base == "base_nextbot") then

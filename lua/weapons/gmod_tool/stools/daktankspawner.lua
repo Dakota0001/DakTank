@@ -2885,8 +2885,9 @@ function TOOL.BuildCPanel( panel )
 
 				local String = string.Explode( " ", CrateModel )
 				local AmmoCrate = String[1]..AmmoType..String[3]
-				local ShellVol 	   = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.5118113
+				local ShellVol = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.5118113
 				local ShellLenMult = 6.5
+				local ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 
 				if Caliber < 100 then
 					if AmmoTypeSelect:GetValue() == "Anti Tank Guided Missile" then
@@ -2896,29 +2897,33 @@ function TOOL.BuildCPanel( panel )
 					end
 				end
 
-				if AmmoBoxSelect:GetSelected() == "Howitzer" then
+				if AmmoBoxSelect:GetSelected() == "Howitzer" or AmmoBoxSelect:GetSelected() == "Autoloading Howitzer" then
 					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.3149608
 					ShellLenMult = 4
-				elseif AmmoBoxSelect:GetSelected() == "Mortar" then
+					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
+				elseif AmmoBoxSelect:GetSelected() == "Mortar" or  AmmoBoxSelect:GetSelected() == "AutoloadingMortar" then
 					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.206693025
 					ShellLenMult = 2.75
-				elseif AmmoBoxSelect:GetSelected() == "Short Cannon" then
+					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
+				elseif AmmoBoxSelect:GetSelected() == "Short Cannon" or AmmoBoxSelect:GetSelected() == "Heavy Machine Gun" or AmmoBoxSelect:GetSelected() == "Short Autoloader" then
 					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.393701
 					ShellLenMult = 5
-				elseif AmmoBoxSelect:GetSelected() == "Long Cannon" then
+					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
+				elseif AmmoBoxSelect:GetSelected() == "Long Cannon" or AmmoBoxSelect:GetSelected() == "Long Autoloader" then
 					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.7086618
 					ShellLenMult = 9
+					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 				end
 
 				local ShellMass = ShellVol * 0.044
-				AmmoWeight 		= math.Round(ShellMass*math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)+10)
-				AmmoCount 		= math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)
+				AmmoCount 		= math.floor(Volume/ShellVolSquare)
+				AmmoWeight 		= math.Round(10+(AmmoCount*ShellMass))
 
 				if AmmoType == "ATGM" then
 					ShellMass = ShellMass * 1.5
 					ShellVol = ShellVol * 1.5
-					AmmoWeight 		= math.Round(ShellMass*math.Round(math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)*(1/1.5))+10)
-					AmmoCount 		= math.Round(math.floor((((Volume^(1/3))/(Caliber*0.0393701))^2)/ShellLenMult)*(1/1.5))
+					AmmoCount 		= math.Round(math.floor(Volume/ShellVolSquare)*(1/1.5))
+					AmmoWeight 		= math.Round(10+(AmmoCount*ShellMass))
 				end
 
 				selectedAmmo[AmmoType]()
