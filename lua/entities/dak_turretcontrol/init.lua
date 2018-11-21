@@ -143,6 +143,7 @@ function ENT:Initialize()
  	self.LastHullAngles = self:GetAngles()
  	self.DakBurnStacks = 0
  	self.DakTurretMotors = {}
+ 	self.Locked = 0
 end
 
 local function GetParents( ent, Results )
@@ -281,13 +282,15 @@ function ENT:Think()
 						if self.DakActive > 0 then
 							if self.Inputs.Lock.Value > 0 then
 								if IsValid(self.DakCore.Base) then
-									if not(constraint.FindConstraint( self.DakGun, "Weld" )) then
+									if self.Locked == 0 then
 										constraint.Weld( self.DakGun, self.DakCore.Base, 0, 0, 0, false, false )
+										self.Locked = 1
 									end
 								end
 							else
-								if constraint.FindConstraint( self.DakGun, "Weld" ) then
+								if self.Locked == 1 then
 					        		constraint.RemoveConstraints( self.DakGun, "Weld" )
+					        		self.Locked = 0
 					        	end
 								if self.DakCamTrace then
 									local trace = {}
@@ -325,8 +328,9 @@ function ENT:Think()
 								end
 							end
 						else
-							if constraint.FindConstraint( self.DakGun, "Weld" ) then
+							if self.Locked == 1 then
 				        		constraint.RemoveConstraints( self.DakGun, "Weld" )
+				        		self.Locked = 0
 				        	end
 							local GunDir = self:GetForward()
 						    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))

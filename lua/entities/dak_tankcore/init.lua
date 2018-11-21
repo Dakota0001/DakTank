@@ -164,117 +164,115 @@ function ENT:Think()
 						self:SetSolid(SOLID_VPHYSICS)
 					end
 					
-					
-					self.Contraption = {}
-					table.Add(self.Contraption,GetParents(self))
-					for k, v in pairs(GetParents(self)) do
-						table.Add(self.Contraption,GetPhysCons(v))
-					end
-
-					local Mass = 0
-					local ParentMass = 0
-					local SA = 0
-
-					for i=1, #self.Contraption do
-						table.Add( self.Contraption, self.Contraption[i]:GetChildren() )
-						table.Add( self.Contraption, self.Contraption[i]:GetParent() )
-					end
-					local Children = {}
-					for i2=1, #self.Contraption do
-						if table.Count(self.Contraption[i2]:GetChildren()) > 0 then
-						table.Add( Children, self.Contraption[i2]:GetChildren() )
+					if self.Contraption == nil then
+						self.Contraption = {}
+						table.Add(self.Contraption,GetParents(self))
+						for k, v in pairs(GetParents(self)) do
+							table.Add(self.Contraption,GetPhysCons(v))
 						end
-					end
-					table.Add( self.Contraption, Children )
 
-					local hash = {}
-					local res = {}
-					for _,v in ipairs(self.Contraption) do
-				   		if (not hash[v]) then
-				    		res[#res+1] = v
-				       		hash[v] = true
-				   		end
-					end
-					self.Contraption=res
-					
-					--self.Contraption = GetContraption(self)
+						local Mass = 0
+						local ParentMass = 0
+						local SA = 0
 
-					self.Ammoboxes={}
-					self.TurretControls={}
-					self.Guns={}
-					self.Crew={}
-					self.Motors={}
-					self.Fuel={}
-					self.Tread={}
-					for i=1, #res do
-						if res[i]:IsSolid() then
-							if res[i]:GetClass()=="dak_tegearbox" then
-								res[i].DakTankCore = self
-								self.Gearbox = res[i]
+						for i=1, #self.Contraption do
+							table.Add( self.Contraption, self.Contraption[i]:GetChildren() )
+							table.Add( self.Contraption, self.Contraption[i]:GetParent() )
+						end
+						local Children = {}
+						for i2=1, #self.Contraption do
+							if table.Count(self.Contraption[i2]:GetChildren()) > 0 then
+							table.Add( Children, self.Contraption[i2]:GetChildren() )
 							end
-							if res[i]:GetClass()=="dak_tefuel" then
-								self.Fuel[#self.Fuel+1] = res[i]
-							end
-							if res[i]:GetClass()=="dak_temotor" then
-								self.Motors[#self.Motors+1] = res[i]
-							end
-							if res[i]:GetClass() == "dak_teammo" then
-								self.Ammoboxes[#self.Ammoboxes+1] = res[i]
-							end
-							if res[i]:GetClass()=="dak_tegun" then
-								res[i].DakTankCore = self
-								self.Guns[#self.Guns+1] = res[i]
-							end
-							if res[i]:GetClass()=="dak_teautogun" then
-								res[i].DakTankCore = self
-								self.Guns[#self.Guns+1] = res[i]
-							end
-							if res[i]:GetClass()=="dak_temachinegun" then
-								res[i].DakTankCore = self
-								self.Guns[#self.Guns+1] = res[i]
-							end
-							if res[i]:GetClass()=="dak_turretcontrol" then
-								self.TurretControls[#self.TurretControls+1]=res[i]
-								res[i].DakContraption = res
-								res[i].DakCore = self
-							end
-							if res[i]:GetClass()=="dak_crew" then
-								self.Crew[#self.Crew+1]=res[i]
-							end
-							Mass = Mass + res[i]:GetPhysicsObject():GetMass()
-							if IsValid(res[i]:GetParent()) then
-								ParentMass = ParentMass + res[i]:GetPhysicsObject():GetMass()
-							end
-							if res[i]:GetPhysicsObject():GetSurfaceArea() then
-								if res[i]:GetPhysicsObject():GetMass()>1 then
-									SA = SA + res[i]:GetPhysicsObject():GetSurfaceArea()
+						end
+						table.Add( self.Contraption, Children )
+
+						local hash = {}
+						local res = {}
+						for _,v in ipairs(self.Contraption) do
+					   		if (not hash[v]) then
+					    		res[#res+1] = v
+					       		hash[v] = true
+					   		end
+						end
+						self.Contraption=res
+
+						self.Ammoboxes={}
+						self.TurretControls={}
+						self.Guns={}
+						self.Crew={}
+						self.Motors={}
+						self.Fuel={}
+						self.Tread={}
+						for i=1, #res do
+							if res[i]:IsSolid() then
+								if res[i]:GetClass()=="dak_tegearbox" then
+									res[i].DakTankCore = self
+									self.Gearbox = res[i]
 								end
-							else
-								self.Tread[#self.Tread+1]=res[i]
+								if res[i]:GetClass()=="dak_tefuel" then
+									self.Fuel[#self.Fuel+1] = res[i]
+								end
+								if res[i]:GetClass()=="dak_temotor" then
+									self.Motors[#self.Motors+1] = res[i]
+								end
+								if res[i]:GetClass() == "dak_teammo" then
+									self.Ammoboxes[#self.Ammoboxes+1] = res[i]
+								end
+								if res[i]:GetClass()=="dak_tegun" then
+									res[i].DakTankCore = self
+									self.Guns[#self.Guns+1] = res[i]
+								end
+								if res[i]:GetClass()=="dak_teautogun" then
+									res[i].DakTankCore = self
+									self.Guns[#self.Guns+1] = res[i]
+								end
+								if res[i]:GetClass()=="dak_temachinegun" then
+									res[i].DakTankCore = self
+									self.Guns[#self.Guns+1] = res[i]
+								end
+								if res[i]:GetClass()=="dak_turretcontrol" then
+									self.TurretControls[#self.TurretControls+1]=res[i]
+									res[i].DakContraption = res
+									res[i].DakCore = self
+								end
+								if res[i]:GetClass()=="dak_crew" then
+									self.Crew[#self.Crew+1]=res[i]
+								end
+								Mass = Mass + res[i]:GetPhysicsObject():GetMass()
+								if IsValid(res[i]:GetParent()) then
+									ParentMass = ParentMass + res[i]:GetPhysicsObject():GetMass()
+								end
+								if res[i]:GetPhysicsObject():GetSurfaceArea() then
+									if res[i]:GetPhysicsObject():GetMass()>1 then
+										SA = SA + res[i]:GetPhysicsObject():GetSurfaceArea()
+									end
+								else
+									self.Tread[#self.Tread+1]=res[i]
+								end
 							end
 						end
-					end
-					self.CrewCount = #self.Crew
-					WireLib.TriggerOutput(self, "Crew", self.CrewCount)
-					if self.Gearbox then
-						self.Gearbox.TotalMass = Mass
-						self.Gearbox.ParentMass = ParentMass
-						self.Gearbox.PhysicalMass = Mass-ParentMass
-					end
+						self.CrewCount = #self.Crew
+						WireLib.TriggerOutput(self, "Crew", self.CrewCount)
+						if self.Gearbox then
+							self.Gearbox.TotalMass = Mass
+							self.Gearbox.ParentMass = ParentMass
+							self.Gearbox.PhysicalMass = Mass-ParentMass
+						end
 
-					if IsValid(self.Tread[1]) then
-						if self.Tread[1]:GetPhysicsObject():GetMaterial()~="jeeptire" then
-							for i=1, table.Count(self.Tread) do
-								self.Tread[i]:GetPhysicsObject():SetMaterial("jeeptire")
+						if IsValid(self.Tread[1]) then
+							if self.Tread[1]:GetPhysicsObject():GetMaterial()~="jeeptire" then
+								for i=1, table.Count(self.Tread) do
+									self.Tread[i]:GetPhysicsObject():SetMaterial("jeeptire")
+								end
 							end
 						end
+						self.TotalMass = Mass
+						self.ParMass = ParentMass
+						self.PhysMass = Mass-ParentMass
+						self.SurfaceArea = SA
+						self.SizeMult = (SA/Mass)*0.18
 					end
-
-					self.TotalMass = Mass
-					self.ParMass = ParentMass
-					self.PhysMass = Mass-ParentMass
-					self.SurfaceArea = SA
-					self.SizeMult = (SA/Mass)*0.18
 
 					if table.Count(self.HitBox) == 0 then
 						WireLib.TriggerOutput(self, "Health", self.DakHealth)
@@ -328,6 +326,15 @@ function ENT:Think()
 
 					if self.DakActive == 1 and table.Count(self.HitBox)~=0 and self.CurrentHealth then
 						if table.Count(self.HitBox) > 0 then
+							if self.Crew then
+								if table.Count(self.Crew) > 0 then
+									for i = 1, table.Count(self.Crew) do
+										if not(IsValid(self.Crew[i])) then
+											table.remove( self.Crew, i )
+										end
+									end
+								end
+							end
 
 							if self.Composites then
 								if table.Count(self.Composites) > 0 then

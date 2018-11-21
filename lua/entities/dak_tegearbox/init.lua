@@ -47,6 +47,8 @@ function ENT:Initialize()
  	self.MoveRightOld = 0
 	self.MoveLeftOld = 0
 	self.InertiaSet = 0
+	self.LeftBrakesEnabled = 0
+	self.RightBrakesEnabled = 0
 end
 
 function ENT:Think()
@@ -275,12 +277,6 @@ function ENT:Think()
 	self.CarTurning = self.Inputs.CarTurning.Value
     
     if IsValid(self.DakTankCore) and IsValid(self.LeftDriveWheel) and IsValid(self.RightDriveWheel) and not(IsValid(self.LeftDriveWheel:GetParent())) and not(IsValid(self.RightDriveWheel:GetParent())) then
-		--if self.InertiaSet == 0 then
-			--print((self.DakTankCore.ParMass+self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass())/self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass())
-			--self.DakTankCore:GetParent():GetParent():GetPhysicsObject():SetInertia(self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetInertia()*((self.DakTankCore.ParMass+self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass())/self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass()))
-			--self.InertiaSet = 1
-		--end
-		
     	local LPhys = self.LeftDriveWheel:GetPhysicsObject()
     	local RPhys = self.RightDriveWheel:GetPhysicsObject()
     	local LPos = self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60)
@@ -330,9 +326,13 @@ function ENT:Think()
 				end
 
 	        	if self.Brakes>0 then
-		        	if not(constraint.FindConstraint( self.LeftDriveWheel, "Weld" )) then
+		        	if self.LeftBrakesEnabled == 0 then
 		        		constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
+		        		self.LeftBrakesEnabled = 1
+		        	end
+		        	if self.RightBrakesEnabled == 0 then
 		        		constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
+		        		self.RightBrakesEnabled = 1
 		        	end
 		        	if #self.DakTankCore.Motors>0 then
 						for i=1, #self.DakTankCore.Motors do
@@ -342,10 +342,6 @@ function ENT:Think()
 						end
 					end
 		        else
-		        	--if constraint.FindConstraint( self.LeftDriveWheel, "Weld" ) then
-		        	--	constraint.RemoveConstraints( self.LeftDriveWheel, "Weld" )
-		        	--	constraint.RemoveConstraints( self.RightDriveWheel, "Weld" )
-		        	--end
 		        	if not(self.MoveForward>0) and not(self.MoveReverse>0) then
 							self.Perc = 0
 					end
@@ -424,15 +420,16 @@ function ENT:Think()
 								self.RBoost = 1
 							end
 						end
-
 						if self.MoveLeft==0 then
-							if constraint.FindConstraint( self.LeftDriveWheel, "Weld" ) then
+							if self.LeftBrakesEnabled == 1 then
 				        		constraint.RemoveConstraints( self.LeftDriveWheel, "Weld" )
+				        		self.LeftBrakesEnabled = 0
 				        	end
 				        end
 				        if self.MoveRight==0 then
-				        	if constraint.FindConstraint( self.RightDriveWheel, "Weld" ) then
+				        	if self.RightBrakesEnabled == 1 then
 				        		constraint.RemoveConstraints( self.RightDriveWheel, "Weld" )
+				        		self.RightBrakesEnabled = 0
 				        	end
 				        end
 
@@ -505,23 +502,27 @@ function ENT:Think()
 									end
 								end
 								if self.MoveLeft>0 and self.MoveRight==0 then
-									if not(constraint.FindConstraint( self.LeftDriveWheel, "Weld" )) then
+									if self.LeftBrakesEnabled == 0 then
 										constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
+										self.LeftBrakesEnabled = 1
 									end
 									RPhys:ApplyTorqueCenter( -self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakTankCore.PhysMass/3000)*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 								end
 								if self.MoveRight>0 and self.MoveLeft==0 then
-									if not(constraint.FindConstraint( self.RightDriveWheel, "Weld" )) then
+									if self.RightBrakesEnabled == 0 then
 										constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
+										self.RightBrakesEnabled = 1
 									end
 									LPhys:ApplyTorqueCenter( -self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakTankCore.PhysMass/3000)*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 								end
 							else
-								if constraint.FindConstraint( self.LeftDriveWheel, "Weld" ) then
+								if self.LeftBrakesEnabled == 1 then
 					        		constraint.RemoveConstraints( self.LeftDriveWheel, "Weld" )
+					        		self.LeftBrakesEnabled = 0
 					        	end
-					        	if constraint.FindConstraint( self.RightDriveWheel, "Weld" ) then
+					        	if self.RightBrakesEnabled == 1 then
 					        		constraint.RemoveConstraints( self.RightDriveWheel, "Weld" )
+					        		self.RightBrakesEnabled = 0
 					        	end
 					        	if self.MoveLeft>0 or self.MoveRight>0 then
 									self.RPM = 1000*math.Clamp( 0.5*(self.HPperTon/13) / math.abs(self.LastYaw-self:GetAngles().yaw) ,0,2)
@@ -639,9 +640,13 @@ function ENT:Think()
 	        end
 	    end
 	else
-		if not(constraint.FindConstraint( self.LeftDriveWheel, "Weld" )) then
+		if self.LeftBrakesEnabled == 0 then
     		constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
+    		self.LeftBrakesEnabled = 1
+    	end
+    	if self.RightBrakesEnabled == 0 then
     		constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
+    		self.RightBrakesEnabled = 1
     	end
     	if IsValid(self.DakTankCore) then
 	    	if #self.DakTankCore.Motors>0 then
