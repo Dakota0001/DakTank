@@ -52,11 +52,20 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 			end
 
 			local TDRatio = HitEnt.DakArmor/Caliber
+			if ShellType == "APFSDS" then
+				TDRatio = HitEnt.DakArmor/(Caliber*2.5)
+			end
 			local HitAng = math.deg(math.acos(ShellSimTrace.HitNormal:Dot(-ShellSimTrace.Normal)))
 			if HitEnt.IsComposite == 1 then
 				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal )*9.2
-				if EffArmor/Caliber >= 0.8 then
-					Shatter = 1
+				if ShellType == "APFSDS" then
+					if EffArmor/(Caliber*2.5) >= 0.8 then
+						Shatter = 1
+					end
+				else
+					if EffArmor/Caliber >= 0.8 then
+						Shatter = 1
+					end
 				end
 				if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
 					EffArmor = EffArmor*2
@@ -259,7 +268,12 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 
 				local CurrentPen = Shell.DakPenetration-Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)
 
+				local HitAng = math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))
+
 				local TDRatio = HitEnt.DakArmor/Shell.DakCaliber
+				if Shell.DakShellType == "APFSDS" then
+					TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
+				end
 				local PenRatio = CurrentPen/HitEnt.DakArmor
 				if HitEnt.IsComposite == 1 then
 					PenRatio = CurrentPen/DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward() )*9.2
@@ -304,8 +318,16 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 				end
-
-				local HitAng = math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))
+				if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM") then
+					if HitAng >= 80 then
+						Failed = 1
+						Shattered = 1
+					end
+					if HitAng >= 70 and HitAng < 80 then
+						Failed = 0
+						Shattered = 1
+					end
+				end
 				
 				if HitEnt.IsComposite == 1 then
 					EffArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward() )*9.2
@@ -914,7 +936,12 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 
 					local CurrentPen = Shell.DakPenetration-Shell.DakPenetration*Shell.DakVelocity*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)
 
+					local HitAng = math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))
+
 					local TDRatio = HitEnt.DakArmor/Shell.DakCaliber
+					if Shell.DakShellType == "APFSDS" then
+						TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
+					end
 					local PenRatio = CurrentPen/HitEnt.DakArmor
 					if HitEnt.IsComposite == 1 then
 						PenRatio = CurrentPen/DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward() )*9.2
@@ -959,8 +986,16 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 						end
 					end
-
-					local HitAng = math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))
+					if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM") then
+						if HitAng >= 80 then
+							Failed = 1
+							Shattered = 1
+						end
+						if HitAng >= 70 and HitAng < 80 then
+							Failed = 0
+							Shattered = 1
+						end
+					end
 					
 					if HitEnt.IsComposite == 1 then
 						EffArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward() )*9.2
