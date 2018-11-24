@@ -1956,11 +1956,11 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 				if not(Shell.DakDamageList[i].Base == "base_nextbot") then
 					if(Shell.DakDamageList[i]:GetParent():IsValid()) then
 						if(Shell.DakDamageList[i]:GetParent():GetParent():IsValid()) then
-						Shell.DakDamageList[i]:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*1000*2*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000)) )
+						Shell.DakDamageList[i]:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*Shell.DakDamageList[i]:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000)) )
 						end
 					end
 					if not(Shell.DakDamageList[i]:GetParent():IsValid()) then
-						Shell.DakDamageList[i]:GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*1000*2*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000))  )
+						Shell.DakDamageList[i]:GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*Shell.DakDamageList[i]:GetPhysicsObject():GetMass()*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000))  )
 					end
 				end
 			end

@@ -2921,8 +2921,10 @@ function TOOL.BuildCPanel( panel )
 				AmmoWeight 		= math.Round(10+(AmmoCount*ShellMass))
 
 				if AmmoType == "ATGM" then
-					ShellMass = ShellMass * 1.5
-					ShellVol = ShellVol * 1.5
+					ShellVol = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.5118113 * 1.5
+					ShellLenMult = 6.5
+					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
+					ShellMass = ShellVol * 0.044
 					AmmoCount 		= math.Round(math.floor(Volume/ShellVolSquare)*(1/1.5))
 					AmmoWeight 		= math.Round(10+(AmmoCount*ShellMass))
 				end

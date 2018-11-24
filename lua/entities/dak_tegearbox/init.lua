@@ -512,18 +512,34 @@ function ENT:Think()
 									end
 								end
 								if self.MoveLeft>0 and self.MoveRight==0 then
-									if self.LeftBrakesEnabled == 0 then
-										constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
-										self.LeftBrakesEnabled = 1
+									if self.MoveReverse>0 then 
+										if self.RightBrakesEnabled == 0 then
+											constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
+											self.RightBrakesEnabled = 1
+										end
+										LPhys:ApplyTorqueCenter( self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
+									else
+										if self.LeftBrakesEnabled == 0 then
+											constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
+											self.LeftBrakesEnabled = 1
+										end
+										RPhys:ApplyTorqueCenter( -self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 									end
-									RPhys:ApplyTorqueCenter( -self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 								end
 								if self.MoveRight>0 and self.MoveLeft==0 then
-									if self.RightBrakesEnabled == 0 then
-										constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
-										self.RightBrakesEnabled = 1
+									if self.MoveReverse>0 then 
+										if self.LeftBrakesEnabled == 0 then
+											constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
+											self.LeftBrakesEnabled = 1
+										end
+										RPhys:ApplyTorqueCenter( self:GetRight()*(RPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
+									else
+										if self.RightBrakesEnabled == 0 then
+											constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
+											self.RightBrakesEnabled = 1
+										end
+										LPhys:ApplyTorqueCenter( -self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 									end
-									LPhys:ApplyTorqueCenter( -self:GetRight()*(LPhys:GetMass()/150)*10*math.Clamp( (0.13*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 								end
 							else
 								if self.LeftBrakesEnabled == 1 then
