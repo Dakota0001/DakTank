@@ -164,7 +164,11 @@ function ENT:Think()
 						self:SetSolid(SOLID_VPHYSICS)
 					end
 					
-					if self.Contraption == nil then
+					if self.rebuildtable == nil or self.rebuildtable == 5 then --rebuild contraption table every 5 seconds instead of every second to notice weight changes.
+						self.rebuildtable = 0
+					end
+
+					if self.rebuildtable == 0 then
 						self.Contraption = {}
 						table.Add(self.Contraption,GetParents(self))
 						for k, v in pairs(GetParents(self)) do
@@ -273,6 +277,8 @@ function ENT:Think()
 						self.SurfaceArea = SA
 						self.SizeMult = (SA/Mass)*0.18
 					end
+
+					self.rebuildtable = self.rebuildtable+1
 
 					if table.Count(self.HitBox) == 0 then
 						WireLib.TriggerOutput(self, "Health", self.DakHealth)

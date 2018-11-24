@@ -118,9 +118,9 @@ function ENT:Think()
 				self.ShellMass = self.ShellVolume*0.044
 				self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
 				self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
-				if (string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "C") or (string.Split( self.DakName, "m" )[3][1] == "H" and string.Split( self.DakName, "m" )[3][2] == "M" and string.Split( self.DakName, "m" )[3][2] == "G") then
+				if (string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "C") or (string.Split( self.DakName, "m" )[3][1] == "H" and string.Split( self.DakName, "m" )[3][2] == "M" and string.Split( self.DakName, "m" )[3][3] == "G") then
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*10)
-					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
+					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*10)
 					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 				end
 				if string.Split( self.DakName, "m" )[3][1] == "L" and string.Split( self.DakName, "m" )[3][2] == "C" then
@@ -438,9 +438,9 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.ShellMass = self.ShellVolume*0.044
 		self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
 		self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
-		if (string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "C") or (string.Split( self.DakName, "m" )[3][1] == "H" and string.Split( self.DakName, "m" )[3][2] == "M" and string.Split( self.DakName, "m" )[3][2] == "G") then
+		if (string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "C") or (string.Split( self.DakName, "m" )[3][1] == "H" and string.Split( self.DakName, "m" )[3][2] == "M" and string.Split( self.DakName, "m" )[3][3] == "G") then
 			self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*10)
-			self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
+			self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*10)
 			self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 		end
 		if string.Split( self.DakName, "m" )[3][1] == "L" and string.Split( self.DakName, "m" )[3][2] == "C" then

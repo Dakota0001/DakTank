@@ -2149,6 +2149,7 @@ function TOOL:RightClick( trace )
 						ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
 					else
 						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Crewed")
+						ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
 					end
 				end
 			end
