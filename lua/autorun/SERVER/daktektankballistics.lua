@@ -26,8 +26,9 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 	local HitEnt = ShellSimTrace.Entity
 	local EffArmor = 0
 	local Shatter = 0
+	local HitAng = math.deg(math.acos(ShellSimTrace.HitNormal:Dot(-ShellSimTrace.Normal)))
 	if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and not(HitEnt.DakHealth <= 0) then
-		if not((CheckClip(HitEnt,End)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
+		if not((CheckClip(HitEnt,ShellSimTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
 			if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
 				DakTekTankEditionSetupNewEnt(HitEnt)
 			end
@@ -55,7 +56,6 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 			if ShellType == "APFSDS" then
 				TDRatio = HitEnt.DakArmor/(Caliber*2.5)
 			end
-			local HitAng = math.deg(math.acos(ShellSimTrace.HitNormal:Dot(-ShellSimTrace.Normal)))
 			if HitEnt.IsComposite == 1 then
 				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal )*9.2
 				if ShellType == "APFSDS" then
@@ -83,7 +83,7 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 				if ShellType == "AP" or ShellType == "APHE" or ShellType == "HE" then
 					local aVal = 2.251132 - 0.1955696*math.max( HitAng, 10 ) + 0.009955601*math.pow( math.max( HitAng, 10 ), 2 ) - 0.0001919089*math.pow( math.max( HitAng, 10 ), 3 ) + 0.000001397442*math.pow( math.max( HitAng, 10 ), 4 )
 					local bVal = 0.04411227 - 0.003575789*math.max( HitAng, 10 ) + 0.0001886652*math.pow( math.max( HitAng, 10 ), 2 ) - 0.000001151088*math.pow( math.max( HitAng, 10 ), 3 ) + 1.053822e-9*math.pow( math.max( HitAng, 10 ), 4 )
-					EffArmor = HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal ))
+					EffArmor = math.Clamp(HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal )),HitEnt.DakArmor,10000000000)
 				end
 				if ShellType == "HVAP" then
 					EffArmor = HitEnt.DakArmor * math.pow( 2.71828, (math.pow( HitAng, 2.6 )*0.00003011) )
@@ -113,7 +113,7 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	local LastPenPos = FirstPenPos
 	local Shatters = Shattered
 	while Go == 1 and Recurse<25 do
-		local newArmor, newEnt, LastPenPos, Shattered = DTGetArmor(Start, End, ShellType, Caliber, NewFilter)
+		local newArmor, newEnt, LastPenPos, Shattered = DTGetArmor(Start, End, ShellType, Caliber, NewFilter)		
 		if Armor == 0 or newArmor == 0 then
 			FirstPenPos = LastPenPos
 		end
@@ -344,7 +344,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if Shell.DakShellType == "AP" or Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" then
 						local aVal = 2.251132 - 0.1955696*math.max( HitAng, 10 ) + 0.009955601*math.pow( math.max( HitAng, 10 ), 2 ) - 0.0001919089*math.pow( math.max( HitAng, 10 ), 3 ) + 0.000001397442*math.pow( math.max( HitAng, 10 ), 4 )
 						local bVal = 0.04411227 - 0.003575789*math.max( HitAng, 10 ) + 0.0001886652*math.pow( math.max( HitAng, 10 ), 2 ) - 0.000001151088*math.pow( math.max( HitAng, 10 ), 3 ) + 1.053822e-9*math.pow( math.max( HitAng, 10 ), 4 )
-						EffArmor = HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal ))
+						EffArmor = math.Clamp(HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal )),HitEnt.DakArmor,10000000000)
 					end
 					if Shell.DakShellType == "HVAP" then
 						EffArmor = HitEnt.DakArmor * math.pow( 2.71828, (math.pow( HitAng, 2.6 )*0.00003011) )
@@ -1012,7 +1012,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						if Shell.DakShellType == "AP" or Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" then
 							local aVal = 2.251132 - 0.1955696*math.max( HitAng, 10 ) + 0.009955601*math.pow( math.max( HitAng, 10 ), 2 ) - 0.0001919089*math.pow( math.max( HitAng, 10 ), 3 ) + 0.000001397442*math.pow( math.max( HitAng, 10 ), 4 )
 							local bVal = 0.04411227 - 0.003575789*math.max( HitAng, 10 ) + 0.0001886652*math.pow( math.max( HitAng, 10 ), 2 ) - 0.000001151088*math.pow( math.max( HitAng, 10 ), 3 ) + 1.053822e-9*math.pow( math.max( HitAng, 10 ), 4 )
-							EffArmor = HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal ))
+							EffArmor = math.Clamp(HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal )),HitEnt.DakArmor,10000000000)
 						end
 						if Shell.DakShellType == "HVAP" then
 							EffArmor = HitEnt.DakArmor * math.pow( 2.71828, (math.pow( HitAng, 2.6 )*0.00003011) )
@@ -2060,12 +2060,12 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 	local SpallVolume = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)
 	local SpallMass = (SpallVolume*0.0078125) * 0.1
 	local SpallPen = Armor * 0.1
-	local SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.1
+	local SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.01
 	local traces = 10
 
 	if Shell.DakShellType == "HESH" then
 		SpallMass = (SpallVolume*0.0078125) * 0.05
-		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.05
+		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.005
 		SpallPen = Caliber * 0.1
 		traces = 20 * math.Clamp((Pen/Armor),1,3)
 	end

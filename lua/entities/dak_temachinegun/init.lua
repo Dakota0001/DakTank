@@ -80,7 +80,7 @@ function ENT:Think()
 
 			self.DakAP = math.Round(self.DakCaliber,2).."mmMGAPAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -138,7 +138,7 @@ function ENT:Think()
 
 			self.DakAP = "Flamethrower Fuel"
 
-			self.BaseDakShellDamage = 0.2
+			self.BaseDakShellDamage = 0.2*25
 			self.BaseDakShellMass = 1
 			self.DakShellSplashDamage = 0.2
 			self.BaseDakShellPenetration = 0.0001

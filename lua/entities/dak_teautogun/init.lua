@@ -99,7 +99,7 @@ function ENT:Think()
 			self.DakAPFSDS = math.Round(self.DakCaliber,2).."mmCAPFSDSAmmo"
 			self.DakAPHE = math.Round(self.DakCaliber,2).."mmCAPHEAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -176,7 +176,7 @@ function ENT:Think()
 			self.DakAPFSDS = math.Round(self.DakCaliber,2).."mmLCAPFSDSAmmo"
 			self.DakAPHE = math.Round(self.DakCaliber,2).."mmLCAPHEAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*9))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*9))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
@@ -252,7 +252,7 @@ function ENT:Think()
 			self.DakAPFSDS = math.Round(self.DakCaliber,2).."mmSCAPFSDSAmmo"
 			self.DakAPHE = math.Round(self.DakCaliber,2).."mmSCAPHEAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
@@ -328,7 +328,7 @@ function ENT:Think()
 			self.DakAPFSDS = math.Round(self.DakCaliber,2).."mmHAPFSDSAmmo"
 			self.DakAPHE = math.Round(self.DakCaliber,2).."mmHAPHEAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*4))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*4))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
@@ -400,7 +400,7 @@ function ENT:Think()
 			self.DakAPHE = math.Round(self.DakCaliber,2).."mmMAPHEAmmo"
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmMATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*2.75))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*2.75))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
@@ -476,7 +476,7 @@ function ENT:Think()
 			self.DakAPFSDS = math.Round(self.DakCaliber,2).."mmHMGAPFSDSAmmo"
 			self.DakAPHE = math.Round(self.DakCaliber,2).."mmHMGAPHEAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -536,7 +536,7 @@ function ENT:Think()
 			self.DakAPFSDS = math.Round(self.DakCaliber,2).."mmACAPFSDSAmmo"
 			self.DakAPHE = math.Round(self.DakCaliber,2).."mmACAPHEAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -591,7 +591,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -637,7 +637,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -683,7 +683,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -729,7 +729,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -775,7 +775,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -821,7 +821,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -867,7 +867,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -913,7 +913,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
@@ -959,7 +959,7 @@ function ENT:Think()
 
 			self.DakATGM = math.Round(self.DakCaliber,2).."mmCATGMAmmo"
 
-			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*6.5))*25
 			--get the volume of shell and multiply by density of steel
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75
