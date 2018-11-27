@@ -1579,47 +1579,48 @@ function TOOL:LeftClick( trace )
 		end
 		--AMMO--
 		--Define variables--
-		if Selection == "MicroAPBox" or Selection == "SmallAPBox" or Selection == "StandardAPBox" or Selection == "LargeAPBox" or Selection == "HugeAPBox" or Selection == "UltraAPBox" then
+		local boxname = (string.Split( Selection, "" ))
+		if boxname[#boxname-4] == "A" and boxname[#boxname-3] == "P" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = false
 			self.AmmoType = "AP"
 		end
-		if Selection == "MicroHEBox" or Selection == "SmallHEBox" or Selection == "StandardHEBox" or Selection == "LargeHEBox" or Selection == "HugeHEBox" or Selection == "UltraHEBox" then
+		if boxname[#boxname-4] == "H" and boxname[#boxname-3] == "E" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = true
 			self.AmmoType = "HE"
 		end
-		if Selection == "MicroHEATBox" or Selection == "SmallHEATBox" or Selection == "StandardHEATBox" or Selection == "LargeHEATBox" or Selection == "HugeHEATBox" or Selection == "UltraHEATBox" then
+		if boxname[#boxname-6] == "H" and boxname[#boxname-5] == "E" and boxname[#boxname-4] == "A" and boxname[#boxname-3] == "T" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = true
 			self.AmmoType = "HEAT"
 		end
-		if Selection == "MicroHEATFSBox" or Selection == "SmallHEATFSBox" or Selection == "StandardHEATFSBox" or Selection == "LargeHEATFSBox" or Selection == "HugeHEATFSBox" or Selection == "UltraHEATFSBox" then
+		if boxname[#boxname-8] == "H" and boxname[#boxname-7] == "E" and boxname[#boxname-6] == "A" and boxname[#boxname-5] == "T" and boxname[#boxname-4] == "F" and boxname[#boxname-3] == "S" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = true
 			self.AmmoType = "HEATFS"
 		end
-		if Selection == "MicroAPHEBox" or Selection == "SmallAPHEBox" or Selection == "StandardAPHEBox" or Selection == "LargeAPHEBox" or Selection == "HugeAPHEBox" or Selection == "UltraAPHEBox" then
+		if boxname[#boxname-6] == "A" and boxname[#boxname-5] == "P" and boxname[#boxname-4] == "H" and boxname[#boxname-3] == "E" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = true
 			self.AmmoType = "APHE"
 		end
-		if Selection == "MicroATGMBox" or Selection == "SmallATGMBox" or Selection == "StandardATGMBox" or Selection == "LargeATGMBox" or Selection == "HugeATGMBox" or Selection == "UltraATGMBox" then
+		if boxname[#boxname-6] == "A" and boxname[#boxname-5] == "T" and boxname[#boxname-4] == "G" and boxname[#boxname-3] == "M" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = true
 			self.AmmoType = "ATGM"
 		end
-		if Selection == "MicroHESHBox" or Selection == "SmallHESHBox" or Selection == "StandardHESHBox" or Selection == "LargeHESHBox" or Selection == "HugeHESHBox" or Selection == "UltraHESHBox" then
+		if boxname[#boxname-6] == "H" and boxname[#boxname-5] == "E" and boxname[#boxname-4] == "S" and boxname[#boxname-3] == "H" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = true
 			self.AmmoType = "HESH"
 		end
-		if Selection == "MicroHVAPBox" or Selection == "SmallHVAPBox" or Selection == "StandardHVAPBox" or Selection == "LargeHVAPBox" or Selection == "HugeHVAPBox" or Selection == "UltraHVAPBox" then
+		if boxname[#boxname-6] == "H" and boxname[#boxname-5] == "V" and boxname[#boxname-4] == "A" and boxname[#boxname-3] == "P" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = false
 			self.AmmoType = "HVAP"
 		end
-		if Selection == "MicroAPFSDSBox" or Selection == "SmallAPFSDSBox" or Selection == "StandardAPFSDSBox" or Selection == "LargeAPFSDSBox" or Selection == "HugeAPFSDSBox" or Selection == "UltraAPFSDSBox" then
+		if boxname[#boxname-8] == "A" and boxname[#boxname-7] == "P" and boxname[#boxname-6] == "F" and boxname[#boxname-5] == "S" and boxname[#boxname-4] == "D" and boxname[#boxname-3] == "S" then
 			self.IsAmmoCrate = 1
 			self.DakIsHE = false
 			self.AmmoType = "APFSDS"
@@ -1704,6 +1705,11 @@ function TOOL:LeftClick( trace )
 		end
 		--
 		if self:GetClientInfo("SpawnEnt") == "dak_teammo" then
+			local boxtype = string.Explode( " ", Selection )[1]
+			local first = string.Explode( "x", boxtype )[1]
+			local second = string.Explode( "x", boxtype )[2]
+			local third1 = string.Explode( "x", boxtype )[3][1]
+			local third2 = string.Explode( "x", boxtype )[3][2]
 			if trace.Entity then
 				if trace.Entity:GetClass() == "dak_teammo" then
 					trace.Entity.DakName = self.DakAmmoType
@@ -1718,28 +1724,34 @@ function TOOL:LeftClick( trace )
 					self.spawnedent.DakAmmoType = self.DakAmmoType
 					self.spawnedent.DakOwner = self:GetOwner()
 					self.spawnedent.DakIsHE = self.DakIsHE
-					--Micro--
-					if string.Explode( "", Selection )[1] == "M" then
+					if first == "6" and second == "6" and third1 == "3" then
+						self.spawnedent:SetModel( "models/daktanks/ammo7.mdl" )
+					end
+					if first == "6" and second == "6" and third1 == "6" then
+						self.spawnedent:SetModel( "models/daktanks/ammo8.mdl" )
+					end
+					if first == "12" and second == "12" and third1 == "6" then
+						self.spawnedent:SetModel( "models/daktanks/ammo9.mdl" )
+					end
+					if first == "12" and second == "12" and third1 == "1" and third2 == "2" then
+						self.spawnedent:SetModel( "models/daktanks/ammo10.mdl" )
+					end
+					if first == "24" and second == "12" and third1 == "1" and third2 == "2" then
 						self.spawnedent:SetModel( "models/daktanks/ammo1.mdl" )
 					end
-					--Small--
-					if string.Explode( "", Selection )[1] == "S" and string.Explode( "", Selection )[2] == "m" then
+					if first == "24" and second == "24" and third1 == "1" and third2 == "2" then
 						self.spawnedent:SetModel( "models/daktanks/ammo2.mdl" )
 					end
-					--Standard--
-					if string.Explode( "", Selection )[1] == "S" and string.Explode( "", Selection )[2] == "t" then
+					if first == "24" and second == "24" and third1 == "2" and third2 == "4" then
 						self.spawnedent:SetModel( "models/daktanks/ammo3.mdl" )
 					end
-					--Large--
-					if string.Explode( "", Selection )[1] == "L" then
+					if first == "24" and second == "24" and third1 == "3" and third2 == "6" then
 						self.spawnedent:SetModel( "models/daktanks/ammo4.mdl" )
 					end
-					--Huge--
-					if string.Explode( "", Selection )[1] == "H" then
+					if first == "24" and second == "36" and third1 == "3" and third2 == "6" then
 						self.spawnedent:SetModel( "models/daktanks/ammo5.mdl" )
 					end
-					--Ultra--
-					if string.Explode( "", Selection )[1] == "U" then
+					if first == "24" and second == "36" and third1 == "4" and third2 == "8" then
 						self.spawnedent:SetModel( "models/daktanks/ammo6.mdl" )
 					end
 				end
@@ -1750,28 +1762,34 @@ function TOOL:LeftClick( trace )
 				self.spawnedent.DakAmmoType = self.DakAmmoType
 				self.spawnedent.DakOwner = self:GetOwner()
 				self.spawnedent.DakIsHE = self.DakIsHE
-						--Micro--
-				if string.Explode( "", Selection )[1] == "M" then
+				if first == "6" and second == "6" and third == "3" then
+					self.spawnedent:SetModel( "models/daktanks/ammo7.mdl" )
+				end
+				if first == "6" and second == "6" and third == "6" then
+					self.spawnedent:SetModel( "models/daktanks/ammo8.mdl" )
+				end
+				if first == "12" and second == "12" and third == "6" then
+					self.spawnedent:SetModel( "models/daktanks/ammo9.mdl" )
+				end
+				if first == "12" and second == "12" and third == "12" then
+					self.spawnedent:SetModel( "models/daktanks/ammo10.mdl" )
+				end
+				if first == "24" and second == "12" and third == "12" then
 					self.spawnedent:SetModel( "models/daktanks/ammo1.mdl" )
 				end
-				--Small--
-				if string.Explode( "", Selection )[1] == "S" and string.Explode( "", Selection )[2] == "m" then
+				if first == "24" and second == "24" and third == "12" then
 					self.spawnedent:SetModel( "models/daktanks/ammo2.mdl" )
 				end
-				--Standard--
-				if string.Explode( "", Selection )[1] == "S" and string.Explode( "", Selection )[2] == "t" then
+				if first == "24" and second == "24" and third == "24" then
 					self.spawnedent:SetModel( "models/daktanks/ammo3.mdl" )
 				end
-				--Large--
-				if string.Explode( "", Selection )[1] == "L" then
+				if first == "24" and second == "24" and third == "36" then
 					self.spawnedent:SetModel( "models/daktanks/ammo4.mdl" )
 				end
-				--Huge--
-				if string.Explode( "", Selection )[1] == "H" then
+				if first == "24" and second == "36" and third == "36" then
 					self.spawnedent:SetModel( "models/daktanks/ammo5.mdl" )
 				end
-				--Ultra--
-				if string.Explode( "", Selection )[1] == "U" then
+				if first == "24" and second == "36" and third == "48" then
 					self.spawnedent:SetModel( "models/daktanks/ammo6.mdl" )
 				end
 			end
@@ -2564,22 +2582,34 @@ function TOOL.BuildCPanel( panel )
 	
 	--Table containing the volume of the available ammo crates
 	local crateList = {}
-	crateList["Micro Ammo Box"] = function()
+	crateList["6x6x3 Ammo Box"] = function()
+		Volume = 105.7649624
+	end
+	crateList["6x6x6 Ammo Box"] = function()
+		Volume = 211.5299248
+	end
+	crateList["12x12x6 Ammo Box"] = function()
+		Volume = 846.1196993
+	end
+	crateList["12x12x12 Ammo Box"] = function()
+		Volume = 1692.239399
+	end
+	crateList["24x12x12 Ammo Box"] = function()
 		Volume = 3384.4787597656
 	end
-	crateList["Small Ammo Box"] = function()
+	crateList["24x24x12 Ammo Box"] = function()
 		Volume = 6797.3989257813
 	end
-	crateList["Standard Ammo Box"] = function()
+	crateList["24x24x24 Ammo Box"] = function()
 		Volume = 13651.918945313
 	end
-	crateList["Large Ammo Box"] = function()
+	crateList["24x24x36 Ammo Box"] = function()
 		Volume = 20506.4375
 	end
-	crateList["Huge Ammo Box"] = function()
+	crateList["24x36x36 Ammo Box"] = function()
 		Volume = 30802.55859375
 	end
-	crateList["Ultra Ammo Box"] = function()
+	crateList["24x36x48 Ammo Box"] = function()
 		Volume = 41098.6796875
 	end
 	
@@ -3052,16 +3082,19 @@ function TOOL.BuildCPanel( panel )
 	AmmoModelSelect:SetPos( 15, 420 )
 	AmmoModelSelect:SetSortItems( false )
 	AmmoModelSelect:SetValue( "--Select Ammo Crate--" )
-	AmmoModelSelect:AddChoice( "Micro Ammo Box" )
-	AmmoModelSelect:AddChoice( "Small Ammo Box" )
-	AmmoModelSelect:AddChoice( "Standard Ammo Box" )
-	AmmoModelSelect:AddChoice( "Large Ammo Box" )
-	AmmoModelSelect:AddChoice( "Huge Ammo Box" )
-	AmmoModelSelect:AddChoice( "Ultra Ammo Box" )
+	AmmoModelSelect:AddChoice( "6x6x3 Ammo Box" )
+	AmmoModelSelect:AddChoice( "6x6x6 Ammo Box" )
+	AmmoModelSelect:AddChoice( "12x12x6 Ammo Box" )
+	AmmoModelSelect:AddChoice( "12x12x12 Ammo Box" )
+	AmmoModelSelect:AddChoice( "24x12x12 Ammo Box" )
+	AmmoModelSelect:AddChoice( "24x24x12 Ammo Box" )
+	AmmoModelSelect:AddChoice( "24x24x24 Ammo Box" )
+	AmmoModelSelect:AddChoice( "24x24x36 Ammo Box" )
+	AmmoModelSelect:AddChoice( "24x36x36 Ammo Box" )
+	AmmoModelSelect:AddChoice( "24x36x48 Ammo Box" )
 	AmmoModelSelect.OnSelect = function( panel, index, value )
 		CrateModel = value
 		crateList[value]()
-
 		updateUI()
 	end
 
