@@ -347,7 +347,7 @@ function ENT:Think()
 		        	if #self.DakTankCore.Motors>0 then
 						for i=1, #self.DakTankCore.Motors do
 							if IsValid(self.DakTankCore.Motors[i]) then
-								self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
+								self.DakTankCore.Motors[i].Sound:ChangePitch(math.Clamp( 255*self.RPM/2500,0,255), 0.5 )
 							end
 						end
 					end
@@ -451,7 +451,7 @@ function ENT:Think()
 						if #self.DakTankCore.Motors>0 then
 							for i=1, #self.DakTankCore.Motors do
 								if IsValid(self.DakTankCore.Motors[i]) then
-									self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500 , 0.5 )
+									self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp( 255*self.RPM/2500,0,255) , 0.5 )
 								end
 							end
 						end
@@ -507,7 +507,7 @@ function ENT:Think()
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
 										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500 , 0.5 )
+											self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp( 255*self.RPM/2500,0,255) , 0.5 )
 										end
 									end
 								end
@@ -555,7 +555,7 @@ function ENT:Think()
 									if #self.DakTankCore.Motors>0 then
 										for i=1, #self.DakTankCore.Motors do
 											if IsValid(self.DakTankCore.Motors[i]) then
-												self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
+												self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp( 255*self.RPM/2500,0,255), 0.5 )
 											end
 										end
 									end
@@ -606,7 +606,7 @@ function ENT:Think()
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
 									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0.5 )
+										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp( 255*self.RPM/2500,0,255), 0.5 )
 									end
 								end
 							end
@@ -677,7 +677,7 @@ function ENT:Think()
 	    	if #self.DakTankCore.Motors>0 then
 				for i=1, #self.DakTankCore.Motors do
 					if IsValid(self.DakTankCore.Motors[i]) then
-						self.DakTankCore.Motors[i].Sound:ChangePitch( 255*self.RPM/2500, 0 )
+						self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp( 255*self.RPM/2500,0,255), 0 )
 					end
 				end
 			end

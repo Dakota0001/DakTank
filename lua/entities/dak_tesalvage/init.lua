@@ -82,7 +82,11 @@ function ENT:Initialize()
 	self:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 1, 3)
 
 	if self.launch == 1 then
-		self:GetPhysicsObject():ApplyForceCenter( VectorRand()*70*self:GetPhysicsObject():GetMass()*math.Rand(5,15))
+		if self:IsValid() then
+			if self:GetPhysicsObject():IsValid() then
+				self:GetPhysicsObject():ApplyForceCenter( VectorRand()*70*self:GetPhysicsObject():GetMass()*math.Rand(5,15))
+			end
+		end
 	end
 	if math.random(0,4) == 0 then
 		self:Ignite(25,1)
