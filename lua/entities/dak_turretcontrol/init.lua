@@ -45,7 +45,7 @@ local function GetTurretPhysCons( ent, Results )
 		Results[ ent ] = ent
 		local Constraints = constraint.GetTable( ent )
 		for k, v in ipairs( Constraints ) do
-			if (v.Type ~= "NoCollide") and (v.Type ~= "Axis") and (v.Type ~= "Ballsocket") and (v.Type ~= "AdvBallsocket") then
+			if (v.Type ~= "NoCollide") and (v.Type ~= "Axis") and (v.Type ~= "Ballsocket") and (v.Type ~= "AdvBallsocket") and (v.Type ~= "Rope") and (v.Type ~= "Wire") then
 				for i, Ent in pairs( v.Entity ) do
 					GetTurretPhysCons( Ent.Entity, Results )
 				end
