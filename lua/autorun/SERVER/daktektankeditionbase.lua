@@ -51,17 +51,19 @@ if SERVER then
 			end
 	 		--ent.DakArmor = (ent:GetPhysicsObject():GetMass()*0.125)
 		else
-			--exceptions for bots
-			if ent:GetClass()=="dak_bot" then
-				--ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
-				ent.DakBurnStacks = 0
-				ent.DakHealth = 10
-				ent.DakName = "Armor"
-				ent.DakMaxHealth = 10
-		 		--ent.DakMaxHealth = ent:GetPhysicsObject():GetMass()/20
-		 		--DakTekEntList[ ent:EntIndex() ] = ent -- add to list
-		 		ent.DakPooled = 0
-		 		ent.DakArmor = 10
+			if IsValid(ent) then
+				--exceptions for bots
+				if ent:GetClass()=="dak_bot" then
+					--ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
+					ent.DakBurnStacks = 0
+					ent.DakHealth = 10
+					ent.DakName = "Armor"
+					ent.DakMaxHealth = 10
+			 		--ent.DakMaxHealth = ent:GetPhysicsObject():GetMass()/20
+			 		--DakTekEntList[ ent:EntIndex() ] = ent -- add to list
+			 		ent.DakPooled = 0
+			 		ent.DakArmor = 10
+				end
 			end
 		end
 	end
