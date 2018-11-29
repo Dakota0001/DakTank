@@ -60,7 +60,7 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 				TDRatio = HitEnt.DakArmor/(Caliber*2.5)
 			end
 			if HitEnt.IsComposite == 1 then
-				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal )*9.2
+				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal, Filter )*9.2
 				if ShellType == "APFSDS" then
 					if EffArmor/(Caliber*2.5) >= 0.8 then
 						Shatter = 1
@@ -282,7 +282,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				local PenRatio = CurrentPen/HitEnt.DakArmor
 				if HitEnt.IsComposite == 1 then
-					PenRatio = CurrentPen/DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward() )*9.2
+					PenRatio = CurrentPen/DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 				end
 				--shattering occurs when TD ratio is above 0.8 and pen is 1.05 to 1.25 times more than the armor
 				--random chance to pen happens between 0.9 and 1.2 pen to armor ratio
@@ -336,7 +336,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				
 				if HitEnt.IsComposite == 1 then
-					EffArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward() )*9.2
+					EffArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 						EffArmor = EffArmor*2
 					end
@@ -969,7 +969,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					end
 					local PenRatio = CurrentPen/HitEnt.DakArmor
 					if HitEnt.IsComposite == 1 then
-						PenRatio = CurrentPen/DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward() )*9.2
+						PenRatio = CurrentPen/DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 					end
 					--shattering occurs when TD ratio is above 0.8 and pen is 1.05 to 1.25 times more than the armor
 					--random chance to pen happens between 0.9 and 1.2 pen to armor ratio
@@ -1023,7 +1023,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					end
 					
 					if HitEnt.IsComposite == 1 then
-						EffArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward() )*9.2
+						EffArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 							EffArmor = EffArmor*2
 						end
@@ -1612,7 +1612,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					end
 					local EffArmor = (ExpTrace.Entity.DakArmor/math.abs(ExpTrace.HitNormal:Dot(Direction)))
 					if ExpTrace.Entity.IsComposite == 1 then
-						EffArmor = DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal )*9.2
+						EffArmor = DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*9.2
 					end
 					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 						util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
@@ -1767,7 +1767,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					end
 					local EffArmor = (ExpTrace.Entity.DakArmor/math.abs(ExpTrace.HitNormal:Dot(Direction)))
 					if ExpTrace.Entity.IsComposite == 1 then
-						EffArmor = DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal )*9.2
+						EffArmor = DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*9.2
 					end
 					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 						util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
@@ -1910,7 +1910,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 				end
 				local EffArmor = (ExpTrace.Entity.DakArmor/math.abs(ExpTrace.HitNormal:Dot(Direction)))
 				if ExpTrace.Entity.IsComposite == 1 then
-					EffArmor = DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal )*9.2
+					EffArmor = DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*9.2
 				end
 				if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 					util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
@@ -2271,7 +2271,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell, Dir)
 					end
 					local EffArmor = (SpallTrace.Entity.DakArmor/math.abs(SpallTrace.HitNormal:Dot(Direction)))
 					if SpallTrace.Entity.IsComposite == 1 then
-						EffArmor = DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal )*9.2
+						EffArmor = DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal, Shell.Filter )*9.2
 					end
 					if EffArmor < SpallPen and SpallTrace.Entity.IsDakTekFutureTech == nil then
 						--decals don't like using the adjusted by normal Pos
@@ -2413,7 +2413,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 				end
 				local EffArmor = (SpallTrace.Entity.DakArmor/math.abs(SpallTrace.HitNormal:Dot(Direction)))
 				if SpallTrace.Entity.IsComposite == 1 then
-					EffArmor = DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal )*9.2
+					EffArmor = DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal, Shell.Filter )*9.2
 				end
 				if EffArmor < Pen and SpallTrace.Entity.IsDakTekFutureTech == nil then
 					--decals don't like using the adjusted by normal Pos
@@ -2570,7 +2570,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					end
 					local EffArmor = (HEATTrace.Entity.DakArmor/math.abs(HEATTrace.HitNormal:Dot(Direction)))
 					if HEATTrace.Entity.IsComposite == 1 then
-						EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal )*31
+						EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*18.4
 					end
 					if EffArmor < math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen) and HEATTrace.Entity.IsDakTekFutureTech == nil then
 						--decals don't like using the adjusted by normal Pos
@@ -2727,7 +2727,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						end
 						local EffArmor = (HEATTrace.Entity.DakArmor/math.abs(HEATTrace.HitNormal:Dot(Direction)))
 						if HEATTrace.Entity.IsComposite == 1 then
-							EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal )*31
+							EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*18.4
 						end
 						if EffArmor < math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen) and HEATTrace.Entity.IsDakTekFutureTech == nil then
 							--decals don't like using the adjusted by normal Pos
@@ -2894,7 +2894,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 				end
 				local EffArmor = (HEATTrace.Entity.DakArmor/math.abs(HEATTrace.HitNormal:Dot(Direction)))
 				if HEATTrace.Entity.IsComposite == 1 then
-					EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal )*31
+					EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*18.4
 				end
 				if EffArmor < (Pen-HeatPenLoss) and HEATTrace.Entity.IsDakTekFutureTech == nil then
 					--decals don't like using the adjusted by normal Pos
