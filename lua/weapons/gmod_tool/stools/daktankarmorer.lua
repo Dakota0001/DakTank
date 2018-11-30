@@ -221,7 +221,7 @@ function TOOL:Think()
 				self.Weapon:SetNWFloat("Mass",math.Round(trace.Entity:GetPhysicsObject():GetMass(),2))
 				self.Weapon:SetNWFloat("Shell",math.Round(self:GetClientInfo("DakArmor"),2))
 				if trace.Entity.IsComposite == 1 then
-					local CompArmor = math.Round((DTCompositesTrace( trace.Entity, trace.HitPos, trace.Normal )*9.2),2)
+					local CompArmor = math.Round((DTCompositesTrace( trace.Entity, trace.HitPos, trace.Normal, {self:GetOwner()} )*9.2),2)
 					self.Weapon:SetNWFloat("Armor",CompArmor)
 					self.Weapon:SetNWFloat("AP",CompArmor)
 					self.Weapon:SetNWFloat("HEAT",math.Round(CompArmor*2,2))

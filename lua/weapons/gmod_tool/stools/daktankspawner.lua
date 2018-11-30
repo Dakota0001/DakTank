@@ -2151,7 +2151,7 @@ function TOOL:RightClick( trace )
 			local MHP = math.Round(Target.DakMaxHealth, 1 )
 			local PHP = math.Round((HP/MHP)*100, 1 )
 			if trace.Entity.IsComposite == 1 then
-				ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*9.2),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal )*18.4),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+				ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*9.2),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*18.4),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
 			else
 				ply:ChatPrint(TarName..", ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
 			end
