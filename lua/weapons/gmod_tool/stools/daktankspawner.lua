@@ -1704,7 +1704,32 @@ function TOOL:LeftClick( trace )
 			self.spawnedent:SetModel(self.spawnedent.DakModel)
 		end
 		--
-		if self:GetClientInfo("SpawnEnt") == "dak_teammo" then
+		if self:GetClientInfo("SpawnEnt") == "dak_teammo" and Selection == "Flamethrower Fuel" then
+			if trace.Entity then
+				if trace.Entity:GetClass() == "dak_teammo" then
+					trace.Entity.DakName = self.DakAmmoType
+					trace.Entity.DakIsExplosive = self.DakIsExplosive
+					trace.Entity.DakAmmoType = self.DakAmmoType
+					trace.Entity.DakOwner = self:GetOwner()
+					trace.Entity.DakIsHE = self.DakIsHE
+					self:GetOwner():ChatPrint("Ammo updated.")
+				else
+					self.spawnedent.DakName = self.DakAmmoType
+					self.spawnedent.DakIsExplosive = self.DakIsExplosive
+					self.spawnedent.DakAmmoType = self.DakAmmoType
+					self.spawnedent.DakOwner = self:GetOwner()
+					self.spawnedent.DakIsHE = self.DakIsHE
+				end
+			end
+			if not(trace.Entity:IsValid()) then
+				self.spawnedent.DakName = self.DakAmmoType
+				self.spawnedent.DakIsExplosive = self.DakIsExplosive
+				self.spawnedent.DakAmmoType = self.DakAmmoType
+				self.spawnedent.DakOwner = self:GetOwner()
+				self.spawnedent.DakIsHE = self.DakIsHE
+			end
+		end
+		if self:GetClientInfo("SpawnEnt") == "dak_teammo" and not(Selection == "Flamethrower Fuel") then
 			local boxtype = string.Explode( " ", Selection )[1]
 			local first = string.Explode( "x", boxtype )[1]
 			local second = string.Explode( "x", boxtype )[2]
@@ -2633,7 +2658,7 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Composite Armor"] = function()
-		DLabel:SetText( "DakTank Guide: Composite Armor\n\nComposite armor provides 15.5mm protection against KE and 31mm protection against HEAT per inch(source unit) that is penned. Composite armor automatically sets its weight based on its volume and its protection based on how much of it is penned by a given shell. If something is clipped inside of a composite block shells will only take into account the amount of composite armor that was penned before hitting the clipping entity. \n\nIn general Composites prove to be more durable than armor for a given weight, though they take up much more space requiring the vehicle itself to be a larger target, which may also make it more costly to armor. \n\nComposites may be created from any prop on the vehicle by using the linker tool to select the props (must be prop_phsyics) and right clicking on the tank core." )
+		DLabel:SetText( "DakTank Guide: Composite Armor\n\nComposite armor provides 9.2mm protection against KE and 18.4mm protection against HEAT per inch(source unit) that is penned. Composite armor automatically sets its weight based on its volume and its protection based on how much of it is penned by a given shell. If something is clipped inside of a composite block shells will only take into account the amount of composite armor that was penned before hitting the clipping entity. \n\nIn general Composites prove to be more durable than armor for a given weight, though they take up much more space requiring the vehicle itself to be a larger target, which may also make it more costly to armor. \n\nComposites may be created from any prop on the vehicle by using the linker tool to select the props (must be prop_phsyics) and right clicking on the tank core." )
 		DLabel:SetVisible( true )
 	end
 	selection["DakTank Guide: Health"] = function()

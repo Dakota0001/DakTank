@@ -178,14 +178,8 @@ function DTCompositesTrace( Ent, StartPos, Dir, Filter )
 								checktrace.filter = checkfilter
 							end
 						local checkinternaltrace = util.TraceLine( checktrace )
-						print(Ent)
-						print(Pos:Distance(checkinternaltrace.HitPos))
-						print(Pos:Distance(checkinternaltrace.HitPos) > 2)
-						print(Pos:Distance(H1))
-						if Pos:Distance(checkinternaltrace.HitPos) > 2 then
-							if IsValid(checkinternaltrace.Entity) then
-								return Pos:Distance(checkinternaltrace.HitPos)
-							end
+						if IsValid(checkinternaltrace.Entity) and Pos:Distance(checkinternaltrace.HitPos)<Pos:Distance(H1) then
+							return Pos:Distance(checkinternaltrace.HitPos)
 						end
                     	return Pos:Distance(H1)
                     else
@@ -1996,7 +1990,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 				trace.mins = Vector(-0.1,-0.1,-0.1)
 				trace.maxs = Vector(0.1,0.1,0.1)
 				local ExpTrace = util.TraceHull( trace )
-				if ExpTrace.Entity == Targets[i] then
+				if ExpTrace.Entity == Targets[i] and (not(CheckClip(Targets[i],ExpTrace.HitPos))) then
 					if not(string.Explode("_",Targets[i]:GetClass(),false)[2] == "wire") and not(Targets[i]:IsVehicle()) and not(Targets[i]:GetClass() == "dak_salvage") and not(Targets[i]:GetClass() == "dak_tesalvage") and Targets[i].DakIsTread==nil and not(Targets[i]:GetClass() == "dak_turretcontrol") then
 						if (not(ExpTrace.Entity:IsPlayer())) and (not(ExpTrace.Entity:IsNPC())) and (not(ExpTrace.Entity.Base == "base_nextbot")) then
 							if ExpTrace.Entity:GetPhysicsObject():GetMass()>1 then
