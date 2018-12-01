@@ -110,7 +110,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -187,7 +187,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -263,7 +263,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -339,7 +339,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -411,7 +411,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -487,7 +487,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -547,7 +547,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -602,7 +602,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -648,7 +648,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -694,7 +694,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -740,7 +740,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -786,7 +786,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -832,7 +832,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -878,7 +878,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -924,7 +924,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
@@ -970,7 +970,7 @@ function ENT:Think()
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
 			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
-			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*Caliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
 			self.DakFirePitch = 100
