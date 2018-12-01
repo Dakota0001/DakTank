@@ -214,7 +214,8 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 		newtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
 		newtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
 	local HitCheckShellTrace = util.TraceHull( newtrace )
-
+	local HitCheckNormalTrace = util.TraceLine( newtrace )
+	Normal = HitCheckShellTrace.HitNormal
 	HitEnt = HitCheckShellTrace.Entity
 	local HitPos = HitCheckShellTrace.HitPos
 	if hook.Run("DakTankDamageCheck", HitEnt, Shell.DakGun.DakOwner, Shell.DakGun) ~= false then
@@ -856,6 +857,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 		newtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
 		newtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
 	local ContShellTrace = util.TraceHull( newtrace )
+	Normal = ContShellTrace.HitNormal
 	if (Shell.DakShellType == "APHE" or Shell.DakShellType == "HE") and not(ContShellTrace.Hit) and not(HitNonHitable) then
 		if Shell.DieTime == nil then
 			Shell.DieTime = CurTime()
@@ -2748,7 +2750,6 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 end
 
 function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggered)
-	print("cont")
 	if isangle(Direction) then
 		Direction = Direction:Forward()
 	end
