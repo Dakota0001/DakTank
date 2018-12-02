@@ -1586,16 +1586,16 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-								ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001
+								ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001,0,ExpTrace.Entity.DakArmor*2)
 							else	
-								ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)
+								ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor),0,ExpTrace.Entity.DakArmor*2)
 							end
 						end
 					else
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001
+							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001,0,ExpTrace.Entity.DakArmor*2)
 						else
-							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)
+							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor),0,ExpTrace.Entity.DakArmor*2)
 						end
 					end
 					local EffArmor = (ExpTrace.Entity.DakArmor/math.abs(ExpTrace.HitNormal:Dot(Direction)))
@@ -1731,16 +1731,16 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-								ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001
+								ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001,0,ExpTrace.Entity.DakArmor*2)
 							else
-								ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)
+								ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor),0,ExpTrace.Entity.DakArmor*2)
 							end
 						end
 					else
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001
+							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001,0,ExpTrace.Entity.DakArmor*2)
 						else
-							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)
+							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor),0,ExpTrace.Entity.DakArmor*2)
 						end
 					end
 					local EffArmor = (ExpTrace.Entity.DakArmor/math.abs(ExpTrace.HitNormal:Dot(Direction)))
@@ -1874,16 +1874,16 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 				if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001
+							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001,0,ExpTrace.Entity.DakArmor*2)
 						else
-							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)
+							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor),0,ExpTrace.Entity.DakArmor*2)
 						end
 					end
 				else
 					if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001
+						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)*0.001,0,ExpTrace.Entity.DakArmor*2)
 					else
-						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*(Pen/ExpTrace.Entity.DakArmor)
+						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- math.Clamp((Damage/traces)*(Pen/ExpTrace.Entity.DakArmor),0,ExpTrace.Entity.DakArmor*2)
 					end
 				end
 				local EffArmor = (ExpTrace.Entity.DakArmor/math.abs(ExpTrace.HitNormal:Dot(Direction)))
@@ -2051,15 +2051,15 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 					if Shell.DakDamageList[i].DakIsTread==nil then
 						if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then
 							if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001
+								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001,0,Shell.DakDamageList[i].DakArmor*2)
 							else
-								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))
+								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius)),0,Shell.DakDamageList[i].DakArmor*2)
 							end
 						else
 							if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*0.001
+								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*0.001,0,Shell.DakDamageList[i].DakArmor*2)
 							else
-								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )
+								Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  ),0,Shell.DakDamageList[i].DakArmor*2)
 							end
 						end
 					end
@@ -2072,15 +2072,15 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 						if Shell.DakDamageList[i].DakIsTread==nil then
 							if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
 								if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-									Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001
+									Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001,0,Shell.DakDamageList[i].DakArmor*2)
 								else
-									Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))
+									Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius)),0,Shell.DakDamageList[i].DakArmor*2)
 								end
 							else
 								if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-									Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*0.001
+									Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*0.001,0,Shell.DakDamageList[i].DakArmor*2)
 								else
-									Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )
+									Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  ),0,Shell.DakDamageList[i].DakArmor*2)
 								end
 							end
 						end
@@ -2094,15 +2094,15 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 				if Shell.DakDamageList[i].DakIsTread==nil then
 					if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
 						if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001
+							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001,0,Shell.DakDamageList[i].DakArmor*2)
 						else
-							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))
+							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius)),0,Shell.DakDamageList[i].DakArmor*2)
 						end
 					else
 						if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*0.001
+							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )*0.001,0,Shell.DakDamageList[i].DakArmor*2)
 						else
-							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - (  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  )
+							Shell.DakDamageList[i].DakHealth = Shell.DakDamageList[i].DakHealth - math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/Shell.DakDamageList[i].DakArmor)  ),0,Shell.DakDamageList[i].DakArmor*2)
 						end
 					end
 				end
