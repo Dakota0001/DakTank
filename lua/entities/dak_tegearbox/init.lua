@@ -284,8 +284,7 @@ function ENT:Think()
 		    		self.YawAng = Angle(0,self:GetParent():GetParent():GetAngles().yaw,0)
 		 			self.LastYaw = self:GetParent():GetParent():GetAngles().yaw
 
-		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/self:GetParent():GetParent():GetPhysicsObject():GetMass())*0.1 )
-		 			print(self.TotalMass/self:GetParent():GetParent():GetPhysicsObject():GetMass())
+		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/self:GetParent():GetParent():GetPhysicsObject():GetMass())*0.25 )
 
 		 			self.setup = 1
 		 		end
@@ -360,10 +359,10 @@ function ENT:Think()
 		        else
 		        	if not(self.MoveForward>0) and not(self.MoveReverse>0) then
 		        		if self.Perc > 0 then
-							self.Perc = self.Perc - 0.0125
+							self.Perc = self.Perc - 0.1
 						end
 						if self.Perc < 0 then
-							self.Perc = self.Perc + 0.0125
+							self.Perc = self.Perc + 0.1
 						end
 					end
 					if not(self.MoveRight>0) and not(self.MoveLeft>0) then
@@ -374,7 +373,7 @@ function ENT:Think()
 							self.Perc = 0
 						end
 						if self.Perc < 1 then
-		        			self.Perc = self.Perc + 0.0125
+		        			self.Perc = self.Perc + 0.1
 		        		end
 					end
 					if self.MoveReverse>0 then
@@ -382,7 +381,7 @@ function ENT:Think()
 								self.Perc = 0
 							end
 		        			if self.Perc > -1 then
-			        			self.Perc = self.Perc - 0.0125
+			        			self.Perc = self.Perc - 0.1
 			        		end
 		        			self.TopSpeed = self.TopSpeed/3
 					end
@@ -559,18 +558,15 @@ function ENT:Think()
 								end
 							end
 						end
-
-						print((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif)
-						
-
-						if #self.DakTankCore.Motors>0 then
-							for i=1, #self.DakTankCore.Motors do
-								if IsValid(self.DakTankCore.Motors[i]) then
-									self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif),0.5,1)*255 , 0.2 )
+						if self.MoveForward>0 or self.MoveReverse>0 or self.MoveLeft>0 or self.MoveRight>0 then
+							if #self.DakTankCore.Motors>0 then
+								for i=1, #self.DakTankCore.Motors do
+									if IsValid(self.DakTankCore.Motors[i]) then
+										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif),0.5,1)*255 , 0.2 )
+									end
 								end
 							end
 						end
-
 					end
 					if self.Speed > self.TopSpeed then
 						if self.MoveForward>0 or self.MoveReverse>0 or self.MoveLeft>0 or self.MoveRight>0 then
@@ -719,7 +715,7 @@ function ENT:Think()
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
 									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp( 255*self.RPM/2500,0,255), 0.5 )
+										self.DakTankCore.Motors[i].Sound:ChangePitch( 50, 0.5 )
 									end
 								end
 							end

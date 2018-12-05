@@ -199,8 +199,7 @@ function ENT:Think()
 					       		hash[v] = true
 					   		end
 						end
-						self.Contraption=res
-
+						self.Contraption={}
 						self.Ammoboxes={}
 						self.TurretControls={}
 						self.Guns={}
@@ -210,6 +209,7 @@ function ENT:Think()
 						self.Tread={}
 						for i=1, #res do
 							if res[i]:IsSolid() then
+									self.Contraption[#self.Contraption+1] = res[i]
 								if res[i]:GetClass()=="dak_tegearbox" then
 									res[i].DakTankCore = self
 									self.Gearbox = res[i]
@@ -256,6 +256,7 @@ function ENT:Think()
 								end
 							end
 						end
+						--PrintTable(self.Contraption)
 						self.CrewCount = #self.Crew
 						WireLib.TriggerOutput(self, "Crew", self.CrewCount)
 						if self.Gearbox then
