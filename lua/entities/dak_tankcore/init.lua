@@ -199,6 +199,7 @@ function ENT:Think()
 					       		hash[v] = true
 					   		end
 						end
+						self.Modern = 0
 						self.Contraption={}
 						self.Ammoboxes={}
 						self.TurretControls={}
@@ -221,6 +222,10 @@ function ENT:Think()
 									self.Motors[#self.Motors+1] = res[i]
 								end
 								if res[i]:GetClass() == "dak_teammo" then
+									local boxname = (string.Split( res[i].DakAmmoType, "" ))
+									if (boxname[#boxname-9] == "H" and boxname[#boxname-8] == "E" and boxname[#boxname-7] == "A" and boxname[#boxname-6] == "T" and boxname[#boxname-5] == "F" and boxname[#boxname-4] == "S") or (boxname[#boxname-9] == "A" and boxname[#boxname-8] == "P" and boxname[#boxname-7] == "F" and boxname[#boxname-6] == "S" and boxname[#boxname-5] == "D" and boxname[#boxname-4] == "S") or (boxname[#boxname-7] == "A" and boxname[#boxname-6] == "T" and boxname[#boxname-5] == "G" and boxname[#boxname-4] == "M") then
+										self.Modern = 1
+									end
 									self.Ammoboxes[#self.Ammoboxes+1] = res[i]
 								end
 								if res[i]:GetClass()=="dak_tegun" then
@@ -345,6 +350,7 @@ function ENT:Think()
 
 							if self.Composites then
 								if table.Count(self.Composites) > 0 then
+									self.Modern = 1
 									for i = 1, table.Count(self.Composites) do
 										self.Composites[i].IsComposite = 1
 										self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*2000) )

@@ -1191,7 +1191,7 @@ function ENT:DakTEAutoAmmoCheck()
 		self.DakShellDamage = 0
 		self.DakShellMass = self.BaseDakShellMass
 		self.DakShellPenetration = self.DakMaxHealth*1.25
-		self.DakShellVelocity = self.BaseDakShellVelocity*0.5
+		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
@@ -1532,7 +1532,7 @@ function ENT:DakTEAutoGunAmmoSwap()
 		self.DakShellDamage = 0
 		self.DakShellMass = self.BaseDakShellMass
 		self.DakShellPenetration = self.DakMaxHealth*1.25
-		self.DakShellVelocity = self.BaseDakShellVelocity*0.5
+		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = 0
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)

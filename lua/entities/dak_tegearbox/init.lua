@@ -475,42 +475,48 @@ function ENT:Think()
 						self.CurTopSpeed = 0
 						self.LastTopSpeed = 0
 						self.MaxSpeedDif = 0
+
+						local G1Speed = self.TopSpeed*0.2
+						local G2Speed = self.TopSpeed*0.4
+						local G3Speed = self.TopSpeed*0.7
+						local G4Speed = self.TopSpeed
+
 						
-						if self.Speed < self.TopSpeed*0.2 then
+						if self.Speed < G1Speed then
 							--self.Gear = 1
 							GearBoost = math.Clamp(self.TopSpeed/(self.Speed*2.0),0,8*math.abs(self.Perc))
-							self.CurTopSpeed = self.TopSpeed*0.2
+							self.CurTopSpeed = G1Speed
 							self.LastTopSpeed = 0
-							self.MaxSpeedDif = self.TopSpeed*0.2
+							self.MaxSpeedDif = G1Speed
 							LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2.0),0,8*math.abs(self.Perc)) )
 							RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2.0),0,8*math.abs(self.Perc)) )
-						elseif self.Speed < self.TopSpeed*0.4 then
+						elseif self.Speed < G2Speed then
 							--self.Gear = 2
 							GearBoost = math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc))
-							self.CurTopSpeed = self.TopSpeed*0.4
-							self.LastTopSpeed = self.TopSpeed*0.2
-							self.MaxSpeedDif = self.TopSpeed*0.4 - self.TopSpeed*0.1
+							self.CurTopSpeed = G2Speed
+							self.LastTopSpeed = G1Speed
+							self.MaxSpeedDif = G2Speed - self.TopSpeed*0.1
 							LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc)) )
 							RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc)) )
-						elseif self.Speed < self.TopSpeed*0.7 then
+						elseif self.Speed < G3Speed then
 							--self.Gear = 3
 							GearBoost = math.Clamp(self.TopSpeed/(self.Speed*2.5),0,2*math.abs(self.Perc))
-							self.CurTopSpeed = self.TopSpeed*0.7
-							self.LastTopSpeed = self.TopSpeed*0.4
-							self.MaxSpeedDif = self.TopSpeed*0.7 - self.TopSpeed*0.4
+							self.CurTopSpeed = G3Speed
+							self.LastTopSpeed = G2Speed
+							self.MaxSpeedDif = G3Speed - G2Speed
 							LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2.5),0,2*math.abs(self.Perc)) )
 							RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2.5),0,2*math.abs(self.Perc)) )
 						else
 							--self.Gear = 4
 							GearBoost = math.Clamp(self.TopSpeed/(self.Speed*1.75),0,1*math.abs(self.Perc))
-							self.CurTopSpeed = self.TopSpeed
-							self.LastTopSpeed = self.TopSpeed*0.7
-							self.MaxSpeedDif = self.TopSpeed - self.TopSpeed*0.7
+							self.CurTopSpeed = G4Speed
+							self.LastTopSpeed = G3Speed
+							self.MaxSpeedDif = G4Speed - G3Speed
 							LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.75),0,1*math.abs(self.Perc)) )
 							RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.75),0,1*math.abs(self.Perc)) )
 						end
 
-						if self.Speed > self.TopSpeed*0.0 and self.Speed < self.TopSpeed*0.2 and not(self.Gear == 1) then
+						if self.Speed > 0 and self.Speed < G1Speed and not(self.Gear == 1) then
 							self.Gear = 1 
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
@@ -522,7 +528,7 @@ function ENT:Think()
 								end
 							end
 						end
-						if self.Speed > self.TopSpeed*0.2 and self.Speed < self.TopSpeed*0.4 and not(self.Gear == 2) then
+						if self.Speed > G1Speed and self.Speed < G2Speed and not(self.Gear == 2) then
 							self.Gear = 2 
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
@@ -534,7 +540,7 @@ function ENT:Think()
 								end
 							end
 						end
-						if self.Speed > self.TopSpeed*0.4 and self.Speed < self.TopSpeed*0.7 and not(self.Gear == 3) then
+						if self.Speed > G2Speed and self.Speed < G3Speed and not(self.Gear == 3) then
 							self.Gear = 3
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
@@ -546,7 +552,7 @@ function ENT:Think()
 								end
 							end
 						end
-						if self.Speed > self.TopSpeed*0.7 and self.Speed < self.TopSpeed and not(self.Gear == 4) then
+						if self.Speed > G3Speed and self.Speed < G4Speed and not(self.Gear == 4) then
 							self.Gear = 4
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
@@ -562,7 +568,7 @@ function ENT:Think()
 							if #self.DakTankCore.Motors>0 then
 								for i=1, #self.DakTankCore.Motors do
 									if IsValid(self.DakTankCore.Motors[i]) then
-										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif),0.5,1)*255 , 0.2 )
+										self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif),0.7,1)*200 , 0.2 )
 									end
 								end
 							end

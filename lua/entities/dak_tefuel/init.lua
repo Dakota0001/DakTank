@@ -11,6 +11,20 @@ ENT.DakHealth = 10
 ENT.DakPooled=0
 ENT.DakFuel = 0
 
+function CheckClip(Ent, HitPos)
+	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
+	local HitClip = false
+	local normal
+	local origin
+	for i=1, #Ent.ClipData do
+		normal = Ent:LocalToWorldAngles(Ent.ClipData[i]["n"]):Forward()
+		origin = Ent:LocalToWorld(Ent.ClipData[i]["n"]:Forward()*Ent.ClipData[i]["d"])
+		HitClip = HitClip or normal:Dot((origin - HitPos):GetNormalized()) > 0
+		if HitClip then return true end
+	end
+	return HitClip
+end
+
 function ENT:Initialize()
 
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -142,7 +156,7 @@ function ENT:Think()
 				local Class = Targets[i]:GetClass()
 				if Class=="dak_crew" or Class=="dak_teammo" or Class=="dak_teautoloadingmodule" or Class=="dak_tefuel" or Class=="dak_tegearbox" or Class=="dak_temotor" or Class=="dak_turretmotor" then
 					local trace = {}
-						trace.start = self:GetPos()
+						trace.start = self:NearestPoint( Targets[i]:GetPos() )
 						trace.endpos = Targets[i]:GetPos()
 						trace.filter = self
 					local FireTrace = util.TraceLine( trace )

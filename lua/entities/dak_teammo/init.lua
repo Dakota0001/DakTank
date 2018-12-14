@@ -161,7 +161,7 @@ function ENT:Think()
 			--	self:SetModel( "models/daktanks/Ammo.mdl" )
 			--end
 		if self.DakAmmoType == "Flamethrower Fuel" then
-			self.DakArmor = 25
+			self.DakArmor = 12.5
 		 	self.DakMaxHealth = 30
 		 	if self.DakHealth >= self.DakMaxHealth then
 				self.DakHealth = 30
