@@ -645,7 +645,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = 0
-		self.CooldownWeightMod = 5350
+		self.CooldownWeightMod = 3450
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
