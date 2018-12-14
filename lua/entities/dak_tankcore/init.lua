@@ -200,6 +200,7 @@ function ENT:Think()
 					   		end
 						end
 						self.Modern = 0
+						self.ColdWar = 0
 						self.Contraption={}
 						self.Ammoboxes={}
 						self.TurretControls={}
@@ -223,8 +224,11 @@ function ENT:Think()
 								end
 								if res[i]:GetClass() == "dak_teammo" then
 									local boxname = (string.Split( res[i].DakAmmoType, "" ))
-									if (boxname[#boxname-9] == "H" and boxname[#boxname-8] == "E" and boxname[#boxname-7] == "A" and boxname[#boxname-6] == "T" and boxname[#boxname-5] == "F" and boxname[#boxname-4] == "S") or (boxname[#boxname-9] == "A" and boxname[#boxname-8] == "P" and boxname[#boxname-7] == "F" and boxname[#boxname-6] == "S" and boxname[#boxname-5] == "D" and boxname[#boxname-4] == "S") or (boxname[#boxname-7] == "A" and boxname[#boxname-6] == "T" and boxname[#boxname-5] == "G" and boxname[#boxname-4] == "M") then
+									if (boxname[#boxname-9] == "A" and boxname[#boxname-8] == "P" and boxname[#boxname-7] == "F" and boxname[#boxname-6] == "S" and boxname[#boxname-5] == "D" and boxname[#boxname-4] == "S") then
 										self.Modern = 1
+									end
+									if (boxname[#boxname-9] == "H" and boxname[#boxname-8] == "E" and boxname[#boxname-7] == "A" and boxname[#boxname-6] == "T" and boxname[#boxname-5] == "F" and boxname[#boxname-4] == "S") or (boxname[#boxname-7] == "A" and boxname[#boxname-6] == "T" and boxname[#boxname-5] == "G" and boxname[#boxname-4] == "M") then
+										self.ColdWar = 1
 									end
 									self.Ammoboxes[#self.Ammoboxes+1] = res[i]
 								end

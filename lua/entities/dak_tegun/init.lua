@@ -610,6 +610,11 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
 		self.DakShellPenetration = self.DakMaxHealth*1.20
+		if self.DakTankCore.ColdWar and self.DakTankCore.Modern then
+			if self.DakTankCore.ColdWar == 1 or self.DakTankCore.Modern == 1 then
+				self.DakShellPenetration = self.DakMaxHealth*5.4*0.431
+			end
+		end
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
@@ -658,6 +663,11 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
 		self.DakShellPenetration = self.DakMaxHealth*6.40
+		if self.DakTankCore.ColdWar and self.DakTankCore.Modern then
+			if self.DakTankCore.ColdWar == 1 and self.DakTankCore.Modern == 0 then
+				self.DakShellPenetration = self.DakMaxHealth*6.40*0.45
+			end
+		end
 		self.DakShellVelocity = 12600
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
@@ -674,6 +684,11 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
 		self.DakShellPenetration = self.DakMaxHealth*5.40
+		if self.DakTankCore.ColdWar and self.DakTankCore.Modern then
+			if self.DakTankCore.ColdWar == 1 and self.DakTankCore.Modern == 0 then
+				self.DakShellPenetration = self.DakMaxHealth*5.40*0.658
+			end
+		end
 		self.DakShellVelocity = self.BaseDakShellVelocity*1.3333
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
@@ -752,7 +767,6 @@ function ENT:DakTEAmmoCheck()
 				end
 				box = box + 1
 			end
-			table.sort( self.SortedAmmo, function( a, b ) return a[2] < b[2] end )
 		end
 
 		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
@@ -971,7 +985,12 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
-		self.DakShellPenetration = self.DakMaxHealth*5.40*self.ShellLengthMult
+		self.DakShellPenetration = self.DakMaxHealth*1.20
+		if self.DakTankCore.ColdWar and self.DakTankCore.Modern then
+			if self.DakTankCore.ColdWar == 1 or self.DakTankCore.Modern == 1 then
+				self.DakShellPenetration = self.DakMaxHealth*5.4*0.431
+			end
+		end
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
@@ -1016,7 +1035,12 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
-		self.DakShellPenetration = self.DakMaxHealth*6.40*self.ShellLengthMult
+		self.DakShellPenetration = self.DakMaxHealth*6.40
+		if self.DakTankCore.ColdWar and self.DakTankCore.Modern then
+			if self.DakTankCore.ColdWar == 1 and self.DakTankCore.Modern == 0 then
+				self.DakShellPenetration = self.DakMaxHealth*6.40*0.45
+			end
+		end
 		self.DakShellVelocity = 12600
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
@@ -1031,7 +1055,12 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellExplosive = true
 		self.DakShellDamage = self.BaseDakShellDamage/8
 		self.DakShellMass = self.BaseDakShellMass/8
-		self.DakShellPenetration = self.DakMaxHealth*5.40*self.ShellLengthMult
+		self.DakShellPenetration = self.DakMaxHealth*5.40
+		if self.DakTankCore.ColdWar and self.DakTankCore.Modern then
+			if self.DakTankCore.ColdWar == 1 and self.DakTankCore.Modern == 0 then
+				self.DakShellPenetration = self.DakMaxHealth*5.40*0.658
+			end
+		end
 		self.DakShellVelocity = self.BaseDakShellVelocity*1.3333
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
