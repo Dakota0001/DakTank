@@ -103,7 +103,7 @@ function ENT:Think()
 			self.DakMass = 1000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakMagazine = math.floor(0.5*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
+					self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
 					self.DakGun.DakReloadTime = self.DakGun.DakCooldown * self.DakGun.DakMagazine
 					self.DakGun.Loaded = 1
 				end
@@ -113,7 +113,7 @@ function ENT:Think()
 			self.DakMass = 2000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakMagazine = math.floor(0.5*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
+					self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
 					self.DakGun.DakReloadTime = self.DakGun.DakCooldown * self.DakGun.DakMagazine
 					self.DakGun.Loaded = 1
 				end
@@ -123,7 +123,7 @@ function ENT:Think()
 			self.DakMass = 3000
 			if IsValid(self.DakGun) then
 				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakMagazine = math.floor(0.5*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
+					self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
 					self.DakGun.DakReloadTime = self.DakGun.DakCooldown * self.DakGun.DakMagazine
 					self.DakGun.Loaded = 1
 				end
