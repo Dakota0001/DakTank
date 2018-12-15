@@ -97,7 +97,7 @@ function ENT:Think()
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.ShellLengthMult = (40/50)
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*self.CooldownWeightMod
-			self.DakCooldown = 0.5*self.BaseDakShellMass*self.CooldownDistanceModifier
+			self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
 			self.DakShellSplashDamage = self.DakCaliber*5
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
@@ -173,7 +173,7 @@ function ENT:Think()
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*self.CooldownWeightMod
 			--print((math.pi*((75*0.001*0.5)^2)*(75*0.001*6.5))*7700)
 			--print((math.pi*((200*0.001*0.5)^2)*(200*0.001*6.5))*7700)
-			self.DakCooldown = 0.5*self.BaseDakShellMass*self.CooldownDistanceModifier
+			self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
 			self.ShellLengthMult = (50/50)
 			self.DakShellSplashDamage = self.DakCaliber*5
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
@@ -249,7 +249,7 @@ function ENT:Think()
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.ShellLengthMult = (70/50)
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*9))*self.CooldownWeightMod
-			self.DakCooldown = 0.5*self.BaseDakShellMass*self.CooldownDistanceModifier
+			self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
 			self.DakShellSplashDamage = self.DakCaliber*5
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
@@ -323,7 +323,7 @@ function ENT:Think()
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.ShellLengthMult = (30/50)
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*4))*self.CooldownWeightMod
-			self.DakCooldown = 0.5*self.BaseDakShellMass*self.CooldownDistanceModifier
+			self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
 			self.DakShellSplashDamage = self.DakCaliber*5
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
@@ -394,7 +394,7 @@ function ENT:Think()
 			--Shell length ratio: Long Cannon - 9, Cannon - 6.5, Short Cannon - 5, Howitzer - 4, Mortar - 2.75
 			self.ShellLengthMult = (15/50)
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*2.75))*self.CooldownWeightMod
-			self.DakCooldown = 0.5*self.BaseDakShellMass*self.CooldownDistanceModifier
+			self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
 			self.DakShellSplashDamage = self.DakCaliber*5
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 			self.DakShellExplosive = false
