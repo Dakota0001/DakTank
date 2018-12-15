@@ -62,11 +62,11 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 			if HitEnt.IsComposite == 1 then
 				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal, Filter )*9.2
 				if ShellType == "APFSDS" then
-					if EffArmor/(Caliber*2.5) >= 0.8 then
+					if (EffArmor/3)/(Caliber*2.5) >= 0.8 then
 						Shatter = 1
 					end
 				else
-					if EffArmor/Caliber >= 0.8 then
+					if (EffArmor/3)/Caliber >= 0.8 then
 						Shatter = 1
 					end
 				end
@@ -278,13 +278,24 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 
 				local HitAng = math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))
 
-				local TDRatio = HitEnt.DakArmor/Shell.DakCaliber
-				if Shell.DakShellType == "APFSDS" then
-					TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
-				end
-				local PenRatio = CurrentPen/HitEnt.DakArmor
+				
+				local TDRatio = 0
+				local PenRatio = 0
 				if HitEnt.IsComposite == 1 then
-					PenRatio = CurrentPen/DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+					local CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+					if Shell.DakShellType == "APFSDS" then
+						TDRatio = (CompArmor/3)/(Shell.DakCaliber*2.5)
+					else
+						TDRatio = (CompArmor/3)/Shell.DakCaliber
+					end
+					PenRatio = CurrentPen/CompArmor
+				else
+					if Shell.DakShellType == "APFSDS" then
+						TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
+					else
+						TDRatio = HitEnt.DakArmor/Shell.DakCaliber
+					end
+					PenRatio = CurrentPen/HitEnt.DakArmor
 				end
 				--shattering occurs when TD ratio is above 0.8 and pen is 1.05 to 1.25 times more than the armor
 				--random chance to pen happens between 0.9 and 1.2 pen to armor ratio
@@ -338,7 +349,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				
 				if HitEnt.IsComposite == 1 then
-					EffArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+					EffArmor = CompArmor
 					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 						EffArmor = EffArmor*2
 					end
@@ -964,14 +975,25 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 
 					local HitAng = math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))
 
-					local TDRatio = HitEnt.DakArmor/Shell.DakCaliber
-					if Shell.DakShellType == "APFSDS" then
-						TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
-					end
-					local PenRatio = CurrentPen/HitEnt.DakArmor
+					local TDRatio = 0
+					local PenRatio = 0
 					if HitEnt.IsComposite == 1 then
-						PenRatio = CurrentPen/DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+						local CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+						if Shell.DakShellType == "APFSDS" then
+							TDRatio = (CompArmor/3)/(Shell.DakCaliber*2.5)
+						else
+							TDRatio = (CompArmor/3)/Shell.DakCaliber
+						end
+						PenRatio = CurrentPen/CompArmor
+					else
+						if Shell.DakShellType == "APFSDS" then
+							TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
+						else
+							TDRatio = HitEnt.DakArmor/Shell.DakCaliber
+						end
+						PenRatio = CurrentPen/HitEnt.DakArmor
 					end
+
 					--shattering occurs when TD ratio is above 0.8 and pen is 1.05 to 1.25 times more than the armor
 					--random chance to pen happens between 0.9 and 1.2 pen to armor ratio
 					--if pen to armor ratio is 0.9 or below round fails
@@ -1023,7 +1045,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 					end
 					if HitEnt.IsComposite == 1 then
-						EffArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+						EffArmor = CompArmor
 						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 							EffArmor = EffArmor*2
 						end
