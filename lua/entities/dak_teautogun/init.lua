@@ -1125,6 +1125,18 @@ function ENT:Think()
 				trace.start = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*-0.1)
 				trace.endpos = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1)
 			else
+				local DragForce = 0.166 * ((self.ShellList[i].DakVelocity*0.0254)*(self.ShellList[i].DakVelocity*0.0254)) * (math.pi * ((self.ShellList[i].DakCaliber/2000)*(self.ShellList[i].DakCaliber/2000)))
+				if self.ShellList[i].DakShellType == "HVAP" then
+					DragForce = 0.033 * ((self.ShellList[i].DakVelocity*0.0254)*(self.ShellList[i].DakVelocity*0.0254)) * (math.pi * ((self.ShellList[i].DakCaliber/1000)*(self.ShellList[i].DakCaliber/1000)))
+				end
+				if self.ShellList[i].DakShellType == "APFSDS" then
+					DragForce = 0.085 * ((self.ShellList[i].DakVelocity*0.0254)*(self.ShellList[i].DakVelocity*0.0254)) * (math.pi * ((self.ShellList[i].DakCaliber/1000)*(self.ShellList[i].DakCaliber/1000)))
+				end
+				if not(self.ShellList[i].DakShellType == "HEAT" or self.ShellList[i].DakShellType == "HEATFS" or self.ShellList[i].DakShellType == "ATGM" or self.ShellList[i].DakShellType == "HESH") then
+					local PenLoss = self.ShellList[i].DakBasePenetration*((((DragForce/(self.ShellList[i].DakMass/2))*0.1)*39.37)/self.ShellList[i].DakBaseVelocity)
+					self.ShellList[i].DakPenetration = self.ShellList[i].DakPenetration - PenLoss
+				end
+				self.ShellList[i].DakVelocity = self.ShellList[i].DakVelocity - ((DragForce/(self.ShellList[i].DakMass/2))*0.1)
 				trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
 				trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
 			end
@@ -1391,6 +1403,7 @@ function ENT:DakTEAutoFire()
  				Shell.Ang = shootAngles + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))
 				Shell.DakTrail = self.DakShellTrail
 				Shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.99, 1.01 )
+				Shell.DakBaseVelocity = self.DakShellVelocity
 				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakMass = self.DakShellMass
 				Shell.DakIsPellet = false

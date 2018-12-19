@@ -82,6 +82,7 @@ function SWEP:Initialize()
 	self.PrimaryCooldown = 0.1
 	self.FireSound = "weapons/ak47/ak47-1.wav"
 	self.IsPistol = false
+	self.IsRifle = true
 
  	--shell info
  	self.DakTrail = "dakteballistictracer"
@@ -196,6 +197,9 @@ function SWEP:PrimaryAttack()
 			local FinalRecoil = BaseRecoil * self.ShotCount * ShotForce * IsMoving * IsCrouch * (self.SpreadStacks/1) --have spread stacks so first few shots are sorta accurate
 			if self.IsPistol == true then
 				FinalRecoil = FinalRecoil * 3
+			end
+			if self.IsRifle == true then
+				FinalRecoil = FinalRecoil * 0.5
 			end
 			if self.SpreadStacks<5 then
 				self.SpreadStacks = self.SpreadStacks + (ShotForce/10000)

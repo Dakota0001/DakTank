@@ -185,7 +185,10 @@ function ENT:Think()
 	for i = 1, #self.ShellList do
 		self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
 		self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
-
+		local DragForce = 0.0245 * ((self.ShellList[i].DakVelocity*0.0254)*(self.ShellList[i].DakVelocity*0.0254)) * (math.pi * ((self.ShellList[i].DakCaliber/2000)*(self.ShellList[i].DakCaliber/2000)))
+		local PenLoss = self.ShellList[i].DakBasePenetration*((((DragForce/(self.ShellList[i].DakMass/2))*0.1)*39.37)/self.ShellList[i].DakBaseVelocity)
+		self.ShellList[i].DakPenetration = self.ShellList[i].DakPenetration - PenLoss
+		self.ShellList[i].DakVelocity = self.ShellList[i].DakVelocity - ((DragForce/(self.ShellList[i].DakMass/2))*0.1)
 		local trace = {}
 			trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
 			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
@@ -310,6 +313,7 @@ function ENT:DakTEFire()
  				Shell.Ang = shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
 				Shell.DakTrail = self.DakShellTrail
 				Shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.95, 1.05 )
+				Shell.DakBaseVelocity = self.DakShellVelocity
 				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakMass = self.DakShellMass
 				Shell.DakIsPellet = false

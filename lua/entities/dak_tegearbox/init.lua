@@ -217,7 +217,7 @@ function ENT:Think()
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 
-	if IsValid(self.DakTankCore.Motors[1]) then 
+	if self.DakTankCore and IsValid(self.DakTankCore.Motors[1]) then 
 		self.DakSpeed = 0
 		self.DakFuel = 0
 		self.DakFuelReq = 0
@@ -378,13 +378,13 @@ function ENT:Think()
 			        		end
 						end
 						if self.MoveReverse>0 then
-								if self.Perc > 0 then
-									self.Perc = 0
-								end
-			        			if self.Perc > -1 then
-				        			self.Perc = self.Perc - 0.1
-				        		end
-			        			self.TopSpeed = self.TopSpeed/3
+							if self.Perc > 0 then
+								self.Perc = 0
+							end
+		        			if self.Perc > -1 then
+			        			self.Perc = self.Perc - 0.1
+			        		end
+		        			self.TopSpeed = self.TopSpeed/3
 						end
 							
 						local ForwardVal = self:GetForward():Distance(self.phy:GetVelocity():GetNormalized()) --if it is below one you are going forward, if it is above one you are reversing

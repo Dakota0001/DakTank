@@ -281,8 +281,8 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				
 				local TDRatio = 0
 				local PenRatio = 0
+				local CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 				if HitEnt.IsComposite == 1 then
-					local CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 					if Shell.DakShellType == "APFSDS" then
 						TDRatio = (CompArmor/3)/(Shell.DakCaliber*2.5)
 					else
@@ -304,7 +304,11 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				--round must also be going above 600m/s
 				local Failed = 0
 				local Shattered = 0
-				if Shell.DakVelocity*0.0254 > 600 and not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM") then
+				local ShatterVel = 600
+				if Shell.DakShellType == "APFSDS" then
+					ShatterVel = 1500
+				end				
+				if Shell.DakVelocity*0.0254 > ShatterVel and not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then
 					if TDRatio > 0.8 then
 						if PenRatio < 0.9 then
 							Failed = 1
@@ -337,7 +341,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 				end
-				if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM") then
+				if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then
 					if HitAng >= 80 then
 						Failed = 1
 						Shattered = 1
@@ -350,7 +354,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				
 				if HitEnt.IsComposite == 1 then
 					EffArmor = CompArmor
-					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
+					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" then
 						EffArmor = EffArmor*2
 					end
 				else
@@ -408,7 +412,11 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if Shell.DakShellType == "HESH" then
 						DTSpall(HitPos,EffArmor,HitEnt,Shell.DakCaliber,(CurrentPen),Shell.DakGun.DakOwner,Shell,((HitPos-(Normal*2))-HitPos):Angle())
 					else
-						DTSpall(HitPos,EffArmor,HitEnt,Shell.DakCaliber,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.Ang)
+						if Shattered == 1 then
+							DTSpall(HitPos,EffArmor,HitEnt,Shell.DakCaliber*2,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.Ang)
+						else
+							DTSpall(HitPos,EffArmor,HitEnt,Shell.DakCaliber,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.Ang)
+						end
 					end
 					local effectdata = EffectData()
 					effectdata:SetOrigin(HitPos)
@@ -977,8 +985,8 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 
 					local TDRatio = 0
 					local PenRatio = 0
+					local CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 					if HitEnt.IsComposite == 1 then
-						local CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 						if Shell.DakShellType == "APFSDS" then
 							TDRatio = (CompArmor/3)/(Shell.DakCaliber*2.5)
 						else
@@ -1001,7 +1009,11 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					--round must also be going above 600m/s
 					local Failed = 0
 					local Shattered = 0
-					if Shell.DakVelocity*0.0254 > 600 and not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM") then
+					local ShatterVel = 600
+					if Shell.DakShellType == "APFSDS" then
+						ShatterVel = 1500
+					end	
+					if Shell.DakVelocity*0.0254 > ShatterVel and not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then
 						if TDRatio > 0.8 then
 							if PenRatio < 0.9 then
 								Failed = 1
@@ -1034,7 +1046,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 						end
 					end
-					if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM") then
+					if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then
 						if HitAng >= 80 then
 							Failed = 1
 							Shattered = 1
@@ -1046,7 +1058,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					end
 					if HitEnt.IsComposite == 1 then
 						EffArmor = CompArmor
-						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
+						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" then
 							EffArmor = EffArmor*2
 						end
 					else
@@ -1104,7 +1116,11 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						if Shell.DakShellType == "HESH" then
 							DTSpall(ContShellTrace.HitPos,EffArmor,HitEnt,Shell.DakCaliber,(CurrentPen),Shell.DakGun.DakOwner,Shell,((ContShellTrace.HitPos-(Normal*2))-ContShellTrace.HitPos):Angle())
 						else
-							DTSpall(ContShellTrace.HitPos,EffArmor,HitEnt,Shell.DakCaliber,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.Ang)
+							if Shattered == 1 then
+								DTSpall(ContShellTrace.HitPos,EffArmor,HitEnt,Shell.DakCaliber*2,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.Ang)
+							else
+								DTSpall(ContShellTrace.HitPos,EffArmor,HitEnt,Shell.DakCaliber,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.Ang)
+							end
 						end
 
 						local effectdata = EffectData()
