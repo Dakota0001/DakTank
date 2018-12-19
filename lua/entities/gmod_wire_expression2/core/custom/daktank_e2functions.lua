@@ -109,6 +109,9 @@ e2function string entity:daktankGetAmmoType()
 				if this.CurrentAmmoType == 9 then
 					return "APHE"
 				end
+				if this.CurrentAmmoType == 10 then
+					return "APDS"
+				end
 			end
 		end
 	else

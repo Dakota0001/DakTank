@@ -59,11 +59,20 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 			if ShellType == "APFSDS" then
 				TDRatio = HitEnt.DakArmor/(Caliber*2.5)
 			end
+			if ShellType == "APDS" then
+				TDRatio = HitEnt.DakArmor/(Caliber*1.75)
+			end
 			if HitEnt.IsComposite == 1 then
 				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal, Filter )*9.2
-				if ShellType == "APFSDS" then
-					if (EffArmor/3)/(Caliber*2.5) >= 0.8 then
-						Shatter = 1
+				if ShellType == "APFSDS" or ShellType == "APDS" then
+					if ShellType == "APFSDS" then
+						if (EffArmor/3)/(Caliber*2.5) >= 0.8 then
+							Shatter = 1
+						end
+					else
+						if (EffArmor/3)/(Caliber*1.75) >= 0.8 then
+							Shatter = 1
+						end
 					end
 				else
 					if (EffArmor/3)/Caliber >= 0.8 then
@@ -83,12 +92,12 @@ function DTGetArmor(Start, End, ShellType, Caliber, Filter)
 				if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
 					EffArmor = (HitEnt.DakArmor/math.abs(ShellSimTrace.HitNormal:Dot(ShellSimTrace.Normal)) )
 				end
-				if ShellType == "AP" or ShellType == "APHE" or ShellType == "HE" then
+				if ShellType == "AP" or ShellType == "APHE" or ShellType == "HE" or ShellType == "HVAP" or ShellType == "SM" then
 					local aVal = 2.251132 - 0.1955696*math.max( HitAng, 10 ) + 0.009955601*math.pow( math.max( HitAng, 10 ), 2 ) - 0.0001919089*math.pow( math.max( HitAng, 10 ), 3 ) + 0.000001397442*math.pow( math.max( HitAng, 10 ), 4 )
 					local bVal = 0.04411227 - 0.003575789*math.max( HitAng, 10 ) + 0.0001886652*math.pow( math.max( HitAng, 10 ), 2 ) - 0.000001151088*math.pow( math.max( HitAng, 10 ), 3 ) + 1.053822e-9*math.pow( math.max( HitAng, 10 ), 4 )
 					EffArmor = math.Clamp(HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal )),HitEnt.DakArmor,10000000000)
 				end
-				if ShellType == "HVAP" then
+				if ShellType == "APDS" then
 					EffArmor = HitEnt.DakArmor * math.pow( 2.71828, (math.pow( HitAng, 2.6 )*0.00003011) )
 				end
 				if ShellType == "APFSDS" then
@@ -283,15 +292,23 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				local PenRatio = 0
 				local CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 				if HitEnt.IsComposite == 1 then
-					if Shell.DakShellType == "APFSDS" then
-						TDRatio = (CompArmor/3)/(Shell.DakCaliber*2.5)
+					if Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS" then
+						if Shell.DakShellType == "APFSDS" then
+							TDRatio = (CompArmor/3)/(Shell.DakCaliber*2.5)
+						else
+							TDRatio = (CompArmor/3)/(Shell.DakCaliber*1.75)
+						end
 					else
 						TDRatio = (CompArmor/3)/Shell.DakCaliber
 					end
 					PenRatio = CurrentPen/CompArmor
 				else
-					if Shell.DakShellType == "APFSDS" then
-						TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
+					if Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS" then
+						if Shell.DakShellType == "APFSDS" then
+							TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
+						else
+							TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*1.75)
+						end
 					else
 						TDRatio = HitEnt.DakArmor/Shell.DakCaliber
 					end
@@ -307,6 +324,9 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				local ShatterVel = 600
 				if Shell.DakShellType == "APFSDS" then
 					ShatterVel = 1500
+				end	
+				if Shell.DakShellType == "APDS" then
+					ShatterVel = 1050
 				end				
 				if Shell.DakVelocity*0.0254 > ShatterVel and not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then
 					if TDRatio > 0.8 then
@@ -364,12 +384,12 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 						EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())) )
 					end
-					if Shell.DakShellType == "AP" or Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" then
+					if Shell.DakShellType == "AP" or Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" or Shell.DakShellType == "HVAP" or Shell.DakShellType == "SM" then
 						local aVal = 2.251132 - 0.1955696*math.max( HitAng, 10 ) + 0.009955601*math.pow( math.max( HitAng, 10 ), 2 ) - 0.0001919089*math.pow( math.max( HitAng, 10 ), 3 ) + 0.000001397442*math.pow( math.max( HitAng, 10 ), 4 )
 						local bVal = 0.04411227 - 0.003575789*math.max( HitAng, 10 ) + 0.0001886652*math.pow( math.max( HitAng, 10 ), 2 ) - 0.000001151088*math.pow( math.max( HitAng, 10 ), 3 ) + 1.053822e-9*math.pow( math.max( HitAng, 10 ), 4 )
 						EffArmor = math.Clamp(HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal )),HitEnt.DakArmor,10000000000)
 					end
-					if Shell.DakShellType == "HVAP" then
+					if Shell.DakShellType == "APDS" then
 						EffArmor = HitEnt.DakArmor * math.pow( 2.71828, (math.pow( HitAng, 2.6 )*0.00003011) )
 					end
 					if Shell.DakShellType == "APFSDS" then
@@ -861,11 +881,11 @@ end
 
 function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 	local Fuze = 25
-	if Shell.DakShellType == "HE" then
+	if Shell.DakShellType == "HE" or Shell.DakShellType == "SM" then
 		Fuze = 5
 	end
 	local newtrace = {}
-		if (Shell.DakShellType == "APHE" or Shell.DakShellType == "HE") and not(HitNonHitable) then
+		if (Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" or Shell.DakShellType == "SM") and not(HitNonHitable) then
 			newtrace.start = Shell.Pos
 			newtrace.endpos = Shell.Pos + (Fuze * Shell.Ang:Forward())
 		else
@@ -877,7 +897,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 		newtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
 	local ContShellTrace = util.TraceHull( newtrace )
 	Normal = ContShellTrace.HitNormal
-	if (Shell.DakShellType == "APHE" or Shell.DakShellType == "HE") and not(ContShellTrace.Hit) and not(HitNonHitable) then
+	if (Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" or Shell.DakShellType == "SM") and not(ContShellTrace.Hit) and not(HitNonHitable) then
 		if Shell.DieTime == nil then
 			Shell.DieTime = CurTime()
 		end
@@ -987,15 +1007,23 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					local PenRatio = 0
 					local CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 					if HitEnt.IsComposite == 1 then
-						if Shell.DakShellType == "APFSDS" then
-							TDRatio = (CompArmor/3)/(Shell.DakCaliber*2.5)
+						if Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS" then
+							if Shell.DakShellType == "APFSDS" then
+								TDRatio = (CompArmor/3)/(Shell.DakCaliber*2.5)
+							else
+								TDRatio = (CompArmor/3)/(Shell.DakCaliber*1.75)
+							end
 						else
 							TDRatio = (CompArmor/3)/Shell.DakCaliber
 						end
 						PenRatio = CurrentPen/CompArmor
 					else
-						if Shell.DakShellType == "APFSDS" then
-							TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
+						if Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS" then
+							if Shell.DakShellType == "APFSDS" then
+								TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*2.5)
+							else
+								TDRatio = HitEnt.DakArmor/(Shell.DakCaliber*1.75)
+							end
 						else
 							TDRatio = HitEnt.DakArmor/Shell.DakCaliber
 						end
@@ -1012,6 +1040,9 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					local ShatterVel = 600
 					if Shell.DakShellType == "APFSDS" then
 						ShatterVel = 1500
+					end	
+					if Shell.DakShellType == "APDS" then
+						ShatterVel = 1050
 					end	
 					if Shell.DakVelocity*0.0254 > ShatterVel and not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then
 						if TDRatio > 0.8 then
@@ -1068,12 +1099,12 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
 							EffArmor = (HitEnt.DakArmor/math.abs(Normal:Dot(Vel:GetNormalized())) )
 						end
-						if Shell.DakShellType == "AP" or Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" then
+						if Shell.DakShellType == "AP" or Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" or Shell.DakShellType == "HVAP" or Shell.DakShellType == "SM" then
 							local aVal = 2.251132 - 0.1955696*math.max( HitAng, 10 ) + 0.009955601*math.pow( math.max( HitAng, 10 ), 2 ) - 0.0001919089*math.pow( math.max( HitAng, 10 ), 3 ) + 0.000001397442*math.pow( math.max( HitAng, 10 ), 4 )
 							local bVal = 0.04411227 - 0.003575789*math.max( HitAng, 10 ) + 0.0001886652*math.pow( math.max( HitAng, 10 ), 2 ) - 0.000001151088*math.pow( math.max( HitAng, 10 ), 3 ) + 1.053822e-9*math.pow( math.max( HitAng, 10 ), 4 )
 							EffArmor = math.Clamp(HitEnt.DakArmor * (aVal * math.pow( TDRatio, bVal )),HitEnt.DakArmor,10000000000)
 						end
-						if Shell.DakShellType == "HVAP" then
+						if Shell.DakShellType == "APDS" then
 							EffArmor = HitEnt.DakArmor * math.pow( 2.71828, (math.pow( HitAng, 2.6 )*0.00003011) )
 						end
 						if Shell.DakShellType == "APFSDS" then
