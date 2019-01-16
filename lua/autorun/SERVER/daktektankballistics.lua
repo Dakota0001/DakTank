@@ -274,6 +274,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							if not(HitEnt.DakArmor == 7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - HitEnt.DakBurnStacks*0.25) then
 								HitEnt.DakArmor = 7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - HitEnt.DakBurnStacks*0.25
 							end
+							local CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 						end
 					end
 				end
@@ -290,7 +291,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				
 				local TDRatio = 0
 				local PenRatio = 0
-				local CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+				
 				if HitEnt.IsComposite == 1 then
 					if Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS" then
 						if Shell.DakShellType == "APFSDS" then
@@ -990,6 +991,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 								if not(HitEnt.DakArmor == 7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - HitEnt.DakBurnStacks*0.25) then
 									HitEnt.DakArmor = 7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - HitEnt.DakBurnStacks*0.25
 								end
+								local CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 							end
 						end
 					end
@@ -1005,7 +1007,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 
 					local TDRatio = 0
 					local PenRatio = 0
-					local CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+					
 					if HitEnt.IsComposite == 1 then
 						if Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS" then
 							if Shell.DakShellType == "APFSDS" then
