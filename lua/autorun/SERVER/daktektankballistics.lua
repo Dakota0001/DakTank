@@ -1,4 +1,4 @@
---[[ 
+--[[
 local function CheckClip(Ent, HitPos)
 	if not Ent.EntityMods then return false end
     if not Ent.EntityMods.clips or Ent:GetClass() ~= "prop_physics" then return false end
@@ -262,6 +262,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					DakTekTankEditionSetupNewEnt(HitEnt)
 				end
 				local SA = HitEnt:GetPhysicsObject():GetSurfaceArea()
+				local CompArmor
 				if HitEnt.IsDakTekFutureTech == 1 then
 					HitEnt.DakArmor = 1000
 				else
@@ -274,7 +275,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							if not(HitEnt.DakArmor == 7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - HitEnt.DakBurnStacks*0.25) then
 								HitEnt.DakArmor = 7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - HitEnt.DakBurnStacks*0.25
 							end
-							local CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+							CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 						end
 					end
 				end
@@ -979,6 +980,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						DakTekTankEditionSetupNewEnt(HitEnt)
 					end
 					local SA = HitEnt:GetPhysicsObject():GetSurfaceArea()
+					local CompArmor
 					if HitEnt.IsDakTekFutureTech == 1 then
 						HitEnt.DakArmor = 1000
 					else
@@ -991,7 +993,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 								if not(HitEnt.DakArmor == 7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - HitEnt.DakBurnStacks*0.25) then
 									HitEnt.DakArmor = 7.8125*(HitEnt:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - HitEnt.DakBurnStacks*0.25
 								end
-								local CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
+								CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.Ang:Forward(), Shell.Filter )*9.2
 							end
 						end
 					end
