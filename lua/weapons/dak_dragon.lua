@@ -1,6 +1,6 @@
 AddCSLuaFile( "dak_ai_translations.lua" )
 include( "dak_ai_translations.lua" )
-
+SWEP.Base 			= "dak_gun_base"
 if SERVER then
  
 	--AddCSLuaFile ("shared.lua")
@@ -24,7 +24,7 @@ end
  
 SWEP.Author = "DakTank"
 SWEP.Purpose = "Shoots Things."
-SWEP.Instructions = "staring contest consolidation prize, 300mm pen"
+SWEP.Instructions = "staring contest consolidation prize, Caliber: 140mm, Velocity: 100m/s, Damage: 17 vs armor, RPM: 30, Pen: 300mm"
 
 SWEP.Category = "DakTank"
  
@@ -92,16 +92,9 @@ function SWEP:Initialize()
 	self.DakVelocity = 3960
 	self.ShellLengthMult = self.DakVelocity/29527.6
 	self.Zoom = 55
-end
 
-function SWEP:Reload()
-	if  ( self.Weapon:Clip1() < self.Primary.ClipSize && self.Owner:GetAmmoCount( self.Primary.Ammo ) > 0 ) and #self.ShellList == 0 then
-		self.Weapon:DefaultReload(ACT_VM_RELOAD)	
-		if self.Owner:GetFOV()==self.Zoom then
-			self.Owner:SetFOV( 0, 0.1 )
-		end
-		self.SpreadStacks = 0
-	end
+	self.IsMissile = true
+	self.PenOverride = 300
 end
  
 function SWEP:Think()
@@ -163,99 +156,4 @@ function SWEP:Think()
 		self.LastTime = CurTime()
 	end
 end
-
-function SWEP:PrimaryAttack()
-	if self.PrimaryLastFire+self.PrimaryCooldown<CurTime() then
-		if self.Weapon:Clip1() > 0 then
-			if SERVER then
-				local shootOrigin = self.Owner:EyePos()
-				local shootDir = self.Owner:GetAimVector()
-				for i=1, self.ShotCount do
-					local shell = {}
-					shell.Pos = self.Owner:GetShootPos()
-					shell.Ang = self.Owner:GetAimVector():Angle() + Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))
-					if self.Owner:Crouching() then
-						shell.Ang = self.Owner:GetAimVector():Angle() + 0.5*Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))
-					end
-
-					shell.DakTrail = self.DakTrail
-					shell.DakCaliber = self.DakCaliber
-					shell.DakShellType = self.DakShellType
-					shell.DakPenLossPerMeter = self.DakPenLossPerMeter
-					shell.DakExplosive = self.DakExplosive
-
-					shell.DakVelocity = self.DakVelocity
-
-					shell.DakDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*5))*5*self.ShellLengthMult
-					shell.DakMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
-					shell.DakIsPellet = false
-					shell.DakSplashDamage = self.DakCaliber*0.375
-					shell.DakPenetration = 420
-					
-					shell.DakBlastRadius = (self.DakCaliber/25*39)
-					shell.DakPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-					shell.DakBasePenetration = 420
-					shell.DakGun = self
-					shell.DakGun.DakOwner = self.Owner
-					shell.Filter = {self.Owner, self}
-					shell.LifeTime = 0
-					shell.Gravity = 0
-					shell.DakFragPen = (self.DakCaliber/2.5)	
-					self.ShellList[#self.ShellList+1] = shell
-				end
-			end
-			self.SpreadStacks = self.SpreadStacks + 0.1
-			local ActualSpeed = self.Owner:GetVelocity():Length()
-			local MaxSpeed = self.Owner:GetRunSpeed()
-			local IsMoving = math.max(0.5, ActualSpeed/MaxSpeed)
-			local IsCrouch = self.Owner:Crouching() and 0.5 or 1
-			local ShotForce = ((self.DakVelocity*0.0254)*(self.DakVelocity*0.0254)*(math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700)
-			local BaseRecoil = Angle(-math.Rand(0.0004, 0.0006), math.Rand(0.0002,-0.0002), 0)
-			local FinalRecoil = BaseRecoil * self.ShotCount * 0.1 * ShotForce * IsMoving * IsCrouch * (self.SpreadStacks/1) --have spread stacks so first few shots are sorta accurate
-			if self.IsPistol == true then
-				FinalRecoil = FinalRecoil * 3
-			end
-			if CLIENT or game.SinglePlayer() then
-				self.Owner:SetEyeAngles( self.Owner:EyeAngles() + FinalRecoil )
-				self.Owner:ViewPunch( FinalRecoil / 4 )
-			end
-			self:EmitSound( self.FireSound, 140, 100, 1, 2)
-			self.PrimaryLastFire = CurTime()
-			self:TakePrimaryAmmo(1)
-			self.Fired = 1
-		else
-			if #self.ShellList == 0 then
-				if SERVER then
-					self:Reload()
-				end
-			end
-		end
-	end
-	
-	if self.Fired == 1 then
-		self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-		self.Fired = 0
-	end
-end
-
-function SWEP:SecondaryAttack()
-	if self.Owner:GetFOV()==self.Zoom then
-		self.Owner:SetFOV( 0, 0.1 )
-	else
-		self.Owner:SetFOV( self.Zoom, 0.1 )
-	end
-end
- 
-function SWEP:AdjustMouseSensitivity()
-	if math.Round(self.Owner:GetFOV(),0)==self.Zoom then
-		return self.Zoom/100
-	else
-		return 1
-	end
-end
-
-function SWEP:GetCapabilities()
-	return bit.bor( CAP_WEAPON_RANGE_ATTACK1, CAP_INNATE_RANGE_ATTACK1 )
-end
-
 

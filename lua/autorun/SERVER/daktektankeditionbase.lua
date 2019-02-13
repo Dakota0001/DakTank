@@ -13,23 +13,28 @@ if SERVER then
 	 		--setup values
 	 		if ent.IsDakTekFutureTech == nil then
 	 			ent.DakBurnStacks = 0
-	 			if ent:GetClass() == "prop_ragdoll" then
-	 				ent.DakHealth = 100000000000000000000
-	 			else
-		 			if IsValid(ent:GetPhysicsObject()) then
-				 		ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
-				 	else
-				 		ent.DakHealth = 100000000000000000000
-				 	end
-				 end
 				ent.DakName = "Armor"
-				if IsValid(ent:GetPhysicsObject()) then
-			 		ent.DakMaxHealth = ent:GetPhysicsObject():GetMass()/20
-		 		else
-			 		ent.DakMaxHealth = 100000000000000000000
+				if ent.EntityMods and ent.EntityMods.IsERA==1 then 
+					ent.DakMaxHealth = 5
+					ent.DakPooled = 1
+				else
+					if ent:GetClass() == "prop_ragdoll" then
+		 				ent.DakHealth = 100000000000000000000
+		 			else
+			 			if IsValid(ent:GetPhysicsObject()) then
+					 		ent.DakHealth = ent:GetPhysicsObject():GetMass()/20
+					 	else
+					 		ent.DakHealth = 100000000000000000000
+					 	end
+					end
+					if IsValid(ent:GetPhysicsObject()) then
+				 		ent.DakMaxHealth = ent:GetPhysicsObject():GetMass()/20
+			 		else
+				 		ent.DakMaxHealth = 100000000000000000000
+				 	end
+			 		--DakTekEntList[ ent:EntIndex() ] = ent -- add to list
+			 		ent.DakPooled = 0
 			 	end
-		 		--DakTekEntList[ ent:EntIndex() ] = ent -- add to list
-		 		ent.DakPooled = 0
 		 		--1 mm of armor on a meter*meter plate would be 8kg
 		 		--1 kg gives 0.125 armor
 		 		if ent:IsSolid() then

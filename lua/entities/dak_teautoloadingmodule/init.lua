@@ -268,9 +268,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakIsTread = 1
 						else
 							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
-									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
-								end
+								DTArmorSanityCheck(ExpTrace.Entity)
 							end
 						end
 					end
@@ -289,9 +287,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakIsTread = 1
 						else
 							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
-									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
-								end
+								DTArmorSanityCheck(ExpTrace.Entity)
 							end
 						end
 					end
@@ -394,9 +390,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakIsTread = 1
 					else
 						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
-								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
-							end
+							DTArmorSanityCheck(ExpTrace.Entity)
 						end
 					end
 				end
@@ -415,9 +409,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakIsTread = 1
 					else
 						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
-								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
-							end
+							DTArmorSanityCheck(ExpTrace.Entity)
 						end
 					end
 				end

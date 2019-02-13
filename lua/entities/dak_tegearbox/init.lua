@@ -217,7 +217,7 @@ function ENT:Think()
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 
-	if self.DakTankCore and IsValid(self.DakTankCore.Motors[1]) then 
+	if IsValid(self.DakTankCore) and IsValid(self.DakTankCore.Motors[1]) then 
 		self.DakSpeed = 0
 		self.DakFuel = 0
 		self.DakFuelReq = 0

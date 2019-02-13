@@ -517,7 +517,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 		end
 		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 			--decals don't like using the adjusted by normal Pos
-			util.Decal( "Impact.Concrete", self:GetPos(), self:GetPos()+(Direction*Radius), self)
+			util.Decal( "Impact.Concrete", Pos, Pos+(Direction*Radius), self)
 			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0)) then
 				if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
 					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
@@ -533,9 +533,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakIsTread = 1
 						else
 							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
-									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
-								end
+								DTArmorSanityCheck(ExpTrace.Entity)
 							end
 						end
 					end
@@ -554,9 +552,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakIsTread = 1
 						else
 							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
-									ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
-								end
+								DTArmorSanityCheck(ExpTrace.Entity)
 							end
 						end
 					end
@@ -604,7 +600,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 						Pain:SetDamage( (Damage/traces)*500 )
 						Pain:SetAttacker( Owner )
 						Pain:SetInflictor( self )
-						Pain:SetReportedPosition( self:GetPos() )
+						Pain:SetReportedPosition( Pos )
 						Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
 						ExpTrace.Entity:TakeDamageInfo( Pain )
@@ -645,7 +641,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 
 	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 		--decals don't like using the adjusted by normal Pos
-		util.Decal( "Impact.Concrete", self:GetPos(), self:GetPos()+(Direction*Radius), self)
+		util.Decal( "Impact.Concrete", Pos, Pos+(Direction*Radius), self)
 		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0)) then
 			if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
 				if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
@@ -661,9 +657,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakIsTread = 1
 					else
 						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
-								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
-							end
+							DTArmorSanityCheck(ExpTrace.Entity)
 						end
 					end
 				end
@@ -682,9 +676,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakIsTread = 1
 					else
 						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							if not(ExpTrace.Entity.DakArmor == 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25) then
-								ExpTrace.Entity.DakArmor = 7.8125*(ExpTrace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - ExpTrace.Entity.DakBurnStacks*0.25
-							end
+							DTArmorSanityCheck(ExpTrace.Entity)
 						end
 					end
 				end
@@ -732,7 +724,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 					Pain:SetDamage( (Damage/traces)*500 )
 					Pain:SetAttacker( Owner )
 					Pain:SetInflictor( self )
-					Pain:SetReportedPosition( self:GetPos() )
+					Pain:SetReportedPosition( Pos )
 					Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 					Pain:SetDamageType(DMG_BLAST)
 					ExpTrace.Entity:TakeDamageInfo( Pain )

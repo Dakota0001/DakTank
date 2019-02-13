@@ -32,6 +32,7 @@ function ENT:Initialize()
 	self.CurMass = 0
 	self.LastCurMass = 0
 	self.HitBox = {}
+	self.ERA = {}
 	self.HitBoxMass = 0
 	self.Hitboxthinktime = CurTime()
 	self.LastRemake = CurTime()
@@ -209,6 +210,7 @@ function ENT:Think()
 						self.Motors={}
 						self.Fuel={}
 						self.Tread={}
+						self.Cost = 0
 						for i=1, #res do
 							if res[i]:IsSolid() then
 									self.Contraption[#self.Contraption+1] = res[i]
@@ -252,6 +254,70 @@ function ENT:Think()
 								if res[i]:GetClass()=="dak_crew" then
 									self.Crew[#self.Crew+1]=res[i]
 								end
+								if res[i]:GetClass()=="prop_physics" then
+									if res[i].IsComposite == 1 then
+										if res[i].EntityMods==nil then
+											res[i].EntityMods = {}
+											res[i].EntityMods.CompositeType = "NERA"
+											res[i].EntityMods.CompKEMult = 9.2
+											res[i].EntityMods.CompCEMult = 18.4
+											res[i].EntityMods.DakName = "NERA"
+											self.Modern = 1
+											self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*2
+										else
+											if res[i].EntityMods.CompositeType == nil then
+												res[i].EntityMods.CompositeType = "NERA"
+												res[i].EntityMods.CompKEMult = 9.2
+												res[i].EntityMods.CompCEMult = 18.4
+												res[i].EntityMods.DakName = "NERA"
+												self.Modern = 1
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*2
+											end
+										end
+									end
+									if res[i].EntityMods==nil then
+									else
+										if res[i].EntityMods.CompositeType == nil then
+											if res[i].EntityMods.ArmorType == nil then
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()
+											else
+												if res[i].EntityMods.ArmorType == "RHA" then
+													res[i].EntityMods.Density = 7.8125
+													res[i].EntityMods.ArmorMult = 1
+													res[i].EntityMods.Ductility = 1
+													self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()
+												end
+												if res[i].EntityMods.ArmorType == "CHA" then
+													res[i].EntityMods.Density = 7.8125
+													res[i].EntityMods.ArmorMult = 1
+													res[i].EntityMods.Ductility = 1.5
+													self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*0.75
+												end
+												if res[i].EntityMods.ArmorType == "HHA" then
+													res[i].EntityMods.Density = 7.8125
+													res[i].EntityMods.ArmorMult = 1
+													res[i].EntityMods.Ductility = 1.5
+													self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.25
+												end
+											end
+										else
+											if res[i].EntityMods.CompositeType == "NERA" then
+												self.Modern = 1
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*2
+											end
+											if res[i].EntityMods.CompositeType == "Textolite" then
+												self.ColdWar = 1
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.25
+											end
+											if res[i].EntityMods.CompositeType == "ERA" then
+												self.ColdWar = 1
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.5
+											end
+										end
+									end
+								else
+									self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()
+								end
 								Mass = Mass + res[i]:GetPhysicsObject():GetMass()
 								if IsValid(res[i]:GetParent()) then
 									ParentMass = ParentMass + res[i]:GetPhysicsObject():GetMass()
@@ -264,6 +330,13 @@ function ENT:Think()
 									self.Tread[#self.Tread+1]=res[i]
 								end
 							end
+						end
+						if self.Modern == 1 then
+							self.Cost = math.Round(self.Cost*0.003)
+						elseif self.ColdWar == 1 then
+							self.Cost = math.Round(self.Cost*0.002)
+						else
+							self.Cost = math.Round(self.Cost*0.001)
 						end
 						--PrintTable(self.Contraption)
 						self.CrewCount = #self.Crew
@@ -305,12 +378,21 @@ function ENT:Think()
 								for i=1, #self.Contraption do
 									if self.Contraption[i].Controller == nil or self.Contraption[i].Controller == NULL or self.Contraption[i].Controller == self then
 										if IsValid(self.Contraption[i]) then
-											if string.Explode("_",self.Contraption[i]:GetClass(),false)[1] ~= "dak" then
+											if string.Explode("_",self.Contraption[i]:GetClass(),false)[1] ~= "dak" and (self.Contraption[i].EntityMods and self.Contraption[i].EntityMods.IsERA~=1) then
 												if self.Contraption[i]:IsSolid() then
 													self.HitBox[#self.HitBox+1] = self.Contraption[i]
 													self.Contraption[i].Controller = self
 													self.Contraption[i].DakOwner = self.DakOwner
 													self.Contraption[i].DakPooled = 1
+												end
+											else
+												if self.Contraption[i].EntityMods and self.Contraption[i].EntityMods.IsERA==1 then
+													self.ERA[#self.ERA+1] = self.Contraption[i]
+													self.Contraption[i].Controller = self
+													self.Contraption[i].DakOwner = self.DakOwner
+													self.Contraption[i].DakPooled = 1
+													self.Contraption[i].DakHealth = 5
+													self.Contraption[i].DakMaxHealth = 5
 												end
 											end
 										end
@@ -352,13 +434,90 @@ function ENT:Think()
 								end
 							end
 
+							if self.ERA then
+								if table.Count(self.ERA) > 0 then
+									local effectdata
+									local ExpSounds = {"daktanks/eraexplosion.wav"}
+									for i = 1, table.Count(self.ERA) do
+										if not(IsValid(self.ERA[i])) then
+											table.remove( self.ERA, i )
+										end
+										if self.ERA[i] ~= nil and self.ERA[i] ~= NULL then
+											self.ERA[i].IsComposite = 1
+											if self.ERA[i].EntityMods.CompositeType == "NERA" then
+												self.ERA[i].EntityMods.CompKEMult = 9.2
+												self.ERA[i].EntityMods.CompCEMult = 18.4
+												self.ERA[i].EntityMods.DakName = "NERA"
+												self.Modern = 1
+											end
+											if self.ERA[i].EntityMods.CompositeType == "Textolite" then
+												self.ERA[i].EntityMods.CompKEMult = 10.4
+												self.ERA[i].EntityMods.CompCEMult = 14
+												self.ERA[i].EntityMods.DakName = "Textolite"
+												self.ColdWar = 1
+											end
+											if self.ERA[i].EntityMods.CompositeType == "ERA" then
+												self.ERA[i].EntityMods.CompKEMult = 2.5
+												self.ERA[i].EntityMods.CompCEMult = 88.9
+												self.ERA[i].EntityMods.DakName = "ERA"
+												self.ERA[i].EntityMods.IsERA = 1
+												self.ColdWar = 1
+											end
+											if self.ERA[i].DakHealth <= 0 then
+												effectdata = EffectData()
+												effectdata:SetOrigin(self.ERA[i]:GetPos())
+												effectdata:SetEntity(self)
+												effectdata:SetAttachment(1)
+												effectdata:SetMagnitude(.5)
+												effectdata:SetScale(50)
+												effectdata:SetNormal( Vector(0,0,0) )
+												util.Effect("daktescalingexplosion", effectdata, true, true)
+												sound.Play( ExpSounds[math.random(1,#ExpSounds)], self.ERA[i]:GetPos(), 100, 100, 1 )
+												self.ERA[i]:DTExplosion(self.ERA[i]:GetPos(),250,50,40,5,self.DakOwner)
+												self.ERA[i]:Remove()
+											end
+										end
+									end
+								end
+							end
+
 							if self.Composites then
 								if table.Count(self.Composites) > 0 then
 									self.Modern = 1
 									for i = 1, table.Count(self.Composites) do
-										self.Composites[i].IsComposite = 1
-										self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*2000) )
-										self.Composites[i].DakArmor = math.sqrt(math.sqrt(self.Composites[i]:GetPhysicsObject():GetVolume()))*9.2
+										if not(IsValid(self.Composites[i])) then
+											table.remove( self.Composites, i )
+										end
+										if self.Composites[i] ~= nil then
+											self.Composites[i].IsComposite = 1
+											local Density = 2000
+											local KE = 9.2
+											if self.Composites[i].EntityMods.CompositeType == "NERA" then
+												self.Composites[i].EntityMods.CompKEMult = 9.2
+												self.Composites[i].EntityMods.CompCEMult = 18.4
+												KE = 9.2
+												Density = 2000
+												self.Composites[i].EntityMods.DakName = "NERA"
+											end
+											if self.Composites[i].EntityMods.CompositeType == "Textolite" then
+												self.Composites[i].EntityMods.CompKEMult = 10.4
+												self.Composites[i].EntityMods.CompCEMult = 14
+												KE = 10.4
+												Density = 1850
+												self.Composites[i].EntityMods.DakName = "Textolite"
+											end
+											if self.Composites[i].EntityMods.CompositeType == "ERA" then
+												self.Composites[i].EntityMods.CompKEMult = 2.5
+												self.Composites[i].EntityMods.CompCEMult = 88.9
+												KE = 2.5
+												Density = 1732
+												self.Composites[i].EntityMods.DakName = "ERA"
+												self.Composites[i].EntityMods.IsERA = 1
+											end
+											self.Composites[i].IsComposite = 1
+											self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) )
+											self.Composites[i].DakArmor = math.sqrt(math.sqrt(self.Composites[i]:GetPhysicsObject():GetVolume()))*KE
+										end
 									end
 								end
 							end
@@ -384,6 +543,11 @@ function ENT:Think()
 								if self.LastCurMass>0 then
 									if self.HitBox[i].DakHealth then
 										if self.HitBox[i].DakHealth < self.CurrentHealth then
+											if self.HitBox[i].EntityMods.IsERA == 1 then
+												self.HitBox[i]:Remove()
+												table.RemoveByValue( self.Composites, NULL )
+												table.RemoveByValue( self.HitBox, NULL )
+											end
 											self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.HitBox[i].DakHealth)
 											self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos	
 										end
@@ -629,6 +793,15 @@ function ENT:PreEntityCopy()
 		end
 	end
 	info.CompositesCount = table.Count(self.Composites)
+	local ERAIDs = {}
+	if table.Count(self.ERA)>0 then
+		for i = 1, table.Count(self.ERA) do
+			if not(self.ERA[i]==nil) then
+				table.insert(ERAIDs,self.ERA[i]:EntIndex())
+			end
+		end
+	end
+	info.ERACount = table.Count(self.ERA)
 
 	info.DakName = self.DakName
 	info.DakHealth = self.DakHealth
@@ -637,6 +810,7 @@ function ENT:PreEntityCopy()
 	info.DakOwner = self.DakOwner
 	duplicator.StoreEntityModifier( self, "DakTek", info )
 	duplicator.StoreEntityModifier( self, "DTComposites", CompositesIDs )
+	duplicator.StoreEntityModifier( self, "DTERA", ERAIDs )
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
 end
@@ -670,13 +844,40 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 				self.Composites = {}
 			end
 		end
+		if Ent.EntityMods.DakTek.ERACount == nil then
+			self.NewERA = {}
+			if Ent.EntityMods.DTERA then
+				for i = 1, table.Count(Ent.EntityMods.DTERA) do
+					self.Ent = CreatedEntities[ Ent.EntityMods.DTERA[i]]
+					if self.Ent and IsValid(self.Ent) then
+						table.insert(self.NewERA,self.Ent)
+					end
+				end
+			end
+			self.ERA = self.NewERA
+		else
+			if Ent.EntityMods.DakTek.ERACount > 0 then
+				self.NewERA = {}
+				if Ent.EntityMods.DTERA then
+					for i = 1, Ent.EntityMods.DakTek.ERACount do
+						local hitEnt = CreatedEntities[ Ent.EntityMods.DTERA[i]]
+						if IsValid(hitEnt) then
+							table.insert(self.NewERA,hitEnt)
+						end
+					end
+				end
+				self.ERA = self.NewERA
+			else
+				self.ERA = {}
+			end
+		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
 		self.DakMass = Ent.EntityMods.DakTek.DakMass
-		self.DakOwner = Player
 		Ent.EntityMods.DakTek = nil
 	end
+	self.DakOwner = Player
 	self.BaseClass.PostEntityPaste( self, Player, Ent, CreatedEntities )
 end
 
@@ -688,3 +889,4 @@ function ENT:OnRemove()
 		end
 	end
 end
+

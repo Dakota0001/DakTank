@@ -32,6 +32,7 @@ if (CLIENT) then
 	} )
 end
 TOOL.ClientConVar[ "DakArmor" ] = "1"
+TOOL.ClientConVar[ "ArmorType" ]   = "RHA"
 
 local function SetMass( Player, Entity, Data )
 	if not SERVER then return end
@@ -63,9 +64,7 @@ function TOOL:LeftClick( trace )
 						trace.Entity.DakIsTread = 1
 					else
 						if trace.Entity:GetClass()=="prop_physics" and not(trace.Entity.IsComposite == 1) then 
-							if not(trace.Entity.DakArmor == 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25) then
-								trace.Entity.DakArmor = 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25
-							end
+							DTArmorSanityCheck(trace.Entity)
 						end
 					end
 				end
@@ -82,7 +81,31 @@ function TOOL:LeftClick( trace )
 				else
 					if SERVER then
 						local SA = trace.Entity:GetPhysicsObject():GetSurfaceArea()
-						local mass = math.Round(((self:GetClientInfo("DakArmor")/(288/SA))/7.8125)*4.6311781,0)
+						local ArmorType = self:GetClientInfo("ArmorType")
+						local Density = 7.8125
+						local ArmorMult = 1
+						local Ductility = 1
+						if ArmorType == "RHA" then
+							Density = 7.8125
+							ArmorMult = 1
+							Ductility = 1
+						end
+						if ArmorType == "CHA" then
+							Density = 7.8125
+							ArmorMult = 1
+							Ductility = 1.5
+						end
+						if ArmorType == "HHA" then
+							Density = 7.8125
+							ArmorMult = 1
+							Ductility = 1.5
+						end
+						if trace.Entity.EntityMods == nil then trace.Entity.EntityMods = {} end
+						trace.Entity.EntityMods.Density = Density
+						trace.Entity.EntityMods.ArmorMult = ArmorMult
+						trace.Entity.EntityMods.ArmorType = ArmorType
+						trace.Entity.EntityMods.Ductility = Ductility
+						local mass = math.ceil(((self:GetClientInfo("DakArmor")/ArmorMult/(288/SA))/Density)*4.6311781,0)
 						if mass > 0 then
 							SetMass( self:GetOwner(), trace.Entity, { Mass = mass } )
 						end
@@ -210,9 +233,7 @@ function TOOL:Think()
 						trace.Entity.DakIsTread = 1
 					else
 						if trace.Entity:GetClass()=="prop_physics" and not(trace.Entity.IsComposite == 1) then 
-							if not(trace.Entity.DakArmor == 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25) then
-								trace.Entity.DakArmor = 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25
-							end
+							DTArmorSanityCheck(trace.Entity)
 						end
 					end
 				end
@@ -220,18 +241,21 @@ function TOOL:Think()
 				self.Weapon:SetNWFloat("Angle",math.Round(math.deg(math.acos(trace.HitNormal:Dot( -trace.Normal ))),2))
 				self.Weapon:SetNWFloat("Mass",math.Round(trace.Entity:GetPhysicsObject():GetMass(),2))
 				self.Weapon:SetNWFloat("Shell",math.Round(self:GetClientInfo("DakArmor"),2))
+
 				if trace.Entity.IsComposite == 1 then
-					local CompArmor = math.Round((DTCompositesTrace( trace.Entity, trace.HitPos, trace.Normal, {self:GetOwner()} )*9.2),2)
-					self.Weapon:SetNWFloat("Armor",CompArmor)
-					self.Weapon:SetNWFloat("AP",CompArmor)
-					self.Weapon:SetNWFloat("HEAT",math.Round(CompArmor*2,2))
-					self.Weapon:SetNWFloat("HVAP",CompArmor)
-					self.Weapon:SetNWFloat("APFSDS",CompArmor)
+					if trace.Entity.EntityMods.CompKEMult == nil then trace.Entity.EntityMods.CompKEMult = 9.2 end 
+					if trace.Entity.EntityMods.CompCEMult == nil then trace.Entity.EntityMods.CompCEMult = 18.4 end 
+					local CompArmor = math.Round((DTCompositesTrace( trace.Entity, trace.HitPos, trace.Normal, {self:GetOwner()} )*1),2)
+					self.Weapon:SetNWFloat("Armor",math.Round(CompArmor*trace.Entity.EntityMods.CompKEMult,2))
+					self.Weapon:SetNWFloat("AP",math.Round(CompArmor*trace.Entity.EntityMods.CompKEMult,2))
+					self.Weapon:SetNWFloat("HEAT",math.Round(CompArmor*trace.Entity.EntityMods.CompCEMult,2))
+					self.Weapon:SetNWFloat("HVAP",math.Round(CompArmor*trace.Entity.EntityMods.CompKEMult,2))
+					self.Weapon:SetNWFloat("APFSDS",math.Round(CompArmor*trace.Entity.EntityMods.CompKEMult,2))
 				else
-					local APArmor, _, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "AP", self:GetClientInfo("DakArmor"), {self:GetOwner()})
-					local HEATArmor, _, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HEAT", self:GetClientInfo("DakArmor"), {self:GetOwner()})
-					local HVAPArmor, _, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HVAP", self:GetClientInfo("DakArmor"), {self:GetOwner()})
-					local APFSDSArmor, _, _, _ = DTGetArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "APFSDS", self:GetClientInfo("DakArmor"), {self:GetOwner()})
+					local APArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "AP", self:GetClientInfo("DakArmor"), {self:GetOwner()})
+					local HEATArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HEAT", self:GetClientInfo("DakArmor"), {self:GetOwner()})
+					local HVAPArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HVAP", self:GetClientInfo("DakArmor"), {self:GetOwner()})
+					local APFSDSArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "APFSDS", self:GetClientInfo("DakArmor"), {self:GetOwner()})
 					self.Weapon:SetNWFloat("Armor",math.Round(trace.Entity.DakArmor,2))
 					self.Weapon:SetNWFloat("AP",math.Round(APArmor,2))
 					self.Weapon:SetNWFloat("HEAT",math.Round(HEATArmor,2))
@@ -258,32 +282,55 @@ function TOOL.BuildCPanel(panel)
 
 
 	local DLabel = vgui.Create( "DLabel", panel )
-	DLabel:SetPos( 17, 50 )
+	DLabel:SetPos( 17, 55 )
 	DLabel:SetAutoStretchVertical( true )
 	DLabel:SetText( "Put an armor value in the box in mm then left click stuff to set mass for that value." )
 	DLabel:SetTextColor(Color(0,0,0,255))
 	DLabel:SetWide( 200 )
 	DLabel:SetWrap( true )
 
-	local SoundNameText = vgui.Create("DTextEntry", ValuePanel)
-	DLabel:SetPos( 17, 65 )
-	SoundNameText:SetText("")
-	SoundNameText:SetWide(wide/2)
-	SoundNameText:SetTall(20)
-	SoundNameText:SetMultiline(false)
-	SoundNameText:SetConVar("daktankarmorer_DakArmor")
-	SoundNameText:SetVisible(true)
-	panel:AddItem(SoundNameText)
+	local ArmorValueText = vgui.Create("DTextEntry", panel)
+	ArmorValueText:SetPos( 17, 65 )
+	ArmorValueText:SetText("")
+	ArmorValueText:SetWide(wide/2)
+	ArmorValueText:SetTall(20)
+	ArmorValueText:SetMultiline(false)
+	ArmorValueText:SetConVar("daktankarmorer_DakArmor")
+	ArmorValueText:SetVisible(true)
+	panel:AddItem(ArmorValueText)
 
-	--local SoundSet = vgui.Create("DButton", SoundPre)
-	--SoundSet:SetText("Set Armor")
-	--SoundSet:SetWide(SoundPreWide / 2)
-	--SoundSet:SetPos(0, 20)
-	--SoundSet:SetTall(20)
-	--SoundSet:SetVisible(true)
-	--SoundSet.DoClick = function()
-	--	RunConsoleCommand("daktankarmorer_DakArmor", GetConVar("daktankarmorer_DakArmor"):GetString())
-	--end
+	local ArmorTypeSelect = vgui.Create( "DComboBox", panel )
+	ArmorTypeSelect:SetPos( 10, 100 )
+	ArmorTypeSelect:SetSize( 275, 20 )
+	ArmorTypeSelect:SetValue( "--Select Ammo Type--" )
+	ArmorTypeSelect:SetVisible( true )
+	ArmorTypeSelect:AddChoice( "RHA" )
+	ArmorTypeSelect:AddChoice( "CHA" )
+	ArmorTypeSelect:AddChoice( "HHA" )
+	--ArmorTypeSelect:AddChoice( "Aluminum" )
+	ArmorTypeSelect.OnSelect = function( self, index, value )
+		local ArmorDesc = self:GetParent():Find( "ArmorDesc" )
+		if value == "RHA" then
+			ArmorDesc:SetText( "Rolled Homogenous Armor\n\nThe standard of vehicular ballistics protection, this armor is created by rolling steel into shape, the rolling process improves ductility of the steel.\n\nDensity: 7.8125g/cm3\nArmor Multiplier: 1x\nDuctility: 1x\nCost: 1xKG" )
+			RunConsoleCommand( "daktankarmorer_ArmorType", "RHA" )
+		end
+		if value == "CHA" then
+			ArmorDesc:SetText( "Cast Homogenous Armor\n\nSteel cast into the shape of what you need, its cheaper to produce but less effective than RHA at lower armor thicknesses and is more brittle.\n\nDensity: 7.8125g/cm3\nArmor Multiplier: 1x\nDuctility: 1.5x\nCost: 0.75xKG" )
+			RunConsoleCommand( "daktankarmorer_ArmorType", "CHA" )
+		end
+		if value == "HHA" then
+			ArmorDesc:SetText( "High Hardness Armor\n\nHeat treated RHA armor brought to higher hardness values, it provides increased protection against shells that are approximately 60% of the thickness of the armor but is weaker against shells above this amount, this increase or decrease scales with the difference in thickness vs diameter.\n\nDensity: 7.8125g/cm3\nArmor Multiplier: 1x\nDuctility: 1.5x\nCost: 1.25xKG" )
+			RunConsoleCommand( "daktankarmorer_ArmorType", "HHA" )
+		end
+	end
+
+	local ArmorDesc = vgui.Create( "DLabel", panel, "ArmorDesc" )
+	ArmorDesc:SetPos( 17, 125 )
+	ArmorDesc:SetAutoStretchVertical( true )
+	ArmorDesc:SetText( "Pick an armor type." )
+	ArmorDesc:SetTextColor(Color(0,0,0,255))
+	ArmorDesc:SetWide( 200 )
+	ArmorDesc:SetWrap( true )
 end
 
 function TOOL:DrawToolScreen( w, h )

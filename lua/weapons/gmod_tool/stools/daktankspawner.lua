@@ -2167,9 +2167,7 @@ function TOOL:RightClick( trace )
 						trace.Entity.DakIsTread = 1
 					else
 						if trace.Entity:GetClass()=="prop_physics" and not(trace.Entity.IsComposite == 1) then
-							if not(trace.Entity.DakArmor == 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25) then
-								trace.Entity.DakArmor = 7.8125*(trace.Entity:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - trace.Entity.DakBurnStacks*0.25
-							end
+							DTArmorSanityCheck(trace.Entity)
 						end
 					end
 				end
@@ -2181,8 +2179,12 @@ function TOOL:RightClick( trace )
 			local MHP = math.Round(Target.DakMaxHealth, 1 )
 			local PHP = math.Round((HP/MHP)*100, 1 )
 			if trace.Entity.IsComposite == 1 then
-				ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*9.2),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*18.4),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
-			else
+				if Target.EntityMods.DakName then
+					ply:ChatPrint(Target.EntityMods.DakName..", ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompKEMult),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompCEMult),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+				else
+					ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompKEMult),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompCEMult),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+				end
+				else
 				ply:ChatPrint(TarName..", ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
 			end
 			if Target:GetClass() == "dak_teammo" then
@@ -2206,9 +2208,12 @@ function TOOL:RightClick( trace )
 					if Target.Modern == 1 then
 						ply:ChatPrint("Modern Tank, x3 spawn cost multiplier, no limits, Autocannon/HMG reload and mag size improved")
 					elseif Target.ColdWar == 1 then
-						ply:ChatPrint("Cold War Tank, x2 spawn cost multiplier, limited to no composites and no APFSDS, HEATFS pen reduced, Autocannon/HMG mag size improved")
+						ply:ChatPrint("Cold War Tank, x2 spawn cost multiplier, limited to no modern composites and no APFSDS, HEATFS pen reduced, Autocannon/HMG mag size improved")
 					else
 						ply:ChatPrint("Historical Tank, x1 spawn cost multiplier, limited to no composites, APFSDS, HEATFS, or ATGMs,")
+					end
+					if Target.Cost~=nil then
+						ply:ChatPrint("Tank Cost: "..math.Round(Target.Cost))
 					end
 				end
 			end
@@ -2442,7 +2447,7 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*3.34*ShellLength,2).."mm\nDamage:        "..math.Round((25*math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*6.5)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*4/3).." m/s" )
 	end
 	selectedAmmo["APFSDS"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*5.3*ShellLength,2).."mm\nDamage:        "..math.Round((25*math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.25*0.02*6.5)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*2.227).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*7.8*ShellLength,2).."mm\nDamage:        "..math.Round((25*math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.25*0.02*6.5)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*2.394).." m/s" )
 	end
 	selectedAmmo["HESH"] = function()
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.25,2).."mm\nDamage:        0\nSplash Dmg:   "..math.Round(Caliber*5,2).."\nBlast Radius:  "..math.Round(Caliber/10,2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )

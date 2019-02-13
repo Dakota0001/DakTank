@@ -19,7 +19,8 @@ language.Add( "Tool.daktanklinker.desc", "Links stuff to things." )
 language.Add( "Tool.daktanklinker.0", "Left click to select the gearbox, AL magazine, or turret motor. Right click on the fuel, gun, or turret control. Also links crew members to things." )
 end
 --TOOL.ClientConVar[ "myparameter" ] = "fubar"
- 
+TOOL.ClientConVar[ "ArmorType" ]   = "RHA"
+
 function TOOL:LeftClick( trace )
 	if CurTime()>self.LastLeftClick then
 		local Target = trace.Entity
@@ -214,7 +215,9 @@ function TOOL:RightClick( trace )
 			else	
 				if(Target:GetClass() == "dak_tankcore") then
 					if self.EntList[1]:GetClass() == "prop_physics" then
-						Target.Composites = self.EntList
+						if self:GetClientInfo("ArmorType") ~= "ERA" then
+							Target.Composites = self.EntList
+						end
 						self:GetOwner():EmitSound("/items/ammocrate_close.wav")
 						if self:GetClientNumber( "DakChatFeedback" ) == 1 then
 							self:GetOwner():ChatPrint("Composite armor hitpool set, select tankcore to select all composites if you wish to edit them.")
@@ -223,6 +226,28 @@ function TOOL:RightClick( trace )
 							for i = 1, table.Count(self.EntList) do
 								self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
 								if self.EntList[self.Key]:IsValid() then
+									if self.EntList[self.Key].EntityMods==nil then self.EntList[self.Key].EntityMods = {} end
+									self.EntList[self.Key].EntityMods.CompositeType = self:GetClientInfo("ArmorType")
+									self.EntList[self.Key].EntityMods.CompKEMult = 9.2
+									self.EntList[self.Key].EntityMods.CompCEMult = 18.4
+									if self:GetClientInfo("ArmorType") == "NERA" then
+										self.EntList[self.Key].EntityMods.CompKEMult = 9.2
+										self.EntList[self.Key].EntityMods.CompCEMult = 18.4
+										self.EntList[self.Key].EntityMods.DakName = "NERA"
+									end
+									if self:GetClientInfo("ArmorType") == "Textolite" then
+										self.EntList[self.Key].EntityMods.CompKEMult = 10.4
+										self.EntList[self.Key].EntityMods.CompCEMult = 14
+										self.EntList[self.Key].EntityMods.DakName = "Textolite"
+									end
+									if self:GetClientInfo("ArmorType") == "ERA" then
+										self.EntList[self.Key].EntityMods.CompKEMult = 2.5
+										self.EntList[self.Key].EntityMods.CompCEMult = 88.9
+										self.EntList[self.Key].EntityMods.DakName = "ERA"
+										self.EntList[self.Key].DakHealth = 5
+										self.EntList[self.Key].DakMaxHealth = 5
+										self.EntList[self.Key].EntityMods.IsERA = 1
+									end
 									self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
 								end
 							end
@@ -332,5 +357,37 @@ end
 function TOOL.BuildCPanel( panel )
 	panel:AddControl("Header",{Text = "DakTank Linker", Description	= "This tool just links magazines to autoloaders, and turret motors to turret controls, also links crew to things. Ammo is automatically found on the contraption by the gun."})	
 	panel:AddControl("CheckBox", {Label = "Chat Feedback", Description ="Check for feedback in chat when actions are completed with this tool.", Command = "daktanklinker_DakChatFeedback"})
+
+	local ArmorTypeSelect = vgui.Create( "DComboBox", panel )
+	ArmorTypeSelect:SetPos( 10, 125 )
+	ArmorTypeSelect:SetSize( 275, 20 )
+	ArmorTypeSelect:SetValue( "--Select Ammo Type--" )
+	ArmorTypeSelect:SetVisible( true )
+	ArmorTypeSelect:AddChoice( "NERA" )
+	ArmorTypeSelect:AddChoice( "Textolite" )
+	ArmorTypeSelect:AddChoice( "ERA" )
+	ArmorTypeSelect.OnSelect = function( self, index, value )
+		local ArmorDesc = self:GetParent():Find( "ArmorDesc" )
+		if value == "NERA" then
+			ArmorDesc:SetText( "Non-Explosive Reactive Armor\n\nComposite of ceramic plates in a steel and rubber lattice designed to shatter incoming projectiles, it is especially effective at breaking up HEAT jets.\n\nDensity: 2.0g/cm3\nKE Protection: 9.2mm/in\nCE Protection: 18.4mm/in\nCost: 1xKG" )
+			RunConsoleCommand( "daktanklinker_ArmorType", "NERA" )
+		end
+		if value == "Textolite" then
+			ArmorDesc:SetText( "Glass-Textolite\n\nFiber glass and resin mix, it is lighter than RHA for a given protection value but takes up more space.\n\nDensity: 1.85kg/m3\nKE Protection: 10.4mm/in\nCE Protection: 14mm/in\nCost: 1xKG" )
+			RunConsoleCommand( "daktanklinker_ArmorType", "Textolite" )
+		end
+		if value == "ERA" then
+			ArmorDesc:SetText( "Explosive Reactive Armor\n\nExplosives sandwiched between two steel plates, detonates on impact, disrupting and shattering incoming HEAT jets.\n\nDensity: 1.732g/cm3\nKE Protection: 2.5mm/in\nCE Protection: 88.9mm/in\nCost: 1xKG" )
+			RunConsoleCommand( "daktanklinker_ArmorType", "ERA" )
+		end
+	end
+
+	local ArmorDesc = vgui.Create( "DLabel", panel, "ArmorDesc" )
+	ArmorDesc:SetPos( 17, 150 )
+	ArmorDesc:SetAutoStretchVertical( true )
+	ArmorDesc:SetText( "Pick an armor type." )
+	ArmorDesc:SetTextColor(Color(0,0,0,255))
+	ArmorDesc:SetWide( 200 )
+	ArmorDesc:SetWrap( true )
 end
  
