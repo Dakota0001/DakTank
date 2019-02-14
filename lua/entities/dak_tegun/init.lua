@@ -867,7 +867,7 @@ function ENT:DakTEFire()
 				if self.CurrentAmmoType == 4 then
 					Shell.DakCaliber = self.DakMaxHealth/2
 				end
-				if self.CurrentAmmoType == 8 then
+				if self.CurrentAmmoType == 8 or self.CurrentAmmoType == 10 then
 					Shell.DakCaliber = self.DakMaxHealth/4
 				end					
 				Shell.DakFireSound = self.DakFireSound
