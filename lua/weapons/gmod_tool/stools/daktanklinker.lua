@@ -11,6 +11,8 @@ TOOL.LastRightClick = CurTime()
 TOOL.LastReload = CurTime()
 
 TOOL.ClientConVar[ "DakChatFeedback" ] = 1
+TOOL.ClientConVar[ "DakCompOverride" ] = 1
+
 
 if (CLIENT) then
 language.Add( "Tool.daktanklinker.listname", "DakTank Linker" )
@@ -216,7 +218,11 @@ function TOOL:RightClick( trace )
 				if(Target:GetClass() == "dak_tankcore") then
 					if self.EntList[1]:GetClass() == "prop_physics" then
 						if self:GetClientInfo("ArmorType") ~= "ERA" then
-							Target.Composites = self.EntList
+							if self:GetClientNumber( "DakCompOverride" ) == 1 then
+								Target.Composites = self.EntList
+							else
+								table.Add(Target.Composites,self.EntList)
+							end
 						end
 						self:GetOwner():EmitSound("/items/ammocrate_close.wav")
 						if self:GetClientNumber( "DakChatFeedback" ) == 1 then
@@ -358,8 +364,10 @@ function TOOL.BuildCPanel( panel )
 	panel:AddControl("Header",{Text = "DakTank Linker", Description	= "This tool just links magazines to autoloaders, and turret motors to turret controls, also links crew to things. Ammo is automatically found on the contraption by the gun."})	
 	panel:AddControl("CheckBox", {Label = "Chat Feedback", Description ="Check for feedback in chat when actions are completed with this tool.", Command = "daktanklinker_DakChatFeedback"})
 
+	panel:AddControl("CheckBox", {Label = "Composite Override", Description ="When checked this will cause any composite changes to override the current composite table of the tankcore, when unchecked it will add.", Command = "daktanklinker_DakCompOverride"})
+
 	local ArmorTypeSelect = vgui.Create( "DComboBox", panel )
-	ArmorTypeSelect:SetPos( 10, 125 )
+	ArmorTypeSelect:SetPos( 10, 150 )
 	ArmorTypeSelect:SetSize( 275, 20 )
 	ArmorTypeSelect:SetValue( "--Select Composite Type--" )
 	ArmorTypeSelect:SetVisible( true )
@@ -383,7 +391,7 @@ function TOOL.BuildCPanel( panel )
 	end
 
 	local ArmorDesc = vgui.Create( "DLabel", panel, "ArmorDesc" )
-	ArmorDesc:SetPos( 17, 150 )
+	ArmorDesc:SetPos( 17, 175 )
 	ArmorDesc:SetAutoStretchVertical( true )
 	ArmorDesc:SetText( "Pick an armor type." )
 	ArmorDesc:SetTextColor(Color(0,0,0,255))
