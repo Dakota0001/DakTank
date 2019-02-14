@@ -396,7 +396,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 				end
-				if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then
+				if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" or Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then
 					if HitAng >= 80 then
 						Failed = 1
 						Shattered = 1
@@ -406,7 +406,6 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						Shattered = 1
 					end
 				end
-				
 				if HitEnt.IsComposite == 1 then
 					if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end 
 					if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end 
@@ -1123,7 +1122,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 						end
 					end
-					if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then
+					if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" or Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then
 						if HitAng >= 80 then
 							Failed = 1
 							Shattered = 1
