@@ -25,7 +25,7 @@ function ENT:Initialize()
 	if(phys:IsValid()) then
 		phys:Wake()
 	end
-	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "LeftDriveWheel [ENTITY]" , "RightDriveWheel [ENTITY]", "CarTurning" })
+	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "LeftDriveWheel [ENTITY]" , "RightDriveWheel [ENTITY]", "CarTurning", "ForwardFacingEntity [ENTITY]" })
 	self.Soundtime = CurTime()
  	self.Perc = 0
  	self.TurnPerc = 0
@@ -275,7 +275,10 @@ function ENT:Think()
 		self.Active = self.Inputs.Activate.Value
 		self.LeftDriveWheel = self.Inputs.LeftDriveWheel.Value
 		self.RightDriveWheel = self.Inputs.RightDriveWheel.Value
-
+		self.ForwardEnt = self.Inputs.ForwardFacingEntity.Value
+		if self.ForwardEnt == nil or self.ForwardEnt == NULL then
+			self.ForwardEnt = self
+		end
 		self.CarTurning = self.Inputs.CarTurning.Value
 
 	    if IsValid(self.DakTankCore) and IsValid(self.LeftDriveWheel) and IsValid(self.RightDriveWheel) and not(IsValid(self.LeftDriveWheel:GetParent())) and not(IsValid(self.RightDriveWheel:GetParent())) then
@@ -387,7 +390,7 @@ function ENT:Think()
 		        			self.TopSpeed = self.TopSpeed/3
 						end
 							
-						local ForwardVal = self:GetForward():Distance(self.phy:GetVelocity():GetNormalized()) --if it is below one you are going forward, if it is above one you are reversing
+						local ForwardVal = self.ForwardEnt:GetForward():Distance(self.phy:GetVelocity():GetNormalized()) --if it is below one you are going forward, if it is above one you are reversing
 						if self.Speed < self.TopSpeed and math.abs(LPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) and math.abs(RPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) then			
 							self.RBoost = 1
 						 	self.LBoost = 1
@@ -688,12 +691,12 @@ function ENT:Think()
 
 						if math.abs(LPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) and math.abs(RPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) then
 							if not(self.MoveForward>0) and not(self.MoveReverse>0) and not(self.MoveLeft>0) and not(self.MoveRight>0) then
-								self.Vel = ((self.phy:GetVelocity()*self:GetForward()).x+(self.phy:GetVelocity()*self:GetForward()).y)*100
+								self.Vel = ((self.phy:GetVelocity()*self.ForwardEnt:GetForward()).x+(self.phy:GetVelocity()*self.ForwardEnt:GetForward()).y)*100
 								local TorqueBoost = math.Clamp(math.abs(self.Vel/1000),1,10)
 								local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 								local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
-								local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost
-								local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*1*self:GetForward()*TorqueBoost
+								local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*1*self.ForwardEnt:GetForward()*TorqueBoost
+								local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*1*self.ForwardEnt:GetForward()*TorqueBoost
 								if self.Vel>0.1 then
 									LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
 									LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
@@ -722,12 +725,12 @@ function ENT:Think()
 		        		self.RPM = self.RPM - 10
 		        	end
 		        	if math.abs(LPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) and math.abs(RPhys:GetAngleVelocity().y/6) < 1250*(self.Speed*1.5/self.TopSpeed) then
-			        	self.Vel = ((self.phy:GetVelocity()*self:GetForward()).x+(self.phy:GetVelocity()*self:GetForward()).y)*100
+			        	self.Vel = ((self.phy:GetVelocity()*self.ForwardEnt:GetForward()).x+(self.phy:GetVelocity()*self.ForwardEnt:GetForward()).y)*100
 			        	local TorqueBoost = math.Clamp(math.abs(self.Vel/1000),1,10)
 			        	local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 						local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
-						local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self:GetForward()*TorqueBoost
-						local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self:GetForward()*TorqueBoost
+						local LForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.LeftDriveWheel:OBBMaxs().z/22.5)*LeftVel*self.ForwardEnt:GetForward()*TorqueBoost
+						local RForce = (self.DakHealth/self.DakMaxHealth)*1.5*75*(self.RightDriveWheel:OBBMaxs().z/22.5)*RightVel*self.ForwardEnt:GetForward()*TorqueBoost
 						if self.Vel>0.1 then
 							LPhys:ApplyForceOffset( -LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()+LPos)
 							LPhys:ApplyForceOffset( LForce / math.Clamp((self.DakBurnStacks/2.5),1,1000000), self.LeftDriveWheel:GetPos()-LPos)
