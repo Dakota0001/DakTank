@@ -476,20 +476,20 @@ function ENT:Think()
 							self.LastTopSpeed = 0
 							self.MaxSpeedDif = 0
 
-							local G1Speed = self.TopSpeed*0.2
+							local G1Speed = self.TopSpeed*0.15
 							local G2Speed = self.TopSpeed*0.4
-							local G3Speed = self.TopSpeed*0.7
+							local G3Speed = self.TopSpeed*0.75
 							local G4Speed = self.TopSpeed
 
 							
 							if self.Speed < G1Speed then
 								--self.Gear = 1
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*2.0),0,8*math.abs(self.Perc))
+								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*4),0,8*math.abs(self.Perc))
 								self.CurTopSpeed = G1Speed
 								self.LastTopSpeed = 0
 								self.MaxSpeedDif = G1Speed
-								LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2.0),0,8*math.abs(self.Perc)) )
-								RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2.0),0,8*math.abs(self.Perc)) )
+								LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*4),0,8*math.abs(self.Perc)) )
+								RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*4),0,8*math.abs(self.Perc)) )
 							elseif self.Speed < G2Speed then
 								--self.Gear = 2
 								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc))
@@ -500,20 +500,20 @@ function ENT:Think()
 								RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc)) )
 							elseif self.Speed < G3Speed then
 								--self.Gear = 3
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*2.5),0,2*math.abs(self.Perc))
+								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*2),0,2*math.abs(self.Perc))
 								self.CurTopSpeed = G3Speed
 								self.LastTopSpeed = G2Speed
 								self.MaxSpeedDif = G3Speed - G2Speed
-								LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2.5),0,2*math.abs(self.Perc)) )
-								RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2.5),0,2*math.abs(self.Perc)) )
+								LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2),0,2*math.abs(self.Perc)) )
+								RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2),0,2*math.abs(self.Perc)) )
 							else
 								--self.Gear = 4
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*1.75),0,1*math.abs(self.Perc))
+								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc))
 								self.CurTopSpeed = G4Speed
 								self.LastTopSpeed = G3Speed
 								self.MaxSpeedDif = G4Speed - G3Speed
-								LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.75),0,1*math.abs(self.Perc)) )
-								RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.75),0,1*math.abs(self.Perc)) )
+								LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc)) )
+								RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc)) )
 							end
 
 							if self.Speed > 0 and self.Speed < G1Speed and not(self.Gear == 1) then

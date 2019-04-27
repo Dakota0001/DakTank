@@ -544,7 +544,6 @@ function ENT:Think()
 									if self.HitBox[i].DakHealth then
 										if self.HitBox[i].DakHealth < self.CurrentHealth then
 											if self.HitBox[i].EntityMods.IsERA == 1 then
-												self.HitBox[i]:Remove()
 												table.RemoveByValue( self.Composites, NULL )
 												table.RemoveByValue( self.HitBox, NULL )
 											end
