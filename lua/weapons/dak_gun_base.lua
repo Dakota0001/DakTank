@@ -73,9 +73,6 @@ function SWEP:Initialize()
 	self.PrimaryLastFire = 0
 	self.Fired = 0
 
-	self.ShellList = {}
- 	self.RemoveList = {}
-
  	--gun info
  	self.ShotCount = 1
 	self.Spread = 0.05 --0.1 for pistols, 0.075 for smgs, 0.05 for rifles
@@ -96,7 +93,7 @@ function SWEP:Initialize()
 end
 
 function SWEP:Reload()
-	if  ( self.Weapon:Clip1() < self.Primary.ClipSize && self.Owner:GetAmmoCount( self.Primary.Ammo ) > 0 ) and #self.ShellList == 0 then
+	if  ( self.Weapon:Clip1() < self.Primary.ClipSize && self.Owner:GetAmmoCount( self.Primary.Ammo ) > 0 ) then
 		self.Weapon:DefaultReload(ACT_VM_RELOAD)	
 		if self.Owner:GetFOV()==self.Zoom then
 			self.Owner:SetFOV( 0, 0.1 )
@@ -110,48 +107,18 @@ function SWEP:Think()
 		if self.SpreadStacks>0 then
 			self.SpreadStacks = self.SpreadStacks - (0.1*self.SpreadStacks)
 		end
-		for i = 1, #self.ShellList do
-			self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
-			self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
-			local trace = {}
-				trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
-				trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
-				trace.filter = self.ShellList[i].Filter
-				trace.mins = Vector(-1,-1,-1)
-				trace.maxs = Vector(1,1,1)
-			local ShellTrace = util.TraceHull( trace )
-			local effectdata = EffectData()
-			effectdata:SetStart(ShellTrace.StartPos)
-			effectdata:SetOrigin(ShellTrace.HitPos)
-			effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
-			util.Effect(self.ShellList[i].DakTrail, effectdata, true, true)
-			if ShellTrace.Hit then
-				DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
-			end
-			if self.ShellList[i].DieTime then
-				--self.RemoveList[#self.RemoveList+1] = i
-				if self.ShellList[i].DieTime+1.5<CurTime()then
-					self.RemoveList[#self.RemoveList+1] = i
-				end
-			end
-			if self.ShellList[i].RemoveNow == 1 then
-				self.RemoveList[#self.RemoveList+1] = i
-			end
-		end
-		if #self.RemoveList > 0 then
-			for i = 1, #self.RemoveList do
-				table.remove( self.ShellList, self.RemoveList[i] )
-			end
-		end
-		self.RemoveList = {}
 		self.LastTime = CurTime()
 	end
 end
 
 function SWEP:PrimaryAttack()
+	if not IsFirstTimePredicted() then return end
 	if self.PrimaryLastFire+self.PrimaryCooldown<CurTime() then
 		if self.Weapon:Clip1() > 0 then
 			if SERVER then
+				if ( self.Owner:IsPlayer() ) then
+					self.Owner:LagCompensation( true )
+				end
 				local shootOrigin = self.Owner:EyePos()
 				local shootDir = self.Owner:GetAimVector()
 				for i=1, self.ShotCount do
@@ -169,6 +136,7 @@ function SWEP:PrimaryAttack()
 					shell.DakExplosive = self.DakExplosive
 
 					shell.DakVelocity = self.DakVelocity
+					shell.DakBaseVelocity = self.DakVelocity
 
 					shell.DakMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
 					shell.DakDamage = shell.DakMass*((shell.DakVelocity*0.0254)*(shell.DakVelocity*0.0254))*0.01*0.002
@@ -192,9 +160,19 @@ function SWEP:PrimaryAttack()
 					shell.Filter = {self.Owner, self}
 					shell.LifeTime = 0
 					shell.Gravity = 0
-					shell.DakFragPen = (self.DakCaliber/2.5)	
-					self.ShellList[#self.ShellList+1] = shell
+					shell.DakFragPen = (self.DakCaliber/2.5)
+
+					shell.IsGuided = self.DakIsGuided
+
+					shell.Indicator = self.Owner
+					shell.IndicatorStart = self.Owner:GetShootPos()
+					shell.IndicatorEnd = self.Owner:GetShootPos()+self.Owner:GetAimVector()*1000000
+
+					DakTankShellList[#DakTankShellList+1] = shell
 				end
+			end
+			if ( self.Owner:IsPlayer() ) then
+				self.Owner:LagCompensation( false )
 			end
 			local ActualSpeed = self.Owner:GetVelocity():Length()
 			local MaxSpeed = self.Owner:GetRunSpeed()
@@ -221,10 +199,8 @@ function SWEP:PrimaryAttack()
 			self:TakePrimaryAmmo(1)
 			self.Fired = 1
 		else
-			if #self.ShellList == 0 then
-				if SERVER then
-					self:Reload()
-				end
+			if SERVER then
+				self:Reload()
 			end
 		end
 	end

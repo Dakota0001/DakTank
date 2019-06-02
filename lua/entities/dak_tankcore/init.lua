@@ -277,7 +277,7 @@ function ENT:Think()
 									end
 									if res[i].EntityMods==nil then
 									else
-										if res[i].EntityMods.CompositeType == nil then
+										if res[i].EntityMods.CompositeType == nil or res[i].IsComposite == nil then
 											if res[i].EntityMods.ArmorType == nil then
 												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()
 											else
@@ -483,7 +483,6 @@ function ENT:Think()
 
 							if self.Composites then
 								if table.Count(self.Composites) > 0 then
-									self.Modern = 1
 									for i = 1, table.Count(self.Composites) do
 										if not(IsValid(self.Composites[i])) then
 											table.remove( self.Composites, i )
@@ -493,6 +492,7 @@ function ENT:Think()
 											local Density = 2000
 											local KE = 9.2
 											if self.Composites[i].EntityMods.CompositeType == "NERA" then
+												self.Modern = 1
 												self.Composites[i].EntityMods.CompKEMult = 9.2
 												self.Composites[i].EntityMods.CompCEMult = 18.4
 												KE = 9.2
@@ -500,6 +500,7 @@ function ENT:Think()
 												self.Composites[i].EntityMods.DakName = "NERA"
 											end
 											if self.Composites[i].EntityMods.CompositeType == "Textolite" then
+												self.ColdWar = 1
 												self.Composites[i].EntityMods.CompKEMult = 10.4
 												self.Composites[i].EntityMods.CompCEMult = 14
 												KE = 10.4
@@ -507,6 +508,7 @@ function ENT:Think()
 												self.Composites[i].EntityMods.DakName = "Textolite"
 											end
 											if self.Composites[i].EntityMods.CompositeType == "ERA" then
+												self.ColdWar = 1
 												self.Composites[i].EntityMods.CompKEMult = 2.5
 												self.Composites[i].EntityMods.CompCEMult = 88.9
 												KE = 2.5

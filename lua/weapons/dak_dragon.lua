@@ -73,9 +73,6 @@ function SWEP:Initialize()
 	self.PrimaryLastFire = 0
 	self.Fired = 0
 
-	self.ShellList = {}
- 	self.RemoveList = {}
-
  	--gun info
  	self.ShotCount = 1
 	self.Spread = 0.05 --0.1 for pistols, 0.075 for smgs, 0.05 for rifles
@@ -90,6 +87,7 @@ function SWEP:Initialize()
 	self.DakPenLossPerMeter = 0.0
 	self.DakExplosive = true
 	self.DakVelocity = 3960
+	self.DakIsGuided = true
 	self.ShellLengthMult = self.DakVelocity/29527.6
 	self.Zoom = 55
 
@@ -102,57 +100,6 @@ function SWEP:Think()
 		if self.SpreadStacks>0 then
 			self.SpreadStacks = self.SpreadStacks - (0.1*self.SpreadStacks)
 		end
-		for i = 1, #self.ShellList do
-			self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
-			self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
-			local trace = {}
-				local indicatortrace = {}
-					indicatortrace.start = self.Owner:GetShootPos()
-					indicatortrace.endpos = self.Owner:GetShootPos()+self.Owner:GetAimVector()*1000000
-					indicatortrace.filter = {self, self.Owner}
-				local indicator = util.TraceLine(indicatortrace)
-				if not(self.ShellList[i].SimPos) then
-					self.ShellList[i].SimPos = self.ShellList[i].Pos
-				end
-
-				local _, RotatedAngle =	WorldToLocal( Vector(0,0,0), (indicator.HitPos-self.ShellList[i].SimPos):GetNormalized():Angle(), self.ShellList[i].SimPos, self.ShellList[i].Ang )
-				local Pitch = math.Clamp(RotatedAngle.p,-10,10)
-				local Yaw = math.Clamp(RotatedAngle.y,-10,10)
-				local Roll = math.Clamp(RotatedAngle.r,-10,10)
-				local _, FlightAngle = LocalToWorld( self.ShellList[i].SimPos, Angle(Pitch,Yaw,Roll), Vector(0,0,0), Angle(0,0,0) )
-				self.ShellList[i].Ang = self.ShellList[i].Ang + FlightAngle
-				self.ShellList[i].SimPos = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1)
-
-				trace.start = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*-0.1)
-				trace.endpos = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1)
-				trace.filter = self.ShellList[i].Filter
-				trace.mins = Vector(-1,-1,-1)
-				trace.maxs = Vector(1,1,1)
-			local ShellTrace = util.TraceHull( trace )
-			local effectdata = EffectData()
-			effectdata:SetStart(ShellTrace.StartPos)
-			effectdata:SetOrigin(ShellTrace.HitPos)
-			effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
-			util.Effect(self.ShellList[i].DakTrail, effectdata, true, true)
-			if ShellTrace.Hit then
-				DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
-			end
-			if self.ShellList[i].DieTime then
-				--self.RemoveList[#self.RemoveList+1] = i
-				if self.ShellList[i].DieTime+1.5<CurTime()then
-					self.RemoveList[#self.RemoveList+1] = i
-				end
-			end
-			if self.ShellList[i].RemoveNow == 1 then
-				self.RemoveList[#self.RemoveList+1] = i
-			end
-		end
-		if #self.RemoveList > 0 then
-			for i = 1, #self.RemoveList do
-				table.remove( self.ShellList, self.RemoveList[i] )
-			end
-		end
-		self.RemoveList = {}
 		self.LastTime = CurTime()
 	end
 end

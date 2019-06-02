@@ -35,7 +35,6 @@ ENT.DakMagazine = 2
 ENT.DakReloadTime = 10
 ENT.IsAutoLoader = 0
 ENT.DakCrew = NULL
-ENT.ShellList = {}
 ENT.BasicVelocity = 29527.6
 
 function ENT:Initialize()
@@ -76,9 +75,6 @@ function ENT:Initialize()
  		self:NetworkVar("Float",1,"Cooldown")
  		self:NetworkVar("String",0,"Model")
  	end
-
- 	self.ShellList = {}
- 	self.RemoveList = {}
 end
 
 function ENT:Think()
@@ -1109,88 +1105,6 @@ function ENT:Think()
 		end
 		self.MidThinkTime = CurTime()
 	end
-
-	for i = 1, #self.ShellList do
-		self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
-		self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
-
-		local trace = {}
-			if self.ShellList[i].IsGuided then
-				local indicatortrace = {}
-					indicatortrace.start = self.ShellList[i].Indicator:GetPos()
-					indicatortrace.endpos = self.ShellList[i].Indicator:GetPos() + self.ShellList[i].Indicator:GetForward()*1000000
-					indicatortrace.filter = self.ShellList[i].Filter
-				local indicator = util.TraceLine(indicatortrace)
-				if not(self.ShellList[i].SimPos) then
-					self.ShellList[i].SimPos = self.ShellList[i].Pos
-				end
-
-				local _, RotatedAngle =	WorldToLocal( Vector(0,0,0), (indicator.HitPos-self.ShellList[i].SimPos):GetNormalized():Angle(), self.ShellList[i].SimPos, self.ShellList[i].Ang )
-				local Pitch = math.Clamp(RotatedAngle.p,-10,10)
-				local Yaw = math.Clamp(RotatedAngle.y,-10,10)
-				local Roll = math.Clamp(RotatedAngle.r,-10,10)
-				local _, FlightAngle = LocalToWorld( self.ShellList[i].SimPos, Angle(Pitch,Yaw,Roll), Vector(0,0,0), Angle(0,0,0) )
-				self.ShellList[i].Ang = self.ShellList[i].Ang + FlightAngle
-				self.ShellList[i].SimPos = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1)
-
-				trace.start = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*-0.1)
-				trace.endpos = self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1)
-			else
-				local DragForce = 0.166 * ((self.ShellList[i].DakVelocity*0.0254)*(self.ShellList[i].DakVelocity*0.0254)) * (math.pi * ((self.ShellList[i].DakCaliber/2000)*(self.ShellList[i].DakCaliber/2000)))
-				if self.ShellList[i].DakShellType == "HVAP" then
-					DragForce = 0.033 * ((self.ShellList[i].DakVelocity*0.0254)*(self.ShellList[i].DakVelocity*0.0254)) * (math.pi * ((self.ShellList[i].DakCaliber/1000)*(self.ShellList[i].DakCaliber/1000)))
-				end
-				if self.ShellList[i].DakShellType == "APFSDS" then
-					DragForce = 0.085 * ((self.ShellList[i].DakVelocity*0.0254)*(self.ShellList[i].DakVelocity*0.0254)) * (math.pi * ((self.ShellList[i].DakCaliber/1000)*(self.ShellList[i].DakCaliber/1000)))
-				end
-				if not(self.ShellList[i].DakShellType == "HEAT" or self.ShellList[i].DakShellType == "HEATFS" or self.ShellList[i].DakShellType == "ATGM" or self.ShellList[i].DakShellType == "HESH") then
-					local PenLoss = self.ShellList[i].DakBasePenetration*((((DragForce/(self.ShellList[i].DakMass/2))*0.1)*39.37)/self.ShellList[i].DakBaseVelocity)
-					self.ShellList[i].DakPenetration = self.ShellList[i].DakPenetration - PenLoss
-				end
-				self.ShellList[i].DakVelocity = self.ShellList[i].DakVelocity - ((DragForce/(self.ShellList[i].DakMass/2))*0.1)
-				trace.start = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * (self.ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((self.ShellList[i].LifeTime-0.1)^2)/2)
-				trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2)
-			end
-			trace.filter = self.ShellList[i].Filter
-			trace.mins = Vector(-self.ShellList[i].DakCaliber*0.02,-self.ShellList[i].DakCaliber*0.02,-self.ShellList[i].DakCaliber*0.02)
-			trace.maxs = Vector(self.ShellList[i].DakCaliber*0.02,self.ShellList[i].DakCaliber*0.02,self.ShellList[i].DakCaliber*0.02)
-		local ShellTrace = util.TraceHull( trace )
-
-		local effectdata = EffectData()
-		effectdata:SetStart(ShellTrace.StartPos)
-		effectdata:SetOrigin(ShellTrace.HitPos)
-		effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
-		util.Effect(self.ShellList[i].DakTrail, effectdata, true, true)
-
-		if ShellTrace.Hit then
-			if self.ShellList[i].IsGuided then
-				DTShellHit(ShellTrace.StartPos,self.ShellList[i].SimPos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward()*0.1),ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
-			else
-				DTShellHit(ShellTrace.StartPos,self.ShellList[i].Pos + (self.ShellList[i].DakVelocity * self.ShellList[i].Ang:Forward() * self.ShellList[i].LifeTime) - (-physenv.GetGravity()*(self.ShellList[i].LifeTime^2)/2),ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
-			end
-		end
-
-		if self.ShellList[i].DieTime then
-			if self.ShellList[i].DieTime<CurTime()then
-				self.RemoveList[#self.RemoveList+1] = i
-			end
-		end
-
-		if self.ShellList[i].RemoveNow == 1 then
-			self.RemoveList[#self.RemoveList+1] = i
-		end
-
-		--self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
-	end
-	
-	if #self.RemoveList > 0 then
-		for i = 1, #self.RemoveList do
-			table.remove( self.ShellList, self.RemoveList[i] )
-		end
-	end
-
-	self.RemoveList = {}
-
 	self:NextThink( CurTime()+0.1 )
 	return true
 end
@@ -1424,17 +1338,21 @@ function ENT:DakTEAutoFire()
 				end
 				local shootDir = shootAngles:Forward()
 				
+				local Propellant = self:GetPropellant()*0.01
  				local Shell = {}
  				Shell.Pos = shootOrigin + ( self:GetForward() * 1 )
  				Shell.Ang = shootAngles + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))
 				Shell.DakTrail = self.DakShellTrail
-				Shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.99, 1.01 )
-				Shell.DakBaseVelocity = self.DakShellVelocity
+				Shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.99, 1.01 ) * Propellant
+				Shell.DakBaseVelocity = self.DakShellVelocity * Propellant
 				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakMass = self.DakShellMass
 				Shell.DakIsPellet = false
 				Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.99, 1.01 )
+				if self.DakShellAmmoType == "AP" or self.DakShellAmmoType == "HE" or self.DakShellAmmoType == "HVAP" or self.DakShellAmmoType == "APFSDS" or self.DakShellAmmoType == "APHE" or self.DakShellAmmoType == "APDS" then
+					Shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.99, 1.01 ) * Propellant
+				end
 				Shell.DakExplosive = self.DakShellExplosive
 				Shell.DakBlastRadius = self.DakShellBlastRadius
 				Shell.DakPenSounds = self.DakShellPenSounds
@@ -1473,7 +1391,7 @@ function ENT:DakTEAutoFire()
 					end
 				end
 
-				self.ShellList[#self.ShellList+1] = Shell
+				DakTankShellList[#DakTankShellList+1] = Shell
 
 				self:SetNWString("FireSound",self.DakFireSound)
 				self:SetNWInt("FirePitch",self.DakFirePitch)
@@ -1565,6 +1483,7 @@ function ENT:DakTEAutoFire()
 end
 
 function ENT:DakTEAutoGunAmmoSwap()
+	local Propellant = self:GetPropellant()*0.01
 	if( self.AmmoSwap ) then
 		self.CurrentAmmoType = self.CurrentAmmoType+1
 		if self.CurrentAmmoType>10 then

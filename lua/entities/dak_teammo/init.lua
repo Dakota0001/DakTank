@@ -12,7 +12,6 @@ ENT.DakMaxHealth = 10
 ENT.DakHealth = 10
 ENT.DakAmmoType = "Base"
 ENT.DakPooled=0
-ENT.ShellList = {}
 
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -40,9 +39,6 @@ function ENT:Initialize()
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
  	end
-
-	self.ShellList = {}
- 	self.RemoveList = {}
 end
 
 function ENT:Think()
@@ -302,7 +298,7 @@ function ENT:Think()
 									if self.DakName == "Flamethrower" then
 										shell.DakIsFlame = 1
 									end
-									self.ShellList[#self.ShellList+1] = shell
+									DakTankShellList[#DakTankShellList+1] = Shell
 									local effectdata = EffectData()
 									effectdata:SetOrigin( self:GetPos() )
 									effectdata:SetEntity(self)
@@ -324,50 +320,6 @@ function ENT:Think()
 		end
 		self.SlowThinkTime = CurTime()
 	end
-
-	for i = 1, #self.ShellList do
-		self.ShellList[i].LifeTime = self.ShellList[i].LifeTime + 0.1
-		self.ShellList[i].Gravity = physenv.GetGravity()*self.ShellList[i].LifeTime
-
-		local trace = {}
-			trace.start = self.ShellList[i].Pos
-			trace.endpos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
-			trace.filter = self.ShellList[i].Filter
-			trace.mins = Vector(-1,-1,-1)
-			trace.maxs = Vector(1,1,1)
-		local ShellTrace = util.TraceHull( trace )
-
-		local effectdata = EffectData()
-		effectdata:SetStart(ShellTrace.StartPos)
-		effectdata:SetOrigin(ShellTrace.HitPos)
-		effectdata:SetScale((self.ShellList[i].DakCaliber*0.0393701))
-		util.Effect("dakteballistictracer", effectdata, true, true)
-
-		if ShellTrace.Hit then
-			DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,self.ShellList[i],ShellTrace.HitNormal)
-		end
-
-		if self.ShellList[i].DieTime then
-			--self.RemoveList[#self.RemoveList+1] = i
-			if self.ShellList[i].DieTime+1.5<CurTime()then
-				self.RemoveList[#self.RemoveList+1] = i
-			end
-		end
-
-		if self.ShellList[i].RemoveNow == 1 then
-			self.RemoveList[#self.RemoveList+1] = i
-		end
-
-		self.ShellList[i].Pos = self.ShellList[i].Pos + (self.ShellList[i].Ang:Forward()*self.ShellList[i].DakVelocity*0.1) + (self.ShellList[i].Gravity*0.1)
-	end
-	
-	if #self.RemoveList > 0 then
-		for i = 1, #self.RemoveList do
-			table.remove( self.ShellList, self.RemoveList[i] )
-		end
-	end
-
-	self.RemoveList = {}
 
 	if self:IsOnFire() then
 		self.DakHealth = self.DakHealth - 0.1

@@ -163,7 +163,16 @@ e2function number entity:daktankGetShellPenetration()
 		if this.DakShellPenetration == nil then
 			return 1
 		else
-			return this.DakShellPenetration
+			if this.CurrentAmmoType == 1 or this.CurrentAmmoType == 2 or this.CurrentAmmoType == 4 or this.CurrentAmmoType == 8 or this.CurrentAmmoType == 9 or this.CurrentAmmoType == 10 then
+				local Propellant = this:GetPropellant()
+				if Propellant == nil then
+					return this.DakShellPenetration
+				else
+					return this.DakShellPenetration * (Propellant*0.01)
+				end
+			else
+				return this.DakShellPenetration
+			end
 		end
 	end
 	return 0
@@ -176,7 +185,12 @@ e2function number entity:daktankGetShellVelocity()
 		if this.DakShellVelocity == nil then
 			return 1
 		else
-			return this.DakShellVelocity
+			local Propellant = this:GetPropellant()
+			if Propellant == nil then
+				return this.DakShellVelocity
+			else
+				return this.DakShellVelocity * (Propellant*0.01)
+			end
 		end
 	end
 	return 0
