@@ -706,7 +706,7 @@ function ENT:DakTEAmmoCheck()
 			local found = 0
 			local box = 1
 			local distance = 0
-			while found == 0 and box < #self.SortedAmmo do
+			while found == 0 and box <= #self.SortedAmmo do
 				if IsValid(self.SortedAmmo[box][1]) then
 					if self.SortedAmmo[box][1].DakAmmoType == self.DakAmmoType then
 						if self.SortedAmmo[box][1].DakAmmo > 0 then
