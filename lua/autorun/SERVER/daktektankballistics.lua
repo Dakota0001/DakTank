@@ -217,7 +217,7 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	end
 end
 
-function DTGetStandoffMult(Start, End, Caliber, Filter)
+function DTGetStandoffMult(Start, End, Caliber, Filter, ShellType)
 	local Recurse = 1
 	local NewFilter = Filter
 	local Go = 1
@@ -249,6 +249,9 @@ function DTGetStandoffMult(Start, End, Caliber, Filter)
 	if FirstArmor~=nil and SecondArmor~=nil then
 		local Dist = FirstArmor:Distance(SecondArmor)
 		local StandoffCalibers = ((Dist * 25.4)/Caliber) + 1.65
+		if ShellType == "HEAT"  then
+			StandoffCalibers = ((Dist * 25.4)/Caliber)
+		end
 		if StandoffCalibers > 7.5 then
 			return (1.4 / (StandoffCalibers/7.5))
 		else

@@ -130,42 +130,44 @@ function TOOL:RightClick( trace )
 				local HEATArmor, HEATEnt, HEATShatters, HEATRico = DTGetArmorRecurse(trace.StartPos, trace.HitPos+trace.Normal*5000, "HEAT", self:GetClientInfo("DakArmor"), {self:GetOwner()})
 				local HVAPArmor, HVAPEnt, HVAPShatters = DTGetArmorRecurse(trace.StartPos, trace.HitPos+trace.Normal*5000, "HVAP", self:GetClientInfo("DakArmor")*0.5, {self:GetOwner()})
 				local APFSDSArmor, APFSDSEnt, APFSDSShatters, APFSDSRico = DTGetArmorRecurse(trace.StartPos, trace.HitPos+trace.Normal*5000, "APFSDS", self:GetClientInfo("DakArmor")*0.25, {self:GetOwner()})
-				local StandoffMult = DTGetStandoffMult(trace.StartPos, trace.HitPos+trace.Normal*5000, self:GetClientInfo("DakArmor"), {self:GetOwner()})
-				ply:ChatPrint("<><><>-------------------------------------------------------------------------<><><>")
+				local StandoffMult = DTGetStandoffMult(trace.StartPos, trace.HitPos+trace.Normal*5000, self:GetClientInfo("DakArmor"), {self:GetOwner()}, "HEAT")
+				local StandoffMult2 = DTGetStandoffMult(trace.StartPos, trace.HitPos+trace.Normal*5000, self:GetClientInfo("DakArmor"), {self:GetOwner()}, "HEATFS")
+				ply:ChatPrint("<><><>-------------------------------------------------------------------<><><>")
 				if (APEnt:IsWorld() or APEnt==NULL) and APArmor > 0 then
 					ply:ChatPrint("No critical entities hit.")
 				else
 					if APShatters > 0 then
-						ply:ChatPrint("Effective Armor vs AP: "..math.Round(APArmor,2).."(mm), Shattered")
+						ply:ChatPrint("Effective Armor vs AP: "..math.Round(APArmor,2).."(mm), Shattered.")
 					else
-						ply:ChatPrint("Effective Armor vs AP: "..math.Round(APArmor,2).."(mm), No Shatter")
+						ply:ChatPrint("Effective Armor vs AP: "..math.Round(APArmor,2).."(mm), No Shatter.")
 					end
 					if HEATRico == 0 then
 						if HEATShatters > 0 then
-							ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Malfunction, Standoff Multiplier: "..math.Round(StandoffMult,2))
+							ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Malfunction.")
 						else
-							ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Functional, Standoff Multiplier: "..math.Round(StandoffMult,2))
+							ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Functional.")
 						end
 					else
-						ply:ChatPrint("HEAT Fuze Failure")
+						ply:ChatPrint("HEAT Fuze Failure.")
 					end
 					if HVAPShatters > 0 then
-						ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm), Shattered")
+						ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm), Shattered.")
 					else
-						ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm), No Shatter")
+						ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm), No Shatter.")
 					end
 					if APFSDSRico == 0 then
 						if APFSDSShatters > 0 then
 							ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), Shattered.")
 						else
-							ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), No Shatter")
+							ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), No Shatter.")
 						end
 					else
-						ply:ChatPrint("APFSDS Ricochet")
+						ply:ChatPrint("APFSDS Ricochet.")
 					end
 				end
-				ply:ChatPrint("Use armor input value in Q menu as shell diameter")
-				ply:ChatPrint("<><><>-------------------------------------------------------------------------<><><>")
+				ply:ChatPrint("Standoff Multiplier vs HEAT: "..math.Round(StandoffMult,2)..". Standoff Multiplier vs HEATFS: "..math.Round(StandoffMult2,2)..".")
+				ply:ChatPrint("Use armor input value in Q menu as shell diameter.")
+				ply:ChatPrint("<><><>-------------------------------------------------------------------<><><>")
 			end
 		end
 	self.LastRightClick = CurTime()
