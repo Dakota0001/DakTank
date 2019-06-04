@@ -117,12 +117,17 @@ if SERVER then
 			local trace = {}
 				if ShellList[i].IsGuided then
 					local indicatortrace = {}
-						if ShellList[i].Indicator:IsPlayer() then 
-							indicatortrace.start = ShellList[i].Indicator:GetShootPos()
-							indicatortrace.endpos = ShellList[i].Indicator:GetShootPos()+ShellList[i].Indicator:GetAimVector()*1000000
+						if not(ShellList[i].Indicator) then
+							indicatortrace.start = ShellList[i].Ang:Forward()*-10000
+							indicatortrace.endpos = ShellList[i].Ang:Forward()*10000
 						else
-							indicatortrace.start = ShellList[i].Indicator:GetPos()
-							indicatortrace.endpos = ShellList[i].Indicator:GetPos() + ShellList[i].Indicator:GetForward()*1000000
+							if ShellList[i].Indicator:IsPlayer() then 
+								indicatortrace.start = ShellList[i].Indicator:GetShootPos()
+								indicatortrace.endpos = ShellList[i].Indicator:GetShootPos()+ShellList[i].Indicator:GetAimVector()*1000000
+							else
+								indicatortrace.start = ShellList[i].Indicator:GetPos()
+								indicatortrace.endpos = ShellList[i].Indicator:GetPos() + ShellList[i].Indicator:GetForward()*1000000
+							end
 						end
 						indicatortrace.filter = ShellList[i].Filter
 					local indicator = util.TraceLine(indicatortrace)

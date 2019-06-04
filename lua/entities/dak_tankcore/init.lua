@@ -523,6 +523,21 @@ function ENT:Think()
 									end
 								end
 							end
+							if self.ERA then
+								if table.Count(self.ERA) > 0 then
+									for i = 1, table.Count(self.ERA) do
+										if self.ERA[i].EntityMods.CompositeType == "ERA" then
+											self.ColdWar = 1
+											self.ERA[i].EntityMods.CompKEMult = 2.5
+											self.ERA[i].EntityMods.CompCEMult = 88.9
+											self.ERA[i].EntityMods.DakName = "ERA"
+											self.ERA[i].EntityMods.IsERA = 1
+										end
+										self.ERA[i]:GetPhysicsObject():SetMass( math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) )
+										self.ERA[i].DakArmor = math.sqrt(math.sqrt(self.ERA[i]:GetPhysicsObject():GetVolume()))*2.5
+									end
+								end
+							end
 
 							self.DamageCycle = 0
 							if self.DakHealth < self.CurrentHealth then

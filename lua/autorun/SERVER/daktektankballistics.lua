@@ -52,6 +52,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 	local HitEnt = ShellSimTrace.Entity
 	local EffArmor = 0
 	local Shatter = 0
+	local Failed = 0
 	local HitAng = math.deg(math.acos(ShellSimTrace.HitNormal:Dot(-ShellSimTrace.Normal)))
 	if HitEnt.DakHealth == nil then
 		DakTekTankEditionSetupNewEnt(HitEnt)
@@ -110,10 +111,31 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 						Shatter = 1
 					end
 				end
+				if (ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH" or ShellType == "APFSDS" or ShellType == "APDS") then
+					if HitAng >= 80 then
+						if HitEnt:GetPhysicsObject():GetMass()>75 and (ShellType == "APFSDS" or ShellType == "APDS") then Failed = 1 end
+						Shatter = 1
+					end
+					if HitAng >= 70 and HitAng < 80 then
+						Failed = 0
+						Shatter = 1
+					end
+				end
 			else
-				if TDRatio >= 0.8 then
+				if TDRatio >= 0.8 and not(ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH") then
 					Shatter = 1
 				end
+				if (ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH" or ShellType == "APFSDS" or ShellType == "APDS") then
+					if HitAng >= 80 then
+						if HitEnt:GetPhysicsObject():GetMass()>75 and (ShellType == "APFSDS" or ShellType == "APDS") then Failed = 1 end
+						Shatter = 1
+					end
+					if HitAng >= 70 and HitAng < 80 then
+						Failed = 0
+						Shatter = 1
+					end
+				end
+
 				if ShellType == "HESH" then
 					EffArmor = DTGetArmor(HitEnt, ShellType, Caliber)
 				end
@@ -143,11 +165,11 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 	else
 		EndPos = End
 	end
-	return EffArmor, HitEnt, EndPos, Shatter
+	return EffArmor, HitEnt, EndPos, Shatter, Failed
 end
 
 function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
-	local Armor, Ent, FirstPenPos, Shattered = DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
+	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed = DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
@@ -155,13 +177,20 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	local newArmor = 0
 	local Go = 1
 	local LastPenPos = FirstPenPos
-	local Shatters = Shattered
+	local Shatters = HeatShattered
+	local Fails = HeatFailed
+	local Rico = 0
 	while Go == 1 and Recurse<25 do
-		local newArmor, newEnt, LastPenPos, Shattered = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)		
+		local newArmor, newEnt, LastPenPos, Shattered, Failed = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)		
 		if Armor == 0 or newArmor == 0 then
-			FirstPenPos = LastPenPos
+			if Armor == 0 then
+				HeatShattered = Shattered
+				HeatFailed = Failed
+				FirstPenPos = LastPenPos
+			end
 		end
 		Shatters = Shatters + Shattered
+		Fails = Fails + Failed
 		if newEnt:IsValid() then
 			if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
 				Go = 0
@@ -173,11 +202,60 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 			if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
 				Armor = Armor + (FirstPenPos:Distance(LastPenPos)*2.54)
 			end
-			return Armor, newEnt, Shatters
+			if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH" then
+				if HeatFailed == 1 then Rico = 1 end
+				Shatters = HeatShattered
+			end
+			if ShellType == "APDS" or ShellType == "APFSDS" then
+				if Fails > 0 then Rico = 1 end
+			end
+			return Armor, newEnt, Shatters, Rico
 		end
 		NewFilter[#NewFilter+1] = newEnt
 		Armor = Armor + newArmor
 		Recurse = Recurse + 1
+	end
+end
+
+function DTGetStandoffMult(Start, End, Caliber, Filter)
+	local Recurse = 1
+	local NewFilter = Filter
+	local Go = 1
+	local FirstArmor = nil
+	local SecondArmor = nil
+	while Go == 1 and Recurse<25 do
+		local trace = {}
+			trace.start = Start
+			trace.endpos = End 
+			trace.filter = Filter
+		local ShellSimTrace = util.TraceLine( trace )
+		if ShellSimTrace.Entity then
+			if ShellSimTrace.Entity:GetPhysicsObject() then
+				if ShellSimTrace.Entity:GetPhysicsObject():GetMass()>1 then
+					if FirstArmor==nil then 
+						FirstArmor = ShellSimTrace.HitPos 
+					else 
+						SecondArmor = ShellSimTrace.HitPos 
+						Go = 0
+					end
+				end
+			end
+			NewFilter[#NewFilter+1] = ShellSimTrace.Entity
+		else
+			return 1
+		end
+		Recurse = Recurse + 1
+	end
+	if FirstArmor~=nil and SecondArmor~=nil then
+		local Dist = FirstArmor:Distance(SecondArmor)
+		local StandoffCalibers = ((Dist * 25.4)/Caliber) + 1.65
+		if StandoffCalibers > 7.5 then
+			return (1.4 / (StandoffCalibers/7.5))
+		else
+			return (math.sqrt(math.sqrt(StandoffCalibers))/1.185)
+		end
+	else
+		return 1
 	end
 end
 
@@ -219,7 +297,7 @@ function DTCompositesTrace( Ent, StartPos, Dir, Filter )
 								checktrace.filter = checkfilter
 							end
 						local checkinternaltrace = util.TraceLine( checktrace )
-						if IsValid(checkinternaltrace.Entity) and Pos:Distance(checkinternaltrace.HitPos)<Pos:Distance(H1) then
+						if IsValid(checkinternaltrace.Entity) and Pos:Distance(checkinternaltrace.HitPos)<Pos:Distance(H1) and (checkinternaltrace.Entity:GetPhysicsObject() and checkinternaltrace.Entity:GetPhysicsObject():GetMass()>1) then
 							return Pos:Distance(checkinternaltrace.HitPos)
 						end
                     	return Pos:Distance(H1)
@@ -399,7 +477,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" or Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then
 					if HitAng >= 80 then
-						Failed = 1
+						if HitEnt:GetPhysicsObject():GetMass()>75 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Failed = 1 end
 						Shattered = 1
 					end
 					if HitAng >= 70 and HitAng < 80 then
@@ -703,8 +781,13 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					local Pain = DamageInfo()
 					Pain:SetDamageForce( Shell.Ang:Forward()*Shell.DakDamage*Shell.DakMass*Shell.DakVelocity )
 					Pain:SetDamage( Shell.DakDamage*500 )
-					Pain:SetAttacker( Shell.DakGun.DakOwner )
-					Pain:SetInflictor( Shell.DakGun )
+					if Shell.DakGun.DakOwner and Shell.DakGun then
+						Pain:SetAttacker( Shell.DakGun.DakOwner )
+						Pain:SetInflictor( Shell.DakGun )
+					else
+						Pain:SetAttacker( game.GetWorld() )
+						Pain:SetInflictor( game.GetWorld() )
+					end
 					Pain:SetReportedPosition( HitPos )
 					Pain:SetDamagePosition( HitEnt:GetPos() )
 					if Shell.DakIsFlame == 1 then
@@ -1123,9 +1206,9 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 						end
 					end
-					if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" or Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then
+					if (HitNonHitable and (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH")) or (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then
 						if HitAng >= 80 then
-							Failed = 1
+							if HitEnt:GetPhysicsObject():GetMass()>75 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Failed = 1 end
 							Shattered = 1
 						end
 						if HitAng >= 70 and HitAng < 80 then
@@ -1424,8 +1507,13 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						local Pain = DamageInfo()
 						Pain:SetDamageForce( Shell.Ang:Forward()*Shell.DakDamage*Shell.DakMass*Shell.DakVelocity )
 						Pain:SetDamage( Shell.DakDamage*500 )
-						Pain:SetAttacker( Shell.DakGun.DakOwner )
-						Pain:SetInflictor( Shell.DakGun )
+						if Shell.DakGun.DakOwner and Shell.DakGun then
+							Pain:SetAttacker( Shell.DakGun.DakOwner )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
 						Pain:SetReportedPosition( ContShellTrace.HitPos )
 						Pain:SetDamagePosition( HitEnt:GetPos() )
 						if Shell.DakIsFlame == 1 then
@@ -1772,8 +1860,13 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 						local Pain = DamageInfo()
 						Pain:SetDamageForce( Direction*(Damage/traces)*5000*Shell.DakMass )
 						Pain:SetDamage( (Damage/traces)*500 )
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( Shell.DakGun )
+						if Owner and Shell.DakGun then
+							Pain:SetAttacker( Owner )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
 						Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 						Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
@@ -1915,8 +2008,13 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 						local Pain = DamageInfo()
 						Pain:SetDamageForce( Direction*(Damage/traces)*5000*Shell.DakMass )
 						Pain:SetDamage( (Damage/traces)*500 )
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( Shell.DakGun )
+						if Owner and Shell.DakGun then
+							Pain:SetAttacker( Owner )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
 						Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 						Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
@@ -2057,8 +2155,13 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 					local Pain = DamageInfo()
 					Pain:SetDamageForce( Direction*(Damage/traces)*5000*Shell.DakMass )
 					Pain:SetDamage( (Damage/traces)*500 )
-					Pain:SetAttacker( Owner )
-					Pain:SetInflictor( Shell.DakGun )
+					if Owner and Shell.DakGun then
+						Pain:SetAttacker( Owner )
+						Pain:SetInflictor( Shell.DakGun )
+					else
+						Pain:SetAttacker( game.GetWorld() )
+						Pain:SetInflictor( game.GetWorld() )
+					end
 					Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 					Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 					Pain:SetDamageType(DMG_BLAST)
@@ -2137,8 +2240,13 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 								local ExpPain = DamageInfo()
 								ExpPain:SetDamageForce( ExpTrace.Normal*Damage*Shell.DakMass*Shell.DakVelocity )
 								ExpPain:SetDamage( Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)) )
-								ExpPain:SetAttacker( Owner )
-								ExpPain:SetInflictor( Shell.DakGun )
+								if Owner and Shell.DakGun then
+									ExpPain:SetAttacker( Owner )
+									ExpPain:SetInflictor( Shell.DakGun )
+								else
+									ExpPain:SetAttacker( game.GetWorld() )
+									ExpPain:SetInflictor( game.GetWorld() )
+								end
 								ExpPain:SetReportedPosition( Shell.DakGun:GetPos() )
 								ExpPain:SetDamagePosition( ExpTrace.Entity:WorldSpaceCenter() )
 								ExpPain:SetDamageType(DMG_BLAST)
@@ -2394,8 +2502,13 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 						local Pain = DamageInfo()
 						Pain:SetDamageForce( Direction*(SpallDamage)*5000*Shell.DakMass )
 						Pain:SetDamage( (SpallDamage)*500 )
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( Shell.DakGun )
+						if Owner and Shell.DakGun then
+							Pain:SetAttacker( Owner )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
 						Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 						Pain:SetDamagePosition( SpallTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
@@ -2534,8 +2647,13 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell)
 					local Pain = DamageInfo()
 					Pain:SetDamageForce( Direction*(Damage)*5000*Shell.DakMass )
 					Pain:SetDamage( (Damage)*500 )
-					Pain:SetAttacker( Owner )
-					Pain:SetInflictor( Shell.DakGun )
+					if Owner and Shell.DakGun then
+						Pain:SetAttacker( Owner )
+						Pain:SetInflictor( Shell.DakGun )
+					else
+						Pain:SetAttacker( game.GetWorld() )
+						Pain:SetInflictor( game.GetWorld() )
+					end
 					Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 					Pain:SetDamagePosition( SpallTrace.Entity:GetPos() )
 					Pain:SetDamageType(DMG_BLAST)
@@ -2691,8 +2809,13 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						local Pain = DamageInfo()
 						Pain:SetDamageForce( Direction*(HEATDamage)*5000*Shell.DakMass )
 						Pain:SetDamage( (HEATDamage)*500 )
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( Shell.DakGun )
+						if Owner and Shell.DakGun then
+							Pain:SetAttacker( Owner )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
 						Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 						Pain:SetDamagePosition( HEATTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
@@ -2846,8 +2969,13 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						local Pain = DamageInfo()
 						Pain:SetDamageForce( Direction*(HEATDamage)*5000*Shell.DakMass )
 						Pain:SetDamage( (HEATDamage)*500 )
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( Shell.DakGun )
+						if Owner and Shell.DakGun then
+							Pain:SetAttacker( Owner )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
 						Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 						Pain:SetDamagePosition( HEATTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
@@ -3012,8 +3140,13 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 					local Pain = DamageInfo()
 					Pain:SetDamageForce( Direction*(Damage)*5000*Shell.DakMass )
 					Pain:SetDamage( (Damage)*500 )
-					Pain:SetAttacker( Owner )
-					Pain:SetInflictor( Shell.DakGun )
+					if Owner and Shell.DakGun then
+						Pain:SetAttacker( Owner )
+						Pain:SetInflictor( Shell.DakGun )
+					else
+						Pain:SetAttacker( game.GetWorld() )
+						Pain:SetInflictor( game.GetWorld() )
+					end
 					Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 					Pain:SetDamagePosition( HEATTrace.Entity:GetPos() )
 					Pain:SetDamageType(DMG_BLAST)
@@ -3182,8 +3315,18 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 						local Pain = DamageInfo()
 						Pain:SetDamageForce( Direction*(Damage/traces)*5000*2 )
 						Pain:SetDamage( (Damage/traces)*500 )
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( self )
+						if Owner then
+							Pain:SetAttacker( Owner )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+						end
+						if self and Shell.DakGun then
+							Pain:SetAttacker( self )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
 						Pain:SetReportedPosition( Pos )
 						Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 						Pain:SetDamageType(DMG_BLAST)
@@ -3324,8 +3467,18 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 					local Pain = DamageInfo()
 					Pain:SetDamageForce( Direction*(Damage/traces)*5000*2 )
 					Pain:SetDamage( (Damage/traces)*500 )
-					Pain:SetAttacker( Owner )
-					Pain:SetInflictor( self )
+					if Owner then
+						Pain:SetAttacker( Owner )
+					else
+						Pain:SetAttacker( game.GetWorld() )
+					end
+					if self and Shell.DakGun then
+						Pain:SetAttacker( self )
+						Pain:SetInflictor( Shell.DakGun )
+					else
+						Pain:SetAttacker( game.GetWorld() )
+						Pain:SetInflictor( game.GetWorld() )
+					end
 					Pain:SetReportedPosition( Shell.DakGun:GetPos() )
 					Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
 					Pain:SetDamageType(DMG_BLAST)
