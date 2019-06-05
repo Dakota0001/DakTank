@@ -107,7 +107,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 						end
 					end
 				else
-					if (EffArmor/3)/Caliber >= 0.8 then
+					if (EffArmor/3)/Caliber >= 0.8 and not(ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH") then
 						Shatter = 1
 					end
 				end
