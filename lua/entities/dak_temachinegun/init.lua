@@ -106,21 +106,21 @@ function ENT:Think()
 				self.ReloadSound = "daktanks/dakreloadheavy.wav"
 			end
 
-			if self.DakFireSound == nil then
+			if self.DakFireSound1 == nil then
 				if self.DakCaliber < 7.62 then
-					self.DakFireSound = "daktanks/5mm.wav"
+					self.DakFireSound1 = "daktanks/5mm.wav"
 				end
 				if self.DakCaliber >= 7.62 and self.DakCaliber < 9 then
-					self.DakFireSound = "daktanks/7mm.wav"
+					self.DakFireSound1 = "daktanks/7mm.wav"
 				end
 				if self.DakCaliber >= 9 and self.DakCaliber < 12.7 then
-					self.DakFireSound = "daktanks/9mm.wav"
+					self.DakFireSound1 = "daktanks/9mm.wav"
 				end
 				if self.DakCaliber >= 12.7 and self.DakCaliber < 14.5 then
-					self.DakFireSound = "daktanks/12mm.wav"
+					self.DakFireSound1 = "daktanks/12mm.wav"
 				end
 				if self.DakCaliber >= 14.5 then
-					self.DakFireSound = "daktanks/14mm.wav"
+					self.DakFireSound1 = "daktanks/14mm.wav"
 				end
 			end
 		end
@@ -150,8 +150,8 @@ function ENT:Think()
 			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
 			self.ReloadSound = "daktanks/dakreloadlight.wav"
 
-			if self.DakFireSound == nil then
-				self.DakFireSound = "daktanks/flamerfire.wav"
+			if self.DakFireSound1 == nil then
+				self.DakFireSound1 = "daktanks/flamerfire.wav"
 			end
 		end
 
@@ -164,6 +164,12 @@ function ENT:Think()
 
 		if self.DakHealth > self.DakMaxHealth then
 			self.DakHealth = self.DakMaxHealth
+		end
+		if self.DakFireSound2 == nil then
+			self.DakFireSound2 = self.DakFireSound1
+		end
+		if self.DakFireSound3 == nil then
+			self.DakFireSound3 = self.DakFireSound1
 		end
 		self:GetPhysicsObject():SetMass(self.DakMass)
 		self.SlowThinkTime = CurTime()
@@ -275,7 +281,7 @@ function ENT:DakTEFire()
 				Shell.DakBasePenetration = self.BaseDakShellPenetration
 				Shell.DakFragPen = self.DakBaseShellFragPen
 				Shell.DakCaliber = self.DakMaxHealth
-				Shell.DakFireSound = self.DakFireSound
+				Shell.DakFireSound = self.DakFireSound1
 				Shell.DakFirePitch = self.DakFirePitch
 				Shell.DakGun = self
 				Shell.Filter = table.Copy(self.DakTankCore.Contraption)
@@ -293,7 +299,9 @@ function ENT:DakTEFire()
 				end
 				DakTankShellList[#DakTankShellList+1] = Shell
 
-				self:SetNWString("FireSound",self.DakFireSound)
+				local FiringSound = {self.DakFireSound1,self.DakFireSound2,self.DakFireSound3}
+
+				self:SetNWString("FireSound",FiringSound[math.random(1,3)])
 				self:SetNWInt("FirePitch",self.DakFirePitch)
 				self:SetNWFloat("Caliber",self.DakCaliber)
 
@@ -303,7 +311,7 @@ function ENT:DakTEFire()
 						self:SetNWBool("Firing",false)
 					end)
 				else
-					sound.Play( self.DakFireSound, self:GetPos(), 100, 100, 1 )
+					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100, 1 )
 				end
 								
 
@@ -314,7 +322,7 @@ function ENT:DakTEFire()
 				effectdata:SetScale( self.DakMaxHealth*0.25 )
 				util.Effect( self.DakFireEffect, effectdata, true, true )
 
-				--self:EmitSound( self.DakFireSound, 100, self.DakFirePitch, 1, 6)
+				--self:EmitSound( self.DakFireSound1, 100, self.DakFirePitch, 1, 6)
 				self.timer = CurTime()
 				if (self:IsValid()) then
 					if(self.DakTankCore:GetParent():IsValid()) then
@@ -374,7 +382,9 @@ function ENT:PreEntityCopy()
 	info.DakColor = self:GetColor()
 	info.DakCaliber = self.DakCaliber
 	info.DakGunType = self.DakGunType
-	info.DakFireSound = self.DakFireSound
+	info.DakFireSound1 = self.DakFireSound1
+	info.DakFireSound2 = self.DakFireSound2
+	info.DakFireSound3 = self.DakFireSound3
 
 	--Materials
 	info.DakMat0 = self:GetSubMaterial(0)
@@ -397,7 +407,16 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.DakCaliber = Ent.EntityMods.DakTek.DakCaliber
 		self.DakGunType = Ent.EntityMods.DakTek.DakGunType
 		self.DakHealth = self.DakMaxHealth
-		self.DakFireSound = Ent.EntityMods.DakTek.DakFireSound
+		if Ent.EntityMods.DakTek.DakFireSound and Ent.EntityMods.DakTek.DakFireSound1 == "" then
+			self.DakFireSound1 = Ent.EntityMods.DakTek.DakFireSound
+			self.DakFireSound2 = Ent.EntityMods.DakTek.DakFireSound
+			self.DakFireSound3 = Ent.EntityMods.DakTek.DakFireSound
+		else
+			self.DakFireSound1 = Ent.EntityMods.DakTek.DakFireSound1
+			self.DakFireSound2 = Ent.EntityMods.DakTek.DakFireSound2
+			self.DakFireSound3 = Ent.EntityMods.DakTek.DakFireSound3
+		end
+		
 
 		self.DakOwner = Player
 		self:SetColor(Ent.EntityMods.DakTek.DakColor)

@@ -117,7 +117,7 @@ if SERVER then
 			local trace = {}
 				if ShellList[i].IsGuided then
 					local indicatortrace = {}
-						if not(ShellList[i].Indicator) then
+						if not(ShellList[i].Indicator) or ShellList[i].Indicator==nil or ShellList[i].Indicator==NULL then
 							indicatortrace.start = ShellList[i].Ang:Forward()*-10000
 							indicatortrace.endpos = ShellList[i].Ang:Forward()*10000
 						else
