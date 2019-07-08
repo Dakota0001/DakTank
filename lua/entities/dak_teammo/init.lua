@@ -448,7 +448,7 @@ function ENT:CheckClip(Ent, HitPos)
 	end
 	return HitClip
 end
-
+--[[
 function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 	local traces = math.Round(Caliber/2)
 	local Filter = {self}
@@ -695,3 +695,4 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 		end		
 	end
 end
+]]--
