@@ -159,7 +159,6 @@ function ENT:Think()
 						self.CanSpawn = true
 					end
 				end
-				end
 				if not(self.Dead) then
 					if not(self.DakMaxHealth) then
 						self.DakMaxHealth = 10
