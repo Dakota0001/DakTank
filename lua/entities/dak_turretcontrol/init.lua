@@ -144,6 +144,8 @@ function ENT:Initialize()
  	self.DakBurnStacks = 0
  	self.DakTurretMotors = {}
  	self.Locked = 0
+ 	self.Off = true
+ 	self.OffTicks = 0
 end
 
 local function GetParents( ent, Results )
@@ -284,11 +286,17 @@ function ENT:Think()
 								if IsValid(self.DakCore.Base) then
 									if self.Locked == 0 then
 										constraint.Weld( self.DakGun, self.DakCore.Base, 0, 0, 0, false, false )
+										if IsValid(DakTurret) then
+											constraint.Weld( DakTurret, self.DakCore.Base, 0, 0, 0, false, false )
+										end
 										self.Locked = 1
 									end
 								end
 							else
 								if self.Locked == 1 then
+									if IsValid(DakTurret) then
+										constraint.RemoveConstraints( DakTurret, "Weld" )
+									end
 					        		constraint.RemoveConstraints( self.DakGun, "Weld" )
 					        		self.Locked = 0
 					        	end
@@ -316,20 +324,40 @@ function ENT:Think()
 									    TurAng = Angle((TurAng.pitch - TurAngVelAng.pitch),(TurAng.yaw - TurAngVelAng.yaw),(TurAng.roll - TurAngVelAng.roll))
 									    TurAng = Angle((TurAng.pitch*self.TurInertia.pitch),(TurAng.yaw*self.TurInertia.yaw),(TurAng.roll*self.TurInertia.roll))
 									    --find yaw axis
-									   	if (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll > 1 or (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll < -1 then
-											self:ApplyForce(DakTurret, Angle(TurAng.pitch,0,0))
+									    if self.Off == true then
+									    	self.OffTicks = self.OffTicks + 1
+									    	if self.OffTicks > 70 then
+												self.Off = false
+												self.GunAng = Angle(0,0,0)
+												self.TurAng = Angle(0,0,0)
+											end
 										else
-											self:ApplyForce(DakTurret, Angle(0,TurAng.yaw,0))
+										   	if (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll > 1 or (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll < -1 then
+												self:ApplyForce(DakTurret, Angle(TurAng.pitch,0,0))
+											else
+												self:ApplyForce(DakTurret, Angle(0,TurAng.yaw,0))
+											end
+											self:ApplyForce(self.DakGun, Angle(Ang.pitch,0,0))
 										end
-										self:ApplyForce(self.DakGun, Angle(Ang.pitch,0,0))
 									else
-										self:ApplyForce(self.DakGun, Ang)
+										if self.Off == true then
+											self.OffTicks = self.OffTicks + 1
+											if self.OffTicks > 70 then
+												self.Off = false
+												self.GunAng = Angle(0,0,0)
+											end
+										else
+											self:ApplyForce(self.DakGun, Ang)
+										end
 									end
 								end
 							end
 						else
 							if self.Locked == 1 then
 				        		constraint.RemoveConstraints( self.DakGun, "Weld" )
+				        		if IsValid(DakTurret) then
+									constraint.RemoveConstraints( DakTurret, "Weld" )
+								end
 				        		self.Locked = 0
 				        	end
 							local GunDir = self:GetForward()
@@ -344,6 +372,8 @@ function ENT:Think()
 							if IsValid(DakTurret) then
 								self:ApplyForce(DakTurret, Angle(0,Ang.yaw,0))
 							end
+							self.Off = true
+							self.OffTicks = 0
 						end
 					end
 				end

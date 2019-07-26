@@ -109,112 +109,116 @@ function ENT:Think()
 		self.SparkTime=CurTime()
 	end
 	if self.DakName == "Micro Frontal Mount Gearbox" then
-		self.DakMaxHealth = 15
-		self.DakArmor = 15
-		self.DakMass = 150
+		self.DakMaxHealth = 7.5
+		self.DakArmor = 7.5
+		self.DakMass = 80
 		self.DakModel = "models/daktanks/gearbox1f1.mdl"
 		self.Torque = 1
-		self.MaxHP = 150
+		self.MaxHP = 80
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Small Frontal Mount Gearbox" then
-		self.DakMaxHealth = 35
-		self.DakArmor = 35
-		self.DakMass = 350
+		self.DakMaxHealth = 25
+		self.DakArmor = 25
+		self.DakMass = 265
 		self.DakModel = "models/daktanks/gearbox1f2.mdl"
 		self.Torque = 1
-		self.MaxHP = 330
+		self.MaxHP = 250
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Standard Frontal Mount Gearbox" then
 		self.DakMaxHealth = 60
 		self.DakArmor = 60
-		self.DakMass = 625
+		self.DakMass = 630
 		self.DakModel = "models/daktanks/gearbox1f3.mdl"
 		self.Torque = 1
 		self.MaxHP = 600
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Large Frontal Mount Gearbox" then
-		self.DakMaxHealth = 95
-		self.DakArmor = 95
-		self.DakMass = 975
+		self.DakMaxHealth = 120
+		self.DakArmor = 120
+		self.DakMass = 1230
 		self.DakModel = "models/daktanks/gearbox1f4.mdl"
 		self.Torque = 1
-		self.MaxHP = 930
+		self.MaxHP = 1200
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Huge Frontal Mount Gearbox" then
-		self.DakMaxHealth = 140
-		self.DakArmor = 140
-		self.DakMass = 1400
+		self.DakMaxHealth = 200
+		self.DakArmor = 200
+		self.DakMass = 2130
 		self.DakModel = "models/daktanks/gearbox1f5.mdl"
 		self.Torque = 1
-		self.MaxHP = 1350
+		self.MaxHP = 2000
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Ultra Frontal Mount Gearbox" then
-		self.DakMaxHealth = 250
-		self.DakArmor = 250
-		self.DakMass = 2500
+		self.DakMaxHealth = 480
+		self.DakArmor = 480
+		self.DakMass = 5050
 		self.DakModel = "models/daktanks/gearbox1f6.mdl"
 		self.Torque = 1
-		self.MaxHP = 2400
+		self.MaxHP = 4800
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Micro Rear Mount Gearbox" then
-		self.DakMaxHealth = 15
-		self.DakArmor = 15
-		self.DakMass = 150
+		self.DakMaxHealth = 7.5
+		self.DakArmor = 7.5
+		self.DakMass = 80
 		self.DakModel = "models/daktanks/gearbox1r1.mdl"
 		self.Torque = 1
-		self.MaxHP = 150
+		self.MaxHP = 80
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Small Rear Mount Gearbox" then
-		self.DakMaxHealth = 35
-		self.DakArmor = 35
-		self.DakMass = 350
+		self.DakMaxHealth = 25
+		self.DakArmor = 25
+		self.DakMass = 265
 		self.DakModel = "models/daktanks/gearbox1r2.mdl"
 		self.Torque = 1
-		self.MaxHP = 330
+		self.MaxHP = 250
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Standard Rear Mount Gearbox" then
 		self.DakMaxHealth = 60
 		self.DakArmor = 60
-		self.DakMass = 625
+		self.DakMass = 630
 		self.DakModel = "models/daktanks/gearbox1r3.mdl"
 		self.Torque = 1
 		self.MaxHP = 600
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Large Rear Mount Gearbox" then
-		self.DakMaxHealth = 95
-		self.DakArmor = 95
-		self.DakMass = 975
+		self.DakMaxHealth = 120
+		self.DakArmor = 120
+		self.DakMass = 1230
 		self.DakModel = "models/daktanks/gearbox1r4.mdl"
 		self.Torque = 1
-		self.MaxHP = 930
+		self.MaxHP = 1200
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Huge Rear Mount Gearbox" then
-		self.DakMaxHealth = 140
-		self.DakArmor = 140
-		self.DakMass = 1400
+		self.DakMaxHealth = 200
+		self.DakArmor = 200
+		self.DakMass = 2130
 		self.DakModel = "models/daktanks/gearbox1r5.mdl"
 		self.Torque = 1
-		self.MaxHP = 1350
+		self.MaxHP = 2000
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Ultra Rear Mount Gearbox" then
-		self.DakMaxHealth = 250
-		self.DakArmor = 250
-		self.DakMass = 2500
+		self.DakMaxHealth = 480
+		self.DakArmor = 480
+		self.DakMass = 5050
 		self.DakModel = "models/daktanks/gearbox1r6.mdl"
 		self.Torque = 1
-		self.MaxHP = 2400
+		self.MaxHP = 4800
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
+	end
+	if not(self.FirstCheck) and not(self.DakMaxHealth == 25) then
+		self.FirstCheck = true
+		self.DakHealth = self.DakMaxHealth
 	end
 
 	if IsValid(self.DakTankCore) and IsValid(self.DakTankCore.Motors[1]) then 

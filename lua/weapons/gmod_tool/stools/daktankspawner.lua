@@ -2357,43 +2357,43 @@ function TOOL.BuildCPanel( panel )
 	--Table containing the information of the available engines
 	local engineList = {}
 	engineList["Micro Engine"] = function()
-		DLabel:SetText( "Micro Engine\n\nTiny engine for tiny tanks.\n\nEngine Stats:\nHealth:                  15\nArmor:                  15mm\nWeight:                150kg\nCrewed Speed:     25km/h with 10t contraption\nUncrewed Speed: 15km/h with 10t contraption\nPower:                  75 HP\nFuel Required:      45L (for full performance)" )
+		DLabel:SetText( "Micro Engine\n\nTiny engine for tiny tanks.\n\nEngine Stats:\nHealth:                  5\nArmor:                  5mm\nWeight:                80kg\nCrewed Speed:     13km/h with 10t contraption\nUncrewed Speed: 8km/h with 10t contraption\nPower:                  40 HP\nFuel Required:      24L (for full performance)" )
 	end
 	engineList["Small Engine"] = function()
-		DLabel:SetText( "Small Engine\n\nSmall engine for light tanks and slow mediums.\n\nEngine Stats:\nHealth:                  30\nArmor:                  30mm\nWeight:                350kg\nCrewed Speed:     55km/h with 10t contraption\nUncrewed Speed: 33km/h with 10t contraption\nPower:                  165 HP\nFuel Required:      90L (for full performance)" )
+		DLabel:SetText( "Small Engine\n\nSmall engine for light tanks and slow mediums.\n\nEngine Stats:\nHealth:                  20\nArmor:                  20mm\nWeight:                265kg\nCrewed Speed:     42km/h with 10t contraption\nUncrewed Speed: 25km/h with 10t contraption\nPower:                  125 HP\nFuel Required:      75L (for full performance)" )
 	end
 	engineList["Standard Engine"] = function()
-		DLabel:SetText( "Standard Engine\n\nStandard sized engine for medium tanks or slow heavies.\n\nEngine Stats:\nHealth:                  45\nArmor:                  45mm\nWeight:                625kg\nCrewed Speed:     100km/h with 10t contraption\nUncrewed Speed: 60km/h with 10t contraption\nPower:                  300 HP\nFuel Required:      180L (for full performance)" )
+		DLabel:SetText( "Standard Engine\n\nStandard sized engine for medium tanks or slow heavies.\n\nEngine Stats:\nHealth:                  45\nArmor:                  45mm\nWeight:                630kg\nCrewed Speed:     100km/h with 10t contraption\nUncrewed Speed: 60km/h with 10t contraption\nPower:                  300 HP\nFuel Required:      180L (for full performance)" )
 	end
 	engineList["Large Engine"] = function()
-		DLabel:SetText( "Large Engine\n\nLarge engine for heavy tanks.\n\nEngine Stats:\nHealth:                  60\nArmor:                  60mm\nWeight:                975kg\nCrewed Speed:     155km/h with 10t contraption\nUncrewed Speed: 93km/h with 10t contraption\nPower:                  465 HP\nFuel Required:      360L (for full performance)" )
+		DLabel:SetText( "Large Engine\n\nLarge engine for heavy tanks.\n\nEngine Stats:\nHealth:                  90\nArmor:                  90mm\nWeight:                1225kg\nCrewed Speed:     200km/h with 10t contraption\nUncrewed Speed: 120km/h with 10t contraption\nPower:                  600 HP\nFuel Required:      360L (for full performance)" )
 	end
 	engineList["Huge Engine"] = function()
-		DLabel:SetText( "Huge Engine\n\nHuge engine for heavy tanks that want to move fast.\n\nEngine Stats:\nHealth:                  75\nArmor:                  75mm\nWeight:                1400kg\nCrewed Speed:     225km/h with 10t contraption\nUncrewed Speed: 135km/h with 10t contraption\nPower:                  675 HP\nFuel Required:      720L (for full performance)" )
+		DLabel:SetText( "Huge Engine\n\nHuge engine for heavy tanks that want to move fast.\n\nEngine Stats:\nHealth:                  150\nArmor:                  150mm\nWeight:                2120kg\nCrewed Speed:     333km/h with 10t contraption\nUncrewed Speed: 200km/h with 10t contraption\nPower:                  1000 HP\nFuel Required:      600L (for full performance)" )
 	end
 	engineList["Ultra Engine"] = function()
-		DLabel:SetText( "Ultra Engine\n\nUltra engine for use in super heavy tanks.\n\nEngine Stats:\nHealth:                  90\nArmor:                  90mm\nWeight:                2500kg\nCrewed Speed:     400km/h with 10t contraption\nUncrewed Speed: 240km/h with 10t contraption\nPower:                  1200 HP\nFuel Required:      1440L (for full performance)" )
+		DLabel:SetText( "Ultra Engine\n\nUltra engine for use in super heavy tanks.\n\nEngine Stats:\nHealth:                  360\nArmor:                  360mm\nWeight:                5020kg\nCrewed Speed:     800km/h with 10t contraption\nUncrewed Speed: 480km/h with 10t contraption\nPower:                  2400 HP\nFuel Required:      1440L (for full performance)" )
 	end
 	
 	--Table containing the description of the available gearboxes
 	local gearboxList = {}
 	gearboxList["Micro Gearbox"] = function()
-		DLabel:SetText( "Micro "..GearboxDirection.." Mount Gearbox\n\nTiny gearbox for tiny tanks.\n\nGearbox Stats:\nHealth:                 15\nArmor:                 15mm\nWeight:               150kg\nPower Rating:      150 HP" )
+		DLabel:SetText( "Micro "..GearboxDirection.." Mount Gearbox\n\nTiny gearbox for tiny tanks.\n\nGearbox Stats:\nHealth:                 7.5\nArmor:                 7.5mm\nWeight:               80kg\nPower Rating:      80 HP" )
 	end
 	gearboxList["Small Gearbox"] = function()
-		DLabel:SetText( "Small "..GearboxDirection.." Mount Gearbox\n\nSmall gearbox for small tanks.\n\nGearbox Stats:\nHealth:                 35\nArmor:                 35mm\nWeight:               350kg\nPower Rating:      330 HP" )
+		DLabel:SetText( "Small "..GearboxDirection.." Mount Gearbox\n\nSmall gearbox for small tanks.\n\nGearbox Stats:\nHealth:                 25\nArmor:                 25mm\nWeight:               265kg\nPower Rating:      250 HP" )
 	end
 	gearboxList["Standard Gearbox"] = function()
-		DLabel:SetText( "Standard "..GearboxDirection.." Mount Gearbox\n\nMedium gearbox for medium tanks.\n\nGearbox Stats:\nHealth:                 60\nArmor:                 60mm\nWeight:               625kg\nPower Rating:      600 HP" )
+		DLabel:SetText( "Standard "..GearboxDirection.." Mount Gearbox\n\nMedium gearbox for medium tanks.\n\nGearbox Stats:\nHealth:                 60\nArmor:                 60mm\nWeight:               630kg\nPower Rating:      600 HP" )
 	end
 	gearboxList["Large Gearbox"] = function()
-		DLabel:SetText( "Large "..GearboxDirection.." Mount Gearbox\n\nLarge gearbox for large tanks.\n\nGearbox Stats:\nHealth:                 95\nArmor:                 95mm\nWeight:               975kg\nPower Rating:      930 HP" )
+		DLabel:SetText( "Large "..GearboxDirection.." Mount Gearbox\n\nLarge gearbox for large tanks.\n\nGearbox Stats:\nHealth:                 120\nArmor:                 120mm\nWeight:               1230kg\nPower Rating:      1200 HP" )
 	end
 	gearboxList["Huge Gearbox"] = function()
-		DLabel:SetText( "Huge "..GearboxDirection.." Mount Gearbox\n\nHuge gearbox for huge tanks.\n\nGearbox Stats:\nHealth:                 140\nArmor:                 140mm\nWeight:               1400kg\nPower Rating:      1350 HP" )
+		DLabel:SetText( "Huge "..GearboxDirection.." Mount Gearbox\n\nHuge gearbox for huge tanks.\n\nGearbox Stats:\nHealth:                 200\nArmor:                 200mm\nWeight:               2130kg\nPower Rating:      2000 HP" )
 	end
 	gearboxList["Ultra Gearbox"] = function()
-		DLabel:SetText( "Ultra "..GearboxDirection.." Mount Gearbox\n\nUltra gearbox for landcruisers.\n\nGearbox Stats:\nHealth:                 250\nArmor:                 250mm\nWeight:               2500kg\nPower Rating:      2400 HP" )
+		DLabel:SetText( "Ultra "..GearboxDirection.." Mount Gearbox\n\nUltra gearbox for landcruisers.\n\nGearbox Stats:\nHealth:                 480\nArmor:                 480mm\nWeight:               5050kg\nPower Rating:      4800 HP" )
 	end
 	
 	--Table containing the description of the autoloader magazines

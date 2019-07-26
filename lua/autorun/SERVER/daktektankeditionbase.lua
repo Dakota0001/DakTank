@@ -158,19 +158,28 @@ if SERVER then
 						ShellList[i].DakPenetration = ShellList[i].DakPenetration - PenLoss
 					end
 					ShellList[i].DakVelocity = ShellList[i].DakVelocity - (((DragForce/(ShellList[i].DakMass/2))*0.1)*39.37)
-					trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].Ang:Forward() * (ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-0.1)^2)/2)
-					trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].Ang:Forward() * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
+					if ShellList[i].JustBounced == 1 then
+						trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].Ang:Forward() * (ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-0.1)^2)/2)
+						trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].Ang:Forward() * (ShellList[i].LifeTime+0.1)) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
+						ShellList[i].JustBounced = 0
+					else
+						trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].Ang:Forward() * (ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-0.1)^2)/2)
+						trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].Ang:Forward() * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
+					end
+					--trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].Ang:Forward() * (ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-0.1)^2)/2)
+					--trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].Ang:Forward() * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
 				end
 				trace.filter = ShellList[i].Filter
 				trace.mins = Vector(-ShellList[i].DakCaliber*0.02,-ShellList[i].DakCaliber*0.02,-ShellList[i].DakCaliber*0.02)
 				trace.maxs = Vector(ShellList[i].DakCaliber*0.02,ShellList[i].DakCaliber*0.02,ShellList[i].DakCaliber*0.02)
 			local ShellTrace = util.TraceHull( trace )
-
-			local effectdata = EffectData()
-			effectdata:SetStart(ShellTrace.StartPos)
-			effectdata:SetOrigin(ShellTrace.HitPos)
-			effectdata:SetScale((ShellList[i].DakCaliber*0.0393701))
-			util.Effect(ShellList[i].DakTrail, effectdata, true, true)
+			if ShellList[i].Crushed ~= 1 then
+				local effectdata = EffectData()
+				effectdata:SetStart(ShellTrace.StartPos)
+				effectdata:SetOrigin(ShellTrace.HitPos)
+				effectdata:SetScale((ShellList[i].DakCaliber*0.0393701))
+				util.Effect(ShellList[i].DakTrail, effectdata, true, true)
+			end
 
 			if ShellTrace.Hit then
 				if ShellList[i].IsGuided then

@@ -377,15 +377,15 @@ function TOOL.BuildCPanel( panel )
 	ArmorTypeSelect.OnSelect = function( self, index, value )
 		local ArmorDesc = self:GetParent():Find( "ArmorDesc" )
 		if value == "NERA" then
-			ArmorDesc:SetText( "Non-Explosive Reactive Armor\n\nComposite of ceramic plates in a steel and rubber lattice designed to shatter incoming projectiles, it is especially effective at breaking up HEAT jets.\n\nDensity: 2.0g/cm3\nKE Protection: 9.2mm/in\nCE Protection: 18.4mm/in\nCost: 2xKG" )
+			ArmorDesc:SetText( "Non-Explosive Reactive Armor\n\nComposite of ceramic plates in a steel and rubber lattice designed to shatter incoming projectiles, it is especially effective at breaking up HEAT jets.\n\nDensity: 2.0g/cm3\nKE Protection: 9.2mm/in\nCE Protection: 18.4mm/in\nCost: 1.75xKG" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "NERA" )
 		end
 		if value == "Textolite" then
-			ArmorDesc:SetText( "Glass-Textolite\n\nFiber glass and resin mix, it is lighter than RHA for a given protection value but takes up more space.\n\nDensity: 1.85kg/m3\nKE Protection: 10.4mm/in\nCE Protection: 14mm/in\nCost: 1.25xKG" )
+			ArmorDesc:SetText( "Glass-Textolite\n\nFiber glass and resin mix, it is lighter than RHA for a given protection value but takes up more space.\n\nDensity: 1.85kg/m3\nKE Protection: 10.4mm/in\nCE Protection: 14mm/in\nCost: 1.5xKG" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "Textolite" )
 		end
 		if value == "ERA" then
-			ArmorDesc:SetText( "Explosive Reactive Armor\n\nExplosives sandwiched between two steel plates, detonates on impact, disrupting and shattering incoming HEAT jets.\n\nDensity: 1.732g/cm3\nKE Protection: 2.5mm/in\nCE Protection: 88.9mm/in\nCost: 1.5xKG" )
+			ArmorDesc:SetText( "Explosive Reactive Armor\n\nExplosives sandwiched between two steel plates, detonates on impact, disrupting and shattering incoming HEAT jets.\n\nDensity: 1.732g/cm3\nKE Protection: 2.5mm/in\nCE Protection: 88.9mm/in\nCost: 1.25xKG" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "ERA" )
 		end
 	end

@@ -150,28 +150,25 @@ function ENT:Think()
 		self:Ignite( 60, 0 )
 	end
 	if self:IsOnFire() then
-		local Targets = ents.FindInSphere(self:GetPos(),50)
-		if #Targets > 0 then
-			for i=1, #Targets do
-				local Class = Targets[i]:GetClass()
+		for i=1, 10 do
+			local Direction = VectorRand()
+			local trace = {}
+				trace.start = self:GetPos()
+				trace.endpos = self:GetPos() + Direction*50
+				trace.filter = self
+				trace.mins = Vector(-1,-1,-1)
+				trace.maxs = Vector(1,1,1)
+			local FireTrace = util.TraceHull( trace )
+			if IsValid(FireTrace.Entity) then
+				local Class = FireTrace.Entity:GetClass()
 				if Class=="dak_crew" or Class=="dak_teammo" or Class=="dak_teautoloadingmodule" or Class=="dak_tefuel" or Class=="dak_tegearbox" or Class=="dak_temotor" or Class=="dak_turretmotor" then
-					local trace = {}
-						trace.start = self:NearestPoint( Targets[i]:GetPos() )
-						trace.endpos = Targets[i]:GetPos()
-						trace.filter = self
-					local FireTrace = util.TraceLine( trace )
-					if IsValid(FireTrace.Entity) then
-						if FireTrace.Entity == Targets[i] then
-							Targets[i]:Ignite( 60, 0 )
-						else
-							if FireTrace.Entity.DakArmor == nil then
-								DakTekTankEditionSetupNewEnt(FireTrace.Entity)
-							end
-							if FireTrace.Entity.DakArmor < 5 or CheckClip(FireTrace.Entity,FireTrace.HitPos) then
-								RecurseTrace(self:GetPos(), Targets[i]:GetPos(), {self, FireTrace.Entity}, Targets[i])
-							end
-						end
-					end
+					FireTrace.Entity:Ignite( 60, 0 )
+				end
+				if FireTrace.Entity.DakArmor == nil then
+					DakTekTankEditionSetupNewEnt(FireTrace.Entity)
+				end
+				if FireTrace.Entity.DakArmor < 5 or CheckClip(FireTrace.Entity,FireTrace.HitPos) then
+					RecurseTrace(self:GetPos(), self:GetPos() + Direction*50, {self, FireTrace.Entity})
 				end
 			end
 		end
@@ -191,23 +188,25 @@ function ENT:Think()
     return true
 end
 
-function RecurseTrace(start, endpos, filter, target)
+function RecurseTrace(start, endpos, filter)
 	local trace = {}
 		trace.start = start
 		trace.endpos = endpos
 		trace.filter = filter
-	local FireTrace = util.TraceLine( trace )
+		trace.mins = Vector(-1,-1,-1)
+		trace.maxs = Vector(1,1,1)
+	local FireTrace = util.TraceHull( trace )
 	if IsValid(FireTrace.Entity) then
-		if FireTrace.Entity == target then
-			target:Ignite( 60, 0 )
-		else
-			if FireTrace.Entity.DakArmor == nil then
-				DakTekTankEditionSetupNewEnt(FireTrace.Entity)
-			end
-			if FireTrace.Entity.DakArmor < 5 or CheckClip(FireTrace.Entity,FireTrace.HitPos) then
-				filter[#filter+1] = FireTrace.Entity
-				RecurseTrace(start, endpos, filter, target)
-			end
+		local Class = FireTrace.Entity:GetClass()
+		if Class=="dak_crew" or Class=="dak_teammo" or Class=="dak_teautoloadingmodule" or Class=="dak_tefuel" or Class=="dak_tegearbox" or Class=="dak_temotor" or Class=="dak_turretmotor" then
+			FireTrace.Entity:Ignite( 60, 0 )
+		end
+		if FireTrace.Entity.DakArmor == nil then
+			DakTekTankEditionSetupNewEnt(FireTrace.Entity)
+		end
+		if FireTrace.Entity.DakArmor < 5 or CheckClip(FireTrace.Entity,FireTrace.HitPos) then
+			filter[#filter+1] = FireTrace.Entity
+			RecurseTrace(start, endpos, filter)
 		end
 	end
 end

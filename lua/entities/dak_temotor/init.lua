@@ -93,64 +93,68 @@ function ENT:Think()
 		self.SparkTime=CurTime()
 	end
 	if self.DakName == "Micro Engine" then
-		self.DakMaxHealth = 15
-		self.DakArmor = 15
-		self.DakMass = 150
-		self.DakSpeed = 0.8375
+		self.DakMaxHealth = 5
+		self.DakArmor = 5
+		self.DakMass = 80
+		self.DakSpeed = 0.4444
 		self.DakModel = "models/daktanks/engine1.mdl"
-		self.DakFuelReq = 45
-		self.DakHP = 75
+		self.DakFuelReq = 24
+		self.DakHP = 40
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Small Engine" then
-		self.DakMaxHealth = 30
-		self.DakArmor = 30
-		self.DakMass = 350
-		self.DakSpeed = 1.8425
+		self.DakMaxHealth = 20
+		self.DakArmor = 20
+		self.DakMass = 265
+		self.DakSpeed = 1.3888
 		self.DakModel = "models/daktanks/engine2.mdl"
-		self.DakFuelReq = 90
-		self.DakHP = 165
+		self.DakFuelReq = 75
+		self.DakHP = 125
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Standard Engine" then
 		self.DakMaxHealth = 45
 		self.DakArmor = 45
 		self.DakMass = 625
-		self.DakSpeed = 3.35
+		self.DakSpeed = 3.3333
 		self.DakModel = "models/daktanks/engine3.mdl"
 		self.DakFuelReq = 180
 		self.DakHP = 300
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Large Engine" then
-		self.DakMaxHealth = 60
-		self.DakArmor = 60
-		self.DakMass = 975
-		self.DakSpeed = 5.1925
+		self.DakMaxHealth = 90
+		self.DakArmor = 90
+		self.DakMass = 1225
+		self.DakSpeed = 6.6666
 		self.DakModel = "models/daktanks/engine4.mdl"
 		self.DakFuelReq = 360
-		self.DakHP = 465
+		self.DakHP = 600
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Huge Engine" then
-		self.DakMaxHealth = 75
-		self.DakArmor = 75
-		self.DakMass = 1400
-		self.DakSpeed = 7.5375
+		self.DakMaxHealth = 150
+		self.DakArmor = 150
+		self.DakMass = 2120
+		self.DakSpeed = 11.1111
 		self.DakModel = "models/daktanks/engine5.mdl"
-		self.DakFuelReq = 720
-		self.DakHP = 675
+		self.DakFuelReq = 600
+		self.DakHP = 1000
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 	end
 	if self.DakName == "Ultra Engine" then
-		self.DakMaxHealth = 90
-		self.DakArmor = 90
-		self.DakMass = 2500
-		self.DakSpeed = 13.4
+		self.DakMaxHealth = 360
+		self.DakArmor = 360
+		self.DakMass = 5020
+		self.DakSpeed = 26.6666
 		self.DakModel = "models/daktanks/engine6.mdl"
 		self.DakFuelReq = 1440
-		self.DakHP = 1200
+		self.DakHP = 2400
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
+	end
+	if not(self.FirstCheck) and not(self.DakMaxHealth == 25) then
+		self.FirstCheck = true
+		self.DakHealth = self.DakMaxHealth
 	end
 
 	if self.DakHealth > self.DakMaxHealth then

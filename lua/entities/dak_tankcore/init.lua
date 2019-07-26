@@ -149,6 +149,17 @@ function ENT:Think()
 		if IsValid(self:GetParent()) then
 			if IsValid(self:GetParent():GetParent()) then
 				self.Base = self:GetParent():GetParent()
+				if self.Cost and self.Cost>0 then
+					if not(self.CostTimerFirst) then
+						self.CostTimerFirst = CurTime()
+						self.CostTimer = 0	
+					end
+					self.CostTimer = CurTime - self.CostTimerFirst()
+					if CostTimer > 5 then
+						self.CanSpawn = true
+					end
+				end
+				end
 				if not(self.Dead) then
 					if not(self.DakMaxHealth) then
 						self.DakMaxHealth = 10
@@ -263,7 +274,7 @@ function ENT:Think()
 											res[i].EntityMods.CompCEMult = 18.4
 											res[i].EntityMods.DakName = "NERA"
 											self.Modern = 1
-											self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*2
+											self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.75
 										else
 											if res[i].EntityMods.CompositeType == nil then
 												res[i].EntityMods.CompositeType = "NERA"
@@ -271,7 +282,7 @@ function ENT:Think()
 												res[i].EntityMods.CompCEMult = 18.4
 												res[i].EntityMods.DakName = "NERA"
 												self.Modern = 1
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*2
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.75
 											end
 										end
 									end
@@ -303,15 +314,15 @@ function ENT:Think()
 										else
 											if res[i].EntityMods.CompositeType == "NERA" then
 												self.Modern = 1
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*2
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.75
 											end
 											if res[i].EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.25
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.5
 											end
 											if res[i].EntityMods.CompositeType == "ERA" then
 												self.ColdWar = 1
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.5
+												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.25
 											end
 										end
 									end
@@ -473,7 +484,7 @@ function ENT:Think()
 												effectdata:SetNormal( Vector(0,0,0) )
 												util.Effect("daktescalingexplosion", effectdata, true, true)
 												sound.Play( ExpSounds[math.random(1,#ExpSounds)], self.ERA[i]:GetPos(), 100, 100, 1 )
-												self.ERA[i]:DTExplosion(self.ERA[i]:GetPos(),250,50,40,5,self.DakOwner)
+												self.ERA[i]:DTExplosion(self.ERA[i]:GetPos(),25,50,40,5,self.DakOwner)
 												self.ERA[i]:Remove()
 											end
 										end
