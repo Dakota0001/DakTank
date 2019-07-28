@@ -137,32 +137,32 @@ function TOOL:RightClick( trace )
 					ply:ChatPrint("No critical entities hit.")
 				else
 					if APShatters > 0 then
-						ply:ChatPrint("Effective Armor vs AP: "..math.Round(APArmor,2).."(mm), Shattered.")
+						ply:ChatPrint("Effective Armor vs AP: "..math.Round(APArmor,2).."(mm), Shattered: 50% reduced pen.")
 					else
 						ply:ChatPrint("Effective Armor vs AP: "..math.Round(APArmor,2).."(mm), No Shatter.")
 					end
 					if HEATRico == 0 then
 						if HEATShatters > 0 then
-							ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Malfunction.")
+							ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Malfunction: 50% reduced pen.")
 						else
 							ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Functional.")
 						end
 					else
-						ply:ChatPrint("HEAT Fuze Failure.")
+						ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Failure: 75% reduced pen.")
 					end
 					if HVAPShatters > 0 then
-						ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm), Shattered.")
+						ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm), Shattered: 50% reduced pen.")
 					else
 						ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm), No Shatter.")
 					end
 					if APFSDSRico == 0 then
 						if APFSDSShatters > 0 then
-							ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), Shattered.")
+							ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), Shattered: 50% reduced pen.")
 						else
 							ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), No Shatter.")
 						end
 					else
-						ply:ChatPrint("APFSDS Ricochet.")
+						ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), Ricochet: 75% reduced pen.")
 					end
 				end
 				ply:ChatPrint("Standoff Multiplier vs HEAT: "..math.Round(StandoffMult,2)..". Standoff Multiplier vs HEATFS: "..math.Round(StandoffMult2,2)..".")

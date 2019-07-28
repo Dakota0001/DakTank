@@ -9,7 +9,6 @@ function EFFECT:Init( data )
 			pregroundtrace.endpos = Pos + Vector(0,0,-25)
 			pregroundtrace.mask = MASK_SOLID_BRUSHONLY
 		local groundtrace = util.TraceLine(pregroundtrace)
-		
 		if groundtrace.Hit then
 			for i = 1,math.Clamp(dustsize*2,2,1000) do
 

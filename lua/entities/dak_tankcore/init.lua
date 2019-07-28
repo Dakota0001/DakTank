@@ -155,7 +155,7 @@ function ENT:Think()
 						self.CostTimer = 0	
 					end
 					self.CostTimer = CurTime() - self.CostTimerFirst
-					if CostTimer > 5 then
+					if self.CostTimer > 5 then
 						self.CanSpawn = true
 					end
 				end

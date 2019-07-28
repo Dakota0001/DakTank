@@ -113,7 +113,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 				end
 				if (ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH" or ShellType == "APFSDS" or ShellType == "APDS") then
 					if HitAng >= 80 then
-						if HitEnt:GetPhysicsObject():GetMass()>75 and (ShellType == "APFSDS" or ShellType == "APDS") then Failed = 1 end
+						if HitEnt:GetPhysicsObject():GetMass()>75 and (ShellType == "APFSDS" or ShellType == "APDS" or ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM") then Failed = 1 end
 						Shatter = 1
 					end
 					if HitAng >= 70 and HitAng < 80 then
@@ -127,7 +127,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 				end
 				if (ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH" or ShellType == "APFSDS" or ShellType == "APDS") then
 					if HitAng >= 80 then
-						if HitEnt:GetPhysicsObject():GetMass()>75 and (ShellType == "APFSDS" or ShellType == "APDS") then Failed = 1 end
+						if HitEnt:GetPhysicsObject():GetMass()>75 and (ShellType == "APFSDS" or ShellType == "APDS" or ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM") then Failed = 1 end
 						Shatter = 1
 					end
 					if HitAng >= 70 and HitAng < 80 then
@@ -480,7 +480,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				if (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" or Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then
 					if HitAng >= 80 then
-						if HitEnt:GetPhysicsObject():GetMass()>75 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Failed = 1 end
+						if HitEnt:GetPhysicsObject():GetMass()>75 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS" or Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM") then Failed = 1 end
 						Shattered = 1
 					end
 					if HitAng >= 70 and HitAng < 80 then
@@ -1240,7 +1240,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					end
 					if (HitNonHitable and (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH")) or (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then
 						if HitAng >= 80 then
-							if HitEnt:GetPhysicsObject():GetMass()>75 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Failed = 1 end
+							if HitEnt:GetPhysicsObject():GetMass()>75 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS" or Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM") then Failed = 1 end
 							Shattered = 1
 						end
 						if HitAng >= 70 and HitAng < 80 then
@@ -2415,19 +2415,25 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 	local SpallMass = (SpallVolume*0.0078125) * 0.1
 	local SpallPen = Armor * 0.1
 	local SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.001
-	local traces = 10
+	local Ang = 45*(Armor/Pen)
+	if Shell.DakShellType == "HESH" then
+		Ang = 30 * math.Clamp((Pen/Armor),1,3)
+	end
+	local traces = (Ang*Ang*0.01)
 
 	if Shell.DakShellType == "HESH" then
 		SpallMass = (SpallVolume*0.0078125) * 0.05
 		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.005
 		SpallPen = Caliber * 0.1
-		traces = 20 * math.Clamp((Pen/Armor),1,3)
+		traces = traces*2
+		--traces = 20 * math.Clamp((Pen/Armor),1,3)
 	end
 	if Shell.DakShellType == "HEAT" then
 		SpallMass = (SpallVolume*0.0078125) * 0.05
 		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.005
 		SpallPen = Armor * 0.2
-		traces = 20
+		traces = traces*2
+		--traces = 20
 	end
 
 	if HitEnt.EntityMods ~= nil and HitEnt.EntityMods.Ductility ~= nil then
@@ -2438,10 +2444,6 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 
 	local Filter = table.Copy( Shell.Filter )
 	for i=1, traces do
-		local Ang = 45*(Armor/Pen)
-		if Shell.DakShellType == "HESH" then
-			Ang = 30 * math.Clamp((Pen/Armor),1,3)
-		end
 		local Direction = (Dir + Angle(math.Rand(-Ang,Ang),math.Rand(-Ang,Ang),math.Rand(-Ang,Ang))):Forward()
 		local trace = {}
 			trace.start = Pos
