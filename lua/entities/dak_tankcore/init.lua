@@ -15,15 +15,10 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
+
 	self.DakHealth = self.DakMaxHealth
 	self.DakArmor = 10
-	local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
-
-	if(IsValid(phys)) then
-		phys:Wake()
-	end
-
 	self.Outputs = WireLib.CreateOutputs( self, { "Health","HealthPercent","Crew" } )
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
@@ -87,7 +82,7 @@ end
 --[[
 local function GetParents(Ent)
     if not IsValid(Ent) then return end
-    
+
     local Table  = {[Ent] = true}
     local Parent = Ent:GetParent()
 
@@ -152,7 +147,7 @@ function ENT:Think()
 				if self.Cost and self.Cost>0 then
 					if not(self.CostTimerFirst) then
 						self.CostTimerFirst = CurTime()
-						self.CostTimer = 0	
+						self.CostTimer = 0
 					end
 					self.CostTimer = CurTime() - self.CostTimerFirst
 					if self.CostTimer > 5 then
@@ -174,7 +169,7 @@ function ENT:Think()
 						self:SetMoveType(MOVETYPE_VPHYSICS)
 						self:SetSolid(SOLID_VPHYSICS)
 					end
-					
+
 					if self.rebuildtable == nil or self.rebuildtable == 5 then --rebuild contraption table every 5 seconds instead of every second to notice weight changes.
 						self.rebuildtable = 0
 					end
@@ -552,14 +547,14 @@ function ENT:Think()
 							self.DamageCycle = 0
 							if self.DakHealth < self.CurrentHealth then
 								self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.DakHealth)
-								self.DakLastDamagePos = self.DakLastDamagePos	
+								self.DakLastDamagePos = self.DakLastDamagePos
 							end
 							self.Remake = 0
 							self.LastCurMass = self.CurMass
 							self.CurMass = 0
 							for i = 1, table.Count(self.HitBox) do
 								if self.HitBox[i].Controller ~= self then
-									self.Remake = 1	
+									self.Remake = 1
 								end
 								if self.Remake == 1 then
 									if self.HitBox[i].Controller == self then
@@ -575,7 +570,7 @@ function ENT:Think()
 												table.RemoveByValue( self.HitBox, NULL )
 											end
 											self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.HitBox[i].DakHealth)
-											self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos	
+											self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos
 										end
 									end
 								end
@@ -610,7 +605,7 @@ function ENT:Think()
 								self.HitBox[i].DakHealth = self.CurrentHealth
 							end
 							self.DakHealth = self.CurrentHealth
-							
+
 							local curvel = self:GetParent():GetParent():GetVelocity()
 							if self.LastVel == nil then
 								self.LastVel = curvel
