@@ -21,11 +21,8 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
+
 	self.DakHealth = self.DakMaxHealth
-	local phys = self:GetPhysicsObject()
-	if(phys:IsValid()) then
-		phys:Wake()
-	end
 	--self:EmitSound(self.DakSound,75,0,1,CHAN_AUTO)
 	self.initsound = self.DakSound
 	self.Sound = CreateSound( self, self.DakSound, CReliableBroadcastRecipientFilter )
@@ -217,7 +214,7 @@ function ENT:PreEntityCopy()
 
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
-	
+
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )

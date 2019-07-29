@@ -18,11 +18,8 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
+
 	self.DakHealth = self.DakMaxHealth
-	local phys = self:GetPhysicsObject()
-	if(phys:IsValid()) then
-		phys:Wake()
-	end
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.DakBurnStacks = 0
@@ -74,7 +71,7 @@ function ENT:Think()
 	self.DakMaxHealth = 5
 	self.DakArmor = 2.5
 	self.DakMass = 75
-	--self.DakModel = "models/daktanks/crew.mdl"	
+	--self.DakModel = "models/daktanks/crew.mdl"
 	if self.DakHealth > self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end
@@ -166,7 +163,7 @@ function ENT:PreEntityCopy()
 
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
-	
+
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )

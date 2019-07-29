@@ -35,16 +35,12 @@ ENT.BasicVelocity = 29527.6
 function ENT:Initialize()
 	--self:SetModel(self.DakModel)
 	self.DakHealth = self.DakMaxHealth
-	
+
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
-	local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
-	if(IsValid(phys)) then
-		phys:Wake()
-	end
 	self.Inputs = Wire_CreateInputs(self, { "Fire" })
 	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "MaxCooldown", "Ammo", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
@@ -208,7 +204,7 @@ function ENT:DakTEAmmoCheck()
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
 	if IsValid(self.DakTankCore) then
-		self.AmmoCount = 0 
+		self.AmmoCount = 0
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -225,7 +221,7 @@ end
 function ENT:DakTEFire()
 	if( self.Firing ) then
 		if IsValid(self.DakTankCore) then
-			self.AmmoCount = 0 
+			self.AmmoCount = 0
 			if not(self.DakTankCore.Ammoboxes == nil) then
 				for i = 1, #self.DakTankCore.Ammoboxes do
 					if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -313,7 +309,7 @@ function ENT:DakTEFire()
 				else
 					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100, 1 )
 				end
-								
+
 
 				local effectdata = EffectData()
 				effectdata:SetOrigin( self:GetAttachment( 1 ).Pos )
@@ -338,7 +334,7 @@ function ENT:DakTEFire()
 		end
 	end
 	if IsValid(self.DakTankCore) then
-		self.AmmoCount = 0 
+		self.AmmoCount = 0
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -395,7 +391,7 @@ function ENT:PreEntityCopy()
 
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
-	
+
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
@@ -416,7 +412,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 			self.DakFireSound2 = Ent.EntityMods.DakTek.DakFireSound2
 			self.DakFireSound3 = Ent.EntityMods.DakTek.DakFireSound3
 		end
-		
+
 
 		self.DakOwner = Player
 		self:SetColor(Ent.EntityMods.DakTek.DakColor)
@@ -435,13 +431,13 @@ end
 --[[
 function GetAncestor ( Entity )
     if not IsValid(Entity) return end
-    
+
     local Parent = Entity
-    
+
     while Parent:GetParent() do
         Parent = Parent:GetParent()
     end
-    
+
     return Parent
 end
 ]]--
