@@ -337,7 +337,10 @@ function ENT:Think()
 											else
 												self:ApplyForce(DakTurret, Angle(0,TurAng.yaw,0))
 											end
-											self:ApplyForce(self.DakGun, Angle(Ang.pitch,0,0))
+											local CounterAngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
+										    local CounterAngVelAng = Angle( CounterAngVel.y*30, CounterAngVel.z*30, CounterAngVel.x*30 )
+										    CounterAng = Angle((-CounterAngVelAng.pitch*self.Inertia.pitch),(-CounterAngVelAng.yaw*self.Inertia.yaw),(-CounterAngVelAng.roll*self.Inertia.roll))
+											self:ApplyForce(self.DakGun, Angle(Ang.pitch,CounterAng.yaw,CounterAng.roll))
 										end
 									else
 										if self.Off == true then
