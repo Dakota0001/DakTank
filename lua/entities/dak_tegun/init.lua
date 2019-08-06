@@ -35,16 +35,12 @@ ENT.BasicVelocity = 29527.6
 function ENT:Initialize()
 	--self:SetModel(self.DakModel)
 	self.DakHealth = self.DakMaxHealth
-	
+
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
-	local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
-	if(IsValid(phys)) then
-		phys:Wake()
-	end
 	self.Inputs = Wire_CreateInputs(self, { "Fire", "SwapAmmo", "Indicator [ENTITY]" })
 	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "MaxCooldown", "Ammo", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
@@ -495,7 +491,7 @@ function ENT:Think()
 		self:GetPhysicsObject():SetMass(self.DakMass)
 
 		self:DakTEAmmoCheck()
-		
+
 		self.SlowThinkTime = CurTime()
 	end
 	if CurTime()>=self.MidThinkTime+0.33 then
@@ -733,7 +729,7 @@ end
 function ENT:DakTEFire()
 	if( self.Firing ) then
 		if IsValid(self.DakTankCore) then
-			self.AmmoCount = 0 
+			self.AmmoCount = 0
 			if not(self.SortedAmmo == nil) then
 				for i = 1, #self.SortedAmmo do
 					if IsValid(self.SortedAmmo[i][1]) then
@@ -794,7 +790,7 @@ function ENT:DakTEFire()
 				end
 				if self.CurrentAmmoType == 8 or self.CurrentAmmoType == 10 then
 					Shell.DakCaliber = self.DakMaxHealth/4
-				end					
+				end
 				Shell.DakFireSound = self.DakFireSound1
 				Shell.DakFirePitch = self.DakFirePitch
 				Shell.DakGun = self
@@ -852,7 +848,7 @@ function ENT:DakTEFire()
 				util.Effect( self.DakFireEffect, effectdata, true, true)
 				--self:EmitSound( self.DakFireSound1, 100, self.DakFirePitch, 1, 6)
 				self.timer = CurTime()
-				
+
 				if self.DakAmmoType == self.DakATGM then
 					if(self:IsValid()) then
 						if(self.DakTankCore:GetParent():IsValid()) then
@@ -880,7 +876,7 @@ function ENT:DakTEFire()
 		end
 	end
 	if IsValid(self.DakTankCore) then
-		self.AmmoCount = 0 
+		self.AmmoCount = 0
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -1078,7 +1074,7 @@ function ENT:DakTEGunAmmoSwap()
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
 	if IsValid(self.DakTankCore) then
-		self.AmmoCount = 0 
+		self.AmmoCount = 0
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -1150,7 +1146,7 @@ function ENT:PreEntityCopy()
 
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
-	
+
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )

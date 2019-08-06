@@ -25,7 +25,7 @@ end
 --[[
 local function GetParents(Ent)
     if not IsValid(Ent) then return end
-    
+
     local Table  = {[Ent] = true}
     local Parent = Ent:GetParent()
 
@@ -122,15 +122,10 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
+
 	self.DakHealth = self.DakMaxHealth
 	self.DakArmor = 10
-	local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
-
-	if(IsValid(phys)) then
-		phys:Wake()
-	end
-
 	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]", "Lock" })
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
@@ -266,7 +261,7 @@ function ENT:Think()
 					self.RotationSpeed = RotMult * (15000/self.GunMass)
 					self.DakCamTrace = self.Inputs.CamTrace.Value
 					if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
-						
+
 						if not(self.Inertia) then
 							self.Inertia = Angle(self.DakGun:GetPhysicsObject():GetInertia().y,self.DakGun:GetPhysicsObject():GetInertia().z,self.DakGun:GetPhysicsObject():GetInertia().x)
 						end
@@ -413,7 +408,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		if Ent.EntityMods.DakTek.TurretMotorIDs then
 			if #Ent.EntityMods.DakTek.TurretMotorIDs > 0 then
 				for i = 1, #Ent.EntityMods.DakTek.TurretMotorIDs do
-					self.DakTurretMotors[#self.DakTurretMotors+1] = CreatedEntities[ Ent.EntityMods.DakTek.TurretMotorIDs[i] ] 
+					self.DakTurretMotors[#self.DakTurretMotors+1] = CreatedEntities[ Ent.EntityMods.DakTek.TurretMotorIDs[i] ]
 				end
 			end
 		end
