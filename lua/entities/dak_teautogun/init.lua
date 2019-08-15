@@ -1349,7 +1349,7 @@ function ENT:DakTEAutoAmmoCheck()
 	if IsValid(self.DakTankCore) then
 		self.AmmoCount = 0 
 		self.SortedAmmo = {}
-		if not(self.DakTankCore.Ammoboxes == nil) then
+		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
 					if (self.HasMag == 0 and self.IsAutoLoader == 1) then
@@ -1776,7 +1776,7 @@ function ENT:DakTEAutoGunAmmoSwap()
 	end
 	if IsValid(self.DakTankCore) then
 		self.AmmoCount = 0 
-		if not(self.DakTankCore.Ammoboxes == nil) then
+		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
 					if (self.HasMag == 0 and self.IsAutoLoader == 1) then
