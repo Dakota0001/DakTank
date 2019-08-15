@@ -235,6 +235,7 @@ function ENT:Think()
 							if res[i]:IsValid() then
 								if res[i]:GetClass() == "dak_tegun" or res[i]:GetClass() == "dak_teautogun" or res[i]:GetClass() == "dak_temachinegun" then
 									res[i].TurretController = self
+									res[i].TurretBase = DakTurret
 								end
 							end
 						end

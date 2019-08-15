@@ -943,7 +943,6 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				effectdata:SetMagnitude(.5)
 				effectdata:SetScale(Shell.DakBlastRadius)
 				effectdata:SetNormal( Normal )
-				print(Shell.DakShellType)
 				if Shell.DakShellType == "SM" then
 					util.Effect("daktescalingsmoke", effectdata, true, true)
 				else
@@ -1089,7 +1088,6 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			effectdata:SetScale(Shell.DakBlastRadius)
 		end
 		effectdata:SetNormal( Normal )
-		print(Shell.DakShellType)
 		if Shell.DakShellType == "SM" then
 			util.Effect("daktescalingsmoke", effectdata, true, true)
 		else
@@ -1706,7 +1704,6 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakBlastRadius)
 					effectdata:SetNormal( Normal )
-					print(Shell.DakShellType)
 					if Shell.DakShellType == "SM" then
 						util.Effect("daktescalingsmoke", effectdata, true, true)
 					else

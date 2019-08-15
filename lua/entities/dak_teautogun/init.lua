@@ -1778,7 +1778,7 @@ function ENT:DakTEAutoGunAmmoSwap()
 		self.AmmoCount = 0 
 		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
-				if IsValid(self.DakTankCore.Ammoboxes[i]) then
+				if IsValid(self.DakTankCore.Ammoboxes[i]) and IsValid(self.DakTankCore.Ammoboxes[i]:GetParent()) and IsValid(self.DakTankCore.Ammoboxes[i]:GetParent():GetParent()) then
 					if (self.HasMag == 0 and self.IsAutoLoader == 1) then
 						if self.TurretController.TurretBase == self.DakTankCore.Ammoboxes[i]:GetParent():GetParent() then
 							if self.DakTankCore.Ammoboxes[i].DakAmmoType == self.DakAmmoType then
