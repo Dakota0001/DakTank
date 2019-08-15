@@ -133,7 +133,7 @@ function TOOL:RightClick( trace )
 				local StandoffMult = DTGetStandoffMult(trace.StartPos, trace.HitPos+trace.Normal*5000, self:GetClientInfo("DakArmor"), {self:GetOwner()}, "HEAT")
 				local StandoffMult2 = DTGetStandoffMult(trace.StartPos, trace.HitPos+trace.Normal*5000, self:GetClientInfo("DakArmor"), {self:GetOwner()}, "HEATFS")
 				ply:ChatPrint("<><><>-------------------------------------------------------------------<><><>")
-				if (APEnt:IsWorld() or APEnt==NULL) and APArmor > 0 then
+				if (APEnt:IsWorld() or APEnt==NULL) then
 					ply:ChatPrint("No critical entities hit.")
 				else
 					if APShatters > 0 then
@@ -148,7 +148,7 @@ function TOOL:RightClick( trace )
 							ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Functional.")
 						end
 					else
-						ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Failure: 75% reduced pen.")
+						ply:ChatPrint("Effective Armor vs HEAT: "..math.Round(HEATArmor,2).."(mm), Fuze Failure: 50% reduced pen.")
 					end
 					if HVAPShatters > 0 then
 						ply:ChatPrint("Effective Armor vs HVAP: "..math.Round(HVAPArmor,2).."(mm), Shattered: 50% reduced pen.")
@@ -162,7 +162,7 @@ function TOOL:RightClick( trace )
 							ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), No Shatter.")
 						end
 					else
-						ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), Ricochet: 75% reduced pen.")
+						ply:ChatPrint("Effective Armor vs APFSDS: "..math.Round(APFSDSArmor,2).."(mm), Ricochet: 50% reduced pen.")
 					end
 				end
 				ply:ChatPrint("Standoff Multiplier vs HEAT: "..math.Round(StandoffMult,2)..". Standoff Multiplier vs HEATFS: "..math.Round(StandoffMult2,2)..".")
@@ -269,8 +269,11 @@ function TOOL:Think()
 
 				self.Weapon:SetNWFloat("Angle",math.Round(math.deg(math.acos(trace.HitNormal:Dot( -trace.Normal ))),2))
 				self.Weapon:SetNWFloat("Mass",math.Round(trace.Entity:GetPhysicsObject():GetMass(),2))
-				self.Weapon:SetNWFloat("Shell",math.Round(self:GetClientInfo("DakArmor"),2))
-
+				if not(tonumber(self:GetClientInfo("DakArmor")) == nil) then
+					self.Weapon:SetNWFloat("Shell",math.Round(self:GetClientInfo("DakArmor"),2))
+				else
+					self.Weapon:SetNWFloat("Shell",0,2)
+				end
 				if trace.Entity.IsComposite == 1 then
 					if trace.Entity.EntityMods.CompKEMult == nil then trace.Entity.EntityMods.CompKEMult = 9.2 end 
 					if trace.Entity.EntityMods.CompCEMult == nil then trace.Entity.EntityMods.CompCEMult = 18.4 end 
@@ -283,8 +286,8 @@ function TOOL:Think()
 				else
 					local APArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "AP", self:GetClientInfo("DakArmor"), {self:GetOwner()})
 					local HEATArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HEAT", self:GetClientInfo("DakArmor"), {self:GetOwner()})
-					local HVAPArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HVAP", self:GetClientInfo("DakArmor"), {self:GetOwner()})
-					local APFSDSArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "APFSDS", self:GetClientInfo("DakArmor"), {self:GetOwner()})
+					local HVAPArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "HVAP", self:GetClientInfo("DakArmor")*0.5, {self:GetOwner()})
+					local APFSDSArmor, _, _, _ = DTGetEffArmor(trace.StartPos, trace.HitPos+trace.Normal*5, "APFSDS", self:GetClientInfo("DakArmor")*0.25, {self:GetOwner()})
 					self.Weapon:SetNWFloat("Armor",math.Round(trace.Entity.DakArmor,2))
 					self.Weapon:SetNWFloat("AP",math.Round(APArmor,2))
 					self.Weapon:SetNWFloat("HEAT",math.Round(HEATArmor,2))
@@ -295,7 +298,11 @@ function TOOL:Think()
 				self.Weapon:SetNWFloat("Angle",0)
 				self.Weapon:SetNWFloat("Armor",0)
 				self.Weapon:SetNWFloat("Mass",0)
-				self.Weapon:SetNWFloat("Shell",math.Round(self:GetClientInfo("DakArmor"),2))
+				if not(tonumber(self:GetClientInfo("DakArmor")) == nil) then
+					self.Weapon:SetNWFloat("Shell",math.Round(self:GetClientInfo("DakArmor"),2))
+				else
+					self.Weapon:SetNWFloat("Shell",0,2)
+				end
 				self.Weapon:SetNWFloat("AP",0)
 				self.Weapon:SetNWFloat("HEAT",0)
 				self.Weapon:SetNWFloat("HVAP",0)

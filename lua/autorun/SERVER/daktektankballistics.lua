@@ -43,16 +43,20 @@ function DTArmorSanityCheck(Ent)
 end
 
 function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
+	if tonumber(Caliber) == nil then return 0, NULL, Vector(0,0,0), 0, 0, 0 end
 	local trace = {}
 		trace.start = Start
 		trace.endpos = End 
 		trace.filter = Filter
+		trace.ignoreworld = true
 	local ShellSimTrace = util.TraceLine( trace )
 
 	local HitEnt = ShellSimTrace.Entity
 	local EffArmor = 0
 	local Shatter = 0
 	local Failed = 0
+	local HitGun = 0
+	local HitGear = 0
 	local HitAng = math.deg(math.acos(ShellSimTrace.HitNormal:Dot(-ShellSimTrace.Normal)))
 	if HitEnt.DakHealth == nil then
 		DakTekTankEditionSetupNewEnt(HitEnt)
@@ -80,6 +84,12 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 				end
 			end
 
+			if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_teautogun" or HitEnt:GetClass() == "dak_temachinegun" then
+				HitGun = 1
+			end
+			if HitEnt:GetClass() == "dak_tegearbox" then
+				HitGear = 1
+			end
 			local TDRatio = HitEnt.DakArmor/Caliber
 			if ShellType == "APFSDS" then
 				TDRatio = HitEnt.DakArmor/(Caliber*2.5)
@@ -165,11 +175,12 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 	else
 		EndPos = End
 	end
-	return EffArmor, HitEnt, EndPos, Shatter, Failed
+	return EffArmor, HitEnt, EndPos, Shatter, Failed, HitGun, HitGear
 end
 
 function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
-	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed = DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
+	if tonumber(Caliber) == nil then return 0, NULL, 0, 0, 0 end
+	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
@@ -180,8 +191,11 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	local Shatters = HeatShattered
 	local Fails = HeatFailed
 	local Rico = 0
+	
 	while Go == 1 and Recurse<25 do
-		local newArmor, newEnt, LastPenPos, Shattered, Failed = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)		
+		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)
+		if newHitGun == 1 then HitGun = 1 end
+		if newHitGear == 1 then HitGear = 1 end		
 		if Armor == 0 or newArmor == 0 then
 			if Armor == 0 then
 				HeatShattered = Shattered
@@ -209,7 +223,7 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 			if ShellType == "APDS" or ShellType == "APFSDS" then
 				if Fails > 0 then Rico = 1 end
 			end
-			return Armor, newEnt, Shatters, Rico
+			return Armor, newEnt, Shatters, Rico, HitGun, HitGear
 		end
 		NewFilter[#NewFilter+1] = newEnt
 		Armor = Armor + newArmor
@@ -218,6 +232,7 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 end
 
 function DTGetStandoffMult(Start, End, Caliber, Filter, ShellType)
+	if tonumber(Caliber) == nil then return 0 end
 	local Recurse = 1
 	local NewFilter = Filter
 	local Go = 1
@@ -229,9 +244,9 @@ function DTGetStandoffMult(Start, End, Caliber, Filter, ShellType)
 			trace.endpos = End 
 			trace.filter = Filter
 		local ShellSimTrace = util.TraceLine( trace )
-		if ShellSimTrace.Entity then
+		if IsValid(ShellSimTrace.Entity) then
 			if ShellSimTrace.Entity:GetPhysicsObject() then
-				if ShellSimTrace.Entity:GetPhysicsObject():GetMass()>1 then
+				if ShellSimTrace.Entity:GetPhysicsObject():GetMass()>1 and not((CheckClip(ShellSimTrace.Entity,ShellSimTrace.HitPos))) then
 					if FirstArmor==nil then 
 						FirstArmor = ShellSimTrace.HitPos 
 					else 
@@ -720,10 +735,10 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								else
 									sound.Play( BounceSounds[math.random(1,#BounceSounds)], HitPos, 100, 100, 1 )
 								end
-							Shell.DakVelocity = Shell.DakVelocity*0.25
+							Shell.DakVelocity = Shell.DakVelocity*0.5
 							Shell.Ang = ((Normal)+((HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized():Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
-							Shell.DakPenetration = Shell.DakPenetration*0.25
-							Shell.DakDamage = Shell.DakDamage*0.25
+							Shell.DakPenetration = Shell.DakPenetration*0.5
+							Shell.DakDamage = Shell.DakDamage*0.5
 							Shell.LifeTime = 0.0
 							Shell.Pos = HitPos
 							Shell.JustBounced = 1
@@ -928,7 +943,12 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				effectdata:SetMagnitude(.5)
 				effectdata:SetScale(Shell.DakBlastRadius)
 				effectdata:SetNormal( Normal )
-				util.Effect("daktescalingexplosion", effectdata, true, true)
+				print(Shell.DakShellType)
+				if Shell.DakShellType == "SM" then
+					util.Effect("daktescalingsmoke", effectdata, true, true)
+				else
+					util.Effect("daktescalingexplosion", effectdata, true, true)
+				end
 
 				Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
 				if Shell.DakCaliber>=75 then
@@ -1069,7 +1089,12 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			effectdata:SetScale(Shell.DakBlastRadius)
 		end
 		effectdata:SetNormal( Normal )
-		util.Effect("daktescalingexplosion", effectdata, true, true)
+		print(Shell.DakShellType)
+		if Shell.DakShellType == "SM" then
+			util.Effect("daktescalingsmoke", effectdata, true, true)
+		else
+			util.Effect("daktescalingexplosion", effectdata, true, true)
+		end
 		Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
 		if Shell.DakCaliber>=75 then
 			Shell.DakGun:SetNWBool("Exploding",true)
@@ -1481,10 +1506,10 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 									else
 										sound.Play( BounceSounds[math.random(1,#BounceSounds)], ContShellTrace.HitPos, 100, 100, 1 )
 									end
-								Shell.DakVelocity = Shell.DakVelocity*0.25
+								Shell.DakVelocity = Shell.DakVelocity*0.5
 								Shell.Ang = ((Normal)+((ContShellTrace.HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized():Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
-								Shell.DakPenetration = Shell.DakPenetration*0.25
-								Shell.DakDamage = Shell.DakDamage*0.25
+								Shell.DakPenetration = Shell.DakPenetration*0.5
+								Shell.DakDamage = Shell.DakDamage*0.5
 								Shell.LifeTime = 0.0
 								Shell.Pos = ContShellTrace.HitPos
 								Shell.JustBounced = 1
@@ -1681,7 +1706,12 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakBlastRadius)
 					effectdata:SetNormal( Normal )
-					util.Effect("daktescalingexplosion", effectdata, true, true)
+					print(Shell.DakShellType)
+					if Shell.DakShellType == "SM" then
+						util.Effect("daktescalingsmoke", effectdata, true, true)
+					else
+						util.Effect("daktescalingexplosion", effectdata, true, true)
+					end
 
 					Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
 					if Shell.DakCaliber>=75 then
@@ -2232,6 +2262,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 end
 
 function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
+	if Shell.DakShellType == "SM" then Radius = Radius*10 end
 	Shell.DakDamageList = {}
 	Shell.RemoveList = {}
 	Shell.IgnoreList = {}
@@ -2282,7 +2313,13 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 							end
 						else
 							if Targets[i]:GetClass() == "dak_bot" then
-								Targets[i]:SetHealth(Targets[i]:Health() - Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000))*500)
+								if Shell.DakShellType == "SM" then
+									Targets[i]:SetHealth(Targets[i]:Health() - 50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)))
+									Targets[i]:Extinguish()
+									Targets[i]:Ignite(25*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)),1)
+								else
+									Targets[i]:SetHealth(Targets[i]:Health() - Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000))*500)
+								end
 								if Targets[i]:Health() <= 0 and Shell.revenge==0 then
 									local body = ents.Create( "prop_ragdoll" )
 									body:SetPos( Targets[i]:GetPos() )
@@ -2297,8 +2334,15 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 								end
 							else
 								local ExpPain = DamageInfo()
-								ExpPain:SetDamageForce( ExpTrace.Normal*Damage*Shell.DakMass*Shell.DakVelocity )
-								ExpPain:SetDamage( Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)) )
+								if Shell.DakShellType == "SM" then
+									ExpPain:SetDamageForce( ExpTrace.Normal*50*Shell.DakMass*Shell.DakVelocity )
+									ExpPain:SetDamage( 50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)) )
+									ExpTrace.Entity:Extinguish()
+									ExpTrace.Entity:Ignite(25*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)),1)
+								else
+									ExpPain:SetDamageForce( ExpTrace.Normal*Damage*Shell.DakMass*Shell.DakVelocity )
+									ExpPain:SetDamage( Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)) )
+								end
 								if Owner and Shell and Shell.DakGun then
 									ExpPain:SetAttacker( Owner )
 									ExpPain:SetInflictor( Shell.DakGun )
@@ -2411,38 +2455,46 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell)
 end
 
 function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
-	local SpallVolume = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)
-	local SpallMass = (SpallVolume*0.0078125) * 0.1
+	--local SpallVolume = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)
+	--local SpallMass = (SpallVolume*0.0078125) * 0.1
 	local SpallPen = Armor * 0.1
 	local SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.001
 	local Ang = 45*(Armor/Pen)
 	if Shell.DakShellType == "HESH" then
 		Ang = 30 * math.Clamp((Pen/Armor),1,3)
 	end
-	local traces = (Ang*Ang*0.01)
-
+	if Ang < 22.5 then Ang = 22.5 end
+	local traces = (Ang*Ang*0.04)
 	if Shell.DakShellType == "HESH" then
-		SpallMass = (SpallVolume*0.0078125) * 0.05
-		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.005
+		--SpallMass = (SpallVolume*0.0078125) * 0.05
+		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*5*0.005
 		SpallPen = Caliber * 0.1
 		traces = traces*2
 		--traces = 20 * math.Clamp((Pen/Armor),1,3)
 	end
 	if Shell.DakShellType == "HEAT" then
-		SpallMass = (SpallVolume*0.0078125) * 0.05
-		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.005
+		--SpallMass = (SpallVolume*0.0078125) * 0.05
+		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*5*0.005
 		SpallPen = Armor * 0.2
 		traces = traces*2
 		--traces = 20
 	end
-
+	if Shell.DakShellType == "HEATFS" then
+		--SpallMass = (SpallVolume*0.0078125) * 0.05
+		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*5*0.005
+		SpallPen = Armor * 0.2
+		--traces = 20
+	end
 	if HitEnt.EntityMods ~= nil and HitEnt.EntityMods.Ductility ~= nil then
 		traces = math.Round(traces * HitEnt.EntityMods.Ductility)
 		SpallDamage = math.Round(SpallDamage * HitEnt.EntityMods.Ductility)
 		SpallPen = math.Round(SpallPen * HitEnt.EntityMods.Ductility)
 	end
-
 	local Filter = table.Copy( Shell.Filter )
+	if traces > 10 then
+		SpallDamage = SpallDamage * (traces/10)
+		traces = 10
+	end
 	for i=1, traces do
 		local Direction = (Dir + Angle(math.Rand(-Ang,Ang),math.Rand(-Ang,Ang),math.Rand(-Ang,Ang))):Forward()
 		local trace = {}

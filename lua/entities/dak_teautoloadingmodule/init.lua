@@ -17,6 +17,9 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
+	local phys = self:GetPhysicsObject()
+
+	
 	self.DakArmor = 10
 	self.DakMass = 1000
 	self.Soundtime = CurTime()
@@ -25,7 +28,7 @@ function ENT:Initialize()
  	if self.DakHealth>self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end
-
+ 	
 	self.DakBurnStacks = 0
 end
 
@@ -86,40 +89,36 @@ function ENT:Think()
 		self.SparkTime=CurTime()
 	end
 		if self.DakName == "Small Autoloader Clip" then
-			self.DakName = "Small Autoloader Magazine"
+			self.DakName = "Small Autoloader Magazine" 
 		end
 		if self.DakName == "Medium Autoloader Clip" then
-			self.DakName = "Medium Autoloader Magazine"
+			self.DakName = "Medium Autoloader Magazine" 
 		end
 		if self.DakName == "Large Autoloader Clip" then
-			self.DakName = "Large Autoloader Magazine"
+			self.DakName = "Large Autoloader Magazine" 
 		end
 		if self.DakName == "Small Autoloader Magazine" then
 			self.DakMass = 1000
-			if IsValid(self.DakGun) then
-				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
-					self.DakGun.DakReloadTime = self.DakGun.DakCooldown * self.DakGun.DakMagazine
-					self.DakGun.Loaded = 1
-				end
-			end
 		end
 		if self.DakName == "Medium Autoloader Magazine" then
 			self.DakMass = 2000
-			if IsValid(self.DakGun) then
-				if self.DakGun.IsAutoLoader == 1 then
-					self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
-					self.DakGun.DakReloadTime = self.DakGun.DakCooldown * self.DakGun.DakMagazine
-					self.DakGun.Loaded = 1
-				end
-			end
 		end
 		if self.DakName == "Large Autoloader Magazine" then
 			self.DakMass = 3000
-			if IsValid(self.DakGun) then
-				if self.DakGun.IsAutoLoader == 1 then
+		end
+		if IsValid(self.DakGun) then
+			if self.DakGun.IsAutoLoader == 1 then
+				if self.DakGun.TurretController then
+					if self:GetParent():GetParent() == self.DakGun.TurretController.TurretBase then
+						self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
+						self.DakGun.DakReloadTime = self.DakGun.DakCooldown * self.DakGun.DakMagazine
+						self.DakGun.HasMag = 1
+						self.DakGun.Loaded = 1
+					end
+				else
 					self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
 					self.DakGun.DakReloadTime = self.DakGun.DakCooldown * self.DakGun.DakMagazine
+					self.DakGun.HasMag = 1
 					self.DakGun.Loaded = 1
 				end
 			end
@@ -214,7 +213,7 @@ end
 
 function ENT:CheckClip(Ent, HitPos)
 	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
-
+	
 	local HitClip = false
 	local normal
 	local origin
@@ -243,7 +242,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 		if ExpTrace.Entity:IsValid() then
 			if ExpTrace.Entity:GetClass() == self:GetClass() then
 				ExpTrace.Entity =  NULL
-			end
+			end 
 		end
 		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 			--decals don't like using the adjusted by normal Pos
@@ -262,7 +261,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
 							ExpTrace.Entity.DakIsTread = 1
 						else
-							if ExpTrace.Entity:GetClass()=="prop_physics" then
+							if ExpTrace.Entity:GetClass()=="prop_physics" then 
 								DTArmorSanityCheck(ExpTrace.Entity)
 							end
 						end
@@ -281,16 +280,16 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
 							ExpTrace.Entity.DakIsTread = 1
 						else
-							if ExpTrace.Entity:GetClass()=="prop_physics" then
+							if ExpTrace.Entity:GetClass()=="prop_physics" then 
 								DTArmorSanityCheck(ExpTrace.Entity)
 							end
 						end
 					end
-
+					
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-					if not(ExpTrace.Entity.SPPOwner==nil) then
-						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
+					if not(ExpTrace.Entity.SPPOwner==nil) then			
+						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
 							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
 						end
 					else
@@ -345,7 +344,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 				if not(ExpTrace.Entity:GetParent():IsValid()) then
 					ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 				end
-			end
+			end		
 		end
 	end
 end
@@ -364,7 +363,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 	if ExpTrace.Entity:IsValid() then
 		if ExpTrace.Entity:GetClass() == self:GetClass() then
 			ExpTrace.Entity =  NULL
-		end
+		end 
 	end
 
 	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
@@ -384,7 +383,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
 						ExpTrace.Entity.DakIsTread = 1
 					else
-						if ExpTrace.Entity:GetClass()=="prop_physics" then
+						if ExpTrace.Entity:GetClass()=="prop_physics" then 
 							DTArmorSanityCheck(ExpTrace.Entity)
 						end
 					end
@@ -403,16 +402,16 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
 						ExpTrace.Entity.DakIsTread = 1
 					else
-						if ExpTrace.Entity:GetClass()=="prop_physics" then
+						if ExpTrace.Entity:GetClass()=="prop_physics" then 
 							DTArmorSanityCheck(ExpTrace.Entity)
 						end
 					end
 				end
-
+				
 				ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-				if not(ExpTrace.Entity.SPPOwner==nil) then
-					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
+				if not(ExpTrace.Entity.SPPOwner==nil) then			
+					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
 					end
 				else
@@ -466,6 +465,6 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 			if not(ExpTrace.Entity:GetParent():IsValid()) then
 				ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 			end
-		end
+		end		
 	end
 end

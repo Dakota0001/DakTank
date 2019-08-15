@@ -31,6 +31,9 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
+	local phys = self:GetPhysicsObject()
+
+	
 	self.DakArmor = 10
 	self.DakMass = 1000
 	self.PowerMod = 1
@@ -41,7 +44,7 @@ function ENT:Initialize()
  	if self.DakHealth>self.DakMaxHealth then
 		self.DakHealth = self.DakMaxHealth
 	end
-
+ 	
 	self.DakBurnStacks = 0
 end
 
@@ -222,7 +225,7 @@ function ENT:PreEntityCopy()
 
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
-
+	
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )

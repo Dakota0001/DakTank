@@ -17,9 +17,10 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
-
 	self.DakArmor = 10
 	self.DakHealth = self.DakMaxHealth
+	local phys = self:GetPhysicsObject()
+	
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.DakBurnStacks = 0
@@ -92,19 +93,19 @@ function ENT:Think()
 	if self.DakName == "Small Turret Motor" then
 		self.DakMaxHealth = 10
 		self.DakMass = 250
-		self.DakModel = "models/xqm/hydcontrolbox.mdl"
+		self.DakModel = "models/xqm/hydcontrolbox.mdl"	
 		self.DakRotMult = 0.1
 	end
 	if self.DakName == "Medium Turret Motor" then
 		self.DakMaxHealth = 20
 		self.DakMass = 500
-		self.DakModel = "models/props_c17/utilityconducter001.mdl"
+		self.DakModel = "models/props_c17/utilityconducter001.mdl"	
 		self.DakRotMult = 0.25
 	end
 	if self.DakName == "Large Turret Motor" then
 		self.DakMaxHealth = 50
 		self.DakMass = 1000
-		self.DakModel = "models/props_c17/substation_transformer01d.mdl"
+		self.DakModel = "models/props_c17/substation_transformer01d.mdl"	
 		self.DakRotMult = 0.6
 	end
 	if self.DakModel then
@@ -158,7 +159,7 @@ function ENT:PreEntityCopy()
 
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
-
+	
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )

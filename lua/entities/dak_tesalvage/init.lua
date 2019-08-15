@@ -74,9 +74,7 @@ function ENT:Initialize()
 	self:SetColor(Color(100,100,100,255))
 	self:SetCollisionGroup( COLLISION_GROUP_WORLD )
 	local phys = self:GetPhysicsObject()
-	if(phys:IsValid()) then
-		phys:Wake()
-	end
+	
 	self.SpawnTime = CurTime()
 	local DeathSounds = {"daktanks/closeexp1.wav","daktanks/closeexp2.wav","daktanks/closeexp3.wav"}
 	self:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 1, 3)

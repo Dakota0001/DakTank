@@ -18,8 +18,11 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
-	--self.DakAmmo = self.DakMaxAmmo
+	local phys = self:GetPhysicsObject()
 
+	
+	--self.DakAmmo = self.DakMaxAmmo
+	
 	self.Inputs = Wire_CreateInputs(self, { "EjectAmmo" })
 	self.Outputs = WireLib.CreateOutputs( self, { "Ammo", "MaxAmmo" } )
 	self.Soundtime = CurTime()
@@ -138,7 +141,7 @@ function ENT:Think()
 					self.ShellVolume = self.ShellVolume*1.5
 				end
 				self.ShellMass = self.ShellVolume*0.044
-				if self.DakAmmo == nil then
+				if self.DakAmmo == nil then 
 					self.DakAmmo = self.DakMaxAmmo
 				end
 				if self.DakAmmo > self.DakMaxAmmo then
@@ -170,7 +173,7 @@ function ENT:Think()
 				self:GetPhysicsObject():SetMass(math.Round((self.ShellMass*self.DakAmmo)+10))
 			end
 		end
-
+		
 		WireLib.TriggerOutput(self, "Ammo", self.DakAmmo)
 		WireLib.TriggerOutput(self, "MaxAmmo", self.DakMaxAmmo)
 
@@ -239,7 +242,7 @@ function ENT:Think()
 									self:Remove()
 								end
 							end
-						end)
+						end)		
 						timer.Create( "AmmoBurnTimer"..self:EntIndex(), 0.25, 100, function()
 							if not(self.DakAmmo == nil) then
 								if self.DakAmmo > 0 then
@@ -327,7 +330,7 @@ function ENT:Think()
 			self:Remove()
 		end
 	end
-
+	
 	self:NextThink( CurTime()+0.1 )
     return true
 end
@@ -353,7 +356,7 @@ function ENT:PreEntityCopy()
 
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
-
+	
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
@@ -418,7 +421,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 			self.ShellVolume = self.ShellVolume*1.5
 		end
 		self.ShellMass = self.ShellVolume*0.044
-		if self.DakAmmo == nil then
+		if self.DakAmmo == nil then 
 			self.DakAmmo = self.DakMaxAmmo
 		end
 		if self.DakAmmo > self.DakMaxAmmo then
@@ -431,7 +434,7 @@ end
 
 function ENT:CheckClip(Ent, HitPos)
 	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
-
+	
 	local HitClip = false
 	local normal
 	local origin
@@ -460,7 +463,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 		if ExpTrace.Entity:IsValid() then
 			if ExpTrace.Entity:GetClass() == self:GetClass() then
 				ExpTrace.Entity =  NULL
-			end
+			end 
 		end
 		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
 			--decals don't like using the adjusted by normal Pos
@@ -479,7 +482,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
 							ExpTrace.Entity.DakIsTread = 1
 						else
-							if ExpTrace.Entity:GetClass()=="prop_physics" then
+							if ExpTrace.Entity:GetClass()=="prop_physics" then 
 								DTArmorSanityCheck(ExpTrace.Entity)
 							end
 						end
@@ -498,16 +501,16 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
 							ExpTrace.Entity.DakIsTread = 1
 						else
-							if ExpTrace.Entity:GetClass()=="prop_physics" then
+							if ExpTrace.Entity:GetClass()=="prop_physics" then 
 								DTArmorSanityCheck(ExpTrace.Entity)
 							end
 						end
 					end
-
+					
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-					if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then
-						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
+					if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
 							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
 						end
 					else
@@ -564,7 +567,7 @@ function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 				if not(ExpTrace.Entity:GetParent():IsValid()) then
 					ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( 0.01*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 				end
-			end
+			end		
 		end
 	end
 end
@@ -583,7 +586,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 	if ExpTrace.Entity:IsValid() then
 		if ExpTrace.Entity:GetClass() == self:GetClass() then
 			ExpTrace.Entity =  NULL
-		end
+		end 
 	end
 
 	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
@@ -603,7 +606,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
 						ExpTrace.Entity.DakIsTread = 1
 					else
-						if ExpTrace.Entity:GetClass()=="prop_physics" then
+						if ExpTrace.Entity:GetClass()=="prop_physics" then 
 							DTArmorSanityCheck(ExpTrace.Entity)
 						end
 					end
@@ -622,15 +625,15 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
 						ExpTrace.Entity.DakIsTread = 1
 					else
-						if ExpTrace.Entity:GetClass()=="prop_physics" then
+						if ExpTrace.Entity:GetClass()=="prop_physics" then 
 							DTArmorSanityCheck(ExpTrace.Entity)
 						end
 					end
 				end
-
+				
 				ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-				if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then
+				if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
 					end
@@ -687,7 +690,7 @@ function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dire
 			if not(ExpTrace.Entity:GetParent():IsValid()) then
 				ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( 0.01*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 			end
-		end
+		end		
 	end
 end
 ]]--

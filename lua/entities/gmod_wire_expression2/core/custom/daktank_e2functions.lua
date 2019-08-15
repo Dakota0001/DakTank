@@ -119,6 +119,9 @@ e2function string entity:daktankGetAmmoType()
 				if this.CurrentAmmoType == 10 then
 					return "APDS"
 				end
+				if this.CurrentAmmoType == 11 then
+					return "SM"
+				end
 			end
 		end
 	else
@@ -441,17 +444,19 @@ e2function number entity:daktankGetMaxCooldown()
 	return 0
 end
 
-e2function number daktankHitCrit(vector Start, vector End, string ShellType, Caliber, array Filter)
-	local Armor, Ent, _ = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
-	if Ent:IsWorld() and Armor > 0 then
-		Armor = 1000000
+e2function number daktankHitCrit(vector Start, vector End, string ShellType, number Caliber, array Filter)
+	local ArmorVal, Ent, _, _ = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
+	if Ent:IsWorld() and ArmorVal > 0 then
+		ArmorVal = 1000000
 	end
-	return Armor
+	if not(ArmorVal>-1) then return 1000000 end
+	return ArmorVal
 end
 
-e2function number daktankRecurseArmor(vector Start, vector End, string ShellType, Caliber, array Filter)
-	local Armor, Ent, _ = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
-	return Armor
+e2function number daktankRecurseArmor(vector Start, vector End, string ShellType, number Caliber, array Filter)
+	local ArmorVal, Ent, _, _ = DTGetArmorRecurse(Vector(Start[1],Start[2],Start[3]), Vector(End[1],End[2],End[3]), ShellType, Caliber, Filter)
+	if not(ArmorVal>-1) then return 1000000 end
+	return ArmorVal
 end
 
 e2function number entity:daktankGetSpeed()

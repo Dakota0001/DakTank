@@ -1630,6 +1630,11 @@ function TOOL:LeftClick( trace )
 			self.DakIsHE = false
 			self.AmmoType = "APDS"
 		end
+		if boxname[#boxname-4] == "S" and boxname[#boxname-3] == "M" then
+			self.IsAmmoCrate = 1
+			self.DakIsHE = true
+			self.AmmoType = "SM"
+		end
 		if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
 			self.GunType = "C"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
@@ -2195,10 +2200,10 @@ function TOOL:RightClick( trace )
 			if Target:GetClass() == "dak_tegearbox" then
 				if Target.DakHP and Target.TotalMass then
 					if Target.DakCrew == NULL then
-						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Uncrewed")
+						ply:ChatPrint("HP/T: "..math.Round(math.Clamp(Target.DakHP,0,Target.MaxHP)/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Uncrewed")
 						ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
 					else
-						ply:ChatPrint("HP/T: "..math.Round(Target.DakHP/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Crewed")
+						ply:ChatPrint("HP/T: "..math.Round(math.Clamp(Target.DakHP,0,Target.MaxHP)/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Crewed")
 						ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
 					end
 				end
@@ -2206,14 +2211,23 @@ function TOOL:RightClick( trace )
 			if Target:GetClass() == "dak_tankcore" then
 				if Target.Modern and Target.ColdWar then
 					if Target.Modern == 1 then
-						ply:ChatPrint("Modern Tank, x3 spawn cost multiplier, no limits, Autocannon/HMG reload and mag size improved")
+						ply:ChatPrint("Modern Tank, no limits, autocannon/HMG reload and mag size improved, carousel autoloader functionality gained")
 					elseif Target.ColdWar == 1 then
-						ply:ChatPrint("Cold War Tank, x2 spawn cost multiplier, limited to no modern composites and no APFSDS, HEATFS pen reduced, Autocannon/HMG mag size improved")
+						ply:ChatPrint("Cold War Tank, limited to no modern composites and no APFSDS, HEATFS/ATGM pen reduced, autocannon/HMG mag size improved, carousel autoloader functionality gained")
 					else
-						ply:ChatPrint("Historical Tank, x1 spawn cost multiplier, limited to no composites, APFSDS, HEATFS, or ATGMs,")
+						ply:ChatPrint("Historical Tank, limited to no composites, APFSDS, HEATFS, or ATGMs")
 					end
 					if Target.Cost~=nil then
-						ply:ChatPrint("Tank Cost: "..math.Round(Target.Cost))
+						if Target.CanSpawn == true then
+							ply:ChatPrint("Tank Cost: "..Target.Cost..", breakdown below:")
+							ply:ChatPrint("Component Cost: "..Target.ComponentCost)
+							ply:ChatPrint("Ammo Cost: "..Target.AmmoCost)
+							ply:ChatPrint("Cost multiplier for Armor: "..Target.ArmorMult)
+							ply:ChatPrint("Cost multiplier for Speed: "..Target.SpeedMult)
+							ply:ChatPrint("Cost multiplier for Firepower: "..Target.FirepowerMult)
+						else
+							ply:ChatPrint("Calculating Tank Cost")
+						end
 					end
 				end
 			end
@@ -2452,6 +2466,9 @@ function TOOL.BuildCPanel( panel )
 	selectedAmmo["HESH"] = function()
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.25,2).."mm\nDamage:        0\nSplash Dmg:   "..math.Round(Caliber*5,2).."\nBlast Radius:  "..math.Round(Caliber/10,2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )
 	end
+	selectedAmmo["SM"] = function()
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*0.1*ShellLength,2).."mm\nFrag Pen:      0mm\nDamage:        "..math.Round((25*0.25*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*6.5)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.5,2).."\nBlast Radius:  "..math.Round(0.1*(Caliber/10*(-0.005372093*(ShellLength*50)+1.118186)),2).."m\nVelocity:         "..math.Round(29527.6*0.42*0.0254*ShellLength).." m/s" )	
+	end
 	
 	--Table containing the description of the fuel tanks
 	local fuelList = {}
@@ -2483,19 +2500,19 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm Autocannon\n\nLight guns with large magazines and very rapid fire but long reload times. Great for hit and runs. They can only use AP and HE cannon ammo.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..3.1*math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nRate of Fire: "..math.Round(60/(0.2*math.sqrt((math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*7700)),2).." rpm, "..math.Round(60/(0.14*math.sqrt((math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*7700)),2).." modern\nReload Time: "..math.Round(math.sqrt((math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*7700)*0.5*math.Round(600/Caliber),2).." seconds\nMag Size:      "..math.Round(600/Caliber).." rounds, size of crate modern and cold war\n\n" )
 	end
 	gunList["Autoloader"] = function()
-		DLabel:SetText( Caliber.."mm Autoloader\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nRefire Time:  "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
+		DLabel:SetText( Caliber.."mm Autoloader\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nRefire Time (Mag):         "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300,2).." seconds\nRefire Time (Carousel):  "..math.Round(0.225*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
 	end
 	gunList["Short Autoloader"] = function()
-		DLabel:SetText( Caliber.."mm Short Autoloader\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*40))-(math.pi*((Caliber/2)^2)*(Caliber*40)))*0.001*7.8125)/1000).." kg\nRefire Time:  "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
+		DLabel:SetText( Caliber.."mm Short Autoloader\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*40))-(math.pi*((Caliber/2)^2)*(Caliber*40)))*0.001*7.8125)/1000).." kg\nRefire Time (Mag):         "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300,2).." seconds\nRefire Time (Carousel):  "..math.Round(0.225*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*5))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
 	end
 	gunList["Long Autoloader"] = function()
-		DLabel:SetText( Caliber.."mm Long Autoloader\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*9)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*70))-(math.pi*((Caliber/2)^2)*(Caliber*70)))*0.001*7.8125)/1000).." kg\nRefire Time:  "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
+		DLabel:SetText( Caliber.."mm Long Autoloader\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*9)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*70))-(math.pi*((Caliber/2)^2)*(Caliber*70)))*0.001*7.8125)/1000).." kg\nRefire Time (Mag):         "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300,2).." seconds\nRefire Time (Carousel):  "..math.Round(0.225*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*9))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
 	end
 	gunList["Autoloading Howitzer"] = function()
-		DLabel:SetText( Caliber.."mm Autoloading Howitzer\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*4)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*30))-(math.pi*((Caliber/2)^2)*(Caliber*30)))*0.001*7.8125)/1000).." kg\nRefire Time:  "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
+		DLabel:SetText( Caliber.."mm Autoloading Howitzer\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*4)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*30))-(math.pi*((Caliber/2)^2)*(Caliber*30)))*0.001*7.8125)/1000).." kg\nRefire Time (Mag):         "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300,2).." seconds\nRefire Time (Carousel):  "..math.Round(0.225*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*4))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
 	end
 	gunList["Autoloading Mortar"] = function()
-		DLabel:SetText( Caliber.."mm Autoloading Mortar\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*2.75)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*15))-(math.pi*((Caliber/2)^2)*(Caliber*15)))*0.001*7.8125)/1000).." kg\nRefire Time:  "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
+		DLabel:SetText( Caliber.."mm Autoloading Mortar\n\nCannons that fire a burst of shells before having to reload. Requires magazine module.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*2.75)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*15))-(math.pi*((Caliber/2)^2)*(Caliber*15)))*0.001*7.8125)/1000).." kg\nRefire Time (Mag):         "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300,2).." seconds\nRefire Time (Carousel):  "..math.Round(0.225*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
 	end
 	gunList["Cannon"] = function()
 		DLabel:SetText( Caliber.."mm Cannon\n\nVersatile and reliable guns with high penetration and velocity but high weight.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nReloads: \n\nAP: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*5150) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*5150)/25 ) , 1).. "\nHE: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*5350) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*5350)/25 ) , 1).. "\nHEAT: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550)/25 ) , 1).. "\nHVAP: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3725) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3725)/25 ) , 1).. "\nHESH: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3450) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3450)/25 ) , 1).. "\nATGM: "..math.Round( 0.75*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550)/25 ) , 1).. "\nHEATFS: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550)/25 ) , 1).. "\nAPFSDS: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*2750) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*2750)/25 ) , 1).. "\nAPHE: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*5450) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*5450)/25 ) , 1).. "\nAPDS: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3725) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3725)/25 ) , 1).. "\nAPDS: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3725) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3725)/25 ) , 1).. "\n\n" )
@@ -2553,49 +2570,49 @@ function TOOL.BuildCPanel( panel )
 	gunData["Autoloader"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 50/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot", "Smoke" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Long Autoloader"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 70/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot", "Smoke" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Short Autoloader"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 40/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot", "Smoke" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Autoloading Howitzer"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 30/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile", "Smoke" }
 		DermaNumSlider:SetMinMax( 50, 240 )
 	end
 	gunData["Autoloading Mortar"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 15/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile", "Smoke" }
 		DermaNumSlider:SetMinMax( 40, 280 )
 	end
 	gunData["Cannon"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 50/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot", "Smoke" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Long Cannon"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 70/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot", "Smoke" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Short Cannon"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 40/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "High Explosive Squash Head", "Anti Tank Guided Missile", "Armor Piercing Fin Stabilized Discarding Sabot", "Smoke" }
 		DermaNumSlider:SetMinMax( 25, 200 )
 	end
 	gunData["Flamethrower"] = function()
@@ -2612,7 +2629,7 @@ function TOOL.BuildCPanel( panel )
 	gunData["Howitzer"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 30/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile" }
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile", "Smoke" }
 		DermaNumSlider:SetMinMax( 50, 240 )
 	end
 	gunData["Machine Gun"] = function()
@@ -2624,7 +2641,7 @@ function TOOL.BuildCPanel( panel )
 	gunData["Mortar"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 15/50
-		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile"}
+		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile", "Smoke"}
 		DermaNumSlider:SetMinMax( 40, 280 )
 	end
 	

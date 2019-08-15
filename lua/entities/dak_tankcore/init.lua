@@ -15,10 +15,13 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
-
 	self.DakHealth = self.DakMaxHealth
 	self.DakArmor = 10
+	local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
+
+	
+
 	self.Outputs = WireLib.CreateOutputs( self, { "Health","HealthPercent","Crew" } )
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
@@ -33,6 +36,9 @@ function ENT:Initialize()
 	self.LastRemake = CurTime()
 	self.DakBurnStacks = 0
 	self.SpawnTime = CurTime()
+	self.FrontalArmor = 0
+	self.SideArmor = 0
+	self.RearArmor = 0
 end
 
 
@@ -82,7 +88,7 @@ end
 --[[
 local function GetParents(Ent)
     if not IsValid(Ent) then return end
-
+    
     local Table  = {[Ent] = true}
     local Parent = Ent:GetParent()
 
@@ -144,14 +150,315 @@ function ENT:Think()
 		if IsValid(self:GetParent()) then
 			if IsValid(self:GetParent():GetParent()) then
 				self.Base = self:GetParent():GetParent()
-				if self.Cost and self.Cost>0 then
-					if not(self.CostTimerFirst) then
-						self.CostTimerFirst = CurTime()
-						self.CostTimer = 0
+				if self.PreCost and self.PreCost>0 then
+					if not(self.PreCostTimerFirst) then
+						self.PreCostTimerFirst = CurTime()
+						self.PreCostTimer = 0	
 					end
-					self.CostTimer = CurTime() - self.CostTimerFirst
-					if self.CostTimer > 5 then
+					self.PreCostTimer = CurTime() - self.PreCostTimerFirst
+					if self.PreCostTimer > 5 and self.CanSpawn ~= true then
 						self.CanSpawn = true
+
+						local ArmorVal1 = 0
+						local addpos
+						local count = 0
+						local blocks50 = 0
+						local blocks100 = 0
+						local blocks150 = 0
+						local blocks200 = 0
+						local blocks300 = 0
+						local blocks400 = 0
+						local blocks500 = 0
+						local blocks650 = 0
+						local blocks850 = 0
+						local blocks1000 = 0
+						local gunhit = 0
+						local gearhit = 0
+						local forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
+						local right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
+						local up = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Up()
+						--FRONT
+						local startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
+						for i=1, 25 do
+							for j=1, 25 do
+								addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
+								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos+forward*500, startpos+addpos-forward*500, "AP", 75, player.GetAll())
+								if IsValid(ent) then
+									if gunhit==0 and ent.Controller == self then
+										count = count+1
+										if ArmorVal1>50 then
+											blocks50 = blocks50 + 1
+										end
+										if ArmorVal1>100 then
+											blocks100 = blocks100 + 1
+										end
+										if ArmorVal1>150 then
+											blocks150 = blocks150 + 1
+										end
+										if ArmorVal1>200 then
+											blocks200 = blocks200 + 1
+										end
+										if ArmorVal1>300 then
+											blocks300 = blocks300 + 1
+										end
+										if ArmorVal1>400 then
+											blocks400 = blocks400 + 1
+										end
+										if ArmorVal1>500 then
+											blocks500 = blocks500 + 1
+										end
+										if ArmorVal1>650 then
+											blocks650 = blocks650 + 1
+										end
+										if ArmorVal1>850 then
+											blocks850 = blocks850 + 1
+										end
+										if ArmorVal1>1000 then
+											blocks1000 = blocks1000 + 1
+										end
+									end
+								end
+							end
+						end
+						self.FrontalArmor = (((blocks50/count)+(blocks100/count)+(blocks150/count)+(blocks200/count)+(blocks300/count)+(blocks400/count)+(blocks500/count)+(blocks650/count)+(blocks850/count)+(blocks1000/count))/10)
+						--REAR
+						count = 0
+						blocks50 = 0
+						blocks100 = 0
+						blocks150 = 0
+						blocks200 = 0
+						blocks300 = 0
+						blocks400 = 0
+						blocks500 = 0
+						blocks650 = 0
+						blocks850 = 0
+						blocks1000 = 0
+						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
+						for i=1, 25 do
+							for j=1, 25 do
+								addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
+								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos-forward*500, startpos+addpos+forward*500, "AP", 75, player.GetAll())
+								if IsValid(ent) then
+									if gunhit==0 and ent.Controller == self then
+										count = count+1
+										if ArmorVal1>50 then
+											blocks50 = blocks50 + 1
+										end
+										if ArmorVal1>100 then
+											blocks100 = blocks100 + 1
+										end
+										if ArmorVal1>150 then
+											blocks150 = blocks150 + 1
+										end
+										if ArmorVal1>200 then
+											blocks200 = blocks200 + 1
+										end
+										if ArmorVal1>300 then
+											blocks300 = blocks300 + 1
+										end
+										if ArmorVal1>400 then
+											blocks400 = blocks400 + 1
+										end
+										if ArmorVal1>500 then
+											blocks500 = blocks500 + 1
+										end
+										if ArmorVal1>650 then
+											blocks650 = blocks650 + 1
+										end
+										if ArmorVal1>850 then
+											blocks850 = blocks850 + 1
+										end
+										if ArmorVal1>1000 then
+											blocks1000 = blocks1000 + 1
+										end
+									end
+								end
+							end
+						end
+						self.RearArmor = (((blocks50/count)+(blocks100/count)+(blocks150/count)+(blocks200/count)+(blocks300/count)+(blocks400/count)+(blocks500/count)+(blocks650/count)+(blocks850/count)+(blocks1000/count))/10)
+						--LEFT
+						count = 0
+						blocks50 = 0
+						blocks100 = 0
+						blocks150 = 0
+						blocks200 = 0
+						blocks300 = 0
+						blocks400 = 0
+						blocks500 = 0
+						blocks650 = 0
+						blocks850 = 0
+						blocks1000 = 0
+						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
+						for i=1, 25 do
+							for j=1, 25 do
+								addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
+								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos+right*500, startpos+addpos-right*500, "AP", 75, player.GetAll())
+								if IsValid(ent) then
+									if gunhit==0 and ent.Controller == self then
+										count = count+1
+										if ArmorVal1>50 then
+											blocks50 = blocks50 + 1
+										end
+										if ArmorVal1>100 then
+											blocks100 = blocks100 + 1
+										end
+										if ArmorVal1>150 then
+											blocks150 = blocks150 + 1
+										end
+										if ArmorVal1>200 then
+											blocks200 = blocks200 + 1
+										end
+										if ArmorVal1>300 then
+											blocks300 = blocks300 + 1
+										end
+										if ArmorVal1>400 then
+											blocks400 = blocks400 + 1
+										end
+										if ArmorVal1>500 then
+											blocks500 = blocks500 + 1
+										end
+										if ArmorVal1>650 then
+											blocks650 = blocks650 + 1
+										end
+										if ArmorVal1>850 then
+											blocks850 = blocks850 + 1
+										end
+										if ArmorVal1>1000 then
+											blocks1000 = blocks1000 + 1
+										end
+									end
+								end
+							end
+						end
+						local LeftArmor = (((blocks50/count)+(blocks100/count)+(blocks150/count)+(blocks200/count)+(blocks300/count)+(blocks400/count)+(blocks500/count)+(blocks650/count)+(blocks850/count)+(blocks1000/count))/10)
+						--RIGHT
+						count = 0
+						blocks50 = 0
+						blocks100 = 0
+						blocks150 = 0
+						blocks200 = 0
+						blocks300 = 0
+						blocks400 = 0
+						blocks500 = 0
+						blocks650 = 0
+						blocks850 = 0
+						blocks1000 = 0
+						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
+						for i=1, 25 do
+							for j=1, 25 do
+								addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
+								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos-right*500, startpos+addpos+right*500, "AP", 75, player.GetAll())
+								if IsValid(ent) then
+									if gunhit==0 and ent.Controller == self then
+										count = count+1
+										if ArmorVal1>50 then
+											blocks50 = blocks50 + 1
+										end
+										if ArmorVal1>100 then
+											blocks100 = blocks100 + 1
+										end
+										if ArmorVal1>150 then
+											blocks150 = blocks150 + 1
+										end
+										if ArmorVal1>200 then
+											blocks200 = blocks200 + 1
+										end
+										if ArmorVal1>300 then
+											blocks300 = blocks300 + 1
+										end
+										if ArmorVal1>400 then
+											blocks400 = blocks400 + 1
+										end
+										if ArmorVal1>500 then
+											blocks500 = blocks500 + 1
+										end
+										if ArmorVal1>650 then
+											blocks650 = blocks650 + 1
+										end
+										if ArmorVal1>850 then
+											blocks850 = blocks850 + 1
+										end
+										if ArmorVal1>1000 then
+											blocks1000 = blocks1000 + 1
+										end
+									end
+								end
+							end
+						end
+						local RightArmor = (((blocks50/count)+(blocks100/count)+(blocks150/count)+(blocks200/count)+(blocks300/count)+(blocks400/count)+(blocks500/count)+(blocks650/count)+(blocks850/count)+(blocks1000/count))/10)
+						self.SideArmor = (RightArmor+LeftArmor)/2
+
+						local armormult = (self.FrontalArmor*0.55)+(self.SideArmor*0.35)+(self.RearArmor*0.1)
+
+						local shellvol = ((100*0.0393701)^2)*(100*0.0393701*13)
+						local shells = 0
+						local ammocosts = 0
+						for k=1, #self.Ammoboxes do 
+							local boxname = (string.Split( self.Ammoboxes[k].DakAmmoType, "" ))
+							local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+							local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+							local name2 = boxname[#boxname-5]..boxname[#boxname-4]
+							--check longest to shortest names, with if then ifelse then else
+							local name 
+							if name6 == "APFSDS" or name6 == "HEATFS" then
+								name = name6
+							elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
+								name = name4
+							elseif name2 == "AP" or name2 == "HE" then
+								name = name2
+							end
+							shells = self.Ammoboxes[k]:GetPhysicsObject():GetVolume()/shellvol
+							local cost = 0
+							if name == "HE" or name == "HESH" then
+								cost = shells * 0.1
+							elseif name == "AP" or name == "APHE" or name == "HEAT" then
+								if name == "HEAT" and self.ColdWar == 1 then
+									cost = shells * 0.41
+								else
+									cost = shells * 0.25
+								end
+							elseif name == "HVAP" then
+								cost = shells * 0.38
+							elseif name == "APDS" then
+								cost = shells * 0.42
+							elseif name == "HEATFS" or name == "APFSDS" then
+								if name == "HEATFS" and self.ColdWar == 1 and self.Modern == 0 then
+									cost = shells * 0.62
+								else
+									cost = shells * 1
+								end
+							elseif name == "ATGM" then
+								if self.ColdWar == 1 and self.Modern == 0 then
+									cost = shells * 1.0
+								else
+									cost = shells * 1.25
+								end
+							end
+							ammocosts = ammocosts + cost
+						end
+						local speedmult = (3+(self.Gearbox.HPperTon/20))/4
+						armormult = armormult+0.5
+						--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
+
+						local KEPen = {}
+						local CEPen = {}
+						for g=1, #self.Guns do 
+							KEPen[#KEPen+1] = self.Guns[g].BaseDakShellPenetration
+							CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*1.20
+						end
+						
+						table.sort( KEPen, function( a, b ) return a > b end )
+						table.sort( CEPen, function( a, b ) return a > b end )
+						local Pen = math.max(KEPen[1],CEPen[1])		
+						local firepowermult = (1+( Pen/150 ))/2				
+						self.FirepowerMult = math.Round(firepowermult,2)
+						self.SpeedMult = math.Round(speedmult,2)
+						self.ArmorMult = math.Round(armormult,2)
+						self.AmmoCost = math.Round(ammocosts)
+						self.ComponentCost = math.Round(self.PreCost)
+						self.PreCost = self.PreCost + ammocosts
+						self.PreCost = self.PreCost*armormult*speedmult*firepowermult
+						self.Cost = math.Round(self.PreCost)
 					end
 				end
 				if not(self.Dead) then
@@ -169,7 +476,7 @@ function ENT:Think()
 						self:SetMoveType(MOVETYPE_VPHYSICS)
 						self:SetSolid(SOLID_VPHYSICS)
 					end
-
+					
 					if self.rebuildtable == nil or self.rebuildtable == 5 then --rebuild contraption table every 5 seconds instead of every second to notice weight changes.
 						self.rebuildtable = 0
 					end
@@ -215,7 +522,7 @@ function ENT:Think()
 						self.Motors={}
 						self.Fuel={}
 						self.Tread={}
-						self.Cost = 0
+						self.PreCost = 0
 						for i=1, #res do
 							if res[i]:IsSolid() then
 									self.Contraption[#self.Contraption+1] = res[i]
@@ -231,10 +538,22 @@ function ENT:Think()
 								end
 								if res[i]:GetClass() == "dak_teammo" then
 									local boxname = (string.Split( res[i].DakAmmoType, "" ))
-									if (boxname[#boxname-9] == "A" and boxname[#boxname-8] == "P" and boxname[#boxname-7] == "F" and boxname[#boxname-6] == "S" and boxname[#boxname-5] == "D" and boxname[#boxname-4] == "S") then
+									local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+									local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+									local name2 = boxname[#boxname-5]..boxname[#boxname-4]
+									--check longest to shortest names, with if then ifelse then else
+									local name 
+									if name6 == "APFSDS" or name6 == "HEATFS" then
+										name = name6
+									elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
+										name = name4
+									elseif name2 == "AP" or name2 == "HE" then
+										name = name2
+									end
+									if name == "APFSDS" then
 										self.Modern = 1
 									end
-									if (boxname[#boxname-9] == "H" and boxname[#boxname-8] == "E" and boxname[#boxname-7] == "A" and boxname[#boxname-6] == "T" and boxname[#boxname-5] == "F" and boxname[#boxname-4] == "S") or (boxname[#boxname-7] == "A" and boxname[#boxname-6] == "T" and boxname[#boxname-5] == "G" and boxname[#boxname-4] == "M") or (boxname[#boxname-7] == "A" and boxname[#boxname-6] == "P" and boxname[#boxname-5] == "D" and boxname[#boxname-4] == "S") then
+									if name == "HEATFS" or name == "ATGM" or name == "APDS" then
 										self.ColdWar = 1
 									end
 									self.Ammoboxes[#self.Ammoboxes+1] = res[i]
@@ -268,7 +587,7 @@ function ENT:Think()
 											res[i].EntityMods.CompCEMult = 18.4
 											res[i].EntityMods.DakName = "NERA"
 											self.Modern = 1
-											self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.75
+											self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.75
 										else
 											if res[i].EntityMods.CompositeType == nil then
 												res[i].EntityMods.CompositeType = "NERA"
@@ -276,7 +595,7 @@ function ENT:Think()
 												res[i].EntityMods.CompCEMult = 18.4
 												res[i].EntityMods.DakName = "NERA"
 												self.Modern = 1
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.75
+												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.75
 											end
 										end
 									end
@@ -284,44 +603,50 @@ function ENT:Think()
 									else
 										if res[i].EntityMods.CompositeType == nil or res[i].IsComposite == nil then
 											if res[i].EntityMods.ArmorType == nil then
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()
+												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()
 											else
 												if res[i].EntityMods.ArmorType == "RHA" then
 													res[i].EntityMods.Density = 7.8125
 													res[i].EntityMods.ArmorMult = 1
 													res[i].EntityMods.Ductility = 1
-													self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()
+													self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()
 												end
 												if res[i].EntityMods.ArmorType == "CHA" then
 													res[i].EntityMods.Density = 7.8125
 													res[i].EntityMods.ArmorMult = 1
 													res[i].EntityMods.Ductility = 1.5
-													self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*0.75
+													self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*0.75
 												end
 												if res[i].EntityMods.ArmorType == "HHA" then
 													res[i].EntityMods.Density = 7.8125
 													res[i].EntityMods.ArmorMult = 1
 													res[i].EntityMods.Ductility = 1.5
-													self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.25
+													self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.25
 												end
 											end
 										else
 											if res[i].EntityMods.CompositeType == "NERA" then
 												self.Modern = 1
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.75
+												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.75
 											end
 											if res[i].EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.5
+												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.5
 											end
 											if res[i].EntityMods.CompositeType == "ERA" then
 												self.ColdWar = 1
-												self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()*1.25
+												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.25
 											end
 										end
 									end
 								else
-									self.Cost = self.Cost + res[i]:GetPhysicsObject():GetMass()
+									if res[i]:GetClass()=="dak_teautogun"  then
+										self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.5
+									elseif res[i]:GetClass()=="dak_temachinegun" then
+										self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*0.5
+									else
+										self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()
+									end
 								end
 								Mass = Mass + res[i]:GetPhysicsObject():GetMass()
 								if IsValid(res[i]:GetParent()) then
@@ -337,11 +662,11 @@ function ENT:Think()
 							end
 						end
 						if self.Modern == 1 then
-							self.Cost = math.Round(self.Cost*0.003)
+							self.PreCost = math.Round(self.PreCost*0.001)
 						elseif self.ColdWar == 1 then
-							self.Cost = math.Round(self.Cost*0.002)
+							self.PreCost = math.Round(self.PreCost*0.001)
 						else
-							self.Cost = math.Round(self.Cost*0.001)
+							self.PreCost = math.Round(self.PreCost*0.001)
 						end
 						--PrintTable(self.Contraption)
 						self.CrewCount = #self.Crew
@@ -373,7 +698,7 @@ function ENT:Think()
 						WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
 					end
 					--SETUP HEALTHPOOL
-					if table.Count(self.HitBox) == 0 and self.Contraption then
+					if table.Count(self.HitBox) == 0 and self.Contraption and IsValid(self.Gearbox.ForwardEnt) then
 						if #self.Contraption>=1 then
 							self.Remake = 0
 							self.DakPooled = 1
@@ -400,6 +725,7 @@ function ENT:Think()
 													self.Contraption[i].DakMaxHealth = 5
 												end
 											end
+											self.Contraption[i].Controller = self
 										end
 									end
 								end
@@ -547,14 +873,14 @@ function ENT:Think()
 							self.DamageCycle = 0
 							if self.DakHealth < self.CurrentHealth then
 								self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.DakHealth)
-								self.DakLastDamagePos = self.DakLastDamagePos
+								self.DakLastDamagePos = self.DakLastDamagePos	
 							end
 							self.Remake = 0
 							self.LastCurMass = self.CurMass
 							self.CurMass = 0
 							for i = 1, table.Count(self.HitBox) do
 								if self.HitBox[i].Controller ~= self then
-									self.Remake = 1
+									self.Remake = 1	
 								end
 								if self.Remake == 1 then
 									if self.HitBox[i].Controller == self then
@@ -570,7 +896,7 @@ function ENT:Think()
 												table.RemoveByValue( self.HitBox, NULL )
 											end
 											self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.HitBox[i].DakHealth)
-											self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos
+											self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos	
 										end
 									end
 								end
@@ -605,7 +931,7 @@ function ENT:Think()
 								self.HitBox[i].DakHealth = self.CurrentHealth
 							end
 							self.DakHealth = self.CurrentHealth
-
+							
 							local curvel = self:GetParent():GetParent():GetVelocity()
 							if self.LastVel == nil then
 								self.LastVel = curvel
