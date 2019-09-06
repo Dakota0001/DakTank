@@ -40,7 +40,7 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
-	local phys = self:GetPhysicsObject()
+	----local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
 	
 	self.Inputs = Wire_CreateInputs(self, { "Fire", "SwapAmmo", "Indicator [ENTITY]" })
@@ -457,16 +457,22 @@ function ENT:Think()
 			end
 		end
 
+		if not(self.BaseDakShellDamage==nil) then self.DakShellSplashDamage = self.BaseDakShellDamage/2 end
 		self.Loaders = 0
-
 		if self.DakTankCore and self.TurretController then
 			if self.DakTankCore.Crew then
 				if #self.DakTankCore.Crew>0 then
 					for i=1, #self.DakTankCore.Crew do
 						if self.DakTankCore.Crew[i].DakEntity == self then
 							if IsValid(self.TurretController.TurretBase) and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
-								if self.DakTankCore.Crew[i]:GetParent():GetParent() == self.TurretController.TurretBase then
-									self.Loaders = self.Loaders + 1	
+								if self.DakTankCore.Crew[i]:IsValid() then
+									if self.DakTankCore.Crew[i]:GetParent():IsValid() then
+										if self.DakTankCore.Crew[i]:GetParent():GetParent():IsValid() then
+											if self.DakTankCore.Crew[i]:GetParent():GetParent() == self.TurretController.TurretBase or self.DakTankCore.Crew[i]:GetParent():GetParent() == self:GetParent():GetParent() then
+												self.Loaders = self.Loaders + 1	
+											end
+										end
+									end
 								end
 							else
 								self.Loaders = self.Loaders + 1	
@@ -491,7 +497,7 @@ function ENT:Think()
 		end
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
-			self:PhysicsInit(SOLID_VPHYSICS)
+			--self:PhysicsInit(SOLID_VPHYSICS)
 			self:SetMoveType(MOVETYPE_VPHYSICS)
 			self:SetSolid(SOLID_VPHYSICS)
 		end
@@ -551,7 +557,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellPenetration = self.DakMaxHealth*0.2
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
-		self.DakShellFragPen = self.DakBaseShellFragPen
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.1
 		self.CooldownWeightMod = 5350
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
@@ -572,7 +578,7 @@ function ENT:DakTEAmmoCheck()
 		end
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
-		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75*0.1
 		self.CooldownWeightMod = 3550
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
@@ -601,7 +607,7 @@ function ENT:DakTEAmmoCheck()
 		self.DakShellExplosive = true
 		self.DakShellDamage = 0
 		self.DakShellMass = self.BaseDakShellMass
-		self.DakShellPenetration = self.DakMaxHealth*1.25
+		self.DakShellPenetration = self.DakMaxHealth*0.05
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = 0
@@ -625,7 +631,7 @@ function ENT:DakTEAmmoCheck()
 		end
 		self.DakShellVelocity = 12600
 		self.DakPenLossPerMeter = 0.0
-		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75*0.1
 		self.CooldownWeightMod = 3550
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
@@ -646,7 +652,7 @@ function ENT:DakTEAmmoCheck()
 		end
 		self.DakShellVelocity = self.BaseDakShellVelocity*1.3333
 		self.DakPenLossPerMeter = 0.0
-		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75*0.1
 		self.CooldownWeightMod = 3550
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
@@ -971,7 +977,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellPenetration = self.DakMaxHealth*0.2
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
-		self.DakShellFragPen = self.DakBaseShellFragPen
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.1
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -991,7 +997,7 @@ function ENT:DakTEGunAmmoSwap()
 		end
 		self.DakShellVelocity = self.BaseDakShellVelocity*0.75
 		self.DakPenLossPerMeter = 0.0
-		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75*0.1
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -1018,7 +1024,7 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakShellExplosive = true
 		self.DakShellDamage = 0
 		self.DakShellMass = self.BaseDakShellMass
-		self.DakShellPenetration = self.DakMaxHealth*1.25
+		self.DakShellPenetration = self.DakMaxHealth*0.05
 		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0
 		self.DakShellFragPen = 0
@@ -1041,7 +1047,7 @@ function ENT:DakTEGunAmmoSwap()
 		end
 		self.DakShellVelocity = 12600
 		self.DakPenLossPerMeter = 0.0
-		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75*0.1
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
@@ -1061,7 +1067,7 @@ function ENT:DakTEGunAmmoSwap()
 		end
 		self.DakShellVelocity = self.BaseDakShellVelocity*1.3333
 		self.DakPenLossPerMeter = 0.0
-		self.DakShellFragPen = self.DakBaseShellFragPen*0.75
+		self.DakShellFragPen = self.DakBaseShellFragPen*0.75*0.1
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)

@@ -8,7 +8,7 @@ ENT.Editable = true
 
 function ENT:SetupDataTables()
 
-	self:NetworkVar( "Float", 	0, "Propellant", 	{ KeyName = "propellant", 	Edit = { type = "Float", order = 1, min = 50, max = 100 } } )
+	self:NetworkVar( "Float", 	0, "Propellant", 	{ KeyName = "propellant", 	Edit = { type = "Float", order = 1, min = 10, max = 100 } } )
 	self:SetPropellant( 100 )
 
 end

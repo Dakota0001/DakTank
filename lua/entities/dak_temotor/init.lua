@@ -22,7 +22,7 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self.DakHealth = self.DakMaxHealth
-	local phys = self:GetPhysicsObject()
+	--local phys = self:GetPhysicsObject()
 	
 	--self:EmitSound(self.DakSound,75,0,1,CHAN_AUTO)
 	self.initsound = self.DakSound
@@ -173,7 +173,7 @@ function ENT:Think()
 	if self.DakModel then
 		if self:GetModel() ~= self.DakModel then
 			self:SetModel(self.DakModel)
-			self:PhysicsInit(SOLID_VPHYSICS)
+			--self:PhysicsInit(SOLID_VPHYSICS)
 			self:SetMoveType(MOVETYPE_VPHYSICS)
 			self:SetSolid(SOLID_VPHYSICS)
 		end

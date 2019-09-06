@@ -124,7 +124,7 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self.DakHealth = self.DakMaxHealth
 	self.DakArmor = 10
-	local phys = self:GetPhysicsObject()
+	--local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
 
 	

@@ -17,7 +17,7 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
-	local phys = self:GetPhysicsObject()
+	--local phys = self:GetPhysicsObject()
 
 	
 	self.DakArmor = 10
@@ -109,11 +109,14 @@ function ENT:Think()
 		if IsValid(self.DakGun) then
 			if self.DakGun.IsAutoLoader == 1 then
 				if self.DakGun.TurretController then
-					if self:GetParent():GetParent() == self.DakGun.TurretController.TurretBase then
+					if self:GetParent():GetParent() == self.DakGun.TurretController.TurretBase or self:GetParent():GetParent() == self.DakGun:GetParent():GetParent() then
 						self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))
 						self.DakGun.DakReloadTime = self.DakGun.DakCooldown * self.DakGun.DakMagazine
 						self.DakGun.HasMag = 1
 						self.DakGun.Loaded = 1
+					else
+						self.DakGun.HasMag = 0
+						self.DakGun.Loaded = 0
 					end
 				else
 					self.DakGun.DakMagazine = math.floor(0.27*self:GetPhysicsObject():GetVolume()/(((self.DakGun.DakCaliber*0.0393701)^2)*(self.DakGun.DakCaliber*0.0393701*13*self.DakGun.ShellLengthMult)))

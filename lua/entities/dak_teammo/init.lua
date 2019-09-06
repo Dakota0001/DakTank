@@ -18,7 +18,7 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
-	local phys = self:GetPhysicsObject()
+	--local phys = self:GetPhysicsObject()
 
 	
 	--self.DakAmmo = self.DakMaxAmmo
@@ -215,7 +215,7 @@ function ENT:Think()
 							end
 						end
 					end )
-					self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,600,300,self.DakOwner)
+					self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,200,300,self.DakOwner)
 					self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
 					timer.Create( "RemoveTimer"..self:EntIndex(), 0.5, 1, function()
 						if self:IsValid() then
@@ -236,7 +236,7 @@ function ENT:Think()
 									effectdata:SetNormal( Vector(0,0,-1) )
 									util.Effect("daktescalingexplosion", effectdata, true, true)
 
-									self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,400,200,self.DakOwner)
+									self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,100,200,self.DakOwner)
 
 									self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
 									self:Remove()

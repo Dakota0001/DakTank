@@ -37,10 +37,10 @@ function ENT:Initialize()
 	self.DakHealth = self.DakMaxHealth
 	
 	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
+	--self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
-	local phys = self:GetPhysicsObject()
+	--local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
 	
 	self.Inputs = Wire_CreateInputs(self, { "Fire" })
@@ -155,7 +155,7 @@ function ENT:Think()
 
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
-			self:PhysicsInit(SOLID_VPHYSICS)
+			--self:PhysicsInit(SOLID_VPHYSICS)
 			self:SetMoveType(MOVETYPE_VPHYSICS)
 			self:SetSolid(SOLID_VPHYSICS)
 		end

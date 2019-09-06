@@ -31,7 +31,7 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 
-	local phys = self:GetPhysicsObject()
+	--local phys = self:GetPhysicsObject()
 
 	
 	self.DakArmor = 10

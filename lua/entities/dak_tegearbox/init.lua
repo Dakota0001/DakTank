@@ -21,7 +21,7 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self.DakHealth = self.DakMaxHealth
 	self.DakSpeed = 2
-	local phys = self:GetPhysicsObject()
+	--local phys = self:GetPhysicsObject()
 	
 	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "LeftDriveWheel [ENTITY]" , "RightDriveWheel [ENTITY]", "CarTurning", "ForwardFacingEntity [ENTITY]" })
 	self.Soundtime = CurTime()
@@ -265,7 +265,7 @@ function ENT:Think()
 		end
 		if self:GetModel() ~= self.DakModel then
 			self:SetModel(self.DakModel)
-			self:PhysicsInit(SOLID_VPHYSICS)
+			--self:PhysicsInit(SOLID_VPHYSICS)
 			self:SetMoveType(MOVETYPE_VPHYSICS)
 			self:SetSolid(SOLID_VPHYSICS)
 		end
@@ -302,7 +302,6 @@ function ENT:Think()
 	    	local RPhys = self.RightDriveWheel:GetPhysicsObject()
 	    	local LPos = self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60)
 			local RPos = self:GetUp()*math.Clamp(self.RightDriveWheel:OBBMaxs().z*2,1,60)
-
 	    	if self.TotalMass then
 		    	self.DakSpeed = self.DakSpeed*(10000/self.TotalMass)
 		    	self.TopSpeed = (29.851*self.DakSpeed)*GearRatio
@@ -457,18 +456,29 @@ function ENT:Think()
 									self.RBoost = 1
 								end
 							end
-							if self.MoveLeft==0 then
+							if self.CarTurning == 1 then
 								if self.LeftBrakesEnabled == 1 then
 					        		constraint.RemoveConstraints( self.LeftDriveWheel, "Weld" )
 					        		self.LeftBrakesEnabled = 0
 					        	end
-					        end
-					        if self.MoveRight==0 then
 					        	if self.RightBrakesEnabled == 1 then
 					        		constraint.RemoveConstraints( self.RightDriveWheel, "Weld" )
 					        		self.RightBrakesEnabled = 0
 					        	end
-					        end
+							else
+								if self.MoveLeft==0 then
+									if self.LeftBrakesEnabled == 1 then
+						        		constraint.RemoveConstraints( self.LeftDriveWheel, "Weld" )
+						        		self.LeftBrakesEnabled = 0
+						        	end
+						        end
+						        if self.MoveRight==0 then
+						        	if self.RightBrakesEnabled == 1 then
+						        		constraint.RemoveConstraints( self.RightDriveWheel, "Weld" )
+						        		self.RightBrakesEnabled = 0
+						        	end
+						        end
+							end
 
 							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
