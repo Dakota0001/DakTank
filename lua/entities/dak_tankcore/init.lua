@@ -460,12 +460,13 @@ function ENT:Think()
 							end
 							ammocosts = ammocosts + cost
 						end
-						local speedmult = math.Clamp((1+((self.Gearbox.DakHP/(self.Gearbox.TotalMass/1000))*0.05))*0.5,0,1.5)
+
+						local speedmult = math.Clamp((1+((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05))*0.5,0,1.5)
 						armormult = armormult+0.5
 						--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
 
-						local KEPen = {}
-						local CEPen = {}
+						local KEPen = {0}
+						local CEPen = {0}
 						local DPS = 0
 						local TotalDPS = 0
 						local ShotsPerSecond
@@ -503,7 +504,8 @@ function ENT:Think()
 								DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
 							end
 							if self.Guns[g]:GetClass() == "dak_tegun" or self.Guns[g]:GetClass() == "dak_temachinegun" then
-								ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*6.5)*5150)+1.279318)
+								if self.Guns[g]:GetClass() == "dak_temachinegun" then self.Guns[g].ShellLengthExact = 6.5 end
+								ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
 								DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
 							end
 							local shellmult = 1
@@ -519,7 +521,8 @@ function ENT:Think()
 						--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
 						math.max(0.1,firepowermult)
 						firepowermult = (altfirepowermult+firepowermult)*0.5
-						self.FirepowerMult = math.Round(math.max(0.1,firepowermult),2)
+						firepowermult = math.max((self.DakMaxHealth/25000),firepowermult)
+						self.FirepowerMult = math.Round(math.max((self.DakMaxHealth/25000),firepowermult),2)
 						self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
 						self.ArmorMult = math.Round(math.max(0.1,armormult),2)
 						self.AmmoCost = math.Round(ammocosts)
@@ -771,7 +774,7 @@ function ENT:Think()
 						WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
 					end
 					--SETUP HEALTHPOOL
-					if table.Count(self.HitBox) == 0 and self.Contraption and IsValid(self.Gearbox) and IsValid(self.Gearbox.ForwardEnt) then
+					if table.Count(self.HitBox) == 0 and self.Contraption and IsValid(self.Gearbox) then
 						if #self.Contraption>=1 then
 							self.Remake = 0
 							self.DakPooled = 1
@@ -1103,10 +1106,14 @@ function ENT:Think()
 															self.salvage = ents.Create( "dak_tesalvage" )
 															if ( !IsValid( self.salvage ) ) then return end
 															if self.Contraption[i]:GetClass() == "dak_crew" then
-																self.salvage.DakModel = "models/Humans/Charple01.mdl"
-															else
-																self.salvage.DakModel = self.Contraption[i]:GetModel()
+																if self.Contraption[i].DakHealth <= 0 then
+																	for i=1, 15 do
+																		util.Decal( "Blood", self.Contraption[i]:GetPos(), self.Contraption[i]:GetPos()+(VectorRand()*500), self.Contraption[i])
+																	end
+																end
 															end
+
+															self.salvage.DakModel = self.Contraption[i]:GetModel()
 															self.salvage:SetPos( self.Contraption[i]:GetPos())
 															self.salvage:SetAngles( self.Contraption[i]:GetAngles())
 															self.salvage:Spawn()
@@ -1133,10 +1140,13 @@ function ENT:Think()
 														if ( !IsValid( self.salvage ) ) then return end
 														self.salvage.launch = 1
 														if self.Contraption[i]:GetClass() == "dak_crew" then
-															self.salvage.DakModel = "models/Humans/Charple01.mdl"
-														else
-															self.salvage.DakModel = self.Contraption[i]:GetModel()
+															if self.Contraption[i].DakHealth <= 0 then
+																for i=1, 15 do
+																	util.Decal( "Blood", self.Contraption[i]:GetPos(), self.Contraption[i]:GetPos()+(VectorRand()*500), self.Contraption[i])
+																end
+															end
 														end
+														self.salvage.DakModel = self.Contraption[i]:GetModel()
 														self.salvage:SetPos( self.Contraption[i]:GetPos())
 														self.salvage:SetAngles( self.Contraption[i]:GetAngles())
 														self.salvage:Spawn()

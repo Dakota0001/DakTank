@@ -215,6 +215,7 @@ function ENT:OnRemove()
 			sound.Play( "daktanks/crew/us/"..self.VO6Death[math.random(1,#self.VO6Death)], self:GetPos(), 75, 100, 1 )
 		end
 	end
+
 	if IsValid(self.DakEntity) then
 	    self.DakEntity.DakCrew = NULL
     end
