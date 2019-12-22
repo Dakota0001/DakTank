@@ -534,6 +534,7 @@ function ENT:Think()
 						self.Cost = math.Round(self.PreCost)
 					end
 				end
+
 				if not(self.Dead) then
 					if not(self.DakMaxHealth) then
 						self.DakMaxHealth = 10
@@ -565,16 +566,18 @@ function ENT:Think()
 						local Mass = 0
 						local ParentMass = 0
 						local SA = 0
-
+						local ContraptionI
 						for i=1, #self.Contraption do
-							table.Add( self.Contraption, self.Contraption[i]:GetChildren() )
-							table.Add( self.Contraption, self.Contraption[i]:GetParent() )
+							ContraptionI = self.Contraption[i]
+							table.Add( self.Contraption, ContraptionI:GetChildren() )
+							table.Add( self.Contraption, ContraptionI:GetParent() )
 						end
 						local Children = {}
-
+						local ContraptionI2
 						for i2=1, #self.Contraption do
-							if table.Count(self.Contraption[i2]:GetChildren()) > 0 then
-							table.Add( Children, self.Contraption[i2]:GetChildren() )
+							ContraptionI2 = self.Contraption[i2]
+							if table.Count(ContraptionI2:GetChildren()) > 0 then
+							table.Add( Children, ContraptionI2:GetChildren() )
 							end
 						end
 
@@ -600,24 +603,27 @@ function ENT:Think()
 						self.Motors={}
 						self.Fuel={}
 						self.Tread={}
+						self.ERA={}
 						self.PreCost = 0
 						self.GunCount = 0
 						self.MachineGunCount = 0
+						local CurrentRes
 						for i=1, #res do
-							if res[i]:IsSolid() then
-									self.Contraption[#self.Contraption+1] = res[i]
-								if res[i]:GetClass()=="dak_tegearbox" then
-									res[i].DakTankCore = self
-									self.Gearbox = res[i]
+							CurrentRes = res[i]
+							if CurrentRes:IsSolid() then
+									self.Contraption[#self.Contraption+1] = CurrentRes
+								if CurrentRes:GetClass()=="dak_tegearbox" then
+									CurrentRes.DakTankCore = self
+									self.Gearbox = CurrentRes
 								end
-								if res[i]:GetClass()=="dak_tefuel" then
-									self.Fuel[#self.Fuel+1] = res[i]
+								if CurrentRes:GetClass()=="dak_tefuel" then
+									self.Fuel[#self.Fuel+1] = CurrentRes
 								end
-								if res[i]:GetClass()=="dak_temotor" then
-									self.Motors[#self.Motors+1] = res[i]
+								if CurrentRes:GetClass()=="dak_temotor" then
+									self.Motors[#self.Motors+1] = CurrentRes
 								end
-								if res[i]:GetClass() == "dak_teammo" then
-									local boxname = (string.Split( res[i].DakAmmoType, "" ))
+								if CurrentRes:GetClass() == "dak_teammo" then
+									local boxname = (string.Split( CurrentRes.DakAmmoType, "" ))
 									local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
 									local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
 									local name2 = boxname[#boxname-5]..boxname[#boxname-4]
@@ -636,111 +642,112 @@ function ENT:Think()
 									if name == "HEATFS" or name == "ATGM" or name == "HESH" or name == "APDS" then
 										self.ColdWar = 1
 									end
-									self.Ammoboxes[#self.Ammoboxes+1] = res[i]
+									self.Ammoboxes[#self.Ammoboxes+1] = CurrentRes
 								end
-								if res[i]:GetClass()=="dak_tegun" then
-									res[i].DakTankCore = self
+								if CurrentRes:GetClass()=="dak_tegun" then
+									CurrentRes.DakTankCore = self
 									self.GunCount = self.GunCount + 1
-									self.Guns[#self.Guns+1] = res[i]
+									self.Guns[#self.Guns+1] = CurrentRes
 								end
-								if res[i]:GetClass()=="dak_teautogun" then
-									res[i].DakTankCore = self
+								if CurrentRes:GetClass()=="dak_teautogun" then
+									CurrentRes.DakTankCore = self
 									self.GunCount = self.GunCount + 1
-									self.Guns[#self.Guns+1] = res[i]
+									self.Guns[#self.Guns+1] = CurrentRes
 								end
-								if res[i]:GetClass()=="dak_temachinegun" then
-									res[i].DakTankCore = self
+								if CurrentRes:GetClass()=="dak_temachinegun" then
+									CurrentRes.DakTankCore = self
 									self.MachineGunCount = self.MachineGunCount + 1
-									self.Guns[#self.Guns+1] = res[i]
+									self.Guns[#self.Guns+1] = CurrentRes
 								end
-								if res[i]:GetClass()=="dak_turretcontrol" then
-									self.TurretControls[#self.TurretControls+1]=res[i]
-									res[i].DakContraption = res
-									res[i].DakCore = self
+								if CurrentRes:GetClass()=="dak_turretcontrol" then
+									self.TurretControls[#self.TurretControls+1]=CurrentRes
+									CurrentRes.DakContraption = res
+									CurrentRes.DakCore = self
 								end
-								if res[i]:GetClass()=="dak_crew" then
-									self.Crew[#self.Crew+1]=res[i]
+								if CurrentRes:GetClass()=="dak_crew" then
+									self.Crew[#self.Crew+1]=CurrentRes
 								end
-								if res[i]:GetClass()=="prop_physics" then
-									if res[i].IsComposite == 1 then
-										if res[i].EntityMods==nil then
-											res[i].EntityMods = {}
-											res[i].EntityMods.CompositeType = "NERA"
-											res[i].EntityMods.CompKEMult = 9.2
-											res[i].EntityMods.CompCEMult = 18.4
-											res[i].EntityMods.DakName = "NERA"
+								if CurrentRes:GetClass()=="prop_physics" then
+									if CurrentRes.IsComposite == 1 then
+										if CurrentRes.EntityMods==nil then
+											CurrentRes.EntityMods = {}
+											CurrentRes.EntityMods.CompositeType = "NERA"
+											CurrentRes.EntityMods.CompKEMult = 9.2
+											CurrentRes.EntityMods.CompCEMult = 18.4
+											CurrentRes.EntityMods.DakName = "NERA"
 											self.Modern = 1
-											self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.75
+											self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.75
 										else
-											if res[i].EntityMods.CompositeType == nil then
-												res[i].EntityMods.CompositeType = "NERA"
-												res[i].EntityMods.CompKEMult = 9.2
-												res[i].EntityMods.CompCEMult = 18.4
-												res[i].EntityMods.DakName = "NERA"
+											if CurrentRes.EntityMods.CompositeType == nil then
+												CurrentRes.EntityMods.CompositeType = "NERA"
+												CurrentRes.EntityMods.CompKEMult = 9.2
+												CurrentRes.EntityMods.CompCEMult = 18.4
+												CurrentRes.EntityMods.DakName = "NERA"
 												self.Modern = 1
-												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.75
+												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.75
 											end
 										end
 									end
-									if res[i].EntityMods==nil then
+									if CurrentRes.EntityMods==nil then
 									else
-										if res[i].EntityMods.CompositeType == nil or res[i].IsComposite == nil then
-											if res[i].EntityMods.ArmorType == nil then
-												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()
+										if CurrentRes.EntityMods.CompositeType == nil or CurrentRes.IsComposite == nil then
+											if CurrentRes.EntityMods.ArmorType == nil then
+												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()
 											else
-												if res[i].EntityMods.ArmorType == "RHA" then
-													res[i].EntityMods.Density = 7.8125
-													res[i].EntityMods.ArmorMult = 1
-													res[i].EntityMods.Ductility = 1
-													self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()
+												if CurrentRes.EntityMods.ArmorType == "RHA" then
+													CurrentRes.EntityMods.Density = 7.8125
+													CurrentRes.EntityMods.ArmorMult = 1
+													CurrentRes.EntityMods.Ductility = 1
+													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()
 												end
-												if res[i].EntityMods.ArmorType == "CHA" then
-													res[i].EntityMods.Density = 7.8125
-													res[i].EntityMods.ArmorMult = 1
-													res[i].EntityMods.Ductility = 1.5
-													self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*0.75
+												if CurrentRes.EntityMods.ArmorType == "CHA" then
+													CurrentRes.EntityMods.Density = 7.8125
+													CurrentRes.EntityMods.ArmorMult = 1
+													CurrentRes.EntityMods.Ductility = 1.5
+													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*0.75
 												end
-												if res[i].EntityMods.ArmorType == "HHA" then
-													res[i].EntityMods.Density = 7.8125
-													res[i].EntityMods.ArmorMult = 1
-													res[i].EntityMods.Ductility = 1.5
-													self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.25
+												if CurrentRes.EntityMods.ArmorType == "HHA" then
+													CurrentRes.EntityMods.Density = 7.8125
+													CurrentRes.EntityMods.ArmorMult = 1
+													CurrentRes.EntityMods.Ductility = 1.5
+													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.25
 												end
 											end
 										else
-											if res[i].EntityMods.CompositeType == "NERA" then
+											if CurrentRes.EntityMods.CompositeType == "NERA" then
 												self.Modern = 1
-												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.75
+												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.75
 											end
-											if res[i].EntityMods.CompositeType == "Textolite" then
+											if CurrentRes.EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1
-												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.5
+												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.5
 											end
-											if res[i].EntityMods.CompositeType == "ERA" then
+											if CurrentRes.EntityMods.CompositeType == "ERA" then
 												self.ColdWar = 1
-												self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.25
+												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.25
+												self.ERA[#self.ERA+1]=CurrentRes
 											end
 										end
 									end
 								else
-									if res[i]:GetClass()=="dak_teautogun"  then
-										self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*1.5
-									elseif res[i]:GetClass()=="dak_temachinegun" then
-										self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()*0.5
+									if CurrentRes:GetClass()=="dak_teautogun"  then
+										self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.5
+									elseif CurrentRes:GetClass()=="dak_temachinegun" then
+										self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*0.5
 									else
-										self.PreCost = self.PreCost + res[i]:GetPhysicsObject():GetMass()
+										self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()
 									end
 								end
-								Mass = Mass + res[i]:GetPhysicsObject():GetMass()
-								if IsValid(res[i]:GetParent()) then
-									ParentMass = ParentMass + res[i]:GetPhysicsObject():GetMass()
+								Mass = Mass + CurrentRes:GetPhysicsObject():GetMass()
+								if IsValid(CurrentRes:GetParent()) then
+									ParentMass = ParentMass + CurrentRes:GetPhysicsObject():GetMass()
 								end
-								if res[i]:GetPhysicsObject():GetSurfaceArea() then
-									if res[i]:GetPhysicsObject():GetMass()>1 then
-										SA = SA + res[i]:GetPhysicsObject():GetSurfaceArea()
+								if CurrentRes:GetPhysicsObject():GetSurfaceArea() then
+									if CurrentRes:GetPhysicsObject():GetMass()>1 then
+										SA = SA + CurrentRes:GetPhysicsObject():GetSurfaceArea()
 									end
 								else
-									self.Tread[#self.Tread+1]=res[i]
+									self.Tread[#self.Tread+1]=CurrentRes
 								end
 							end
 						end
@@ -783,33 +790,35 @@ function ENT:Think()
 					--SETUP HEALTHPOOL
 					if table.Count(self.HitBox) == 0 and self.Contraption and IsValid(self.Gearbox) then
 						if #self.Contraption>=1 then
-							print("test")
 							self.Remake = 0
 							self.DakPooled = 1
 							self.DakEngine = self
 							self.Controller = self
 							if #self.Contraption>0 then
+								local ContraptionCurrent
 								for i=1, #self.Contraption do
-									if self.Contraption[i].Controller == nil or self.Contraption[i].Controller == NULL or self.Contraption[i].Controller == self then
-										if IsValid(self.Contraption[i]) then
-											if string.Explode("_",self.Contraption[i]:GetClass(),false)[1] ~= "dak" and (self.Contraption[i].EntityMods and self.Contraption[i].EntityMods.IsERA~=1) then
-												if self.Contraption[i]:IsSolid() then
-													self.HitBox[#self.HitBox+1] = self.Contraption[i]
-													self.Contraption[i].Controller = self
-													self.Contraption[i].DakOwner = self.DakOwner
-													self.Contraption[i].DakPooled = 1
+									ContraptionCurrent = self.Contraption[i]
+									if ContraptionCurrent.Controller == nil or ContraptionCurrent.Controller == NULL or ContraptionCurrent.Controller == self then
+										if IsValid(ContraptionCurrent) then
+											
+											if ContraptionCurrent.DakName == nil and (ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA~=1) then
+												if ContraptionCurrent:IsSolid() then
+													self.HitBox[#self.HitBox+1] = ContraptionCurrent
+													ContraptionCurrent.Controller = self
+													ContraptionCurrent.DakOwner = self.DakOwner
+													ContraptionCurrent.DakPooled = 1
 												end
 											else
-												if self.Contraption[i].EntityMods and self.Contraption[i].EntityMods.IsERA==1 then
-													self.ERA[#self.ERA+1] = self.Contraption[i]
-													self.Contraption[i].Controller = self
-													self.Contraption[i].DakOwner = self.DakOwner
-													self.Contraption[i].DakPooled = 1
-													self.Contraption[i].DakHealth = 5
-													self.Contraption[i].DakMaxHealth = 5
+												if ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA==1 then
+													self.ERA[#self.ERA+1] = ContraptionCurrent
+													ContraptionCurrent.Controller = self
+													ContraptionCurrent.DakOwner = self.DakOwner
+													ContraptionCurrent.DakPooled = 1
+													ContraptionCurrent.DakHealth = 5
+													ContraptionCurrent.DakMaxHealth = 5
 												end
 											end
-											self.Contraption[i].Controller = self
+											ContraptionCurrent.Controller = self
 										end
 									end
 								end
@@ -836,7 +845,7 @@ function ENT:Think()
 					else
 						self.DakActive = 0
 					end
-
+					--####################OPTIMIZE ZONE START###################--
 					if self.DakActive == 1 and table.Count(self.HitBox)~=0 and self.CurrentHealth then
 						if table.Count(self.HitBox) > 0 then
 							if self.Crew then
@@ -848,36 +857,24 @@ function ENT:Think()
 									end
 								end
 							end
-
+							
 							if self.ERA then
 								if table.Count(self.ERA) > 0 then
 									local effectdata
 									local ExpSounds = {"daktanks/eraexplosion.mp3"}
+									local EntMod 
 									for i = 1, table.Count(self.ERA) do
 										if not(IsValid(self.ERA[i])) then
 											table.remove( self.ERA, i )
 										end
 										if self.ERA[i] ~= nil and self.ERA[i] ~= NULL then
-											self.ERA[i].IsComposite = 1
-											if self.ERA[i].EntityMods.CompositeType == "NERA" then
-												self.ERA[i].EntityMods.CompKEMult = 9.2
-												self.ERA[i].EntityMods.CompCEMult = 18.4
-												self.ERA[i].EntityMods.DakName = "NERA"
-												self.Modern = 1
-											end
-											if self.ERA[i].EntityMods.CompositeType == "Textolite" then
-												self.ERA[i].EntityMods.CompKEMult = 10.4
-												self.ERA[i].EntityMods.CompCEMult = 14
-												self.ERA[i].EntityMods.DakName = "Textolite"
-												self.ColdWar = 1
-											end
-											if self.ERA[i].EntityMods.CompositeType == "ERA" then
-												self.ERA[i].EntityMods.CompKEMult = 2.5
-												self.ERA[i].EntityMods.CompCEMult = 88.9
-												self.ERA[i].EntityMods.DakName = "ERA"
-												self.ERA[i].EntityMods.IsERA = 1
-												self.ColdWar = 1
-											end
+											EntMod = self.ERA[i].EntityMods
+											if self.ERA[i].IsComposite ~= 1 then self.ERA[i].IsComposite = 1 end
+											if EntMod.CompKEMult ~= 2.5 then EntMod.CompKEMult = 2.5 end
+											if EntMod.CompCEMult ~= 88.9 then EntMod.CompCEMult = 88.9 end
+											if EntMod.DakName ~= "ERA" then EntMod.DakName = "ERA" end
+											if EntMod.IsERA ~= 1 then EntMod.IsERA = 1 end
+											if self.ColdWar ~= 1 then self.ColdWar = 1 end
 											if self.ERA[i].DakHealth <= 0 then
 												effectdata = EffectData()
 												effectdata:SetOrigin(self.ERA[i]:GetPos())
@@ -892,10 +889,11 @@ function ENT:Think()
 												self.ERA[i]:Remove()
 											end
 										end
+										
 									end
 								end
 							end
-
+							
 							if self.Composites then
 								if table.Count(self.Composites) > 0 then
 									local weightvalcomp
@@ -1014,10 +1012,12 @@ function ENT:Think()
 									self.CurrentHealth = self.CurrentHealth-self.DamageCycle
 								end
 							end
+							if self.CurrentHealth >= self.DakMaxHealth then
+								self.DakMaxHealth = self.CurMass*0.01*self.SizeMult*25
+								self.CurrentHealth = self.CurMass*0.01*self.SizeMult*25
+							end
 							for i = 1, table.Count(self.HitBox) do
 								if self.CurrentHealth >= self.DakMaxHealth then
-									self.DakMaxHealth = self.CurMass*0.01*self.SizeMult*25
-									self.CurrentHealth = self.CurMass*0.01*self.SizeMult*25
 									self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult*25
 								end
 								self.HitBox[i].DakHealth = self.CurrentHealth
@@ -1048,6 +1048,10 @@ function ENT:Think()
 
 							WireLib.TriggerOutput(self, "Health", self.DakHealth)
 							WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
+
+
+					--####################OPTIMIZE ZONE END###################--
+
 							if self.DakHealth then
 								if (self.DakHealth <= 0 or #self.Crew <= 0) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
 									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
@@ -1114,7 +1118,7 @@ function ENT:Think()
 												self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
 												if self.Contraption[i] ~= self:GetParent():GetParent() and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self then
 													if math.random(1,6)>1 then
-														if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or (string.Explode("_",self.Contraption[i]:GetClass(),false)[1] == "gmod") then
+														if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or self.Contraption[i]:GetClass() == "gmod_wire_expression2" then
 															self.salvage = ents.Create( "dak_tesalvage" )
 															if ( !IsValid( self.salvage ) ) then return end
 															if self.Contraption[i]:GetClass() == "dak_crew" then
