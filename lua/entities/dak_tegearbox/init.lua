@@ -249,7 +249,6 @@ function ENT:Think()
 				self.DakHP = 0
 			end
 		end
-
 		self.DakSpeed = (self.DakSpeed * math.Clamp(self.DakFuel/self.DakFuelReq,0,1)) * math.Clamp(self.MaxHP/self.DakHP,0,1)
 
 		if self.DakCrew == NULL then
@@ -269,7 +268,7 @@ function ENT:Think()
 			self:SetMoveType(MOVETYPE_VPHYSICS)
 			self:SetSolid(SOLID_VPHYSICS)
 		end
-		self:GetPhysicsObject():SetMass(self.DakMass)
+		if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 		self.MoveForward = self.Inputs.Forward.Value
 		self.MoveReverse = self.Inputs.Reverse.Value
 		self.MoveLeft = self.Inputs.Left.Value

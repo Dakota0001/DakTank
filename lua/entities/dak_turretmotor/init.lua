@@ -122,9 +122,8 @@ function ENT:Think()
 	if self.DakRotMult then
 		self.DakRotMult = self.DakRotMult * self.DakHealth/self.DakMaxHealth
 	end
-
-	self:GetPhysicsObject():SetMass(self.DakMass)
-
+	if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
+	
 	if self:IsOnFire() then
 		self.DakHealth = self.DakHealth - 1*0.33
 		if self.DakHealth <= 0 then

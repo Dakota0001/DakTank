@@ -421,28 +421,28 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
+				self.DakFireSound = "daktanks/c25.mp3"
 			end
 			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
+				self.DakFireSound = "daktanks/c37.mp3"
 			end
 			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
+				self.DakFireSound = "daktanks/c50.mp3"
 			end
 			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
+				self.DakFireSound = "daktanks/c75.mp3"
 			end
 			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
+				self.DakFireSound = "daktanks/c100.mp3"
 			end
 			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
+				self.DakFireSound = "daktanks/c120.mp3"
 			end
 			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
+				self.DakFireSound = "daktanks/c152.mp3"
 			end
 			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+				self.DakFireSound = "daktanks/c200.mp3"
 			end
 		end
 		if Selection == "Long Cannon" then
@@ -530,28 +530,28 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
+				self.DakFireSound = "daktanks/c25.mp3"
 			end
 			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
+				self.DakFireSound = "daktanks/c37.mp3"
 			end
 			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
+				self.DakFireSound = "daktanks/c50.mp3"
 			end
 			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
+				self.DakFireSound = "daktanks/c75.mp3"
 			end
 			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
+				self.DakFireSound = "daktanks/c100.mp3"
 			end
 			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
+				self.DakFireSound = "daktanks/c120.mp3"
 			end
 			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
+				self.DakFireSound = "daktanks/c152.mp3"
 			end
 			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+				self.DakFireSound = "daktanks/c200.mp3"
 			end
 
 		end
@@ -640,28 +640,28 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
+				self.DakFireSound = "daktanks/c25.mp3"
 			end
 			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
+				self.DakFireSound = "daktanks/c37.mp3"
 			end
 			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
+				self.DakFireSound = "daktanks/c50.mp3"
 			end
 			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
+				self.DakFireSound = "daktanks/c75.mp3"
 			end
 			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
+				self.DakFireSound = "daktanks/c100.mp3"
 			end
 			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
+				self.DakFireSound = "daktanks/c120.mp3"
 			end
 			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
+				self.DakFireSound = "daktanks/c152.mp3"
 			end
 			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+				self.DakFireSound = "daktanks/c200.mp3"
 			end
 		end
 		if Selection == "Howitzer" then
@@ -749,25 +749,25 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/h50.wav"
+				self.DakFireSound = "daktanks/h50.mp3"
 			end
 			if self.DakCaliber >= 75 and self.DakCaliber < 105 then
-				self.DakFireSound = "daktanks/h75.wav"
+				self.DakFireSound = "daktanks/h75.mp3"
 			end
 			if self.DakCaliber >= 105 and self.DakCaliber < 122 then
-				self.DakFireSound = "daktanks/h105.wav"
+				self.DakFireSound = "daktanks/h105.mp3"
 			end
 			if self.DakCaliber >= 122 and self.DakCaliber < 155 then
-				self.DakFireSound = "daktanks/h122.wav"
+				self.DakFireSound = "daktanks/h122.mp3"
 			end
 			if self.DakCaliber >= 155 and self.DakCaliber < 203 then
-				self.DakFireSound = "daktanks/h155.wav"
+				self.DakFireSound = "daktanks/h155.mp3"
 			end
 			if self.DakCaliber >= 203 and self.DakCaliber < 420 then
-				self.DakFireSound = "daktanks/h203.wav"
+				self.DakFireSound = "daktanks/h203.mp3"
 			end
 			if self.DakCaliber >= 420 then
-				self.DakFireSound = "daktanks/h420.wav"
+				self.DakFireSound = "daktanks/h420.mp3"
 			end
 		end
 		if Selection == "Mortar" then
@@ -870,29 +870,58 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 90 then
-				self.DakFireSound = "daktanks/m60.wav"
+				self.DakFireSound = "daktanks/m60.mp3"
 			end
 			if self.DakCaliber >= 90 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/m90.wav"
+				self.DakFireSound = "daktanks/m90.mp3"
 			end
 			if self.DakCaliber >= 120 and self.DakCaliber < 150 then
-				self.DakFireSound = "daktanks/m120.wav"
+				self.DakFireSound = "daktanks/m120.mp3"
 			end
 			if self.DakCaliber >= 150 and self.DakCaliber < 240 then
-				self.DakFireSound = "daktanks/m150.wav"
+				self.DakFireSound = "daktanks/m150.mp3"
 			end
 			if self.DakCaliber >= 240 and self.DakCaliber < 280 then
-				self.DakFireSound = "daktanks/m240.wav"
+				self.DakFireSound = "daktanks/m240.mp3"
 			end
 			if self.DakCaliber >= 280 and self.DakCaliber < 420 then
-				self.DakFireSound = "daktanks/m280.wav"
+				self.DakFireSound = "daktanks/m280.mp3"
 			end
 			if self.DakCaliber >= 420 and self.DakCaliber < 600 then
-				self.DakFireSound = "daktanks/m420.wav"
+				self.DakFireSound = "daktanks/m420.mp3"
 			end
 			if self.DakCaliber >= 600 then
-				self.DakFireSound = "daktanks/m600.wav"
+				self.DakFireSound = "daktanks/m600.mp3"
 			end
+		end
+		if Selection == "Smoke Launcher" then
+			self.DakGunType = "Smoke Launcher"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,100)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakName = self.DakCaliber.."mm Smoke Launcher"
+			if self.DakCaliber < 50 then
+				self.DakModel = "models/daktanks/smokelauncher40mm.mdl"
+			end
+			if self.DakCaliber >= 50 and self.DakCaliber < 60 then
+				self.DakModel = "models/daktanks/smokelauncher50mm.mdl"
+			end
+			if self.DakCaliber >= 60 and self.DakCaliber < 70 then
+				self.DakModel = "models/daktanks/smokelauncher60mm.mdl"
+			end
+			if self.DakCaliber >= 70 and self.DakCaliber < 80 then
+				self.DakModel = "models/daktanks/smokelauncher70mm.mdl"
+			end
+			if self.DakCaliber >= 80 and self.DakCaliber < 90 then
+				self.DakModel = "models/daktanks/smokelauncher80mm.mdl"
+			end
+			if self.DakCaliber >= 90 and self.DakCaliber < 100 then
+				self.DakModel = "models/daktanks/smokelauncher90mm.mdl"
+			end
+			if self.DakCaliber >= 100 then
+				self.DakModel = "models/daktanks/smokelauncher100mm.mdl"
+			end
+
+			self.DakFireSound = "daktanks/new/cannons/misc/grenade_launcher_01.mp3"
 		end
 		if Selection == "Autoloader" then
 			self.DakGunType = "Autoloader"
@@ -979,28 +1008,28 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
+				self.DakFireSound = "daktanks/c25.mp3"
 			end
 			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
+				self.DakFireSound = "daktanks/c37.mp3"
 			end
 			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
+				self.DakFireSound = "daktanks/c50.mp3"
 			end
 			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
+				self.DakFireSound = "daktanks/c75.mp3"
 			end
 			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
+				self.DakFireSound = "daktanks/c100.mp3"
 			end
 			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
+				self.DakFireSound = "daktanks/c120.mp3"
 			end
 			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
+				self.DakFireSound = "daktanks/c152.mp3"
 			end
 			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+				self.DakFireSound = "daktanks/c200.mp3"
 			end
 		end
 		if Selection == "Long Autoloader" then
@@ -1088,28 +1117,28 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
+				self.DakFireSound = "daktanks/c25.mp3"
 			end
 			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
+				self.DakFireSound = "daktanks/c37.mp3"
 			end
 			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
+				self.DakFireSound = "daktanks/c50.mp3"
 			end
 			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
+				self.DakFireSound = "daktanks/c75.mp3"
 			end
 			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
+				self.DakFireSound = "daktanks/c100.mp3"
 			end
 			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
+				self.DakFireSound = "daktanks/c120.mp3"
 			end
 			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
+				self.DakFireSound = "daktanks/c152.mp3"
 			end
 			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+				self.DakFireSound = "daktanks/c200.mp3"
 			end
 
 		end
@@ -1198,28 +1227,28 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/c25.wav"
+				self.DakFireSound = "daktanks/c25.mp3"
 			end
 			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/c37.wav"
+				self.DakFireSound = "daktanks/c37.mp3"
 			end
 			if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/c50.wav"
+				self.DakFireSound = "daktanks/c50.mp3"
 			end
 			if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-				self.DakFireSound = "daktanks/c75.wav"
+				self.DakFireSound = "daktanks/c75.mp3"
 			end
 			if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/c100.wav"
+				self.DakFireSound = "daktanks/c100.mp3"
 			end
 			if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-				self.DakFireSound = "daktanks/c120.wav"
+				self.DakFireSound = "daktanks/c120.mp3"
 			end
 			if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-				self.DakFireSound = "daktanks/c152.wav"
+				self.DakFireSound = "daktanks/c152.mp3"
 			end
 			if self.DakCaliber >= 200 then
-				self.DakFireSound = "daktanks/c200.wav"
+				self.DakFireSound = "daktanks/c200.mp3"
 			end
 		end
 		if Selection == "Autoloading Howitzer" then
@@ -1307,25 +1336,25 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 75 then
-				self.DakFireSound = "daktanks/h50.wav"
+				self.DakFireSound = "daktanks/h50.mp3"
 			end
 			if self.DakCaliber >= 75 and self.DakCaliber < 105 then
-				self.DakFireSound = "daktanks/h75.wav"
+				self.DakFireSound = "daktanks/h75.mp3"
 			end
 			if self.DakCaliber >= 105 and self.DakCaliber < 122 then
-				self.DakFireSound = "daktanks/h105.wav"
+				self.DakFireSound = "daktanks/h105.mp3"
 			end
 			if self.DakCaliber >= 122 and self.DakCaliber < 155 then
-				self.DakFireSound = "daktanks/h122.wav"
+				self.DakFireSound = "daktanks/h122.mp3"
 			end
 			if self.DakCaliber >= 155 and self.DakCaliber < 203 then
-				self.DakFireSound = "daktanks/h155.wav"
+				self.DakFireSound = "daktanks/h155.mp3"
 			end
 			if self.DakCaliber >= 203 and self.DakCaliber < 420 then
-				self.DakFireSound = "daktanks/h203.wav"
+				self.DakFireSound = "daktanks/h203.mp3"
 			end
 			if self.DakCaliber >= 420 then
-				self.DakFireSound = "daktanks/h420.wav"
+				self.DakFireSound = "daktanks/h420.mp3"
 			end
 		end
 		if Selection == "Autoloading Mortar" then
@@ -1428,28 +1457,28 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 90 then
-				self.DakFireSound = "daktanks/m60.wav"
+				self.DakFireSound = "daktanks/m60.mp3"
 			end
 			if self.DakCaliber >= 90 and self.DakCaliber < 120 then
-				self.DakFireSound = "daktanks/m90.wav"
+				self.DakFireSound = "daktanks/m90.mp3"
 			end
 			if self.DakCaliber >= 120 and self.DakCaliber < 150 then
-				self.DakFireSound = "daktanks/m120.wav"
+				self.DakFireSound = "daktanks/m120.mp3"
 			end
 			if self.DakCaliber >= 150 and self.DakCaliber < 240 then
-				self.DakFireSound = "daktanks/m150.wav"
+				self.DakFireSound = "daktanks/m150.mp3"
 			end
 			if self.DakCaliber >= 240 and self.DakCaliber < 280 then
-				self.DakFireSound = "daktanks/m240.wav"
+				self.DakFireSound = "daktanks/m240.mp3"
 			end
 			if self.DakCaliber >= 280 and self.DakCaliber < 420 then
-				self.DakFireSound = "daktanks/m280.wav"
+				self.DakFireSound = "daktanks/m280.mp3"
 			end
 			if self.DakCaliber >= 420 and self.DakCaliber < 600 then
-				self.DakFireSound = "daktanks/m420.wav"
+				self.DakFireSound = "daktanks/m420.mp3"
 			end
 			if self.DakCaliber >= 600 then
-				self.DakFireSound = "daktanks/m600.wav"
+				self.DakFireSound = "daktanks/m600.mp3"
 			end
 		end
 		if Selection == "MG" then
@@ -1477,19 +1506,19 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 7.62 then
-				self.DakFireSound = "daktanks/5mm.wav"
+				self.DakFireSound = "daktanks/5mm.mp3"
 			end
 			if self.DakCaliber >= 7.62 and self.DakCaliber < 9 then
-				self.DakFireSound = "daktanks/7mm.wav"
+				self.DakFireSound = "daktanks/7mm.mp3"
 			end
 			if self.DakCaliber >= 9 and self.DakCaliber < 12.7 then
-				self.DakFireSound = "daktanks/9mm.wav"
+				self.DakFireSound = "daktanks/9mm.mp3"
 			end
 			if self.DakCaliber >= 12.7 and self.DakCaliber < 14.5 then
-				self.DakFireSound = "daktanks/12mm.wav"
+				self.DakFireSound = "daktanks/12mm.mp3"
 			end
 			if self.DakCaliber >= 14.5 then
-				self.DakFireSound = "daktanks/14mm.wav"
+				self.DakFireSound = "daktanks/14mm.mp3"
 			end
 		end
 		if Selection == "Flamethrower" then
@@ -1498,7 +1527,7 @@ function TOOL:LeftClick( trace )
 			self.DakMaxHealth = 10
 			self.DakName = "Flamethrower"
 			self.DakModel = "models/daktanks/flamethrower.mdl"
-			self.DakFireSound = "daktanks/flamerfire.wav"
+			self.DakFireSound = "daktanks/flamerfire.mp3"
 		end
 		if Selection == "HMG" then
 			self.DakGunType = "HMG"
@@ -1525,13 +1554,13 @@ function TOOL:LeftClick( trace )
 			end
 
 			if self.DakCaliber < 30 then
-				self.DakFireSound = "daktanks/hmg20.wav"
+				self.DakFireSound = "daktanks/hmg20.mp3"
 			end
 			if self.DakCaliber >= 30 and self.DakCaliber < 40 then
-				self.DakFireSound = "daktanks/hmg30.wav"
+				self.DakFireSound = "daktanks/hmg30.mp3"
 			end
 			if self.DakCaliber >= 40 then
-				self.DakFireSound = "daktanks/hmg40.wav"
+				self.DakFireSound = "daktanks/hmg40.mp3"
 			end
 		end
 		if Selection == "Autocannon" then
@@ -1568,13 +1597,13 @@ function TOOL:LeftClick( trace )
 			end
 			
 			if self.DakCaliber < 37 then
-				self.DakFireSound = "daktanks/ac25.wav"
+				self.DakFireSound = "daktanks/ac25.mp3"
 			end
 			if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-				self.DakFireSound = "daktanks/ac37.wav"
+				self.DakFireSound = "daktanks/ac37.mp3"
 			end
 			if self.DakCaliber >= 50 then
-				self.DakFireSound = "daktanks/ac50.wav"
+				self.DakFireSound = "daktanks/ac50.mp3"
 			end
 		end
 		--AMMO--
@@ -1650,6 +1679,10 @@ function TOOL:LeftClick( trace )
 		if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
 			self.GunType = "H"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+		end
+		if self:GetClientInfo("DTTE_AmmoType") == "Smoke Launcher" then
+			self.GunType = "SL"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,100)
 		end
 		if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
 			self.GunType = "M"
@@ -2538,6 +2571,9 @@ function TOOL.BuildCPanel( panel )
 	gunList["MG"] = function()
 		DLabel:SetText( Caliber.."mm Machine Gun\n\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..5+(2*math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000)).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.1)).." rpm\n\n" )
 	end
+	gunList["Smoke Launcher"] = function()
+		DLabel:SetText( Caliber.."mm Smoke Launcher\n\nLightweight tube built to fire low velocity smoke grenades to conceal the vehicle's movement.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..5+(2*math.Round(((((Caliber*0.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*3))-(math.pi*((Caliber/2)^2)*(Caliber*3)))*0.001*7.8125)/1000)).." kg\nReload Time: 30 seconds" )
+	end
 	gunList["Mortar"] = function()
 		DLabel:SetText( Caliber.."mm Mortar\n\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*2.75)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*15))-(math.pi*((Caliber/2)^2)*(Caliber*15)))*0.001*7.8125)/1000).." kg\nReloads: \n\nAP: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5150) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5150)/25 ) , 1).. "\nHE: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5350) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5350)/25 ) , 1).. "\nHEAT: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550)/25 ) , 1).. "\nHESH: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3450) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3450)/25 ) , 1).. "\nATGM: "..math.Round( 0.75*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550)/25 ) , 1).. "\nHEATFS: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550)/25 ) , 1).. "\nAPHE: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5450) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5450)/25 ) , 1).. "\n\n" )
 	end
@@ -2597,6 +2633,13 @@ function TOOL.BuildCPanel( panel )
 		ShellLengthExact = 4
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile", "Smoke" }
 		DermaNumSlider:SetMinMax( 50, 240 )
+	end
+	gunData["Smoke Launcher"] = function()
+		EntType   = "dak_temachinegun"
+		ShellLength = 3/50
+		ShellLengthExact = 0.5
+		AmmoTypes = { "Smoke" }
+		DermaNumSlider:SetMinMax( 40, 100 )
 	end
 	gunData["Autoloading Mortar"] = function()
 		EntType   = "dak_teautogun"
@@ -3001,7 +3044,7 @@ function TOOL.BuildCPanel( panel )
 
 				local String = string.Explode( " ", CrateModel )
 				local AmmoCrate = String[1]..AmmoType..String[3]
-				local ShellVol = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.5118113
+				local ShellVol = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*6.5)
 				local ShellLenMult = 6.5
 				local ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 
@@ -3012,21 +3055,25 @@ function TOOL.BuildCPanel( panel )
 						AmmoType = "HEAT"
 					end
 				end
-
+				--NOTE: shell volume formula is pi * ( ( Caliber * 0.5*mm to inch multiplier)^2 )*Caliber*(mm to inch multiplier*shell length mult*2)
 				if AmmoBoxSelect:GetSelected() == "Howitzer" or AmmoBoxSelect:GetSelected() == "Autoloading Howitzer" then
-					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.3149608
+					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*4)
 					ShellLenMult = 4
 					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
+				elseif AmmoBoxSelect:GetSelected() == "Smoke Launcher" then
+					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*1.375)
+					ShellLenMult = 1.375
+					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 				elseif AmmoBoxSelect:GetSelected() == "Mortar" or  AmmoBoxSelect:GetSelected() == "AutoloadingMortar" then
-					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.206693025
+					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*2.75)
 					ShellLenMult = 2.75
 					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 				elseif AmmoBoxSelect:GetSelected() == "Short Cannon" or AmmoBoxSelect:GetSelected() == "Heavy Machine Gun" or AmmoBoxSelect:GetSelected() == "Short Autoloader" then
-					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.393701
+					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*5)
 					ShellLenMult = 5
 					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 				elseif AmmoBoxSelect:GetSelected() == "Long Cannon" or AmmoBoxSelect:GetSelected() == "Long Autoloader" then
-					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*0.7086618
+					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*9)
 					ShellLenMult = 9
 					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 				end
@@ -3128,6 +3175,7 @@ function TOOL.BuildCPanel( panel )
 	AmmoBoxSelect:AddChoice( "Heavy Machine Gun" )
 	AmmoBoxSelect:AddChoice( "Howitzer" )
 	AmmoBoxSelect:AddChoice( "Machine Gun" )
+	AmmoBoxSelect:AddChoice( "Smoke Launcher" )
 	AmmoBoxSelect:AddChoice( "Mortar" )
 	AmmoBoxSelect.OnSelect = function( panel, index, value )
 		GunType = value

@@ -108,42 +108,42 @@ function ENT:Think()
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
-				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-				self.ReloadSound = "daktanks/dakreloadlight.wav"
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+				self.ReloadSound = "daktanks/dakreloadlight.mp3"
 			end
 			if self.DakCaliber > 75 and self.DakCaliber < 120 then
-				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadmedium.wav"
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadmedium.mp3"
 			end
 			if self.DakCaliber >= 120 then
-				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadheavy.wav"
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadheavy.mp3"
 			end
 
 			if self.DakFireSound1 == nil then
 				if self.DakCaliber < 37 then
-					self.DakFireSound1 = "daktanks/c25.wav"
+					self.DakFireSound1 = "daktanks/c25.mp3"
 				end
 				if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-					self.DakFireSound1 = "daktanks/c37.wav"
+					self.DakFireSound1 = "daktanks/c37.mp3"
 				end
 				if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-					self.DakFireSound1 = "daktanks/c50.wav"
+					self.DakFireSound1 = "daktanks/c50.mp3"
 				end
 				if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-					self.DakFireSound1 = "daktanks/c75.wav"
+					self.DakFireSound1 = "daktanks/c75.mp3"
 				end
 				if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-					self.DakFireSound1 = "daktanks/c100.wav"
+					self.DakFireSound1 = "daktanks/c100.mp3"
 				end
 				if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-					self.DakFireSound1 = "daktanks/c120.wav"
+					self.DakFireSound1 = "daktanks/c120.mp3"
 				end
 				if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-					self.DakFireSound1 = "daktanks/c152.wav"
+					self.DakFireSound1 = "daktanks/c152.mp3"
 				end
 				if self.DakCaliber >= 200 then
-					self.DakFireSound1 = "daktanks/c200.wav"
+					self.DakFireSound1 = "daktanks/c200.mp3"
 				end
 			end
 		end
@@ -188,42 +188,42 @@ function ENT:Think()
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
-				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-				self.ReloadSound = "daktanks/dakreloadlight.wav"
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+				self.ReloadSound = "daktanks/dakreloadlight.mp3"
 			end
 			if self.DakCaliber > 75 and self.DakCaliber < 120 then
-				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadmedium.wav"
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadmedium.mp3"
 			end
 			if self.DakCaliber >= 120 then
-				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadheavy.wav"
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadheavy.mp3"
 			end
 
 			if self.DakFireSound1 == nil then
 				if self.DakCaliber < 37 then
-					self.DakFireSound1 = "daktanks/c25.wav"
+					self.DakFireSound1 = "daktanks/c25.mp3"
 				end
 				if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-					self.DakFireSound1 = "daktanks/c37.wav"
+					self.DakFireSound1 = "daktanks/c37.mp3"
 				end
 				if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-					self.DakFireSound1 = "daktanks/c50.wav"
+					self.DakFireSound1 = "daktanks/c50.mp3"
 				end
 				if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-					self.DakFireSound1 = "daktanks/c75.wav"
+					self.DakFireSound1 = "daktanks/c75.mp3"
 				end
 				if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-					self.DakFireSound1 = "daktanks/c100.wav"
+					self.DakFireSound1 = "daktanks/c100.mp3"
 				end
 				if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-					self.DakFireSound1 = "daktanks/c120.wav"
+					self.DakFireSound1 = "daktanks/c120.mp3"
 				end
 				if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-					self.DakFireSound1 = "daktanks/c152.wav"
+					self.DakFireSound1 = "daktanks/c152.mp3"
 				end
 				if self.DakCaliber >= 200 then
-					self.DakFireSound1 = "daktanks/c200.wav"
+					self.DakFireSound1 = "daktanks/c200.mp3"
 				end
 			end
 		end
@@ -266,41 +266,41 @@ function ENT:Think()
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
-				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-				self.ReloadSound = "daktanks/dakreloadlight.wav"
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+				self.ReloadSound = "daktanks/dakreloadlight.mp3"
 			end
 			if self.DakCaliber > 75 and self.DakCaliber < 120 then
-				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadmedium.wav"
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadmedium.mp3"
 			end
 			if self.DakCaliber >= 120 then
-				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadheavy.wav"
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadheavy.mp3"
 			end
 			if self.DakFireSound1 == nil then
 				if self.DakCaliber < 37 then
-					self.DakFireSound1 = "daktanks/c25.wav"
+					self.DakFireSound1 = "daktanks/c25.mp3"
 				end
 				if self.DakCaliber >= 37 and self.DakCaliber < 50 then
-					self.DakFireSound1 = "daktanks/c37.wav"
+					self.DakFireSound1 = "daktanks/c37.mp3"
 				end
 				if self.DakCaliber >= 50 and self.DakCaliber < 75 then
-					self.DakFireSound1 = "daktanks/c50.wav"
+					self.DakFireSound1 = "daktanks/c50.mp3"
 				end
 				if self.DakCaliber >= 75 and self.DakCaliber < 100 then
-					self.DakFireSound1 = "daktanks/c75.wav"
+					self.DakFireSound1 = "daktanks/c75.mp3"
 				end
 				if self.DakCaliber >= 100 and self.DakCaliber < 120 then
-					self.DakFireSound1 = "daktanks/c100.wav"
+					self.DakFireSound1 = "daktanks/c100.mp3"
 				end
 				if self.DakCaliber >= 120 and self.DakCaliber < 152 then
-					self.DakFireSound1 = "daktanks/c120.wav"
+					self.DakFireSound1 = "daktanks/c120.mp3"
 				end
 				if self.DakCaliber >= 152 and self.DakCaliber < 200 then
-					self.DakFireSound1 = "daktanks/c152.wav"
+					self.DakFireSound1 = "daktanks/c152.mp3"
 				end
 				if self.DakCaliber >= 200 then
-					self.DakFireSound1 = "daktanks/c200.wav"
+					self.DakFireSound1 = "daktanks/c200.mp3"
 				end
 			end
 		end
@@ -343,39 +343,39 @@ function ENT:Think()
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
-				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-				self.ReloadSound = "daktanks/dakreloadlight.wav"
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+				self.ReloadSound = "daktanks/dakreloadlight.mp3"
 			end
 			if self.DakCaliber > 75 and self.DakCaliber < 120 then
-				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadmedium.wav"
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadmedium.mp3"
 			end
 			if self.DakCaliber >= 120 then
-				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadheavy.wav"
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadheavy.mp3"
 			end
 
 			if self.DakFireSound1 == nil then
 				if self.DakCaliber < 75 then
-					self.DakFireSound1 = "daktanks/h50.wav"
+					self.DakFireSound1 = "daktanks/h50.mp3"
 				end
 				if self.DakCaliber >= 75 and self.DakCaliber < 105 then
-					self.DakFireSound1 = "daktanks/h75.wav"
+					self.DakFireSound1 = "daktanks/h75.mp3"
 				end
 				if self.DakCaliber >= 105 and self.DakCaliber < 122 then
-					self.DakFireSound1 = "daktanks/h105.wav"
+					self.DakFireSound1 = "daktanks/h105.mp3"
 				end
 				if self.DakCaliber >= 122 and self.DakCaliber < 155 then
-					self.DakFireSound1 = "daktanks/h122.wav"
+					self.DakFireSound1 = "daktanks/h122.mp3"
 				end
 				if self.DakCaliber >= 155 and self.DakCaliber < 203 then
-					self.DakFireSound1 = "daktanks/h155.wav"
+					self.DakFireSound1 = "daktanks/h155.mp3"
 				end
 				if self.DakCaliber >= 203 and self.DakCaliber < 420 then
-					self.DakFireSound1 = "daktanks/h203.wav"
+					self.DakFireSound1 = "daktanks/h203.mp3"
 				end
 				if self.DakCaliber >= 420 then
-					self.DakFireSound1 = "daktanks/h420.wav"
+					self.DakFireSound1 = "daktanks/h420.mp3"
 				end
 			end
 		end
@@ -416,42 +416,42 @@ function ENT:Think()
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
-				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-				self.ReloadSound = "daktanks/dakreloadlight.wav"
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+				self.ReloadSound = "daktanks/dakreloadlight.mp3"
 			end
 			if self.DakCaliber > 75 and self.DakCaliber < 120 then
-				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadmedium.wav"
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadmedium.mp3"
 			end
 			if self.DakCaliber >= 120 then
-				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadheavy.wav"
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadheavy.mp3"
 			end
 
 			if self.DakFireSound1 == nil then
 				if self.DakCaliber < 90 then
-					self.DakFireSound1 = "daktanks/m60.wav"
+					self.DakFireSound1 = "daktanks/m60.mp3"
 				end
 				if self.DakCaliber >= 90 and self.DakCaliber < 120 then
-					self.DakFireSound1 = "daktanks/m90.wav"
+					self.DakFireSound1 = "daktanks/m90.mp3"
 				end
 				if self.DakCaliber >= 120 and self.DakCaliber < 150 then
-					self.DakFireSound1 = "daktanks/m120.wav"
+					self.DakFireSound1 = "daktanks/m120.mp3"
 				end
 				if self.DakCaliber >= 150 and self.DakCaliber < 240 then
-					self.DakFireSound1 = "daktanks/m150.wav"
+					self.DakFireSound1 = "daktanks/m150.mp3"
 				end
 				if self.DakCaliber >= 240 and self.DakCaliber < 280 then
-					self.DakFireSound1 = "daktanks/m240.wav"
+					self.DakFireSound1 = "daktanks/m240.mp3"
 				end
 				if self.DakCaliber >= 280 and self.DakCaliber < 420 then
-					self.DakFireSound1 = "daktanks/m280.wav"
+					self.DakFireSound1 = "daktanks/m280.mp3"
 				end
 				if self.DakCaliber >= 420 and self.DakCaliber < 600 then
-					self.DakFireSound1 = "daktanks/m420.wav"
+					self.DakFireSound1 = "daktanks/m420.mp3"
 				end
 				if self.DakCaliber >= 600 then
-					self.DakFireSound1 = "daktanks/m600.wav"
+					self.DakFireSound1 = "daktanks/m600.mp3"
 				end
 			end
 		end
@@ -516,7 +516,7 @@ function ENT:Think()
 		if self.DakFireSound3 == nil then
 			self.DakFireSound3 = self.DakFireSound1
 		end
-		self:GetPhysicsObject():SetMass(self.DakMass)
+		if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 
 		self:DakTEAmmoCheck()
 		
@@ -802,9 +802,10 @@ function ENT:DakTEFire()
 				local Attachment = self:GetAttachment( 1 )
 				local shootOrigin = Attachment.Pos
 				local shootAngles = (self:GetVelocity()+self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
+				local initvel
 				if self:GetParent():IsValid() then
 					if self:GetParent():GetParent():IsValid() then
-						local shootAngles = (self:GetParent():GetParent():GetVelocity()+self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
+						initvel = self:GetParent():GetParent():GetVelocity()
 					end
 				end
 				local shootDir = shootAngles:Forward()
@@ -812,9 +813,8 @@ function ENT:DakTEFire()
 				local Propellant = self:GetPropellant()*0.01
  				local Shell = {}
  				Shell.Pos = shootOrigin + ( self:GetForward() * 1 )
- 				Shell.Ang = shootAngles + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))
 				Shell.DakTrail = self.DakShellTrail
-				Shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.99, 1.01 ) * Propellant
+				Shell.DakVelocity = ((self.DakShellVelocity * math.Rand( 0.95, 1.05 ) * Propellant) * (shootAngles + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))):Forward()) + initvel
 				Shell.DakBaseVelocity = self.DakShellVelocity * Propellant
 				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakMass = self.DakShellMass
@@ -880,7 +880,7 @@ function ENT:DakTEFire()
 						self:SetNWBool("Firing",false)
 					end)
 				else
-					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100, 1 )
+					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.random(0.95, 1.05), 1 )
 				end
 
 				timer.Create( "ReloadFinishTimer"..self:EntIndex()..CurTime(), self.DakCooldown-SoundDuration(self.ReloadSound), 1, function()

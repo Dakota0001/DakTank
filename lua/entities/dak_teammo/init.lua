@@ -108,30 +108,42 @@ function ENT:Think()
 				end
 			else
 				-- steel density 0.132 kg/in3
+				--cannon
 				self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
 				self.ShellMass = self.ShellVolume*0.044
 				self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
 				self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
+				--short cannon and hmg
 				if (string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "C") or (string.Split( self.DakName, "m" )[3][1] == "H" and string.Split( self.DakName, "m" )[3][2] == "M" and string.Split( self.DakName, "m" )[3][3] == "G") then
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*10)
 					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*10)
 					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 				end
+				--long cannon
 				if string.Split( self.DakName, "m" )[3][1] == "L" and string.Split( self.DakName, "m" )[3][2] == "C" then
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*18)
 					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*18)
 					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 				end
+				--Howitzer
 				if string.Split( self.DakName, "m" )[3][1] == "H" and string.Split( self.DakName, "m" )[3][2] ~= "M" then
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*8)
 					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*8)
 					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 				end
+				--Mortar
 				if string.Split( self.DakName, "m" )[3][1] == "M" and string.Split( self.DakName, "m" )[3][2] ~= "G" then
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*5.5)
 					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*5.5)
 					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 				end
+				--Smoke Launcher
+				if string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "L" then
+					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*2.75)
+					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*2.75)
+					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
+				end
+				--ATGM
 				if (string.Split( self.DakName, "m" )[3][2]..string.Split( self.DakName, "m" )[3][3]..string.Split( self.DakName, "m" )[3][4]..string.Split( self.DakName, "m" )[3][5]) == "ATGM" then
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
 					self.ShellMass = self.ShellVolume*0.044
@@ -160,7 +172,7 @@ function ENT:Think()
 		 	if self.DakHealth >= self.DakMaxHealth then
 				self.DakHealth = 30
 			end
-			self:GetPhysicsObject():SetMass(500)
+			if self:GetPhysicsObject():GetMass() ~= 500 then self:GetPhysicsObject():SetMass(500) end
 		else
 			self.DakArmor = 5
 		 	self.DakMaxHealth = 10
@@ -168,9 +180,9 @@ function ENT:Think()
 				self.DakHealth = 10
 			end
 			if self.ShellMass == nil then
-				self:GetPhysicsObject():SetMass(10)
+				if self:GetPhysicsObject():GetMass() ~= 10 then self:GetPhysicsObject():SetMass(10) end
 			else
-				self:GetPhysicsObject():SetMass(math.Round((self.ShellMass*self.DakAmmo)+10))
+				if self:GetPhysicsObject():GetMass() ~= math.Round((self.ShellMass*self.DakAmmo)+10) then self:GetPhysicsObject():SetMass(math.Round((self.ShellMass*self.DakAmmo)+10)) end
 			end
 		end
 		
@@ -216,7 +228,7 @@ function ENT:Think()
 						end
 					end )
 					self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,300,self.DakOwner)
-					self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
+					self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
 					timer.Create( "RemoveTimer"..self:EntIndex(), 0.5, 1, function()
 						if self:IsValid() then
 							self:Remove()
@@ -238,7 +250,7 @@ function ENT:Think()
 
 									self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,200,self.DakOwner)
 
-									self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
+									self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
 									self:Remove()
 								end
 							end
@@ -263,13 +275,13 @@ function ENT:Think()
 									local shootOrigin = self:GetPos()
 									local shootAngles = AngleRand()
 									if self.DakMaxAmmo<5 then
-										self.ShellSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
+										self.ShellSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
 									end
 									if self.DakMaxAmmo>=5 and self.DakMaxAmmo<=15 then
-										self.ShellSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
+										self.ShellSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
 									end
 									if self.DakMaxAmmo>15 then
-										self.ShellSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
+										self.ShellSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
 									end
 									local shell = {}
 					 				shell.Pos = shootOrigin + ( self:GetForward() * 1 )
@@ -410,6 +422,11 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		if string.Split( self.DakName, "m" )[3][1] == "M" and string.Split( self.DakName, "m" )[3][2] ~= "G" then
 			self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*5.5)
 			self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*5.5)
+			self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
+		end
+		if string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "L" then
+			self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*2.75)
+			self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*2.75)
 			self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 		end
 		if (string.Split( self.DakName, "m" )[3][2]..string.Split( self.DakName, "m" )[3][3]..string.Split( self.DakName, "m" )[3][4]..string.Split( self.DakName, "m" )[3][5]) == "ATGM" then

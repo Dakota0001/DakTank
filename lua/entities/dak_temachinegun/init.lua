@@ -92,37 +92,81 @@ function ENT:Think()
 			self.DakPellets = 10
 
 			if self.DakCaliber <= 75 then
-				self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-				self.ReloadSound = "daktanks/dakreloadlight.wav"
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+				self.ReloadSound = "daktanks/dakreloadlight.mp3"
 			end
 			if self.DakCaliber > 75 and self.DakCaliber < 120 then
-				self.DakShellPenSounds = {"daktanks/dakmedpen1.wav","daktanks/dakmedpen2.wav","daktanks/dakmedpen3.wav","daktanks/dakmedpen4.wav","daktanks/dakmedpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadmedium.wav"
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadmedium.mp3"
 			end
 			if self.DakCaliber >= 120 then
-				self.DakShellPenSounds = {"daktanks/dakhevpen1.wav","daktanks/dakhevpen2.wav","daktanks/dakhevpen3.wav","daktanks/dakhevpen4.wav","daktanks/dakhevpen5.wav"}
-				self.ReloadSound = "daktanks/dakreloadheavy.wav"
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadheavy.mp3"
 			end
 
 			if self.DakFireSound1 == nil then
 				if self.DakCaliber < 7.62 then
-					self.DakFireSound1 = "daktanks/5mm.wav"
+					self.DakFireSound1 = "daktanks/5mm.mp3"
 				end
 				if self.DakCaliber >= 7.62 and self.DakCaliber < 9 then
-					self.DakFireSound1 = "daktanks/7mm.wav"
+					self.DakFireSound1 = "daktanks/7mm.mp3"
 				end
 				if self.DakCaliber >= 9 and self.DakCaliber < 12.7 then
-					self.DakFireSound1 = "daktanks/9mm.wav"
+					self.DakFireSound1 = "daktanks/9mm.mp3"
 				end
 				if self.DakCaliber >= 12.7 and self.DakCaliber < 14.5 then
-					self.DakFireSound1 = "daktanks/12mm.wav"
+					self.DakFireSound1 = "daktanks/12mm.mp3"
 				end
 				if self.DakCaliber >= 14.5 then
-					self.DakFireSound1 = "daktanks/14mm.wav"
+					self.DakFireSound1 = "daktanks/14mm.mp3"
 				end
 			end
 		end
-		--Machine Guns
+		--SmokeLauncher
+		if self.DakGunType == "Smoke Launcher" then
+			self.DakName = self.DakCaliber.."mm Smoke Launcher"
+			self.DakCooldown = 30
+			self.DakMaxHealth = self.DakCaliber
+			self.DakArmor = self.DakCaliber*5
+			self.DakMass = math.Round(5+(2*math.Round(((((self.DakCaliber*0.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*3))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*3)))*0.001*7.8125)/1000)))
+
+			self.DakSM = math.Round(self.DakCaliber,2).."mmSLSMAmmo"
+
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*0.5))*25
+			--get the volume of shell and multiply by density of steel
+			--pi*radius^2 * height * density
+			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75, SL - 0.5
+			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*0.5))*7700
+			self.DakShellSplashDamage = self.DakCaliber*5
+			self.BaseDakShellPenetration = (self.DakCaliber*2)*(3/50)
+			self.DakShellExplosive = false
+			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093+1.118186)
+
+			self.DakFireEffect = "dakteballisticfire"
+			self.DakFirePitch = 100
+			self.DakShellTrail = "dakteballistictracer"
+			self.BaseDakShellVelocity = self.BasicVelocity*3/50
+			self.DakPellets = 10
+
+			if self.DakCaliber <= 75 then
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+				self.ReloadSound = "daktanks/dakreloadlight.mp3"
+			end
+			if self.DakCaliber > 75 and self.DakCaliber < 120 then
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadmedium.mp3"
+			end
+			if self.DakCaliber >= 120 then
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadheavy.mp3"
+			end
+
+			if self.DakFireSound1 == nil then
+				self.DakFireSound1 = "daktanks/new/cannons/misc/grenade_launcher_01.mp3"
+			end
+		end
+		--Flamethrower
 		if self.DakGunType == "Flamethrower" then
 			self.DakName = "Flamethrower"
 			self.DakCooldown = 0.1
@@ -145,11 +189,11 @@ function ENT:Think()
 			self.BaseDakShellVelocity = 5000
 			self.DakPellets = 10
 
-			self.DakShellPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
-			self.ReloadSound = "daktanks/dakreloadlight.wav"
+			self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+			self.ReloadSound = "daktanks/dakreloadlight.mp3"
 
 			if self.DakFireSound1 == nil then
-				self.DakFireSound1 = "daktanks/flamerfire.wav"
+				self.DakFireSound1 = "daktanks/flamerfire.mp3"
 			end
 		end
 
@@ -169,7 +213,7 @@ function ENT:Think()
 		if self.DakFireSound3 == nil then
 			self.DakFireSound3 = self.DakFireSound1
 		end
-		self:GetPhysicsObject():SetMass(self.DakMass)
+		if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 		self.SlowThinkTime = CurTime()
 	end
 
@@ -190,16 +234,34 @@ function ENT:DakTEAmmoCheck()
 	if self.CurrentAmmoType == 1 then
 		if self.DakName == "Flamethrower" then
 			WireLib.TriggerOutput(self, "AmmoType", "Fuel")
+			self.DakAmmoType = self.DakAP
+			self.DakShellAmmoType = "AP"
+			self.DakShellVelocity = self.BaseDakShellVelocity
+			self.DakShellExplosive = false
+			self.DakShellDamage = self.BaseDakShellDamage
+			self.DakShellMass = self.BaseDakShellMass
+			self.DakShellPenetration = self.BaseDakShellPenetration
+		elseif self.DakGunType == "Smoke Launcher" then
+			WireLib.TriggerOutput(self, "AmmoType", "Smoke")
+			self.DakAmmoType = self.DakSM
+			self.DakShellAmmoType = "SM"
+			self.DakShellExplosive = true
+			if self.BaseDakShellDamage~= nil then self.DakShellDamage = self.BaseDakShellDamage/4 end
+			self.DakShellMass = self.BaseDakShellMass
+			self.DakShellPenetration = self.DakMaxHealth*0.1
+			if self.BaseDakShellVelocity~= nil then self.DakShellVelocity = self.BaseDakShellVelocity*0.42 end
+			self.DakPenLossPerMeter = 0.001
+			self.DakShellFragPen = 0
 		else
 			WireLib.TriggerOutput(self, "AmmoType", "Armor Piercing")
+			self.DakAmmoType = self.DakAP
+			self.DakShellAmmoType = "AP"
+			self.DakShellVelocity = self.BaseDakShellVelocity
+			self.DakShellExplosive = false
+			self.DakShellDamage = self.BaseDakShellDamage
+			self.DakShellMass = self.BaseDakShellMass
+			self.DakShellPenetration = self.BaseDakShellPenetration
 		end
-		self.DakAmmoType = self.DakAP
-		self.DakShellAmmoType = "AP"
-		self.DakShellExplosive = false
-		self.DakShellDamage = self.BaseDakShellDamage
-		self.DakShellMass = self.BaseDakShellMass
-		self.DakShellPenetration = self.BaseDakShellPenetration
-		self.DakShellVelocity = self.BaseDakShellVelocity
 		self.DakPenLossPerMeter = 0.0005
 		WireLib.TriggerOutput(self, "MuzzleVel", self.DakShellVelocity)
 		WireLib.TriggerOutput(self, "ShellMass", self.DakShellMass)
@@ -250,27 +312,28 @@ function ENT:DakTEFire()
 				self.LastFireTime = CurTime()
 				local Attachment = self:GetAttachment( 1 )
 				local shootOrigin = Attachment.Pos
-				local shootAngles = (self:GetVelocity()+self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
+				local shootAngles = (self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
+				local initvel
 				if self:GetParent():IsValid() then
 					if self:GetParent():GetParent():IsValid() then
-						local shootAngles = (self:GetParent():GetParent():GetVelocity()+self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
+						initvel = self:GetParent():GetParent():GetVelocity()
 					end
 				end
+
 				local shootDir = shootAngles:Forward()
 
 				local Propellant = self:GetPropellant()*0.01
  				local Shell = {}
  				Shell.Pos = shootOrigin + ( self:GetForward() * 1 )
- 				Shell.Ang = shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
 				Shell.DakTrail = self.DakShellTrail
-				Shell.DakVelocity = self.DakShellVelocity * math.Rand( 0.95, 1.05 ) * Propellant
+				Shell.DakVelocity = ((self.DakShellVelocity * math.Rand( 0.95, 1.05 ) * Propellant) * (shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1)) ):Forward()) + initvel
 				Shell.DakBaseVelocity = self.DakShellVelocity * Propellant
 				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakMass = self.DakShellMass
 				Shell.DakIsPellet = false
 				Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.99, 1.01 )
-				if self.DakShellAmmoType == "AP" or self.DakShellAmmoType == "HE" or self.DakShellAmmoType == "HVAP" or self.DakShellAmmoType == "APFSDS" or self.DakShellAmmoType == "APHE" or self.DakShellAmmoType == "APDS" then
+				if self.DakShellAmmoType == "AP" or self.DakShellAmmoType == "HE" or self.DakShellAmmoType == "HVAP" or self.DakShellAmmoType == "APFSDS" or self.DakShellAmmoType == "APHE" or self.DakShellAmmoType == "APDS" or self.DakShellAmmoType == "SM" then
 					Shell.DakPenetration = self.DakShellPenetration * math.Rand( 0.99, 1.01 ) * Propellant
 				end
 				Shell.DakExplosive = self.DakShellExplosive
@@ -287,10 +350,13 @@ function ENT:DakTEFire()
 				Shell.Gravity = 0
 				Shell.DakPenLossPerMeter = self.DakPenLossPerMeter
 				Shell.DakShellType = self.DakShellAmmoType
-				if self.DakShellAmmoType == "HESH" or self.DakShellAmmoType == "HEAT" then
-					Shell.DakFragPen = self.DakBaseShellFragPen * 0.5
+				if self.DakShellAmmoType == "HESH" or self.DakShellAmmoType == "HEAT" or self.DakShellAmmoType == "HEATFS" or self.DakShellAmmoType == "APHE" then
 					Shell.DakBlastRadius = self.DakShellBlastRadius * 0.5
 					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 ) * 0.5
+				end
+				if self.DakShellAmmoType == "SM" then
+					Shell.DakBlastRadius = self.DakShellBlastRadius * 0.1
+					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 ) * 0.1
 				end
 				if self.DakName == "Flamethrower" then
 					Shell.DakIsFlame = 1
@@ -309,9 +375,8 @@ function ENT:DakTEFire()
 						self:SetNWBool("Firing",false)
 					end)
 				else
-					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100, 1 )
-				end
-								
+					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.random(0.95, 1.05), 1 )
+				end								
 
 				local effectdata = EffectData()
 				effectdata:SetOrigin( self:GetAttachment( 1 ).Pos )

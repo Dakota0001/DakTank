@@ -146,6 +146,8 @@ local function GetContraption(Ent)
 end
 ]]--
 function ENT:Think()
+	local systime = SysTime()
+	
 	if IsValid(self) then
 		if IsValid(self:GetParent()) then
 			if IsValid(self:GetParent():GetParent()) then
@@ -555,6 +557,7 @@ function ENT:Think()
 					if self.rebuildtable == 0 then
 						self.Contraption = {}
 						table.Add(self.Contraption,GetParents(self))
+
 						for k, v in pairs(GetParents(self)) do
 							table.Add(self.Contraption,GetPhysCons(v))
 						end
@@ -568,21 +571,25 @@ function ENT:Think()
 							table.Add( self.Contraption, self.Contraption[i]:GetParent() )
 						end
 						local Children = {}
+
 						for i2=1, #self.Contraption do
 							if table.Count(self.Contraption[i2]:GetChildren()) > 0 then
 							table.Add( Children, self.Contraption[i2]:GetChildren() )
 							end
 						end
+
 						table.Add( self.Contraption, Children )
 
 						local hash = {}
 						local res = {}
+
 						for _,v in ipairs(self.Contraption) do
 					   		if (not hash[v]) then
 					    		res[#res+1] = v
 					       		hash[v] = true
 					   		end
 						end
+
 						self.Modern = 0
 						self.ColdWar = 0
 						self.Contraption={}
@@ -776,6 +783,7 @@ function ENT:Think()
 					--SETUP HEALTHPOOL
 					if table.Count(self.HitBox) == 0 and self.Contraption and IsValid(self.Gearbox) then
 						if #self.Contraption>=1 then
+							print("test")
 							self.Remake = 0
 							self.DakPooled = 1
 							self.DakEngine = self
@@ -844,7 +852,7 @@ function ENT:Think()
 							if self.ERA then
 								if table.Count(self.ERA) > 0 then
 									local effectdata
-									local ExpSounds = {"daktanks/eraexplosion.wav"}
+									local ExpSounds = {"daktanks/eraexplosion.mp3"}
 									for i = 1, table.Count(self.ERA) do
 										if not(IsValid(self.ERA[i])) then
 											table.remove( self.ERA, i )
@@ -890,6 +898,7 @@ function ENT:Think()
 
 							if self.Composites then
 								if table.Count(self.Composites) > 0 then
+									local weightvalcomp
 									for i = 1, table.Count(self.Composites) do
 										if not(IsValid(self.Composites[i])) then
 											table.remove( self.Composites, i )
@@ -924,7 +933,8 @@ function ENT:Think()
 												self.Composites[i].EntityMods.IsERA = 1
 											end
 											self.Composites[i].IsComposite = 1
-											self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) )
+											weightvalcomp = math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density)
+											if self.Composites[i]:GetPhysicsObject():GetMass() ~= weightvalcomp then self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) ) end
 											self.Composites[i].DakArmor = math.sqrt(math.sqrt(self.Composites[i]:GetPhysicsObject():GetVolume()))*KE
 										end
 									end
@@ -932,6 +942,7 @@ function ENT:Think()
 							end
 							if self.ERA then
 								if table.Count(self.ERA) > 0 then
+									local weightval
 									for i = 1, table.Count(self.ERA) do
 										if IsValid(self.ERA[i]) then
 											if self.ERA[i].EntityMods then
@@ -942,7 +953,8 @@ function ENT:Think()
 													self.ERA[i].EntityMods.DakName = "ERA"
 													self.ERA[i].EntityMods.IsERA = 1
 												end
-												self.ERA[i]:GetPhysicsObject():SetMass( math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) )
+												weightval = math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) 
+												if self.ERA[i]:GetPhysicsObject():GetMass() ~= weightval then self.ERA[i]:GetPhysicsObject():SetMass( weightval ) end
 												self.ERA[i].DakArmor = math.sqrt(math.sqrt(self.ERA[i]:GetPhysicsObject():GetVolume()))*2.5
 											end
 										end
@@ -1038,7 +1050,7 @@ function ENT:Think()
 							WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
 							if self.DakHealth then
 								if (self.DakHealth <= 0 or #self.Crew <= 0) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
-									local DeathSounds = {"daktanks/closeexp1.wav","daktanks/closeexp2.wav","daktanks/closeexp3.wav"}
+									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
 
 									self.RemoveTurretList = {}
 

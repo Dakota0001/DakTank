@@ -84,7 +84,7 @@ function ENT:Think()
 			self:SetSolid(SOLID_VPHYSICS)
 		end
 	end
-	self:GetPhysicsObject():SetMass(self.DakMass)
+	if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 
 	self.VO = self:GetVoice()
  	if self.VO == 0 then

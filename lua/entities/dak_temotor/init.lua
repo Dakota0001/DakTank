@@ -99,8 +99,7 @@ function ENT:Think()
 		self.DakFuelReq = 24
 		self.DakHP = 40
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Small Engine" then
+	elseif self.DakName == "Small Engine" then
 		self.DakMaxHealth = 20
 		self.DakArmor = 20
 		self.DakMass = 265
@@ -109,8 +108,7 @@ function ENT:Think()
 		self.DakFuelReq = 75
 		self.DakHP = 125
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Standard Engine" then
+	elseif self.DakName == "Standard Engine" then
 		self.DakMaxHealth = 45
 		self.DakArmor = 45
 		self.DakMass = 625
@@ -119,8 +117,7 @@ function ENT:Think()
 		self.DakFuelReq = 180
 		self.DakHP = 300
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Large Engine" then
+	elseif self.DakName == "Large Engine" then
 		self.DakMaxHealth = 90
 		self.DakArmor = 90
 		self.DakMass = 1225
@@ -129,8 +126,7 @@ function ENT:Think()
 		self.DakFuelReq = 360
 		self.DakHP = 600
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Huge Engine" then
+	elseif self.DakName == "Huge Engine" then
 		self.DakMaxHealth = 150
 		self.DakArmor = 150
 		self.DakMass = 2120
@@ -139,8 +135,7 @@ function ENT:Think()
 		self.DakFuelReq = 600
 		self.DakHP = 1000
 		--self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
-	end
-	if self.DakName == "Ultra Engine" then
+	elseif self.DakName == "Ultra Engine" then
 		self.DakMaxHealth = 360
 		self.DakArmor = 360
 		self.DakMass = 5020
@@ -178,7 +173,7 @@ function ENT:Think()
 			self:SetSolid(SOLID_VPHYSICS)
 		end
 	end
-	self:GetPhysicsObject():SetMass(self.DakMass)
+	if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 
 	if self:IsOnFire() then
 		self.DakHealth = self.DakHealth - self.DakMaxHealth*0.025*0.25
@@ -191,7 +186,6 @@ function ENT:Think()
 			self:Remove()
 		end
 	end
-
     self:NextThink(CurTime()+0.25)
     return true
 end

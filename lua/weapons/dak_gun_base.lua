@@ -124,9 +124,10 @@ function SWEP:PrimaryAttack()
 				for i=1, self.ShotCount do
 					local shell = {}
 					shell.Pos = self.Owner:GetShootPos()
-					shell.Ang = self.Owner:GetAimVector():Angle() + Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))
+					local initvel = self.Owner:GetVelocity()
+					shell.DakVelocity = ((self.DakVelocity * math.Rand( 0.95, 1.05 )) * (self.Owner:GetAimVector():Angle() + Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))):Forward()) + initvel
 					if self.Owner:Crouching() then
-						shell.Ang = self.Owner:GetAimVector():Angle() + 0.5*Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))
+						shell.DakVelocity = ((self.DakVelocity * math.Rand( 0.95, 1.05 )) * (self.Owner:GetAimVector():Angle() + 0.5*Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))):Forward()) + initvel
 					end
 
 					shell.DakTrail = self.DakTrail
@@ -135,11 +136,10 @@ function SWEP:PrimaryAttack()
 					shell.DakPenLossPerMeter = self.DakPenLossPerMeter
 					shell.DakExplosive = self.DakExplosive
 
-					shell.DakVelocity = self.DakVelocity
 					shell.DakBaseVelocity = self.DakVelocity
 
 					shell.DakMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
-					shell.DakDamage = shell.DakMass*((shell.DakVelocity*0.0254)*(shell.DakVelocity*0.0254))*0.01*0.002
+					shell.DakDamage = shell.DakMass*((self.DakVelocity*0.0254)*(self.DakVelocity*0.0254))*0.01*0.002
 
 					shell.DakIsPellet = false
 					shell.DakSplashDamage = self.DakCaliber*0.375

@@ -43,7 +43,7 @@ function ENT:Think()
 			effectdata:SetScale(1)
 			util.Effect("daktedamage", effectdata)
 			if CurTime()>=self.Soundtime+3 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.4, 6)
+				self:EmitSound( "daktanks/shock.mp3", 60, math.Rand(60,150), 0.4, 6)
 				self.Soundtime=CurTime()
 			end
 		end
@@ -56,7 +56,7 @@ function ENT:Think()
 			effectdata:SetScale(2)
 			util.Effect("daktedamage", effectdata)
 			if CurTime()>=self.Soundtime+2 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.5, 6)
+				self:EmitSound( "daktanks/shock.mp3", 60, math.Rand(60,150), 0.5, 6)
 				self.Soundtime=CurTime()
 			end
 		end
@@ -69,7 +69,7 @@ function ENT:Think()
 			effectdata:SetScale(3)
 			util.Effect("daktedamage", effectdata)
 			if CurTime()>=self.Soundtime+1 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.6, 6)
+				self:EmitSound( "daktanks/shock.mp3", 60, math.Rand(60,150), 0.6, 6)
 				self.Soundtime=CurTime()
 			end
 		end
@@ -82,7 +82,7 @@ function ENT:Think()
 			effectdata:SetScale(4)
 			util.Effect("daktedamage", effectdata)
 			if CurTime()>=self.Soundtime+0.5 then
-				self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.75, 6)
+				self:EmitSound( "daktanks/shock.mp3", 60, math.Rand(60,150), 0.75, 6)
 				self.Soundtime=CurTime()
 			end
 		end
@@ -131,7 +131,7 @@ function ENT:Think()
 			self.DakHealth = self.DakMaxHealth
 		end
 
-		self:GetPhysicsObject():SetMass(self.DakMass)
+		if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 
 	if self.DakHealth<self.DakMaxHealth/2 and self.DakIsExplosive then
 
@@ -146,7 +146,7 @@ function ENT:Think()
 
 		self:DTExplosion(self:GetPos(),200,500,200,100,self.DakOwner)
 
-		self:EmitSound( "dak/ammoexplode.wav", 100, 75, 1)
+		self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
 		self:Remove()
 	end
 

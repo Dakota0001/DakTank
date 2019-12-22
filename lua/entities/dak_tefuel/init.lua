@@ -142,7 +142,7 @@ function ENT:Think()
 
 		self.DakFuel = self.DakFuel * (self.DakHealth/self.DakMaxHealth)
 
-		self:GetPhysicsObject():SetMass(self.DakMass)
+		if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 
 	if self.DakHealth<(self.DakMaxHealth*0.9) and self.DakIsExplosive then
 		self:Ignite( 60, 0 )
@@ -180,8 +180,6 @@ function ENT:Think()
 			self:Remove()
 		end
 	end
-
-
 	self:NextThink(CurTime()+1)
     return true
 end
