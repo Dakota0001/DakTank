@@ -228,7 +228,8 @@ function ENT:Think()
 						end
 					end )
 					self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,300,self.DakOwner)
-					self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
+					--self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
+					sound.Play( "daktanks/ammoexplode.mp3", self:GetPos(), 100, 75, 1 )
 					timer.Create( "RemoveTimer"..self:EntIndex(), 0.5, 1, function()
 						if self:IsValid() then
 							self:Remove()
@@ -250,7 +251,8 @@ function ENT:Think()
 
 									self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,200,self.DakOwner)
 
-									self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
+									--self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
+									sound.Play( "daktanks/ammoexplode.mp3", self:GetPos(), 100, 75, 1 )
 									self:Remove()
 								end
 							end
@@ -316,7 +318,8 @@ function ENT:Think()
 									effectdata:SetMagnitude(.5)
 									effectdata:SetScale(50/self.DakMaxAmmo)
 									util.Effect("dakteshellimpact", effectdata, true, true)
-									self:EmitSound( self.ShellSounds[math.random(1,#self.ShellSounds)], 100, 100, 1, 1)
+									--self:EmitSound( self.ShellSounds[math.random(1,#self.ShellSounds)], 100, 100, 1, 1)
+									sound.Play( self.ShellSounds[math.random(1,#self.ShellSounds)], self:GetPos(), 100, 100, 1 )
 
 									self.DakAmmo = self.DakAmmo - 1
 								end

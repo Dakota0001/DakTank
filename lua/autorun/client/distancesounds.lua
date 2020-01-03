@@ -1,0 +1,11 @@
+net.Receive( "daktankexplosion", function()
+	local PlayerPos = LocalPlayer():GetPos()
+	local ExplosionPos = net.ReadVector()
+	local ExplosionPower = net.ReadFloat()*0.5
+	local ExplosionSound = net.ReadString()
+	local Dist = PlayerPos:Distance(ExplosionPos)
+	timer.Simple(Dist/13503.9, function()
+		sound.Play(  ExplosionSound, PlayerPos+((ExplosionPos-PlayerPos):GetNormalized()*1000), 100, 100, math.Clamp(math.pow( 0.5,PlayerPos:Distance(ExplosionPos)/(500*ExplosionPower) ),0,1) )
+		util.ScreenShake( ExplosionPos, math.Clamp(math.pow( 0.5,PlayerPos:Distance(ExplosionPos)/(500*ExplosionPower) ),0,1) * 5, 5, 2.5, 5000000 )
+	end)
+end )

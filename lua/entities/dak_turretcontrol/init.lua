@@ -275,7 +275,7 @@ function ENT:Think()
 							end
 						end
 					end
-					self.RotationSpeed = RotMult * (15000/self.GunMass)
+					self.RotationSpeed = RotMult * (15000/self.GunMass) * (66/(1/engine.TickInterval()))
 					self.DakCamTrace = self.Inputs.CamTrace.Value
 					if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
 						
@@ -321,7 +321,7 @@ function ENT:Think()
 							    	GunDir = normalizedVector(CamTrace.HitPos - CamTrace.StartPos+(CamTrace.StartPos-self.DakGun:GetPos()))
 							    	self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
 								    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
-								    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
+								    Ang = Angle(Ang.pitch*1250,Ang.yaw*1250,Ang.roll*1250)
 								    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
 								    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
 								    Ang = Angle((Ang.pitch - AngVelAng.pitch),(Ang.yaw - AngVelAng.yaw),(Ang.roll - AngVelAng.roll))
@@ -357,7 +357,7 @@ function ENT:Think()
 									else
 										if self.Off == true then
 											self.OffTicks = self.OffTicks + 1
-											if self.OffTicks > 70 then
+											if self.OffTicks > 70 / (66/(1/engine.TickInterval())) then
 												self.Off = false
 												self.GunAng = Angle(0,0,0)
 											end
@@ -378,7 +378,7 @@ function ENT:Think()
 							local GunDir = self:GetForward()
 						    self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
 						    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
-						    Ang = Angle(Ang.pitch*2500,Ang.yaw*2500,Ang.roll*2500)
+						    Ang = Angle(Ang.pitch*1250,Ang.yaw*1250,Ang.roll*1250)
 						    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
 						    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
 						    Ang = Angle((Ang.pitch - AngVelAng.pitch),(Ang.yaw - AngVelAng.yaw),(Ang.roll - AngVelAng.roll))

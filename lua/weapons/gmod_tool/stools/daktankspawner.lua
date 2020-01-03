@@ -27,7 +27,7 @@ TOOL.DakSound 		= "npc/combine_gunship/engine_whine_loop1.wav"
 --Main spawning function, creates entities based on the options selected in the menu and updates current entities
 function TOOL:LeftClick( trace )
 	if SERVER then
-		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_temachinegun") then
+		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_tegearbox") and not(trace.Entity:GetClass() == "dak_tegearboxnew") and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_temachinegun") then
 			local Target = trace.HitPos
 			local spawnent = self:GetClientInfo("SpawnEnt")
 			self.spawnedent = ents.Create(spawnent)
@@ -37,6 +37,34 @@ function TOOL:LeftClick( trace )
 		end
 		if (trace.Entity:GetClass() == "dak_gun") or (trace.Entity:GetClass() == "dak_laser") or (trace.Entity:GetClass() == "dak_xpulselaser") or (trace.Entity:GetClass() == "dak_launcher") or (trace.Entity:GetClass() == "dak_lams") or (trace.Entity:GetClass() == "dak_tegun") or (trace.Entity:GetClass() == "dak_teautogun") or (trace.Entity:GetClass() == "dak_temachinegun") then
 			if (self:GetClientInfo("SpawnEnt") == "dak_gun") or (self:GetClientInfo("SpawnEnt") == "dak_laser") or (self:GetClientInfo("SpawnEnt") == "dak_xpulselaser") or (self:GetClientInfo("SpawnEnt") == "dak_launcher") or (self:GetClientInfo("SpawnEnt") == "dak_lams") or (self:GetClientInfo("SpawnEnt") == "dak_tegun") or (self:GetClientInfo("SpawnEnt") == "dak_teautogun")or (self:GetClientInfo("SpawnEnt") == "dak_temachinegun") then
+				local Target = trace.HitPos
+				local spawnent = self:GetClientInfo("SpawnEnt")
+				self.spawnedent = ents.Create(spawnent)
+				if ( !IsValid( self.spawnedent ) ) then return end
+				self.spawnedent:SetPos(trace.Entity:GetPos())
+				self.spawnedent:SetAngles(trace.Entity:GetAngles())		
+				if trace.Entity:GetParent():IsValid() then
+					self.spawnedent:SetMoveType(MOVETYPE_NONE)
+					self.spawnedent:SetParent(trace.Entity:GetParent())
+				end
+			end
+		end
+		if trace.Entity:GetClass() == "dak_tegearbox" then
+			if self:GetClientInfo("SpawnEnt") == "dak_tegearboxnew" then
+				local Target = trace.HitPos
+				local spawnent = self:GetClientInfo("SpawnEnt")
+				self.spawnedent = ents.Create(spawnent)
+				if ( !IsValid( self.spawnedent ) ) then return end
+				self.spawnedent:SetPos(trace.Entity:GetPos())
+				self.spawnedent:SetAngles(trace.Entity:GetAngles())		
+				if trace.Entity:GetParent():IsValid() then
+					self.spawnedent:SetMoveType(MOVETYPE_NONE)
+					self.spawnedent:SetParent(trace.Entity:GetParent())
+				end
+			end
+		end
+		if trace.Entity:GetClass() == "dak_tegearboxnew" then
+			if self:GetClientInfo("SpawnEnt") == "dak_tegearbox" then
 				local Target = trace.HitPos
 				local spawnent = self:GetClientInfo("SpawnEnt")
 				self.spawnedent = ents.Create(spawnent)
@@ -772,102 +800,10 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "Mortar" then
 			self.DakGunType = "Mortar"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,420)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Mortar"
-			if self.DakCaliber < 48 then
-				self.DakModel = "models/daktanks/mortar40mm.mdl"
-			end
-			if self.DakCaliber >= 48 and self.DakCaliber < 56 then
-				self.DakModel = "models/daktanks/mortar48mm.mdl"
-			end
-			if self.DakCaliber >= 56 and self.DakCaliber < 64 then
-				self.DakModel = "models/daktanks/mortar56mm.mdl"
-			end
-			if self.DakCaliber >= 64 and self.DakCaliber < 72 then
-				self.DakModel = "models/daktanks/mortar64mm.mdl"
-			end
-			if self.DakCaliber >= 72 and self.DakCaliber < 80 then
-				self.DakModel = "models/daktanks/mortar72mm.mdl"
-			end
-			if self.DakCaliber >= 80 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/mortar80mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 96 then
-				self.DakModel = "models/daktanks/mortar88mm.mdl"
-			end
-			if self.DakCaliber >= 96 and self.DakCaliber < 104 then
-				self.DakModel = "models/daktanks/mortar96mm.mdl"
-			end
-			if self.DakCaliber >= 104 and self.DakCaliber < 112 then
-				self.DakModel = "models/daktanks/mortar104mm.mdl"
-			end
-			if self.DakCaliber >= 112 and self.DakCaliber < 120 then
-				self.DakModel = "models/daktanks/mortar112mm.mdl"
-			end
-			if self.DakCaliber >= 120 and self.DakCaliber < 128 then
-				self.DakModel = "models/daktanks/mortar120mm.mdl"
-			end
-			if self.DakCaliber >= 128 and self.DakCaliber < 136 then
-				self.DakModel = "models/daktanks/mortar128mm.mdl"
-			end
-			if self.DakCaliber >= 136 and self.DakCaliber < 144 then
-				self.DakModel = "models/daktanks/mortar136mm.mdl"
-			end
-			if self.DakCaliber >= 144 and self.DakCaliber < 152 then
-				self.DakModel = "models/daktanks/mortar144mm.mdl"
-			end
-			if self.DakCaliber >= 152 and self.DakCaliber < 160 then
-				self.DakModel = "models/daktanks/mortar152mm.mdl"
-			end
-			if self.DakCaliber >= 160 and self.DakCaliber < 168 then
-				self.DakModel = "models/daktanks/mortar160mm.mdl"
-			end
-			if self.DakCaliber >= 168 and self.DakCaliber < 176 then
-				self.DakModel = "models/daktanks/mortar168mm.mdl"
-			end
-			if self.DakCaliber >= 176 and self.DakCaliber < 184 then
-				self.DakModel = "models/daktanks/mortar176mm.mdl"
-			end
-			if self.DakCaliber >= 184 and self.DakCaliber < 192 then
-				self.DakModel = "models/daktanks/mortar184mm.mdl"
-			end
-			if self.DakCaliber >= 192 and self.DakCaliber < 200 then
-				self.DakModel = "models/daktanks/mortar192mm.mdl"
-			end
-			if self.DakCaliber >= 200 and self.DakCaliber < 208 then
-				self.DakModel = "models/daktanks/mortar200mm.mdl"
-			end
-			if self.DakCaliber >= 208 and self.DakCaliber < 216 then
-				self.DakModel = "models/daktanks/mortar208mm.mdl"
-			end
-			if self.DakCaliber >= 216 and self.DakCaliber < 224 then
-				self.DakModel = "models/daktanks/mortar216mm.mdl"
-			end
-			if self.DakCaliber >= 224 and self.DakCaliber < 232 then
-				self.DakModel = "models/daktanks/mortar224mm.mdl"
-			end
-			if self.DakCaliber >= 232 and self.DakCaliber < 240 then
-				self.DakModel = "models/daktanks/mortar232mm.mdl"
-			end
-			if self.DakCaliber >= 240 and self.DakCaliber < 248 then
-				self.DakModel = "models/daktanks/mortar240mm.mdl"
-			end
-			if self.DakCaliber >= 248 and self.DakCaliber < 256 then
-				self.DakModel = "models/daktanks/mortar248mm.mdl"
-			end
-			if self.DakCaliber >= 256 and self.DakCaliber < 264 then
-				self.DakModel = "models/daktanks/mortar256mm.mdl"
-			end
-			if self.DakCaliber >= 264 and self.DakCaliber < 272 then
-				self.DakModel = "models/daktanks/mortar264mm.mdl"
-			end
-			if self.DakCaliber >= 272 and self.DakCaliber < 280 then
-				self.DakModel = "models/daktanks/mortar272mm.mdl"
-			end
-			if self.DakCaliber >= 280 then
-				self.DakModel = "models/daktanks/mortar280mm.mdl"
-			end
+			self.DakModel = "models/daktanks/mortar100mm2.mdl"
 
 			if self.DakCaliber < 90 then
 				self.DakFireSound = "daktanks/m60.mp3"
@@ -1359,102 +1295,10 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "Autoloading Mortar" then
 			self.DakGunType = "Autoloading Mortar"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,420)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Autoloading Mortar"
-			if self.DakCaliber < 48 then
-				self.DakModel = "models/daktanks/mortar40mm.mdl"
-			end
-			if self.DakCaliber >= 48 and self.DakCaliber < 56 then
-				self.DakModel = "models/daktanks/mortar48mm.mdl"
-			end
-			if self.DakCaliber >= 56 and self.DakCaliber < 64 then
-				self.DakModel = "models/daktanks/mortar56mm.mdl"
-			end
-			if self.DakCaliber >= 64 and self.DakCaliber < 72 then
-				self.DakModel = "models/daktanks/mortar64mm.mdl"
-			end
-			if self.DakCaliber >= 72 and self.DakCaliber < 80 then
-				self.DakModel = "models/daktanks/mortar72mm.mdl"
-			end
-			if self.DakCaliber >= 80 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/mortar80mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 96 then
-				self.DakModel = "models/daktanks/mortar88mm.mdl"
-			end
-			if self.DakCaliber >= 96 and self.DakCaliber < 104 then
-				self.DakModel = "models/daktanks/mortar96mm.mdl"
-			end
-			if self.DakCaliber >= 104 and self.DakCaliber < 112 then
-				self.DakModel = "models/daktanks/mortar104mm.mdl"
-			end
-			if self.DakCaliber >= 112 and self.DakCaliber < 120 then
-				self.DakModel = "models/daktanks/mortar112mm.mdl"
-			end
-			if self.DakCaliber >= 120 and self.DakCaliber < 128 then
-				self.DakModel = "models/daktanks/mortar120mm.mdl"
-			end
-			if self.DakCaliber >= 128 and self.DakCaliber < 136 then
-				self.DakModel = "models/daktanks/mortar128mm.mdl"
-			end
-			if self.DakCaliber >= 136 and self.DakCaliber < 144 then
-				self.DakModel = "models/daktanks/mortar136mm.mdl"
-			end
-			if self.DakCaliber >= 144 and self.DakCaliber < 152 then
-				self.DakModel = "models/daktanks/mortar144mm.mdl"
-			end
-			if self.DakCaliber >= 152 and self.DakCaliber < 160 then
-				self.DakModel = "models/daktanks/mortar152mm.mdl"
-			end
-			if self.DakCaliber >= 160 and self.DakCaliber < 168 then
-				self.DakModel = "models/daktanks/mortar160mm.mdl"
-			end
-			if self.DakCaliber >= 168 and self.DakCaliber < 176 then
-				self.DakModel = "models/daktanks/mortar168mm.mdl"
-			end
-			if self.DakCaliber >= 176 and self.DakCaliber < 184 then
-				self.DakModel = "models/daktanks/mortar176mm.mdl"
-			end
-			if self.DakCaliber >= 184 and self.DakCaliber < 192 then
-				self.DakModel = "models/daktanks/mortar184mm.mdl"
-			end
-			if self.DakCaliber >= 192 and self.DakCaliber < 200 then
-				self.DakModel = "models/daktanks/mortar192mm.mdl"
-			end
-			if self.DakCaliber >= 200 and self.DakCaliber < 208 then
-				self.DakModel = "models/daktanks/mortar200mm.mdl"
-			end
-			if self.DakCaliber >= 208 and self.DakCaliber < 216 then
-				self.DakModel = "models/daktanks/mortar208mm.mdl"
-			end
-			if self.DakCaliber >= 216 and self.DakCaliber < 224 then
-				self.DakModel = "models/daktanks/mortar216mm.mdl"
-			end
-			if self.DakCaliber >= 224 and self.DakCaliber < 232 then
-				self.DakModel = "models/daktanks/mortar224mm.mdl"
-			end
-			if self.DakCaliber >= 232 and self.DakCaliber < 240 then
-				self.DakModel = "models/daktanks/mortar232mm.mdl"
-			end
-			if self.DakCaliber >= 240 and self.DakCaliber < 248 then
-				self.DakModel = "models/daktanks/mortar240mm.mdl"
-			end
-			if self.DakCaliber >= 248 and self.DakCaliber < 256 then
-				self.DakModel = "models/daktanks/mortar248mm.mdl"
-			end
-			if self.DakCaliber >= 256 and self.DakCaliber < 264 then
-				self.DakModel = "models/daktanks/mortar256mm.mdl"
-			end
-			if self.DakCaliber >= 264 and self.DakCaliber < 272 then
-				self.DakModel = "models/daktanks/mortar264mm.mdl"
-			end
-			if self.DakCaliber >= 272 and self.DakCaliber < 280 then
-				self.DakModel = "models/daktanks/mortar272mm.mdl"
-			end
-			if self.DakCaliber >= 280 then
-				self.DakModel = "models/daktanks/mortar280mm.mdl"
-			end
+			self.DakModel = "models/daktanks/mortar100mm2.mdl"
 
 			if self.DakCaliber < 90 then
 				self.DakFireSound = "daktanks/m60.mp3"
@@ -1664,64 +1508,64 @@ function TOOL:LeftClick( trace )
 			self.DakIsHE = true
 			self.AmmoType = "SM"
 		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
-			self.GunType = "C"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Long Cannon" then
-			self.GunType = "LC"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Short Cannon" then
-			self.GunType = "SC"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
-			self.GunType = "H"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Smoke Launcher" then
-			self.GunType = "SL"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,100)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
-			self.GunType = "M"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Autoloader" then
-			self.GunType = "C"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Long Autoloader" then
-			self.GunType = "LC"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Short Autoloader" then
-			self.GunType = "SC"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Autoloading Howitzer" then
-			self.GunType = "H"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Autoloading Mortar" then
-			self.GunType = "M"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,280)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
-			self.GunType = "AC"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "MG" then
-			self.GunType = "MG"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
-		end
-		if self:GetClientInfo("DTTE_AmmoType") == "HMG" then
-			self.GunType = "HMG"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
-		end
-		--huge if statement that checks to see if its an ammo crate of any type
 		if self.IsAmmoCrate == 1 then
+			if self:GetClientInfo("DTTE_AmmoType") == "Cannon" then
+				self.GunType = "C"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Long Cannon" then
+				self.GunType = "LC"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Short Cannon" then
+				self.GunType = "SC"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Howitzer" then
+				self.GunType = "H"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Smoke Launcher" then
+				self.GunType = "SL"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,100)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
+				self.GunType = "M"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,420)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autoloader" then
+				self.GunType = "C"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Long Autoloader" then
+				self.GunType = "LC"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Short Autoloader" then
+				self.GunType = "SC"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autoloading Howitzer" then
+				self.GunType = "H"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autoloading Mortar" then
+				self.GunType = "M"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,420)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
+				self.GunType = "AC"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "MG" then
+				self.GunType = "MG"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "HMG" then
+				self.GunType = "HMG"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+			end
+		    --huge if statement that checks to see if its an ammo crate of any type
 			self.DakIsExplosive = true
 			self.DakAmmoType = self.DakCaliber.."mm"..self.GunType..self.AmmoType.."Ammo"
 		end
@@ -2072,7 +1916,36 @@ function TOOL:LeftClick( trace )
 				self.spawnedent:SetModel(self.spawnedent.DakModel)
 			end
 		end
-		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
+		if self:GetClientInfo("SpawnEnt") == "dak_tegearboxnew" then
+			if trace.Entity then
+				if trace.Entity:GetClass() == "dak_tegearboxnew" then
+					trace.Entity.DakName = self.DakName
+					trace.Entity.DakMaxHealth = self.DakMaxHealth
+					trace.Entity.DakHealth = self.DakMaxHealth
+					trace.Entity.DakModel = self.DakModel
+					trace.Entity:PhysicsDestroy()
+					trace.Entity:SetModel(trace.Entity.DakModel)
+					trace.Entity:PhysicsInit(SOLID_VPHYSICS)
+					trace.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+					trace.Entity:SetSolid(SOLID_VPHYSICS)
+					self:GetOwner():ChatPrint( "Gearbox updated.")
+				else
+					self.spawnedent.DakName = self.DakName
+					self.spawnedent.DakMaxHealth = self.DakMaxHealth
+					self.spawnedent.DakHealth = self.DakMaxHealth
+					self.spawnedent.DakModel = self.DakModel
+					self.spawnedent:SetModel(self.spawnedent.DakModel)
+				end
+			end
+			if not(trace.Entity:IsValid()) then
+				self.spawnedent.DakName = self.DakName
+				self.spawnedent.DakMaxHealth = self.DakMaxHealth
+				self.spawnedent.DakHealth = self.DakMaxHealth
+				self.spawnedent.DakModel = self.DakModel
+				self.spawnedent:SetModel(self.spawnedent.DakModel)
+			end
+		end
+		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_tegearbox") and not(trace.Entity:GetClass() == "dak_tegearboxnew") and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
 			self.spawnedent:Spawn()
 			self.spawnedent.DakOwner = self:GetOwner()
 			self.spawnedent:GetPhysicsObject():EnableMotion( false )
@@ -2087,72 +1960,139 @@ function TOOL:LeftClick( trace )
 			undo.Finish()
 			ply:AddCleanup( "daktek", self.spawnedent )
 			cleanup.Register("daktek")
+
+			if self.DakModel == "models/daktanks/mortar100mm2.mdl" then
+				if self:GetClientInfo("SpawnEnt") == "dak_tegun" or self:GetClientInfo("SpawnEnt") == "dak_teautogun" or self:GetClientInfo("SpawnEnt") == "dak_temachinegun" then
+					local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
+					self.spawnedent:SetModelScale( self.spawnedent:GetModelScale() * (Caliber/1000), 0 )
+					local mins, maxs = self.spawnedent:GetCollisionBounds()
+					self.spawnedent:PhysicsDestroy()	
+					local x0 = mins[1] -- Define the min corner of the box
+					local y0 = mins[2]
+					local z0 = mins[3]
+					local x1 = maxs[1] -- Define the max corner of the box
+					local y1 = maxs[2]
+					local z1 = maxs[3]
+					self.spawnedent:PhysicsInitConvex( {
+					Vector( x0, y0, z0 ),
+					Vector( x0, y0, z1 ),
+					Vector( x0, y1, z0 ),
+					Vector( x0, y1, z1 ),
+					Vector( x1, y0, z0 ),
+					Vector( x1, y0, z1 ),
+					Vector( x1, y1, z0 ),
+					Vector( x1, y1, z1 )
+					} )
+					self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
+					self.spawnedent:SetSolid(SOLID_VPHYSICS)
+					self.spawnedent:EnableCustomCollisions( true )
+					self.spawnedent.DakOwner = self:GetOwner()
+					local mins2, maxs2 = self.spawnedent:GetHitBoxBounds( 0, 0 )
+					self.spawnedent:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
+					self.spawnedent:Spawn()
+					self.spawnedent:Activate()
+				end
+			end
 		end
 		if (trace.Entity:GetClass() == "dak_gun") or (trace.Entity:GetClass() == "dak_tegun") or (trace.Entity:GetClass() == "dak_teautogun") or (trace.Entity:GetClass() == "dak_temachinegun") or (trace.Entity:GetClass() == "dak_laser") or (trace.Entity:GetClass() == "dak_xpulselaser") or (trace.Entity:GetClass() == "dak_launcher") or (trace.Entity:GetClass() == "dak_lams") then
 			if (self:GetClientInfo("SpawnEnt") == "dak_gun") or (self:GetClientInfo("SpawnEnt") == "dak_tegun") or (self:GetClientInfo("SpawnEnt") == "dak_temachinegun") or (self:GetClientInfo("SpawnEnt") == "dak_teautogun") or (self:GetClientInfo("SpawnEnt") == "dak_laser") or (self:GetClientInfo("SpawnEnt") == "dak_xpulselaser") or (self:GetClientInfo("SpawnEnt") == "dak_launcher") or (self:GetClientInfo("SpawnEnt") == "dak_lams") then
-			self.spawnedent:Spawn()
-			self.spawnedent.DakOwner = self:GetOwner()
-			self.spawnedent:GetPhysicsObject():EnableMotion( false )
-			--self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetallight" )
-			--self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetaldark" )
-			local ply = self:GetOwner()
-			ply:AddCount( "daktek", self.spawnedent)
-			undo.Create( "daktek" )
-			undo.AddEntity( self.spawnedent )
-			undo.SetPlayer( ply )
-			undo.Finish()
-			ply:AddCleanup( "daktek", self.spawnedent )
-			cleanup.Register("daktek")
-			self.spawnedent:GetPhysicsObject():EnableMotion(false)
+				self.spawnedent:Spawn()
+				self.spawnedent.DakOwner = self:GetOwner()
+				self.spawnedent:GetPhysicsObject():EnableMotion( false )
+				--self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetallight" )
+				--self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetaldark" )
+				local ply = self:GetOwner()
+				ply:AddCount( "daktek", self.spawnedent)
+				undo.Create( "daktek" )
+				undo.AddEntity( self.spawnedent )
+				undo.SetPlayer( ply )
+				undo.Finish()
+				ply:AddCleanup( "daktek", self.spawnedent )
+				cleanup.Register("daktek")
 
-		local Constraints = constraint.GetTable( trace.Entity )
-			for k, v in pairs(Constraints) do
-				if v.Ent1 == trace.Entity then
-					v.Ent1 = self.spawnedent
+				if self.DakModel == "models/daktanks/mortar100mm2.mdl" then
+					if self:GetClientInfo("SpawnEnt") == "dak_tegun" or self:GetClientInfo("SpawnEnt") == "dak_teautogun" or self:GetClientInfo("SpawnEnt") == "dak_temachinegun" then
+						local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
+						self.spawnedent:SetModelScale( self.spawnedent:GetModelScale() * (Caliber/1000), 0 )
+						local mins, maxs = self.spawnedent:GetCollisionBounds()
+						self.spawnedent:PhysicsDestroy()	
+						local x0 = mins[1] -- Define the min corner of the box
+						local y0 = mins[2]
+						local z0 = mins[3]
+						local x1 = maxs[1] -- Define the max corner of the box
+						local y1 = maxs[2]
+						local z1 = maxs[3]
+						self.spawnedent:PhysicsInitConvex( {
+						Vector( x0, y0, z0 ),
+						Vector( x0, y0, z1 ),
+						Vector( x0, y1, z0 ),
+						Vector( x0, y1, z1 ),
+						Vector( x1, y0, z0 ),
+						Vector( x1, y0, z1 ),
+						Vector( x1, y1, z0 ),
+						Vector( x1, y1, z1 )
+						} )
+						self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
+						self.spawnedent:SetSolid(SOLID_VPHYSICS)
+						self.spawnedent:EnableCustomCollisions( true )
+						self.spawnedent.DakOwner = self:GetOwner()
+						local mins2, maxs2 = self.spawnedent:GetHitBoxBounds( 0, 0 )
+						self.spawnedent:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
+						self.spawnedent:Spawn()
+						self.spawnedent:Activate()
+					end
 				end
-				if v.Ent2 == trace.Entity then
-					v.Ent2 = self.spawnedent
+				self.spawnedent:GetPhysicsObject():EnableMotion(false)
+
+
+				local Constraints = constraint.GetTable( trace.Entity )
+				for k, v in pairs(Constraints) do
+					if v.Ent1 == trace.Entity then
+						v.Ent1 = self.spawnedent
+					end
+					if v.Ent2 == trace.Entity then
+						v.Ent2 = self.spawnedent
+					end
+					if v.Type == "AdvBallsocket" then
+						constraint.AdvBallsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.xmin, v.ymin, v.zmin, v.xmax, v.ymax, v.zmax, v.xfric, v.yfric, v.zfric, v.onlyrotation, v.nocollide )
+					end
+					if v.Type == "Axis" then
+						constraint.Axis( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.friction, v.nocollide, v.LocalAxis, v.DontAddTable )
+					end
+					if v.Type == "Ballsocket" then
+						constraint.Ballsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LocalPos, v.forcelimit, v.torquelimit, v.nocollide )
+					end
+					if v.Type == "Elastic" then
+						constraint.Elastic( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.constant, v.damping, v.rdamping, v.material, v.width, v.stretchonly )
+					end
+					if v.Type == "Hydraulic" then
+						constraint.Hydraulic( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.speed, v.material )
+					end
+					if v.Type == "Motor" then
+						constraint.Motor( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.friction, v.torque, v.forcetime, v.nocollide, v.toggle, v.pl, v.forcelimit, v.numpadkey_fwd, v.numpadkey_bwd, v.direction, v.LocalAxis )
+					end
+					if v.Type == "Muscle" then
+						constraint.Muscle( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.period, v.amplitude, v.starton, v.material )
+					end
+					if v.Type == "NoCollide" then
+						constraint.NoCollide( v.Ent1, v.Ent2, v.Bone1, v.Bone2 )
+					end
+					if v.Type == "Pulley" then
+						constraint.Pulley( v.Ent1, v.Ent4, v.Bone1, v.Bone4, v.LPos1, v.LPos4, v.WPos2, v.WPos3, v.forcelimit, v.rigid, v.width, v.material )
+					end
+					if v.Type == "Rope" then
+						constraint.Rope( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.length, v.addlength, v.forcelimit, v.width, v.material, v.rigid )
+					end
+					if v.Type == "Slider" then
+						constraint.Slider( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.material )
+					end
+					if v.Type == "Weld" then
+						constraint.Weld( v.ent1, v.ent2, v.bone1, v.bone2, v.forcelimit, v.nocollide, v.deleteent1onbreak )
+					end
+					if v.Type == "Winch" then
+						constraint.Winch( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.key, v.key, v.fwd_speed, v.bwd_speed, v.material, v.toggle )
+					end
 				end
-				if v.Type == "AdvBallsocket" then
-					constraint.AdvBallsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.xmin, v.ymin, v.zmin, v.xmax, v.ymax, v.zmax, v.xfric, v.yfric, v.zfric, v.onlyrotation, v.nocollide )
-				end
-				if v.Type == "Axis" then
-					constraint.Axis( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.friction, v.nocollide, v.LocalAxis, v.DontAddTable )
-				end
-				if v.Type == "Ballsocket" then
-					constraint.Ballsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LocalPos, v.forcelimit, v.torquelimit, v.nocollide )
-				end
-				if v.Type == "Elastic" then
-					constraint.Elastic( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.constant, v.damping, v.rdamping, v.material, v.width, v.stretchonly )
-				end
-				if v.Type == "Hydraulic" then
-					constraint.Hydraulic( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.speed, v.material )
-				end
-				if v.Type == "Motor" then
-					constraint.Motor( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.friction, v.torque, v.forcetime, v.nocollide, v.toggle, v.pl, v.forcelimit, v.numpadkey_fwd, v.numpadkey_bwd, v.direction, v.LocalAxis )
-				end
-				if v.Type == "Muscle" then
-					constraint.Muscle( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.period, v.amplitude, v.starton, v.material )
-				end
-				if v.Type == "NoCollide" then
-					constraint.NoCollide( v.Ent1, v.Ent2, v.Bone1, v.Bone2 )
-				end
-				if v.Type == "Pulley" then
-					constraint.Pulley( v.Ent1, v.Ent4, v.Bone1, v.Bone4, v.LPos1, v.LPos4, v.WPos2, v.WPos3, v.forcelimit, v.rigid, v.width, v.material )
-				end
-				if v.Type == "Rope" then
-					constraint.Rope( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.length, v.addlength, v.forcelimit, v.width, v.material, v.rigid )
-				end
-				if v.Type == "Slider" then
-					constraint.Slider( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.material )
-				end
-				if v.Type == "Weld" then
-					constraint.Weld( v.ent1, v.ent2, v.bone1, v.bone2, v.forcelimit, v.nocollide, v.deleteent1onbreak )
-				end
-				if v.Type == "Winch" then
-					constraint.Winch( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.key, v.key, v.fwd_speed, v.bwd_speed, v.material, v.toggle )
-				end
-			end
 
 				self.spawnedent.Inputs.Fire.Path = trace.Entity.Inputs.Fire.Path
 				self.spawnedent.Inputs.Fire.Entity = self.spawnedent
@@ -2168,22 +2108,191 @@ function TOOL:LeftClick( trace )
 				self.spawnedent.Inputs.Fire.StartPos = trace.Entity.Inputs.Fire.StartPos
 				self.spawnedent.Inputs.Fire.Type = trace.Entity.Inputs.Fire.Type
 
-			self.spawnedent:SetColor(trace.Entity:GetColor())
-			trace.Entity:Remove()
-			local ply = self:GetOwner()
-			ply:AddCount( "daktek", self.spawnedent)
-			ply:AddCleanup( "daktek", self.spawnedent )
+				self.spawnedent:SetColor(trace.Entity:GetColor())
+				trace.Entity:Remove()
+				local ply = self:GetOwner()
+				ply:AddCount( "daktek", self.spawnedent)
+				ply:AddCleanup( "daktek", self.spawnedent )
 
-			undo.Create( "daktek" )
+				undo.Create( "daktek" )
+					undo.AddEntity( self.spawnedent )
+					undo.SetPlayer( ply )
+				undo.Finish()
+				ply:AddCleanup( "DakTek", self.spawnedent )
+				self:GetOwner():ChatPrint("Weapon updated, respawn with duplicator to apply wiring.")
+			end
+		end
+
+		if (trace.Entity:GetClass() == "dak_tegearbox") then
+			if (self:GetClientInfo("SpawnEnt") == "dak_tegearboxnew") then
+				self.spawnedent:Spawn()
+				self.spawnedent.DakOwner = self:GetOwner()
+				self.spawnedent:GetPhysicsObject():EnableMotion( false )
+				--self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetallight" )
+				--self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetaldark" )
+				local ply = self:GetOwner()
+				ply:AddCount( "daktek", self.spawnedent)
+				undo.Create( "daktek" )
 				undo.AddEntity( self.spawnedent )
 				undo.SetPlayer( ply )
-			undo.Finish()
-			ply:AddCleanup( "DakTek", self.spawnedent )
-			self:GetOwner():ChatPrint("Weapon updated, respawn with duplicator to apply wiring.")
-		end
-		end
+				undo.Finish()
+				ply:AddCleanup( "daktek", self.spawnedent )
+				cleanup.Register("daktek")
+				self.spawnedent:GetPhysicsObject():EnableMotion(false)
 
+				local Constraints = constraint.GetTable( trace.Entity )
+				for k, v in pairs(Constraints) do
+					if v.Ent1 == trace.Entity then
+						v.Ent1 = self.spawnedent
+					end
+					if v.Ent2 == trace.Entity then
+						v.Ent2 = self.spawnedent
+					end
+					if v.Type == "AdvBallsocket" then
+						constraint.AdvBallsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.xmin, v.ymin, v.zmin, v.xmax, v.ymax, v.zmax, v.xfric, v.yfric, v.zfric, v.onlyrotation, v.nocollide )
+					end
+					if v.Type == "Axis" then
+						constraint.Axis( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.friction, v.nocollide, v.LocalAxis, v.DontAddTable )
+					end
+					if v.Type == "Ballsocket" then
+						constraint.Ballsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LocalPos, v.forcelimit, v.torquelimit, v.nocollide )
+					end
+					if v.Type == "Elastic" then
+						constraint.Elastic( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.constant, v.damping, v.rdamping, v.material, v.width, v.stretchonly )
+					end
+					if v.Type == "Hydraulic" then
+						constraint.Hydraulic( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.speed, v.material )
+					end
+					if v.Type == "Motor" then
+						constraint.Motor( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.friction, v.torque, v.forcetime, v.nocollide, v.toggle, v.pl, v.forcelimit, v.numpadkey_fwd, v.numpadkey_bwd, v.direction, v.LocalAxis )
+					end
+					if v.Type == "Muscle" then
+						constraint.Muscle( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.period, v.amplitude, v.starton, v.material )
+					end
+					if v.Type == "NoCollide" then
+						constraint.NoCollide( v.Ent1, v.Ent2, v.Bone1, v.Bone2 )
+					end
+					if v.Type == "Pulley" then
+						constraint.Pulley( v.Ent1, v.Ent4, v.Bone1, v.Bone4, v.LPos1, v.LPos4, v.WPos2, v.WPos3, v.forcelimit, v.rigid, v.width, v.material )
+					end
+					if v.Type == "Rope" then
+						constraint.Rope( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.length, v.addlength, v.forcelimit, v.width, v.material, v.rigid )
+					end
+					if v.Type == "Slider" then
+						constraint.Slider( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.material )
+					end
+					if v.Type == "Weld" then
+						constraint.Weld( v.ent1, v.ent2, v.bone1, v.bone2, v.forcelimit, v.nocollide, v.deleteent1onbreak )
+					end
+					if v.Type == "Winch" then
+						constraint.Winch( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.key, v.key, v.fwd_speed, v.bwd_speed, v.material, v.toggle )
+					end
+				end
 
+				self.spawnedent.Inputs = trace.Entity.Inputs
+				for i=1, #self.spawnedent.Inputs do
+					self.spawnedent.Inputs[i].Entity = self.spawnedent
+				end
+
+				self.spawnedent:SetColor(trace.Entity:GetColor())
+				trace.Entity:Remove()
+				local ply = self:GetOwner()
+				ply:AddCount( "daktek", self.spawnedent)
+				ply:AddCleanup( "daktek", self.spawnedent )
+
+				undo.Create( "daktek" )
+					undo.AddEntity( self.spawnedent )
+					undo.SetPlayer( ply )
+				undo.Finish()
+				ply:AddCleanup( "DakTek", self.spawnedent )
+				self:GetOwner():ChatPrint("Weapon updated, respawn with duplicator to apply wiring.")
+			end
+		end
+		if (trace.Entity:GetClass() == "dak_tegearboxnew") then
+			if (self:GetClientInfo("SpawnEnt") == "dak_tegearbox") then
+				self.spawnedent:Spawn()
+				self.spawnedent.DakOwner = self:GetOwner()
+				self.spawnedent:GetPhysicsObject():EnableMotion( false )
+				--self.spawnedent:SetSubMaterial( 0, "dak/dakplainmetallight" )
+				--self.spawnedent:SetSubMaterial( 1, "dak/dakplainmetaldark" )
+				local ply = self:GetOwner()
+				ply:AddCount( "daktek", self.spawnedent)
+				undo.Create( "daktek" )
+				undo.AddEntity( self.spawnedent )
+				undo.SetPlayer( ply )
+				undo.Finish()
+				ply:AddCleanup( "daktek", self.spawnedent )
+				cleanup.Register("daktek")
+				self.spawnedent:GetPhysicsObject():EnableMotion(false)
+
+				local Constraints = constraint.GetTable( trace.Entity )
+				for k, v in pairs(Constraints) do
+					if v.Ent1 == trace.Entity then
+						v.Ent1 = self.spawnedent
+					end
+					if v.Ent2 == trace.Entity then
+						v.Ent2 = self.spawnedent
+					end
+					if v.Type == "AdvBallsocket" then
+						constraint.AdvBallsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.xmin, v.ymin, v.zmin, v.xmax, v.ymax, v.zmax, v.xfric, v.yfric, v.zfric, v.onlyrotation, v.nocollide )
+					end
+					if v.Type == "Axis" then
+						constraint.Axis( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.friction, v.nocollide, v.LocalAxis, v.DontAddTable )
+					end
+					if v.Type == "Ballsocket" then
+						constraint.Ballsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LocalPos, v.forcelimit, v.torquelimit, v.nocollide )
+					end
+					if v.Type == "Elastic" then
+						constraint.Elastic( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.constant, v.damping, v.rdamping, v.material, v.width, v.stretchonly )
+					end
+					if v.Type == "Hydraulic" then
+						constraint.Hydraulic( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.speed, v.material )
+					end
+					if v.Type == "Motor" then
+						constraint.Motor( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.friction, v.torque, v.forcetime, v.nocollide, v.toggle, v.pl, v.forcelimit, v.numpadkey_fwd, v.numpadkey_bwd, v.direction, v.LocalAxis )
+					end
+					if v.Type == "Muscle" then
+						constraint.Muscle( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.period, v.amplitude, v.starton, v.material )
+					end
+					if v.Type == "NoCollide" then
+						constraint.NoCollide( v.Ent1, v.Ent2, v.Bone1, v.Bone2 )
+					end
+					if v.Type == "Pulley" then
+						constraint.Pulley( v.Ent1, v.Ent4, v.Bone1, v.Bone4, v.LPos1, v.LPos4, v.WPos2, v.WPos3, v.forcelimit, v.rigid, v.width, v.material )
+					end
+					if v.Type == "Rope" then
+						constraint.Rope( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.length, v.addlength, v.forcelimit, v.width, v.material, v.rigid )
+					end
+					if v.Type == "Slider" then
+						constraint.Slider( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.material )
+					end
+					if v.Type == "Weld" then
+						constraint.Weld( v.ent1, v.ent2, v.bone1, v.bone2, v.forcelimit, v.nocollide, v.deleteent1onbreak )
+					end
+					if v.Type == "Winch" then
+						constraint.Winch( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.key, v.key, v.fwd_speed, v.bwd_speed, v.material, v.toggle )
+					end
+				end
+
+				self.spawnedent.Inputs = trace.Entity.Inputs
+				for i=1, #self.spawnedent.Inputs do
+					self.spawnedent.Inputs[i].Entity = self.spawnedent
+				end
+
+				self.spawnedent:SetColor(trace.Entity:GetColor())
+				trace.Entity:Remove()
+				local ply = self:GetOwner()
+				ply:AddCount( "daktek", self.spawnedent)
+				ply:AddCleanup( "daktek", self.spawnedent )
+
+				undo.Create( "daktek" )
+					undo.AddEntity( self.spawnedent )
+					undo.SetPlayer( ply )
+				undo.Finish()
+				ply:AddCleanup( "DakTek", self.spawnedent )
+				self:GetOwner():ChatPrint("Weapon updated, respawn with duplicator to apply wiring.")
+			end
+		end
 	end
 end
  
@@ -2230,7 +2339,7 @@ function TOOL:RightClick( trace )
 					ply:ChatPrint("Ammo: "..Target.DakAmmo.."/"..Target.DakMaxAmmo.." Rounds")
 				end
 			end
-			if Target:GetClass() == "dak_tegearbox" then
+			if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" then
 				if Target.DakHP and Target.TotalMass then
 					if Target.DakCrew == NULL then
 						ply:ChatPrint("HP/T: "..math.Round(math.Clamp(Target.DakHP,0,Target.MaxHP)/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Uncrewed")
@@ -2646,7 +2755,7 @@ function TOOL.BuildCPanel( panel )
 		ShellLength = 15/50
 		ShellLengthExact = 2.75
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile", "Smoke" }
-		DermaNumSlider:SetMinMax( 40, 280 )
+		DermaNumSlider:SetMinMax( 40, 420 )
 	end
 	gunData["Cannon"] = function()
 		EntType   = "dak_tegun"
@@ -2701,7 +2810,7 @@ function TOOL.BuildCPanel( panel )
 		ShellLength = 15/50
 		ShellLengthExact = 2.75
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Explosive Squash Head", "Anti Tank Guided Missile", "Smoke"}
-		DermaNumSlider:SetMinMax( 40, 280 )
+		DermaNumSlider:SetMinMax( 40, 420 )
 	end
 	
 	--Table containing the volume of the available ammo crates
@@ -2904,6 +3013,23 @@ function TOOL.BuildCPanel( panel )
 			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_tefuel" )
 		end
 	end
+	selection["Auto Tread Gearboxes"] = function()
+		GearboxDirectionSelect:SetVisible( true )
+		DLabel:SetVisible( true )
+		DLabel:SetPos( 15, 405 )
+
+		if GearboxDirectionSelect:GetSelectedID() ~= nil then
+			GearboxModelSelect:SetVisible( true )
+		end
+		
+		if GearboxModelSelect:GetSelectedID() == nil then
+			DLabel:SetText( "Auto Tread Gearboxes\n\nTransfers the power of your engines to the wheels, you'll need heavy gearboxes to handle high power engines. Comes with auto generated treads for easy editing." )
+		else
+			gearboxList[GearboxModel]()
+			RunConsoleCommand( "daktankspawner_SpawnSettings", string.Replace( GearboxModel, " ", "" )..string.sub( GearboxDirection, 1, 1 ) )
+			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_tegearboxnew" )
+		end
+	end
 	selection["Gearboxes"] = function()
 		GearboxDirectionSelect:SetVisible( true )
 		DLabel:SetVisible( true )
@@ -3048,7 +3174,7 @@ function TOOL.BuildCPanel( panel )
 				local ShellLenMult = 6.5
 				local ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 
-				if Caliber < 100 then
+				if Caliber < 40 then
 					if AmmoTypeSelect:GetValue() == "Anti Tank Guided Missile" then
 						AmmoTypeSelect:SetValue("High Explosive Anti Tank")
 						AmmoCrate = String[1].."HEAT"..String[3]
@@ -3368,6 +3494,7 @@ function TOOL.BuildCPanel( panel )
 		DTTE_NodeList["Engine"]  = DTTE_NodeList["Mobility"]:AddNode( "Engines", "icon16/cog.png" )
 		DTTE_NodeList["Fuel"] 	 = DTTE_NodeList["Mobility"]:AddNode( "Fuel Tanks", "icon16/cog.png" )
 		DTTE_NodeList["Gearbox"] = DTTE_NodeList["Mobility"]:AddNode( "Gearboxes", "icon16/cog.png" )
+		DTTE_NodeList["Auto Tread Gearbox"] = DTTE_NodeList["Mobility"]:AddNode( "Auto Tread Gearboxes", "icon16/cog.png" )
 
 	DTTE_NodeList["Weapons"] 	 	= ctrl:AddNode( "Weaponry", "icon16/folder_wrench.png" )
 		DTTE_NodeList["Launcher"]	= ctrl:AddNode( "Missile Launchers", "icon16/folder_wrench.png" )

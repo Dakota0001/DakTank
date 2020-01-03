@@ -74,6 +74,7 @@ function ENT:Initialize()
  		self:NetworkVar("Float",1,"Cooldown")
  		self:NetworkVar("String",0,"Model")
  	end
+ 	self:SetNWFloat("Caliber",self.DakCaliber)
 end
 
 function ENT:Think()
@@ -1511,7 +1512,7 @@ function ENT:DakTEAutoFire()
 						self:SetNWBool("Firing",false)
 					end)
 				else
-					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.random(0.95, 1.05), 1 )
+					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.Rand(0.95, 1.05), 1 )
 				end
 
 				self.DakShotsCounter = self.DakShotsCounter + 1

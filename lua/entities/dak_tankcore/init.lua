@@ -612,7 +612,7 @@ function ENT:Think()
 							CurrentRes = res[i]
 							if CurrentRes:IsSolid() then
 									self.Contraption[#self.Contraption+1] = CurrentRes
-								if CurrentRes:GetClass()=="dak_tegearbox" then
+								if CurrentRes:GetClass()=="dak_tegearbox" or CurrentRes:GetClass()=="dak_tegearboxnew" then
 									CurrentRes.DakTankCore = self
 									self.Gearbox = CurrentRes
 								end
@@ -872,8 +872,8 @@ function ENT:Think()
 											if self.ERA[i].IsComposite ~= 1 then self.ERA[i].IsComposite = 1 end
 											if EntMod.CompKEMult ~= 2.5 then EntMod.CompKEMult = 2.5 end
 											if EntMod.CompCEMult ~= 88.9 then EntMod.CompCEMult = 88.9 end
-											if EntMod.DakName ~= "ERA" then EntMod.DakName = "ERA" end
-											if EntMod.IsERA ~= 1 then EntMod.IsERA = 1 end
+											if self.ERA[i].DakName ~= "ERA" then self.ERA[i].DakName = "ERA" end
+											if self.ERA[i].IsERA ~= 1 then self.ERA[i].IsERA = 1 end
 											if self.ColdWar ~= 1 then self.ColdWar = 1 end
 											if self.ERA[i].DakHealth <= 0 then
 												effectdata = EffectData()
@@ -1066,7 +1066,8 @@ function ENT:Think()
 													self.TurretControls[j].TurretBase:SetMaterial("models/props_buildings/plasterwall021a")
 													self.TurretControls[j].TurretBase:SetColor(Color(100,100,100,255))
 													self.TurretControls[j].TurretBase:SetCollisionGroup( COLLISION_GROUP_WORLD )
-													self.TurretControls[j].TurretBase:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+													--self.TurretControls[j].TurretBase:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+													sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.TurretControls[j].TurretBase:GetPos(), 100, 100, 0.25 )
 													if math.random(0,9) == 0 then
 														self.TurretControls[j].TurretBase:Ignite(25,1)
 													end
@@ -1086,7 +1087,8 @@ function ENT:Think()
 																self.TurretControls[j].Turret[l]:SetMaterial("models/props_buildings/plasterwall021a")
 																self.TurretControls[j].Turret[l]:SetColor(Color(100,100,100,255))
 																self.TurretControls[j].Turret[l]:SetCollisionGroup( COLLISION_GROUP_WORLD )
-																self.TurretControls[j].Turret[l]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+																--self.TurretControls[j].Turret[l]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+																sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.TurretControls[j].Turret[l]:GetPos(), 100, 100, 0.25 )
 																if self.TurretControls[j].Turret[l]:IsVehicle() then
 																	if IsValid(self.TurretControls[j].Turret[l]:GetDriver()) then
 																		self.TurretControls[j].Turret[l]:GetDriver():Kill()
@@ -1118,7 +1120,7 @@ function ENT:Think()
 												self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
 												if self.Contraption[i] ~= self:GetParent():GetParent() and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self then
 													if math.random(1,6)>1 then
-														if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or self.Contraption[i]:GetClass() == "gmod_wire_expression2" then
+														if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_tegearboxnew" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or self.Contraption[i]:GetClass() == "gmod_wire_expression2" then
 															self.salvage = ents.Create( "dak_tesalvage" )
 															if ( !IsValid( self.salvage ) ) then return end
 															if self.Contraption[i]:GetClass() == "dak_crew" then
@@ -1141,7 +1143,8 @@ function ENT:Think()
 															self.Contraption[i]:SetMaterial("models/props_buildings/plasterwall021a")
 															self.Contraption[i]:SetColor(Color(100,100,100,255))
 															self.Contraption[i]:SetCollisionGroup( COLLISION_GROUP_WORLD )
-															self.Contraption[i]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+															--self.Contraption[i]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+															sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.Contraption[i]:GetPos(), 100, 100, 0.25 )
 															if math.random(0,9) == 0 then
 																self.Contraption[i]:Ignite(25,1)
 															end

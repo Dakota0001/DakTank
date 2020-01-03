@@ -153,7 +153,7 @@ function SWEP:PrimaryAttack()
 					
 					
 					shell.DakBlastRadius = (self.DakCaliber/25*39)
-					shell.DakPenSounds = {"daktanks/daksmallpen1.wav","daktanks/daksmallpen2.wav","daktanks/daksmallpen3.wav","daktanks/daksmallpen4.wav"}
+					shell.DakPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
 					
 					shell.DakGun = self
 					shell.DakGun.DakOwner = self.Owner

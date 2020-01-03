@@ -64,6 +64,7 @@ function ENT:Initialize()
 
  	self.CooldownDistanceModifier = 1
  	self.CooldownWeightMod = 5000
+ 	self:SetNWFloat("Caliber",self.DakCaliber)
 
 end
 
@@ -880,7 +881,7 @@ function ENT:DakTEFire()
 						self:SetNWBool("Firing",false)
 					end)
 				else
-					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.random(0.95, 1.05), 1 )
+					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.Rand(0.95, 1.05), 1 )
 				end
 
 				timer.Create( "ReloadFinishTimer"..self:EntIndex()..CurTime(), self.DakCooldown-SoundDuration(self.ReloadSound), 1, function()
