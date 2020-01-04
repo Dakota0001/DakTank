@@ -93,7 +93,7 @@ function ENT:Initialize()
 	end
 	
 	self.SpawnTime = CurTime()
-	local DeathSounds = {"daktanks/closeexp1.wav","daktanks/closeexp2.wav","daktanks/closeexp3.wav"}
+	local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
 	self:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 1, 3)
 
 	if self.launch == 1 then

@@ -6,16 +6,14 @@ function ENT:Draw()
 
 end
 
-function ENT:Initialize()
-	self:PhysicsDestroy()
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self.Scaled = 0
-	self.CycleVal = 0.05
-	self.LastFire2 = false
-end
-
-
 function ENT:Think()
+	if not(self:GetPhysicsObject():IsValid()) then
+		self:PhysicsDestroy()
+		self:PhysicsInit(SOLID_VPHYSICS)
+	end
+	if self.Scaled == nil then self.Scaled = 0 end
+	if self.CycleVal == nil then self.CycleVal = 0.05 end
+	if self.LastFire2 == nil then self.LastFire2 = false end
 	local Caliber = self:GetNWFloat("Caliber")
 
 	--NOTE: this stuff might need to be set per model
@@ -46,6 +44,7 @@ function ENT:Think()
 	if self.Scaled == 1 then
 		self:GetPhysicsObject():SetPos(self:GetPos())
 		self:GetPhysicsObject():SetAngles(self:GetAngles())
+		self:GetPhysicsObject():EnableMotion( false )
 	end
 
 	if Caliber >= 40 then
