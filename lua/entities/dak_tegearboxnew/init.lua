@@ -75,17 +75,20 @@ end
 
 function ENT:Think()
 	local self = self
- 	if CurTime()>=self.SlowThinkTime+1 then
- 		self.SideDist = self:GetSideDist()
-	 	self.TrackLength = self:GetTrackLength()
-	 	self.WheelsPerSide = self:GetWheelsPerSide()
-	 	self.RideHeight = self:GetRideHeight()
-	 	self.RideLimit = self:GetRideLimit()
-	 	self.FrontWheelRaise = self:GetFrontWheelRaise()
-	 	self.RearWheelRaise = self:GetRearWheelRaise()
-	 	self.ForwardOffset = self:GetForwardOffset()
- 		self.GearRatio = self:GetGearRatio()*0.01
+	self.SideDist = self:GetSideDist()
+ 	self.TrackLength = self:GetTrackLength()
+ 	self.WheelsPerSide = self:GetWheelsPerSide()
+ 	self.RideHeight = self:GetRideHeight()
+ 	self.RideLimit = self:GetRideLimit()
+ 	self.FrontWheelRaise = self:GetFrontWheelRaise()
+ 	self.RearWheelRaise = self:GetRearWheelRaise()
+ 	self.ForwardOffset = self:GetForwardOffset()
+		self.GearRatio = self:GetGearRatio()*0.01
 
+		self.WheelHeight = self:GetWheelHeight()
+ 	self.FrontWheelHeight = self:GetFrontWheelHeight()
+ 	self.RearWheelHeight = self:GetRearWheelHeight()
+ 	if CurTime()>=self.SlowThinkTime+1 then
  		self.SlowThinkTime=CurTime()
 
  		if self.DakName == "Micro Frontal Mount Gearbox" then
@@ -749,7 +752,6 @@ function ENT:Think()
 				local trace = {}
 				local CurTrace
 				local RidePos
-				local SuspensionForceMult = 1
 				local SuspensionForce
 				local SuspensionAbsorb
 				local TotalRideHeight = 0
@@ -762,7 +764,8 @@ function ENT:Think()
 				local lastvelnorm 
 				local CurTraceDist
 				local ForwardEnt = self.ForwardEnt
-				local WheelsPerSide = 5
+				local WheelsPerSide = self.WheelsPerSide--5
+				local SuspensionForceMult = 1
 				local TrackLength = self.TrackLength
 				local ForwardOffset = self.ForwardOffset
 				local RideLimit = self.RideLimit
@@ -778,7 +781,7 @@ function ENT:Think()
 
 				local weightforce = self.PhysicalMass*-GravxTicks --note, raise tick interval if I increase interval
 				local wheelforce = weightforce/(WheelsPerSide*2)
-				local wheelweightforce = ((self.PhysicalMass*0.1)/(WheelsPerSide*2))*GravxTicks
+				local wheelweightforce = ((self.PhysicalMass*0.5)/(WheelsPerSide*2))*GravxTicks
 				if self.LastWheelsPerSide ~= WheelsPerSide then
 			        for i=1, WheelsPerSide do
 						self.RightChanges[i] = 0
@@ -793,13 +796,12 @@ function ENT:Think()
 				local clamp = math.Clamp
 				local abs = math.abs
 				local max = math.Max
-
 				--Right side
 				for i=1, WheelsPerSide do
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*self.SideDist)
 					trace = {
-						start = Pos + up*RideLimit,
-						endpos = Pos + up*-1000000000,
+						start = Pos + up*RideHeight,
+						endpos = Pos + up*-RideHeight,
 						mask = MASK_SOLID_BRUSHONLY
 					}
 					CurTrace = traceline( trace )
@@ -811,18 +813,18 @@ function ENT:Think()
 					lastvel = -self:GetPos()+self:LocalToWorld(Vector(self.RightBrake,1,0)*self:WorldToLocal(self:GetPos()+lastvel))
 					self.RightPosChanges[i] = CurTraceHitPos
 					if i==WheelsPerSide then 
-						RidePos = CurTraceDist - RideLimit - RideHeight + FrontWheelRaise
+						RidePos = (CurTraceDist - RideHeight + FrontWheelRaise) - RideHeight
 					elseif i==1 then
-						RidePos = CurTraceDist - RideLimit - RideHeight + RearWheelRaise
+						RidePos = (CurTraceDist - RideHeight + RearWheelRaise) - RideHeight
 					else
-						RidePos = CurTraceDist - RideLimit - RideHeight
+						RidePos = (CurTraceDist - RideHeight) - RideHeight
 					end
 					if RidePos/RideLimit < 0 then
-						SuspensionForce = wheelforce + ((clamp((RidePos*RidePos)/RideLimit,0,10)*SuspensionForceMult)*wheelforce)
+						SuspensionForce = Vector(0,0, math.Max((wheelforce + ((clamp((RidePos*RidePos)/RideLimit,0,10)*SuspensionForceMult)*wheelforce)).z,0) )
 						FrictionForce = (self.PhysicalMass*-GravxTicks).z * 0.9 --0.9 coef of rubber on pavement
 						AbsorbForce = 0.2
 					else
-						SuspensionForce = wheelweightforce*clamp(RidePos/RideLimit,-1,1)
+						SuspensionForce = wheelweightforce--*clamp(RidePos/RideLimit,-1,1)
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
@@ -836,8 +838,8 @@ function ENT:Think()
 				for i=1, WheelsPerSide do
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*self.SideDist)
 					trace = {
-						start = Pos + up*RideLimit,
-						endpos = Pos + up*-1000000000,
+						start = Pos + up*RideHeight,
+						endpos = Pos + up*-RideHeight,
 						mask = MASK_SOLID_BRUSHONLY
 					}
 					CurTrace = traceline( trace )
@@ -849,18 +851,18 @@ function ENT:Think()
 					lastvel = -self:GetPos()+self:LocalToWorld(Vector(self.LeftBrake,1,0)*self:WorldToLocal(self:GetPos()+lastvel))
 					self.LeftPosChanges[i] = CurTraceHitPos
 					if i==WheelsPerSide then 
-						RidePos = CurTraceDist - RideLimit - RideHeight + FrontWheelRaise
+						RidePos = (CurTraceDist - RideHeight + FrontWheelRaise) - RideHeight
 					elseif i==1 then
-						RidePos = CurTraceDist - RideLimit - RideHeight + RearWheelRaise
+						RidePos = (CurTraceDist - RideHeight + RearWheelRaise) - RideHeight
 					else
-						RidePos = CurTraceDist - RideLimit - RideHeight
+						RidePos = (CurTraceDist - RideHeight) - RideHeight
 					end
 					if RidePos/RideLimit < 0 then
-						SuspensionForce = wheelforce + ((clamp((RidePos*RidePos)/RideLimit,0,10)*SuspensionForceMult)*wheelforce)
+						SuspensionForce = Vector(0,0,math.Max((wheelforce + ((clamp((RidePos*RidePos)/RideLimit,0,10)*SuspensionForceMult)*wheelforce)).z,0))
 						FrictionForce = (self.PhysicalMass*-GravxTicks).z * 0.9 --0.9 coef of rubber on pavement
 						AbsorbForce = 0.2
 					else
-						SuspensionForce = wheelweightforce*clamp(RidePos/RideLimit,-1,1)
+						SuspensionForce = wheelweightforce--*clamp(RidePos/RideLimit,-1,1)
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
@@ -871,7 +873,7 @@ function ENT:Think()
 					self.phy:ApplyForceOffset( self.TimeMult*(forward*3*self.LeftForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
 				
-				self.phy:ApplyForceCenter(self.TimeMult*(-Vector(0,0,self.PhysicalMass*self.base:GetVelocity().z) * 0.05 ))
+				--self.phy:ApplyForceCenter(self.TimeMult*(-Vector(0,0,self.PhysicalMass*self.base:GetVelocity().z) * 0.05 ))
 				--print(self.TimeMult)
 				
 				self.LastWheelsPerSide = WheelsPerSide

@@ -32,9 +32,47 @@ data1["$basetexture"] = "WTP/textures/track_2"
 data2["$basetexture"] = "WTP/textures/track_2"
 local TreadMatRight = CreateMaterial("DakTankTreadMaterialRight" .. SysTime(), "VertexLitGeneric", data1)
 local TreadMatLeft = CreateMaterial("DakTankTreadMaterialLeft" .. SysTime(), "VertexLitGeneric", data2)
+function quickhull(points)
+    local p = #points
 
+    local cross = function(p, q, r)
+        return (q[2] - p[2]) * (r[1] - q[1]) - (q[1] - p[1]) * (r[2] - q[2])
+    end
+
+    table.sort(points, function(a, b)
+        return a[1] == b[1] and a[2] > b[2] or a[1] > b[1]
+    end)
+
+    local lower = {}
+    for i = 1, p do
+        while (#lower >= 2 and cross(lower[#lower - 1], lower[#lower], points[i]) <= 0) do
+            table.remove(lower, #lower)
+        end
+
+        --table.insert(lower, points[i])
+        lower[#lower + 1] = points[i]
+    end
+
+    local upper = {}
+    for i = p, 1, -1 do
+        while (#upper >= 2 and cross(upper[#upper - 1], upper[#upper], points[i]) <= 0) do
+            table.remove(upper, #upper)
+        end
+
+        --table.insert(upper, points[i])
+        upper[#upper + 1] = points[i]
+    end
+
+    table.remove(upper, #upper)
+    table.remove(lower, #lower)
+    for _, point in ipairs(lower) do
+        --table.insert(upper, point)
+        upper[#upper + 1] = point
+    end
+
+    return upper
+end
 function ENT:Draw()
-	
 	self:DrawModel()
 	local treadmodel = ClientsideModel("models/sprops/rectangles/size_2/rect_12x12x3.mdl")
 	local wheelmodel = ClientsideModel( self:GetWheelModel() )
@@ -83,7 +121,8 @@ function ENT:Draw()
 	local WheelColor = self.WheelColor
 	local TreadColor = self.TreadColor
 
-	self:SetRenderBounds( Vector(-1000,-1000,-1000),Vector(1000,1000,1000) )
+	self:SetRenderBounds( Vector(-1000,-1000,-50),Vector(1000,1000,50) )
+	self:DrawShadow(false)
 	--print(WheelColor)
 	wheelmodel:SetColor(Color( 255, 0, 0, 255 ))
  	--check for base and forward ent are not null
@@ -91,21 +130,17 @@ function ENT:Draw()
 	 	if (self.RightAngTable == nil and WheelsPerSide>0) or self.LastWheelsPerSide~=WheelsPerSide then
 			self.RightAngTable = {}
 			self.RightPosTable = {}
-			self.RightNodeTable = {}
 			for i=1, WheelsPerSide do
 				self.RightAngTable[i] = 0
 				self.RightPosTable[i] = Vector(0,0,0)
-				self.RightNodeTable[i] = {}
 			end
 		end
 		if (self.LeftAngTable == nil and WheelsPerSide>0) or self.LastWheelsPerSide~=WheelsPerSide then
 			self.LeftAngTable = {}
 			self.LeftPosTable = {}
-			self.LeftNodeTable = {}
 			for i=1, WheelsPerSide do
 				self.LeftAngTable[i] = 0
 				self.LeftPosTable[i] = Vector(0,0,0)
-				self.LeftNodeTable[i] = {}
 			end
 		end
 		local Speed
@@ -205,13 +240,6 @@ function ENT:Draw()
 		end
 		self.LeftScroll = self.LeftScroll - Speed/(TreadMatLeft:Height()*0.5)
 		TreadMatLeft:SetVector("$translate",Vector(0,self.LeftScroll,0))
-
-		--IDEA
-		--get both pos
-		--get angle between those pos
-		--rotate nodes of wheel by that angle
-		--connect via that
-		--so I need to get the angle between the last and second to last and first and second to first wheels to make them proper
 		
 		local pos1
 		local pos2
@@ -220,279 +248,37 @@ function ENT:Draw()
 		local y1
 		local y2
 		local WheelPos
-		local WheelNodes = {}
 		local Ang
-		local Detail = 8
-		local RightFrontAng 
-		local RightBackAng
-		local LeftFrontAng
-		local LeftBackAng
-		for i=1, 4 do
-			if i == 1 then
+		local Detail = 32
+		local NewPos
 
-				WheelPos = self.RightPosTable[1]+ForwardEnt:GetUp()*wheelmodelZ*(RearWheelHeight/(wheelbounds[3]*2))+ForwardEnt:GetUp()*self.TreadHeight
-				pos1 = self.RightPosTable[1] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.RightPosTable[2] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-			elseif i == 4 then
-				WheelPos = self.RightPosTable[WheelsPerSide]+ForwardEnt:GetUp()*wheelmodelZ*(FrontWheelHeight/(wheelbounds[3]*2))+ForwardEnt:GetUp()*self.TreadHeight
-				pos1 = self.RightPosTable[WheelsPerSide] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.RightPosTable[WheelsPerSide-1] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-			end
-			if i == 2 then
-				WheelPos = self.RightPosTable[2]+ForwardEnt:GetUp()*wheelmodelZ+ForwardEnt:GetUp()*self.TreadHeight
-				pos1 = self.RightPosTable[2] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.RightPosTable[3] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-			elseif i == 3 then
-				WheelPos = self.RightPosTable[WheelsPerSide-1]+ForwardEnt:GetUp()*wheelmodelZ+ForwardEnt:GetUp()*self.TreadHeight
-				pos1 = self.RightPosTable[WheelsPerSide-1] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.RightPosTable[WheelsPerSide-2] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-			end
-			WheelNodes = {}
-			
-			if i <= 2 then
-				Ang = (ForwardEnt:GetUp()):Angle()
+		local LeftWheelNodes = {}
+		for i=1, WheelsPerSide do
+			if i == 1 then
+				WheelPos = self.LeftPosTable[i]+(ForwardEnt:GetUp()*RearWheelHeight*0.5)+ForwardEnt:GetUp()*self.TreadHeight
+			elseif i == WheelsPerSide then
+				WheelPos = self.LeftPosTable[i]+(ForwardEnt:GetUp()*FrontWheelHeight*0.5)+ForwardEnt:GetUp()*self.TreadHeight
 			else
-				Ang = (-ForwardEnt:GetUp()):Angle()
+				WheelPos = self.LeftPosTable[i]+(ForwardEnt:GetUp()*WheelHeight*0.5)+ForwardEnt:GetUp()*self.TreadHeight
 			end
-			if i == 1 or i == 4 then
-				if i == 1 then RightBackAng = -math.atan2(y1-y2,x2-x1)*57.2958 end
-				if i == 4 then RightFrontAng = 180-math.atan2(y1-y2,x2-x1)*57.2958 end
-				Ang:RotateAroundAxis( ForwardEnt:GetRight(), -math.atan2(y1-y2,x2-x1)*57.2958 )
-			end
-			Ang:RotateAroundAxis( ForwardEnt:GetRight(), (360/(Detail*2))*-1 )
-			for j=1, Detail+1 do
-				Ang:RotateAroundAxis( ForwardEnt:GetRight(), (360/(Detail*2)) )
-				if i <= 3 then
-					if i == 1 then
-						WheelNodes[j] = WheelPos + (Ang:Forward()*(wheelmodelZ*(RearWheelHeight/(wheelbounds[3]*2))+(self.TreadHeight*0.5)))
-					else
-						WheelNodes[j] = WheelPos + (Ang:Forward()*(wheelmodelZ+(self.TreadHeight*0.5)))
-					end				
+			WheelPos = Base:WorldToLocal(WheelPos)
+			for j=1, Detail do
+				if i == 1 then
+					NewPos = {WheelPos[1] + (RearWheelHeight*0.5+self.TreadHeight*0.5)*math.cos(j*(360/(Detail))),WheelPos[3] + (RearWheelHeight*0.5+self.TreadHeight*0.5)*math.sin(j*(360/(Detail)))}
+				elseif i == WheelsPerSide then
+					NewPos = {WheelPos[1] + (FrontWheelHeight*0.5+self.TreadHeight*0.5)*math.cos(j*(360/(Detail))),WheelPos[3] + (FrontWheelHeight*0.5+self.TreadHeight*0.5)*math.sin(j*(360/(Detail)))}
 				else
-					WheelNodes[j] = WheelPos - (Ang:Forward()*(wheelmodelZ*(FrontWheelHeight/(wheelbounds[3]*2))+(self.TreadHeight*0.5)))
-				end
-			end
-			self.RightNodeTable[i] = WheelNodes
-		end 
-		for i=1, 4 do
-			if i == 1 then
-				WheelPos = self.LeftPosTable[1]+ForwardEnt:GetUp()*wheelmodelZ*(RearWheelHeight/(wheelbounds[3]*2))+ForwardEnt:GetUp()*self.TreadHeight
-				pos1 = self.LeftPosTable[1] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.LeftPosTable[2] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-			elseif i == 4 then
-				WheelPos = self.LeftPosTable[WheelsPerSide]+ForwardEnt:GetUp()*wheelmodelZ*(FrontWheelHeight/(wheelbounds[3]*2))+ForwardEnt:GetUp()*self.TreadHeight
-				pos1 = self.LeftPosTable[WheelsPerSide] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.LeftPosTable[WheelsPerSide-1] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-			end
-			if i == 2 then
-				WheelPos = self.LeftPosTable[2]+ForwardEnt:GetUp()*wheelmodelZ+ForwardEnt:GetUp()*self.TreadHeight
-				pos1 = self.LeftPosTable[2] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.LeftPosTable[3] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-			elseif i == 3 then
-				WheelPos = self.LeftPosTable[WheelsPerSide-1]+ForwardEnt:GetUp()*wheelmodelZ+ForwardEnt:GetUp()*self.TreadHeight
-				pos1 = self.LeftPosTable[WheelsPerSide-1] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.LeftPosTable[WheelsPerSide-2] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-			end
-			WheelNodes = {}
-			
-			if i <= 2 then
-				Ang = (ForwardEnt:GetUp()):Angle()
-			else
-				Ang = (-ForwardEnt:GetUp()):Angle()
-			end
-			if i == 1 or i == 4 then
-				if i == 1 then LeftBackAng = -math.atan2(y1-y2,x2-x1)*57.2958 end
-				if i == 4 then LeftFrontAng = 180-math.atan2(y1-y2,x2-x1)*57.2958 end
-				Ang:RotateAroundAxis( ForwardEnt:GetRight(), -math.atan2(y1-y2,x2-x1)*57.2958 )
-			end
-			Ang:RotateAroundAxis( ForwardEnt:GetRight(), (360/(Detail*2))*-1 )
-			for j=1, Detail+1 do
-				Ang:RotateAroundAxis( ForwardEnt:GetRight(), (360/(Detail*2)) )
-				if i <= 3 then
-					if i == 1 then
-						WheelNodes[j] = WheelPos + (Ang:Forward()*(wheelmodelZ*(RearWheelHeight/(wheelbounds[3]*2))+(self.TreadHeight*0.5)))
-					else
-						WheelNodes[j] = WheelPos + (Ang:Forward()*(wheelmodelZ+(self.TreadHeight*0.5)))
-					end				
-				else
-					WheelNodes[j] = WheelPos - (Ang:Forward()*(wheelmodelZ*(FrontWheelHeight/(wheelbounds[3]*2))+(self.TreadHeight*0.5)))
-				end
-			end
-			self.LeftNodeTable[i] = WheelNodes
-		end 
-
-		if RightBackAng > 90 then RightBackAng = 0 end
-		if RightFrontAng > 90 then RightFrontAng = 0 end
-
-		local RightBackAngChunks = math.floor(math.abs(RightBackAng)/(360/(Detail*2)))
-		local RightFrontAngChunks = math.floor(math.abs(RightFrontAng)/(360/(Detail*2)))
-		
-		for i=1, WheelsPerSide-1 do
-			mat = Matrix()
-			pos1 = self.RightPosTable[i] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-			pos2 = self.RightPosTable[i+1] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-			if i == 1 then
-				pos1 = self.RightNodeTable[1][Detail+1]
-				pos2 = self.RightNodeTable[2][Detail-RightBackAngChunks+1]
-			elseif i == WheelsPerSide-1 then
-				pos1 = self.RightNodeTable[4][1]
-				pos2 = self.RightNodeTable[3][1+RightFrontAngChunks]
-			end
-			scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-			mat:Scale( scale )
-			treadmodel:EnableMatrix( "RenderMultiply", mat )
-			treadmodel:SetPos( (pos1 + pos2)/2 )
-			x1 = ForwardEnt:WorldToLocal(pos1).x
-			y1 = ForwardEnt:WorldToLocal(pos1).z
-			x2 = ForwardEnt:WorldToLocal(pos2).x
-			y2 = ForwardEnt:WorldToLocal(pos2).z
-			treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-			treadmodel:SetupBones()
-			render.ModelMaterialOverride( TreadMatRight )
-			TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
-			render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-			treadmodel:DrawModel()
-			render.SetColorModulation( 1, 1, 1 )
-			render.ModelMaterialOverride()
-		end
-		for i = 1, Detail do
-			if i > RightBackAngChunks+1 then
-				mat = Matrix()
-				pos1 = self.RightNodeTable[1][i]
-				pos2 = self.RightNodeTable[1][i+1]
-				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-				mat:Scale( scale )
-				treadmodel:EnableMatrix( "RenderMultiply", mat )
-				treadmodel:SetPos( (pos1 + pos2)/2 )
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-				treadmodel:SetupBones()
-				render.ModelMaterialOverride( TreadMatRight )
-				TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
-				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-				treadmodel:DrawModel()
-				render.SetColorModulation( 1, 1, 1 )
-				render.ModelMaterialOverride()
-			end
-			if i+RightFrontAngChunks+1 <= Detail then
-				mat = Matrix()
-				pos1 = self.RightNodeTable[4][i]
-				pos2 = self.RightNodeTable[4][i+1]
-				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-				mat:Scale( scale )
-				treadmodel:EnableMatrix( "RenderMultiply", mat )
-				treadmodel:SetPos( (pos1 + pos2)/2 )
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-				treadmodel:SetupBones()
-				render.ModelMaterialOverride( TreadMatRight )
-				TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
-				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-				treadmodel:DrawModel()
-				render.SetColorModulation( 1, 1, 1 )
-				render.ModelMaterialOverride()
-			end
-			if i>=Detail-RightBackAngChunks+1 and RightBackAngChunks>0 then
-				mat = Matrix()
-				pos1 = self.RightNodeTable[2][i]
-				pos2 = self.RightNodeTable[2][i+1]
-				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-				mat:Scale( scale )
-				treadmodel:EnableMatrix( "RenderMultiply", mat )
-				treadmodel:SetPos( (pos1 + pos2)/2 )
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-				treadmodel:SetupBones()
-				render.ModelMaterialOverride( TreadMatRight )
-				TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
-				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-				treadmodel:DrawModel()
-				render.SetColorModulation( 1, 1, 1 )
-				render.ModelMaterialOverride()
-			end
-			if i>=Detail-RightFrontAngChunks+1 and RightFrontAngChunks>0 then
-				mat = Matrix()
-				pos1 = self.RightNodeTable[3][Detail-i+1]
-				pos2 = self.RightNodeTable[3][Detail-i+2]
-				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-				mat:Scale( scale )
-				treadmodel:EnableMatrix( "RenderMultiply", mat )
-				treadmodel:SetPos( (pos1 + pos2)/2 )
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-				treadmodel:SetupBones()
-				render.ModelMaterialOverride( TreadMatRight )
-				TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
-				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-				treadmodel:DrawModel()
-				render.SetColorModulation( 1, 1, 1 )
-				render.ModelMaterialOverride()
+					NewPos = {WheelPos[1] + (WheelHeight*0.5+self.TreadHeight*0.5)*math.cos(j*(360/(Detail))),WheelPos[3] + (WheelHeight*0.5+self.TreadHeight*0.5)*math.sin(j*(360/(Detail)))}
+				end	
+				--WheelNodes[j] = {NewPos[1],NewPos[3]}	
+				LeftWheelNodes[#LeftWheelNodes+1] = NewPos
 			end
 		end
-		mat = Matrix()
-		pos1 = self.RightNodeTable[4][Detail+1-(RightFrontAngChunks+1)]
-		pos2 = self.RightNodeTable[1][1+RightBackAngChunks+1]
-		scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-		mat:Scale( scale )
-		treadmodel:EnableMatrix( "RenderMultiply", mat )
-		treadmodel:SetPos( (pos1 + pos2)/2 )
-		x1 = ForwardEnt:WorldToLocal(pos1).x
-		y1 = ForwardEnt:WorldToLocal(pos1).z
-		x2 = ForwardEnt:WorldToLocal(pos2).x
-		y2 = ForwardEnt:WorldToLocal(pos2).z
-		treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-		treadmodel:SetupBones()
-		render.ModelMaterialOverride( TreadMatRight )
-		TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
-		render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-		treadmodel:DrawModel()
-		render.SetColorModulation( 1, 1, 1 )
-		render.ModelMaterialOverride()
-
-		if LeftBackAng > 90 then LeftBackAng = 0 end
-		if LeftFrontAng > 90 then LeftFrontAng = 0 end
-
-		local LeftBackAngChunks = math.floor(math.abs(LeftBackAng)/(360/(Detail*2)))
-		local LeftFrontAngChunks = math.floor(math.abs(LeftFrontAng)/(360/(Detail*2)))
-		for i=1, WheelsPerSide-1 do
+		local LeftTreadPoints = quickhull(LeftWheelNodes)
+		for i=1, #LeftTreadPoints-1 do
 			mat = Matrix()
-			pos1 = self.LeftPosTable[i] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-				pos2 = self.LeftPosTable[i+1] + ForwardEnt:GetUp()*(self.TreadHeight*0.5)
-			if i == 1 then
-				pos1 = self.LeftNodeTable[1][Detail+1]
-				pos2 = self.LeftNodeTable[2][Detail-LeftBackAngChunks+1]
-			elseif i == WheelsPerSide-1 then
-				pos1 = self.LeftNodeTable[4][1]
-				pos2 = self.LeftNodeTable[3][1+LeftFrontAngChunks]
-			end
+			pos1 = Base:LocalToWorld(Vector(LeftTreadPoints[i][1],SideDist,LeftTreadPoints[i][2]))
+			pos2 = Base:LocalToWorld(Vector(LeftTreadPoints[i+1][1],SideDist,LeftTreadPoints[i+1][2]))
 			scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
 			mat:Scale( scale )
 			treadmodel:EnableMatrix( "RenderMultiply", mat )
@@ -510,95 +296,9 @@ function ENT:Draw()
 			render.SetColorModulation( 1, 1, 1 )
 			render.ModelMaterialOverride()
 		end
-		for i = 1, Detail do
-			if i > LeftBackAngChunks+1 then
-				mat = Matrix()
-				pos1 = self.LeftNodeTable[1][i]
-				pos2 = self.LeftNodeTable[1][i+1]
-				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-				mat:Scale( scale )
-				treadmodel:EnableMatrix( "RenderMultiply", mat )
-				treadmodel:SetPos( (pos1 + pos2)/2 )
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-				treadmodel:SetupBones()
-				render.ModelMaterialOverride( TreadMatLeft )
-				TreadMatLeft:SetVector("$newscale",Vector((scale.x*512/TreadMatLeft:Height()),512/TreadMatLeft:Width(),5))
-				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-				treadmodel:DrawModel()
-				render.SetColorModulation( 1, 1, 1 )
-				render.ModelMaterialOverride()
-			end
-			if i+LeftFrontAngChunks+1 <= Detail then
-				mat = Matrix()
-				pos1 = self.LeftNodeTable[4][i]
-				pos2 = self.LeftNodeTable[4][i+1]
-				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-				mat:Scale( scale )
-				treadmodel:EnableMatrix( "RenderMultiply", mat )
-				treadmodel:SetPos( (pos1 + pos2)/2 )
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-				treadmodel:SetupBones()
-				render.ModelMaterialOverride( TreadMatLeft )
-				TreadMatLeft:SetVector("$newscale",Vector((scale.x*512/TreadMatLeft:Height()),512/TreadMatLeft:Width(),5))
-				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-				treadmodel:DrawModel()
-				render.SetColorModulation( 1, 1, 1 )
-				render.ModelMaterialOverride()
-			end
-			if i>=Detail-LeftBackAngChunks+1 and LeftBackAngChunks>0 then
-				mat = Matrix()
-				pos1 = self.LeftNodeTable[2][i]
-				pos2 = self.LeftNodeTable[2][i+1]
-				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-				mat:Scale( scale )
-				treadmodel:EnableMatrix( "RenderMultiply", mat )
-				treadmodel:SetPos( (pos1 + pos2)/2 )
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-				treadmodel:SetupBones()
-				render.ModelMaterialOverride( TreadMatLeft )
-				TreadMatLeft:SetVector("$newscale",Vector((scale.x*512/TreadMatLeft:Height()),512/TreadMatLeft:Width(),5))
-				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-				treadmodel:DrawModel()
-				render.SetColorModulation( 1, 1, 1 )
-				render.ModelMaterialOverride()
-			end
-			if i>=Detail-LeftFrontAngChunks+1 and LeftFrontAngChunks>0 then
-				mat = Matrix()
-				pos1 = self.LeftNodeTable[3][Detail-i+1]
-				pos2 = self.LeftNodeTable[3][Detail-i+2]
-				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-				mat:Scale( scale )
-				treadmodel:EnableMatrix( "RenderMultiply", mat )
-				treadmodel:SetPos( (pos1 + pos2)/2 )
-				x1 = ForwardEnt:WorldToLocal(pos1).x
-				y1 = ForwardEnt:WorldToLocal(pos1).z
-				x2 = ForwardEnt:WorldToLocal(pos2).x
-				y2 = ForwardEnt:WorldToLocal(pos2).z
-				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-				treadmodel:SetupBones()
-				render.ModelMaterialOverride( TreadMatLeft )
-				TreadMatLeft:SetVector("$newscale",Vector((scale.x*512/TreadMatLeft:Height()),512/TreadMatLeft:Width(),5))
-				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-				treadmodel:DrawModel()
-				render.SetColorModulation( 1, 1, 1 )
-				render.ModelMaterialOverride()
-			end
-		end
 		mat = Matrix()
-		pos1 = self.LeftNodeTable[4][Detail+1-(LeftFrontAngChunks+1)]
-		pos2 = self.LeftNodeTable[1][1+LeftBackAngChunks+1]
+		pos1 = Base:LocalToWorld(Vector(LeftTreadPoints[1][1],SideDist,LeftTreadPoints[1][2]))
+		pos2 = Base:LocalToWorld(Vector(LeftTreadPoints[#LeftTreadPoints][1],SideDist,LeftTreadPoints[#LeftTreadPoints][2]))
 		scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
 		mat:Scale( scale )
 		treadmodel:EnableMatrix( "RenderMultiply", mat )
@@ -611,6 +311,70 @@ function ENT:Draw()
 		treadmodel:SetupBones()
 		render.ModelMaterialOverride( TreadMatLeft )
 		TreadMatLeft:SetVector("$newscale",Vector((scale.x*512/TreadMatLeft:Height()),512/TreadMatLeft:Width(),5))
+		render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
+		treadmodel:DrawModel()
+		render.SetColorModulation( 1, 1, 1 )
+		render.ModelMaterialOverride()
+
+		local RightWheelNodes = {}
+		for i=1, WheelsPerSide do
+			if i == 1 then
+				WheelPos = self.RightPosTable[i]+(ForwardEnt:GetUp()*RearWheelHeight*0.5)+ForwardEnt:GetUp()*self.TreadHeight
+			elseif i == WheelsPerSide then
+				WheelPos = self.RightPosTable[i]+(ForwardEnt:GetUp()*FrontWheelHeight*0.5)+ForwardEnt:GetUp()*self.TreadHeight
+			else
+				WheelPos = self.RightPosTable[i]+(ForwardEnt:GetUp()*WheelHeight*0.5)+ForwardEnt:GetUp()*self.TreadHeight
+			end
+			WheelPos = Base:WorldToLocal(WheelPos)
+			for j=1, Detail do
+				if i == 1 then
+					NewPos = {WheelPos[1] + (RearWheelHeight*0.5+self.TreadHeight*0.5)*math.cos(j*(360/(Detail))),WheelPos[3] + (RearWheelHeight*0.5+self.TreadHeight*0.5)*math.sin(j*(360/(Detail)))}
+				elseif i == WheelsPerSide then
+					NewPos = {WheelPos[1] + (FrontWheelHeight*0.5+self.TreadHeight*0.5)*math.cos(j*(360/(Detail))),WheelPos[3] + (FrontWheelHeight*0.5+self.TreadHeight*0.5)*math.sin(j*(360/(Detail)))}
+				else
+					NewPos = {WheelPos[1] + (WheelHeight*0.5+self.TreadHeight*0.5)*math.cos(j*(360/(Detail))),WheelPos[3] + (WheelHeight*0.5+self.TreadHeight*0.5)*math.sin(j*(360/(Detail)))}
+				end	
+				--WheelNodes[j] = {NewPos[1],NewPos[3]}	
+				RightWheelNodes[#RightWheelNodes+1] = NewPos
+			end
+		end
+		local RightTreadPoints = quickhull(RightWheelNodes)
+		for i=1, #RightTreadPoints-1 do
+			mat = Matrix()
+			pos1 = Base:LocalToWorld(Vector(RightTreadPoints[i][1],-SideDist,RightTreadPoints[i][2]))
+			pos2 = Base:LocalToWorld(Vector(RightTreadPoints[i+1][1],-SideDist,RightTreadPoints[i+1][2]))
+			scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
+			mat:Scale( scale )
+			treadmodel:EnableMatrix( "RenderMultiply", mat )
+			treadmodel:SetPos( (pos1 + pos2)/2 )
+			x1 = ForwardEnt:WorldToLocal(pos1).x
+			y1 = ForwardEnt:WorldToLocal(pos1).z
+			x2 = ForwardEnt:WorldToLocal(pos2).x
+			y2 = ForwardEnt:WorldToLocal(pos2).z
+			treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
+			treadmodel:SetupBones()
+			render.ModelMaterialOverride( TreadMatRight )
+			TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
+			render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
+			treadmodel:DrawModel()
+			render.SetColorModulation( 1, 1, 1 )
+			render.ModelMaterialOverride()
+		end
+		mat = Matrix()
+		pos1 = Base:LocalToWorld(Vector(RightTreadPoints[1][1],-SideDist,RightTreadPoints[1][2]))
+		pos2 = Base:LocalToWorld(Vector(RightTreadPoints[#RightTreadPoints][1],-SideDist,RightTreadPoints[#RightTreadPoints][2]))
+		scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
+		mat:Scale( scale )
+		treadmodel:EnableMatrix( "RenderMultiply", mat )
+		treadmodel:SetPos( (pos1 + pos2)/2 )
+		x1 = ForwardEnt:WorldToLocal(pos1).x
+		y1 = ForwardEnt:WorldToLocal(pos1).z
+		x2 = ForwardEnt:WorldToLocal(pos2).x
+		y2 = ForwardEnt:WorldToLocal(pos2).z
+		treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
+		treadmodel:SetupBones()
+		render.ModelMaterialOverride( TreadMatRight )
+		TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
 		render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
 		treadmodel:DrawModel()
 		render.SetColorModulation( 1, 1, 1 )

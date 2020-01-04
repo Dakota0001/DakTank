@@ -120,8 +120,8 @@ function TOOL:RightClick( trace )
 		local Target = trace.Entity
 		if IsValid(self.EntList[1]) then
 			if self.EntList[1]:GetClass() == "dak_crew" then
-				if(Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun") then
-					if Target:GetClass() == "dak_tegearbox" then
+				if(Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" or Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun") then
+					if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" then
 						self.Ent2 = Target
 						self.EntList[1].DakEntity = self.Ent2
 						if (CLIENT) or (game.SinglePlayer()) then
