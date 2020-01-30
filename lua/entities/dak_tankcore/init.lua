@@ -484,7 +484,7 @@ function ENT:Think()
 							end
 							if hasATGM==1 then
 								if self.Modern==1 then
-									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*6.20
+									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*6.40
 								else
 									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*6.40*0.45
 								end
@@ -883,7 +883,7 @@ function ENT:Think()
 												effectdata:SetMagnitude(.5)
 												effectdata:SetScale(50)
 												effectdata:SetNormal( Vector(0,0,0) )
-												util.Effect("daktescalingexplosion", effectdata, true, true)
+												util.Effect("daktescalingexplosionold", effectdata, true, true)
 												sound.Play( ExpSounds[math.random(1,#ExpSounds)], self.ERA[i]:GetPos(), 100, 100, 1 )
 												self.ERA[i]:DTExplosion(self.ERA[i]:GetPos(),25,50,40,5,self.DakOwner)
 												self.ERA[i]:Remove()
@@ -1190,7 +1190,7 @@ function ENT:Think()
 									effectdata:SetMagnitude(.5)
 									effectdata:SetNormal( Vector(0,0,-1) )
 									effectdata:SetScale(math.Clamp(self.DakMaxHealth*0.04,100,500))
-									util.Effect("daktescalingexplosion", effectdata)
+									util.Effect("daktescalingexplosionold", effectdata)
 								end
 							else
 								self:Remove()

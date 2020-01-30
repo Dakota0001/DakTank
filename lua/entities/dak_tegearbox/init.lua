@@ -290,8 +290,8 @@ function ENT:Think()
 			    		self.YawAng = Angle(0,self:GetParent():GetParent():GetAngles().yaw,0)
 			 			self.LastYaw = self:GetParent():GetParent():GetAngles().yaw
 
-			 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/self:GetParent():GetParent():GetPhysicsObject():GetMass())*0.25 )
-
+			 			--self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/self:GetParent():GetParent():GetPhysicsObject():GetMass())*0.25 )
+			 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/10000) )
 			 			self.setup = 1
 			 		end
 			 	end

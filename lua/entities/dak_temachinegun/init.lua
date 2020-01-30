@@ -82,8 +82,9 @@ function ENT:Think()
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*7700
 			self.DakShellSplashDamage = self.DakCaliber*0.0375
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(50/50)
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093+1.118186)
+			--self.DakShellExplosive = false
+			self.ShellLengthMult = 50/50
+			self.DakShellBlastRadius = (((self.DakCaliber/155)*50)*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
@@ -140,8 +141,9 @@ function ENT:Think()
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*0.5))*7700
 			self.DakShellSplashDamage = self.DakCaliber*5
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(3/50)
-			self.DakShellExplosive = false
-			self.DakShellBlastRadius = (self.DakCaliber/10*39)*(-0.005372093+1.118186)
+			--self.DakShellExplosive = false
+			self.ShellLengthMult = 3/50
+			self.DakShellBlastRadius = (((self.DakCaliber/155)*50)*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
 			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093+1.118186)
 
 			self.DakFireEffect = "dakteballisticfire"
@@ -181,7 +183,7 @@ function ENT:Think()
 			self.BaseDakShellMass = 1
 			self.DakShellSplashDamage = 0.2
 			self.BaseDakShellPenetration = 0.0001
-			self.DakShellExplosive = false
+			--self.DakShellExplosive = false
 			self.DakShellBlastRadius = 15
 
 			self.DakFireEffect = "dakteflamefire"
@@ -313,8 +315,9 @@ function ENT:DakTEFire()
 				self.LastFireTime = CurTime()
 				local shootOrigin = self:GetPos() + (self:GetForward()*self:GetModelRadius())
 				local shootAngles = (self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
-				local initvel
+				local initvel = self:GetVelocity()
 				if self:GetParent():IsValid() then
+					initvel = self:GetParent():GetVelocity()
 					if self:GetParent():GetParent():IsValid() then
 						initvel = self:GetParent():GetParent():GetVelocity()
 					end
@@ -355,7 +358,7 @@ function ENT:DakTEFire()
 					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 ) * 0.5
 				end
 				if self.DakShellAmmoType == "SM" then
-					Shell.DakBlastRadius = self.DakShellBlastRadius * 0.1
+					Shell.DakBlastRadius = self.DakShellBlastRadius
 					Shell.DakSplashDamage = self.DakShellSplashDamage * math.Rand( 0.99, 1.01 ) * 0.1
 				end
 				if self.DakName == "Flamethrower" then

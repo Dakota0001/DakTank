@@ -24,6 +24,7 @@ function EFFECT:Init( data )
 		
 		if (particle) then
 			particle:SetVelocity(self.Dir*math.Rand(10*self.Dist*0.95,10*self.Dist*1.05) + Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
+			--particle:SetVelocity(Vector(0,0,0))
 			particle:SetLifeTime(0) 
 			particle:SetDieTime(0.2) 
 			particle:SetStartAlpha(200)
@@ -38,6 +39,14 @@ function EFFECT:Init( data )
 			particle:SetAirResistance(0)  
 			particle:SetCollide(false)
 			particle:SetBounce(0)
+			particle.startpos = self.StartPos
+			particle.dist = self.Dist
+			particle:SetNextThink( 0 ) -- Makes sure the think hook is used on all particles of the particle emitter
+			particle:SetThinkFunction( function( pa )
+				if pa:GetPos():Distance(pa.startpos)>pa.dist then pa:SetDieTime( 0 ) end
+				pa:SetNextThink( CurTime() ) -- Makes sure the think hook is actually ran.
+			end )
+
 		end
 	end
 

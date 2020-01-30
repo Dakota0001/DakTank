@@ -212,7 +212,7 @@ function ENT:Think()
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(500)
 					effectdata:SetNormal( Vector(0,0,-1) )
-					util.Effect("daktescalingexplosion", effectdata, true, true)
+					util.Effect("daktescalingexplosionold", effectdata, true, true)
 					timer.Create( "AmmoBurnTimer"..self:EntIndex(), 0.1, 5, function()
 						if not(self.DakAmmo == nil) then
 							if self.DakAmmo > 0 then
@@ -247,7 +247,7 @@ function ENT:Think()
 									effectdata:SetMagnitude(.5)
 									effectdata:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
 									effectdata:SetNormal( Vector(0,0,-1) )
-									util.Effect("daktescalingexplosion", effectdata, true, true)
+									util.Effect("daktescalingexplosionold", effectdata, true, true)
 
 									self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,200,self.DakOwner)
 

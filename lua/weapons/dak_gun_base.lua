@@ -150,9 +150,18 @@ function SWEP:PrimaryAttack()
 						shell.DakPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 						shell.DakBasePenetration = (self.DakCaliber*2)*self.ShellLengthMult
 					end
+
+
+					if self.DakShellType == "HEAT" or self.DakShellType == "HEATFS" or self.DakShellType == "ATGM" then
+						shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)*0.5
+					elseif self.DakShellType == "APHE" then
+						shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)*0.25
+					else
+						shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)
+					end
 					
-					
-					shell.DakBlastRadius = (self.DakCaliber/25*39)
+
+
 					shell.DakPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
 					
 					shell.DakGun = self
@@ -179,6 +188,9 @@ function SWEP:PrimaryAttack()
 			local IsMoving = math.max(0.5, ActualSpeed/MaxSpeed)
 			local IsCrouch = self.Owner:Crouching() and 0.5 or 1
 			local ShotForce = ((self.DakVelocity*0.0254)*(self.DakVelocity*0.0254)*(math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700)
+			if self.DakShellType == "HEAT" or self.DakShellType == "APHE" or self.DakShellType == "HEATFS" or self.DakShellType == "ATGM" then
+				ShotForce = ShotForce * 0.05
+			end
 			local BaseRecoil = Angle(-math.Rand(0.0004, 0.0006), math.Rand(0.0002,-0.0002), 0)
 			local FinalRecoil = BaseRecoil * self.ShotCount * ShotForce * IsMoving * IsCrouch * (self.SpreadStacks/1) --have spread stacks so first few shots are sorta accurate
 			if self.IsPistol == true then
@@ -194,7 +206,22 @@ function SWEP:PrimaryAttack()
 				self.Owner:SetEyeAngles( self.Owner:EyeAngles() + FinalRecoil )
 				self.Owner:ViewPunch( FinalRecoil / 4 )
 			end
-			self:EmitSound( self.FireSound, 140, 100, 1, 2)
+			if self.Primary.ClipSize > 5 and self.Weapon:Clip1() <= 5 then
+				self:EmitSound( self.FireSound, 140, 95*math.Rand(0.99,1.01), 1, 2)
+			else
+				self:EmitSound( self.FireSound, 140, 95*math.Rand(0.99,1.01), 1, 2)
+			end
+			--[[
+			if SERVER then
+				net.Start( "daktankshotfired" )
+				net.WriteVector( self:GetPos() )
+				net.WriteFloat( self.DakCaliber )
+				net.WriteString( self.FireSound )
+				net.Broadcast()
+			end
+			--]]
+			
+
 			self.PrimaryLastFire = CurTime()
 			self:TakePrimaryAmmo(1)
 			self.Fired = 1

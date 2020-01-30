@@ -25,14 +25,14 @@ function EFFECT:Init( data )
 	local emitter = ParticleEmitter( Pos )
 	
 	if not(Ent==NULL) then
-	for i = 1,1 do
+	for i = 1,5 do
 
 		local particle = emitter:Add( "dak/smokey", Pos + Ent:GetForward()*math.random( -0, 0 )) 
 		 
 		if particle == nil then particle = emitter:Add( "dak/smokey", Pos + Ent:GetForward()*math.random( 0, 0 ))  end
 		
 		if (particle) then
-			particle:SetVelocity(Vector(Ent:GetUp()*math.random( -5, 5 ))+Vector(Ent:GetRight()*math.random( -5, 5 ))+Vector(Ent:GetForward()*math.random( 0, 25 )))
+			particle:SetVelocity(Vector(Ent:GetUp()*math.random( -15, 15 ))+Vector(Ent:GetRight()*math.random( -15, 15 ))+Vector(Ent:GetForward()*math.random( 0, 50 )))
 			particle:SetLifeTime(0) 
 			particle:SetDieTime(5) 
 			particle:SetStartAlpha(75)

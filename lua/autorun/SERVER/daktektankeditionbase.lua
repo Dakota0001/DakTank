@@ -104,19 +104,19 @@ if SERVER then
 		ent:AddCallback( "PhysicsCollide", impactexplode )
 	end )
 
+
+	local DakTankBulletThinkDelay = 0.1
 	hook.Add( "Think", "DakTankShellTableFunction", function()
-		--if CurTime()-0.1 >= DakTankLastShellThink then
+		--if CurTime()-DakTankBulletThinkDelay >= DakTankLastShellThink then
 			--DakTankLastShellThink = CurTime()
 			local ShellList = DakTankShellList
 			local RemoveList = {}
-
 			for i = 1, #ShellList do
 				if ShellList[i].ShellThinkTime == nil then
-					ShellList[i].ShellThinkTime = CurTime()-0.1
+					ShellList[i].ShellThinkTime = CurTime()-DakTankBulletThinkDelay
 				end
-				if CurTime()-0.1 >= ShellList[i].ShellThinkTime then
+				if CurTime()-DakTankBulletThinkDelay >= ShellList[i].ShellThinkTime then
 					ShellList[i].ShellThinkTime = CurTime()
-					ShellList[i].LifeTime = ShellList[i].LifeTime + 0.1
 					--ShellList[i].Gravity = physenv.GetGravity()*ShellList[i].LifeTime
 					if ShellList[i].LifeTime>25 then
 						ShellList[i].RemoveNow = 1
@@ -152,10 +152,14 @@ if SERVER then
 
 
 								ShellList[i].DakVelocity = (ShellList[i].DakVelocity:GetNormalized():Angle() + Angle(pitch,yaw,roll)):Forward() * math.Clamp((12600/2*ShellList[i].LifeTime) - (7875/20*ShellList[i].LifeTime), 4725, 12600)
-								ShellList[i].SimPos = ShellList[i].SimPos + (ShellList[i].DakVelocity*0.1)
+								ShellList[i].SimPos = ShellList[i].SimPos + (ShellList[i].DakVelocity*DakTankBulletThinkDelay)
 
-								trace.start = ShellList[i].SimPos + (ShellList[i].DakVelocity*-0.1)
-								trace.endpos = ShellList[i].SimPos + (ShellList[i].DakVelocity*0.1)
+								if ShellList[i].LifeTime == 0 then
+									trace.start = ShellList[i].SimPos
+								else
+									trace.start = ShellList[i].SimPos + (ShellList[i].DakVelocity*-DakTankBulletThinkDelay)
+								end
+								trace.endpos = ShellList[i].SimPos + (ShellList[i].DakVelocity*DakTankBulletThinkDelay)
 							else
 								local DragForce = 0.0245 * ((ShellList[i].DakVelocity:Distance(Vector(0,0,0))*0.0254)*(ShellList[i].DakVelocity:Distance(Vector(0,0,0))*0.0254)) * (math.pi * ((ShellList[i].DakCaliber/2000)*(ShellList[i].DakCaliber/2000)))
 								if ShellList[i].DakShellType == "HVAP" then
@@ -165,20 +169,24 @@ if SERVER then
 									DragForce = 0.085 * ((ShellList[i].DakVelocity:Distance(Vector(0,0,0))*0.0254)*(ShellList[i].DakVelocity:Distance(Vector(0,0,0))*0.0254)) * (math.pi * ((ShellList[i].DakCaliber/1000)*(ShellList[i].DakCaliber/1000)))
 								end
 								if not(ShellList[i].DakShellType == "HEAT" or ShellList[i].DakShellType == "HEATFS" or ShellList[i].DakShellType == "ATGM" or ShellList[i].DakShellType == "HESH") then
-									local PenLoss = ShellList[i].DakBasePenetration*((((DragForce/(ShellList[i].DakMass/2))*0.1)*39.37)/ShellList[i].DakBaseVelocity)
+									local PenLoss = ShellList[i].DakBasePenetration*((((DragForce/(ShellList[i].DakMass/2))*DakTankBulletThinkDelay)*39.37)/ShellList[i].DakBaseVelocity)
 									ShellList[i].DakPenetration = ShellList[i].DakPenetration - PenLoss
 								end
 								if ShellList[i].DakShellType == "HEAT" or ShellList[i].DakShellType == "HVAP" or ShellList[i].DakShellType == "ATGM" or ShellList[i].DakShellType == "HEATFS" or ShellList[i].DakShellType == "APFSDS" then
-									ShellList[i].DakVelocity = ShellList[i].DakVelocity - (((DragForce/(ShellList[i].DakMass*8/2))*0.1)*39.37)*ShellList[i].DakVelocity:GetNormalized()
+									ShellList[i].DakVelocity = ShellList[i].DakVelocity - (((DragForce/(ShellList[i].DakMass*8/2))*DakTankBulletThinkDelay)*39.37)*ShellList[i].DakVelocity:GetNormalized()
 								else
-									ShellList[i].DakVelocity = ShellList[i].DakVelocity - (((DragForce/(ShellList[i].DakMass/2))*0.1)*39.37)*ShellList[i].DakVelocity:GetNormalized()
+									ShellList[i].DakVelocity = ShellList[i].DakVelocity - (((DragForce/(ShellList[i].DakMass/2))*DakTankBulletThinkDelay)*39.37)*ShellList[i].DakVelocity:GetNormalized()
 								end
 								if ShellList[i].JustBounced == 1 then
-									trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-0.1)^2)/2)
-									trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+0.1)) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
+									trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime-DakTankBulletThinkDelay)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-DakTankBulletThinkDelay)^2)/2)
+									trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+DakTankBulletThinkDelay)) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
 									ShellList[i].JustBounced = 0
 								else
-									trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime-0.1)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-0.1)^2)/2)
+									if ShellList[i].LifeTime == 0 then
+										trace.start = ShellList[i].Pos
+									else
+										trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime-DakTankBulletThinkDelay)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-DakTankBulletThinkDelay)^2)/2)
+									end
 									trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
 								end
 							end
@@ -191,12 +199,15 @@ if SERVER then
 							effectdata:SetStart(ShellTrace.StartPos)
 							effectdata:SetOrigin(ShellTrace.HitPos)
 							effectdata:SetScale((ShellList[i].DakCaliber*0.0393701))
-							util.Effect(ShellList[i].DakTrail, effectdata, true, true)
+							if ShellTrace.Hit then
+							else
+								util.Effect(ShellList[i].DakTrail, effectdata, true, true)
+							end
 						end
 
 						if ShellTrace.Hit then
 							if ShellList[i].IsGuided then
-								DTShellHit(ShellTrace.StartPos,ShellList[i].SimPos + (ShellList[i].DakVelocity*0.1),ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+								DTShellHit(ShellTrace.StartPos,ShellList[i].SimPos + (ShellList[i].DakVelocity*DakTankBulletThinkDelay),ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 							else
 								DTShellHit(ShellTrace.StartPos,ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2),ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 							end
@@ -212,7 +223,7 @@ if SERVER then
 					if ShellList[i].RemoveNow == 1 then
 						RemoveList[#RemoveList+1] = i
 					end
-
+					ShellList[i].LifeTime = ShellList[i].LifeTime + DakTankBulletThinkDelay
 				end
 			end	
 			if #RemoveList > 0 then

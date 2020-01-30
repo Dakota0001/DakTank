@@ -23,57 +23,81 @@ function EFFECT:Init( data )
 	
 	local emitter = ParticleEmitter( Pos )
 	
-	for i = 1,3 do
+	for i = 1,5 do
 
-		local particle = emitter:Add( "dak/smokey", Pos+Vector(math.random(-50,50),math.random(-50,50),math.random(-50,50)))  
+		local particle = emitter:Add( "dak/smokey", Pos)  
 		 
 		if particle == nil then particle = emitter:Add( "dak/smokey", Pos) end
 		
 		if (particle) then
-			particle:SetVelocity(Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25)))
+			local ang = math.Rand(0,360) * math.pi/180
+			particle:SetVelocity(Vector(750*math.Rand(0,1)*math.cos(ang),750*math.Rand(0,1)*math.sin(ang),math.Rand(150,250)))
 			particle:SetLifeTime(0) 
 			particle:SetDieTime(5) 
 			particle:SetStartAlpha(150)
 			particle:SetEndAlpha(0)
-			particle:SetStartSize(0) 
+			particle:SetStartSize(50) 
 			particle:SetEndSize(100)
 			particle:SetAngles( Angle(0,0,0) )
 			particle:SetAngleVelocity( Angle(0,0,0) ) 
 			particle:SetRoll(math.Rand( 0, 360 ))
 			local CVal = math.random(50,100)
 			particle:SetColor(CVal,CVal,CVal,math.random(50,50))
-			particle:SetGravity( Vector(0,0,math.random(5,50)) ) 
-			particle:SetAirResistance(20)  
+			particle:SetGravity( Vector(0,0,math.random(500,500)) ) 
+			particle:SetAirResistance(150)  
 			particle:SetCollide(false)
 			particle:SetBounce(0)
 		end
 	end
-
-	for i = 1,3 do
-
-		local particle = emitter:Add( "dak/flamelet5", Pos+Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25))) 
-		 
-		if particle == nil then particle = emitter:Add( "dak/flamelet5", Pos+Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25)))  end
+	local ScaleSize = 2
+	for i = 1,50 do
+		local ang = math.Rand(0,360) * math.pi/180
+		local particle = emitter:Add( "dak/flamelet5", Pos)
+		if particle == nil then particle = emitter:Add( "dak/flamelet5", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-25,100)))  end
 		
 		if (particle) then
-			particle:SetVelocity(Vector(math.random(-50,50),math.random(-50,50),math.random(-25,25)))
+			local ang = math.Rand(0,360) * math.pi/180
+			particle:SetVelocity(ScaleSize*Vector(500*math.Rand(0,1)*math.cos(ang),500*math.Rand(0,1)*math.sin(ang),math.Rand(-100,100)))
 			particle:SetLifeTime(0) 
-			particle:SetDieTime(2.5) 
+			particle:SetDieTime(1) 
 			particle:SetStartAlpha(255)
 			particle:SetEndAlpha(0)
-			particle:SetStartSize(25) 
-			particle:SetEndSize(5)
+			particle:SetStartSize(ScaleSize*15) 
+			particle:SetEndSize(0)
 			particle:SetAngles( Angle(0,0,0) )
 			particle:SetAngleVelocity( Angle(0,0,0) ) 
 			particle:SetRoll(math.Rand( 0, 360 ))
 			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
-			particle:SetGravity( Vector(0,0,math.random(0,0)) ) 
-			particle:SetAirResistance(0.0)  
-			particle:SetCollide(false)
+			particle:SetGravity( ScaleSize*Vector(0,0,-600) ) 
+			particle:SetAirResistance(ScaleSize*75)  
+			particle:SetCollide(true)
 			particle:SetBounce(0)
 		end
 	end
-
+	for i = 1,50 do
+		local ang = math.Rand(0,360) * math.pi/180
+		local particle = emitter:Add( "dak/flamelet5", Pos)
+		if particle == nil then particle = emitter:Add( "dak/flamelet5", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-25,100)))  end
+		
+		if (particle) then
+			local ang = math.Rand(0,360) * math.pi/180
+			particle:SetVelocity(ScaleSize*Vector(200*math.Rand(0,1)*math.cos(ang),200*math.Rand(0,1)*math.sin(ang),math.Rand(-100,300)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(1) 
+			particle:SetStartAlpha(255)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(ScaleSize*15) 
+			particle:SetEndSize(0)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
+			particle:SetGravity( ScaleSize*Vector(0,0,-600) ) 
+			particle:SetAirResistance(ScaleSize*75)  
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+		end
+	end
 	emitter:Finish()
 		
 end

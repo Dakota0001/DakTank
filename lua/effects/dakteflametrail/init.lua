@@ -32,26 +32,26 @@ function EFFECT:Init( data )
 	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
 
 	local emitter = ParticleEmitter( self.StartPos )
-	for i = 1, 3 do
+	for i = 1, 10 do
 
 		local particle = emitter:Add( "dak/flamelet5", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
 		if particle == nil then particle = emitter:Add( "dak/flamelet5", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
 		
 		if (particle) then
-			particle:SetVelocity(Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
+			particle:SetVelocity(Vector(math.Rand(-250,250),math.Rand(-250,250),math.Rand(-250,250)))
 			particle:SetLifeTime(0) 
 			particle:SetDieTime(0.5) 
 			particle:SetStartAlpha(150)
 			particle:SetEndAlpha(0)
 			particle:SetStartSize(15)
-			particle:SetEndSize(10)
+			particle:SetEndSize(0)
 			particle:SetAngles( Angle(0,0,0) )
 			particle:SetAngleVelocity( Angle(0,0,0) ) 
 			particle:SetRoll(math.Rand( 0, 360 ))
 			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
 			particle:SetGravity( Vector(0,0,math.random(-5,-25)) )  
-			particle:SetAirResistance(0)  
+			particle:SetAirResistance(750)  
 			particle:SetCollide(true)
 			particle:SetBounce(0)
 		end

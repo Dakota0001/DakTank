@@ -165,7 +165,7 @@ function ENT:Draw()
 			WheelHeightMult = WheelMult/(wheelbounds[3]*2)
 			Pos = Base:GetPos() + (ForwardEnt:GetForward()*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (ForwardEnt:GetRight()*SideDist)
 			trace = {}
-				trace.start = Pos + ForwardEnt:GetUp()*RideLimit
+				trace.start = Pos + ForwardEnt:GetUp()*RideHeight
 				if i==WheelsPerSide then 
 					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+FrontWheelRaise)
 				elseif i==1 then
@@ -208,7 +208,7 @@ function ENT:Draw()
 			WheelHeightMult = WheelMult/(wheelbounds[3]*2)
 			Pos = Base:GetPos() + (ForwardEnt:GetForward()*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (ForwardEnt:GetRight()*SideDist)
 			trace = {}
-				trace.start = Pos + ForwardEnt:GetUp()*RideLimit
+				trace.start = Pos + ForwardEnt:GetUp()*RideHeight
 				if i==WheelsPerSide then 
 					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+FrontWheelRaise)
 				elseif i==1 then
@@ -274,11 +274,12 @@ function ENT:Draw()
 				LeftWheelNodes[#LeftWheelNodes+1] = NewPos
 			end
 		end
+		local TreadSideOffset = -Base:WorldToLocal(ForwardEnt:GetPos()).y
 		local LeftTreadPoints = quickhull(LeftWheelNodes)
 		for i=1, #LeftTreadPoints-1 do
 			mat = Matrix()
-			pos1 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[i][1],SideDist,LeftTreadPoints[i][2]))
-			pos2 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[i+1][1],SideDist,LeftTreadPoints[i+1][2]))
+			pos1 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[i][1],SideDist+TreadSideOffset,LeftTreadPoints[i][2]))
+			pos2 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[i+1][1],SideDist+TreadSideOffset,LeftTreadPoints[i+1][2]))
 			scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
 			mat:Scale( scale )
 			treadmodel:EnableMatrix( "RenderMultiply", mat )
@@ -297,8 +298,8 @@ function ENT:Draw()
 			render.ModelMaterialOverride()
 		end
 		mat = Matrix()
-		pos1 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[1][1],SideDist,LeftTreadPoints[1][2]))
-		pos2 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[#LeftTreadPoints][1],SideDist,LeftTreadPoints[#LeftTreadPoints][2]))
+		pos1 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[1][1],SideDist+TreadSideOffset,LeftTreadPoints[1][2]))
+		pos2 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[#LeftTreadPoints][1],SideDist+TreadSideOffset,LeftTreadPoints[#LeftTreadPoints][2]))
 		scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
 		mat:Scale( scale )
 		treadmodel:EnableMatrix( "RenderMultiply", mat )
@@ -341,8 +342,8 @@ function ENT:Draw()
 		local RightTreadPoints = quickhull(RightWheelNodes)
 		for i=1, #RightTreadPoints-1 do
 			mat = Matrix()
-			pos1 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[i][1],-SideDist,RightTreadPoints[i][2]))
-			pos2 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[i+1][1],-SideDist,RightTreadPoints[i+1][2]))
+			pos1 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[i][1],-SideDist+TreadSideOffset,RightTreadPoints[i][2]))
+			pos2 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[i+1][1],-SideDist+TreadSideOffset,RightTreadPoints[i+1][2]))
 			scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
 			mat:Scale( scale )
 			treadmodel:EnableMatrix( "RenderMultiply", mat )
@@ -361,8 +362,8 @@ function ENT:Draw()
 			render.ModelMaterialOverride()
 		end
 		mat = Matrix()
-		pos1 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[1][1],-SideDist,RightTreadPoints[1][2]))
-		pos2 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[#RightTreadPoints][1],-SideDist,RightTreadPoints[#RightTreadPoints][2]))
+		pos1 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[1][1],-SideDist+TreadSideOffset,RightTreadPoints[1][2]))
+		pos2 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[#RightTreadPoints][1],-SideDist+TreadSideOffset,RightTreadPoints[#RightTreadPoints][2]))
 		scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
 		mat:Scale( scale )
 		treadmodel:EnableMatrix( "RenderMultiply", mat )
