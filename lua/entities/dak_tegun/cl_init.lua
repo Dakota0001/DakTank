@@ -14,7 +14,6 @@ function ENT:Think()
 	if self.Scaled == nil then self.Scaled = 0 end
 	if self.CycleVal == nil then self.CycleVal = 0.05 end
 	if self.LastFire2 == nil then self.LastFire2 = false end
-
 	local Caliber = self:GetNWFloat("Caliber")
 
 	--NOTE: this stuff might need to be set per model
@@ -25,6 +24,16 @@ function ENT:Think()
 			local mins2, maxs2 = self:GetHitBoxBounds( 1, 0 )
 			self:SetCollisionBounds( mins1, Vector(-mins2.x,maxs1.y,maxs1.z) )
 			self:PhysicsInitBox( mins1, Vector(-mins2.x,maxs1.y,maxs1.z) )
+		end
+		if self:GetModel() == "models/daktanks/smokelauncher100mm.mdl" then
+			local mins1, maxs1 = self:GetHitBoxBounds( 0, 0 )
+			self:SetCollisionBounds( mins1, maxs1 )
+			self:PhysicsInitBox( mins1, maxs1 )
+		end
+		if self:GetModel() == "models/daktanks/grenadelauncher100mm.mdl" then
+			local mins1, maxs1 = self:GetHitBoxBounds( 0, 0 )
+			self:SetCollisionBounds( mins1, maxs1 )
+			self:PhysicsInitBox( mins1, maxs1 )
 		end
 		self.Scaled = 1
 	end

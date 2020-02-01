@@ -835,27 +835,16 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,100)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Smoke Launcher"
-			if self.DakCaliber < 50 then
-				self.DakModel = "models/daktanks/smokelauncher40mm.mdl"
-			end
-			if self.DakCaliber >= 50 and self.DakCaliber < 60 then
-				self.DakModel = "models/daktanks/smokelauncher50mm.mdl"
-			end
-			if self.DakCaliber >= 60 and self.DakCaliber < 70 then
-				self.DakModel = "models/daktanks/smokelauncher60mm.mdl"
-			end
-			if self.DakCaliber >= 70 and self.DakCaliber < 80 then
-				self.DakModel = "models/daktanks/smokelauncher70mm.mdl"
-			end
-			if self.DakCaliber >= 80 and self.DakCaliber < 90 then
-				self.DakModel = "models/daktanks/smokelauncher80mm.mdl"
-			end
-			if self.DakCaliber >= 90 and self.DakCaliber < 100 then
-				self.DakModel = "models/daktanks/smokelauncher90mm.mdl"
-			end
-			if self.DakCaliber >= 100 then
-				self.DakModel = "models/daktanks/smokelauncher100mm.mdl"
-			end
+			self.DakModel = "models/daktanks/smokelauncher100mm.mdl"
+
+			self.DakFireSound = "daktanks/new/cannons/misc/grenade_launcher_01.mp3"
+		end
+		if Selection == "Grenade Launcher" then
+			self.DakGunType = "Grenade Launcher"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,45)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakName = self.DakCaliber.."mm Grenade Launcher"
+			self.DakModel = "models/daktanks/grenadelauncher100mm.mdl"
 
 			self.DakFireSound = "daktanks/new/cannons/misc/grenade_launcher_01.mp3"
 		end
@@ -1529,6 +1518,10 @@ function TOOL:LeftClick( trace )
 				self.GunType = "SL"
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,100)
 			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Grenade Launcher" then
+				self.GunType = "GL"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,45)
+			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Mortar" then
 				self.GunType = "M"
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,420)
@@ -1945,6 +1938,12 @@ function TOOL:LeftClick( trace )
 				self.spawnedent:SetModel(self.spawnedent.DakModel)
 			end
 		end
+
+		self.ScalingGun = 0
+		if self.DakModel == "models/daktanks/mortar100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/smokelauncher100mm.mdl" then self.ScalingGun = 1 end
+
 		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_tegearbox") and not(trace.Entity:GetClass() == "dak_tegearboxnew") and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
 			self.spawnedent:Spawn()
 			self.spawnedent.DakOwner = self:GetOwner()
@@ -1961,7 +1960,7 @@ function TOOL:LeftClick( trace )
 			ply:AddCleanup( "daktek", self.spawnedent )
 			cleanup.Register("daktek")
 
-			if self.DakModel == "models/daktanks/mortar100mm2.mdl" then
+			if self.ScalingGun == 1 then
 				if self:GetClientInfo("SpawnEnt") == "dak_tegun" or self:GetClientInfo("SpawnEnt") == "dak_teautogun" or self:GetClientInfo("SpawnEnt") == "dak_temachinegun" then
 					local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
 					self.spawnedent:SetModelScale( self.spawnedent:GetModelScale() * (Caliber/1000), 0 )
@@ -2010,7 +2009,7 @@ function TOOL:LeftClick( trace )
 				ply:AddCleanup( "daktek", self.spawnedent )
 				cleanup.Register("daktek")
 
-				if self.DakModel == "models/daktanks/mortar100mm2.mdl" then
+				if self.ScalingGun == 1 then
 					if self:GetClientInfo("SpawnEnt") == "dak_tegun" or self:GetClientInfo("SpawnEnt") == "dak_teautogun" or self:GetClientInfo("SpawnEnt") == "dak_temachinegun" then
 						local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
 						self.spawnedent:SetModelScale( self.spawnedent:GetModelScale() * (Caliber/1000), 0 )
@@ -2583,19 +2582,19 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*2*ShellLength,2).."mm\nDamage:        "..math.Round((25*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )
 	end
 	selectedAmmo["HE"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*0.2*ShellLength,2).."mm\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186),2).."mm\nDamage:        "..math.Round((25*0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*5,2).."\nBlast Radius:  "..math.Round(Caliber/10*(-0.005372093*(ShellLength*50)+1.118186),2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )	
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*0.2*ShellLength,2).."mm\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186),2).."mm\nDamage:        "..math.Round((25*0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*5,2).."\nBlast Radius:  "..math.Round((((Caliber/155)*50)*39)*(-0.005372093*(ShellLength*50)+1.118186),2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )	
 	end
 	selectedAmmo["APHE"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.65*ShellLength,2).."mm\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186)*0.1,2).."mm\nDamage:        "..math.Round((25*0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*2.5,2).."\nBlast Radius:  "..math.Round(Caliber/20*(-0.005372093*(ShellLength*50)+1.118186),2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )	
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.65*ShellLength,2).."mm\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186)*0.1,2).."mm\nDamage:        "..math.Round((25*0.5*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*2.5,2).."\nBlast Radius:  "..math.Round(0.1*((((Caliber/155)*50)*39)*(-0.005372093*(ShellLength*50)+1.118186)),2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )	
 	end
 	selectedAmmo["HEAT"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*5.4*0.431,2).."mm Cold War, "..math.Round(Caliber*1.2,2).."mm WWII\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186)*0.75,2).."mm\nDamage:        "..math.Round((25*0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*2.5,2).."\nBlast Radius:  "..math.Round(Caliber/20*(-0.005372093*(ShellLength*50)+1.118186),2).."m\nVelocity:         "..math.Round(29527.6*0.75*ShellLength*0.0254).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*5.4*0.431,2).."mm Cold War, "..math.Round(Caliber*1.2,2).."mm WWII\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186)*0.75,2).."mm\nDamage:        "..math.Round((25*0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*2.5,2).."\nBlast Radius:  "..math.Round(0.5*((((Caliber/155)*50)*39)*(-0.005372093*(ShellLength*50)+1.118186)),2).."m\nVelocity:         "..math.Round(29527.6*0.75*ShellLength*0.0254).." m/s" )
 	end
 	selectedAmmo["HEATFS"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*5.4,2).."mm Modern, "..math.Round(Caliber*5.4*0.658,2).."mm Cold War\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186)*0.75,2).."mm\nDamage:        "..math.Round((25*0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*2.5,2).."\nBlast Radius:  "..math.Round(Caliber/20*(-0.005372093*(ShellLength*50)+1.118186),2).."m\nVelocity:         "..math.Round(29527.6*ShellLength*0.0254*1.3333).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*5.4,2).."mm Modern, "..math.Round(Caliber*5.4*0.658,2).."mm Cold War\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186)*0.75,2).."mm\nDamage:        "..math.Round((25*0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*2.5,2).."\nBlast Radius:  "..math.Round(0.5*((((Caliber/155)*50)*39)*(-0.005372093*(ShellLength*50)+1.118186)),2).."m\nVelocity:         "..math.Round(29527.6*ShellLength*0.0254*1.3333).." m/s" )
 	end
 	selectedAmmo["ATGM"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*6.4,2).."mm Modern, "..math.Round(Caliber*6.4*0.45,2).."mm Cold War\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186)*0.75,2).."mm\nDamage:        "..math.Round((25*0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*5,2).."\nBlast Radius:  "..math.Round(Caliber/20*(-0.005372093*(ShellLength*50)+1.118186),2).."m\nVelocity:         "..math.Round(12600*0.0254).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*6.4,2).."mm Modern, "..math.Round(Caliber*6.4*0.45,2).."mm Cold War\nFrag Pen:      "..math.Round((2.137015-0.1086095*Caliber+0.002989107*Caliber^2)*(-0.005372093*(ShellLength*50)+1.118186)*0.75,2).."mm\nDamage:        "..math.Round((25*0.125*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*5,2).."\nBlast Radius:  "..math.Round(0.5*((((Caliber/155)*50)*39)*(-0.005372093*(ShellLength*50)+1.118186)),2).."m\nVelocity:         "..math.Round(12600*0.0254).." m/s" )
 	end
 	selectedAmmo["HVAP"] = function()
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*3*ShellLength,2).."mm\nDamage:        "..math.Round((25*math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.5*0.02*ShellLengthExact)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*4/3).." m/s" )
@@ -2607,10 +2606,10 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, cooks off when damaged.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*7.8*ShellLength,2).."mm\nDamage:        "..math.Round((25*math.pi*((Caliber*0.02*0.25)^2)*(Caliber*0.25*0.02*ShellLengthExact)),2).."\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength*2.394).." m/s" )
 	end
 	selectedAmmo["HESH"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.25,2).."mm\nDamage:        0\nSplash Dmg:   "..math.Round(Caliber*2.5,2).."\nBlast Radius:  "..math.Round(Caliber/10,2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*1.25,2).."mm\nDamage:        0\nSplash Dmg:   "..math.Round(Caliber*2.5,2).."\nBlast Radius:  "..math.Round(0.5*((((Caliber/155)*50)*39)*(-0.005372093*(ShellLength*50)+1.118186)),2).."m\nVelocity:         "..math.Round(29527.6*0.0254*ShellLength).." m/s" )
 	end
 	selectedAmmo["SM"] = function()
-		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*0.1*ShellLength,2).."mm\nFrag Pen:      0mm\nDamage:        "..math.Round((25*0.25*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.5,2).."\nBlast Radius:  "..math.Round(0.1*(Caliber/10*(-0.005372093*(ShellLength*50)+1.118186)),2).."m\nVelocity:         "..math.Round(29527.6*0.42*0.0254*ShellLength).." m/s" )	
+		DLabel:SetText( Caliber.."mm "..GunType.." "..AmmoType.." Ammo\n\nMakes guns shootier, also explodes.\n\nCrate Stats:\nHealth:  10\nWeight: "..AmmoWeight.."kg\nAmmo:   "..AmmoCount.." round(s)\n\nAmmo Stats:\nPenetration:  "..math.Round(Caliber*0.1*ShellLength,2).."mm\nFrag Pen:      0mm\nDamage:        "..math.Round((25*0.25*math.pi*((Caliber*0.02*0.5)^2)*(Caliber*0.02*ShellLengthExact)),2).."\nSplash Dmg:   "..math.Round(Caliber*0.5,2).."\nBlast Radius:  "..math.Round(((((Caliber/155)*50)*39)*(-0.005372093*(ShellLength*50)+1.118186)),2).."m\nVelocity:         "..math.Round(29527.6*0.42*0.0254*ShellLength).." m/s" )	
 	end
 	
 	--Table containing the description of the fuel tanks
@@ -2681,7 +2680,10 @@ function TOOL.BuildCPanel( panel )
 		DLabel:SetText( Caliber.."mm Machine Gun\n\nLight and rapid fire anti infantry guns with very little penetration power and only AP rounds, its best to not waste them on armored targets.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..5+(2*math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000)).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.1)).." rpm\n\n" )
 	end
 	gunList["Smoke Launcher"] = function()
-		DLabel:SetText( Caliber.."mm Smoke Launcher\n\nLightweight tube built to fire low velocity smoke grenades to conceal the vehicle's movement.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..5+(2*math.Round(((((Caliber*0.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*3))-(math.pi*((Caliber/2)^2)*(Caliber*3)))*0.001*7.8125)/1000)).." kg\nReload Time: 30 seconds" )
+		DLabel:SetText( Caliber.."mm Smoke Launcher\n\nLightweight tube built to fire low velocity smoke grenades to conceal the vehicle's movement.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..5+(2*math.Round(((((Caliber*0.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*3))-(math.pi*((Caliber/2)^2)*(Caliber*3)))*0.001*7.8125)/1000)).." kg\nReload Time: 30 seconds\n\n" )
+	end
+	gunList["Grenade Launcher"] = function()
+		DLabel:SetText( Caliber.."mm Grenade Launcher\n\nAutomatic grenade launcher great for infantry support.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..5+(2*math.Round(((((Caliber*3.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*3))-(math.pi*((Caliber/2)^2)*(Caliber*3)))*0.001*7.8125)/1000)).." kg\nRate of Fire: "..math.Round(60/((Caliber/13 + Caliber/100)*0.05)).." rpm\n\n" )
 	end
 	gunList["Mortar"] = function()
 		DLabel:SetText( Caliber.."mm Mortar\n\nLight guns with low damage, penetration, and velocity but low weight and high HE splash radius.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(((((Caliber*2.75)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*15))-(math.pi*((Caliber/2)^2)*(Caliber*15)))*0.001*7.8125)/1000).." kg\nReloads: \n\nAP: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5150) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5150)/25 ) , 1).. "\nHE: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5350) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5350)/25 ) , 1).. "\nHEAT: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550)/25 ) , 1).. "\nHESH: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3450) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3450)/25 ) , 1).. "\nATGM: "..math.Round( 0.75*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550)/25 ) , 1).. "\nHEATFS: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*3550)/25 ) , 1).. "\nAPHE: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5450) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*2.75)*5450)/25 ) , 1).. "\n\n" )
@@ -2749,6 +2751,13 @@ function TOOL.BuildCPanel( panel )
 		ShellLengthExact = 0.5
 		AmmoTypes = { "Smoke" }
 		DermaNumSlider:SetMinMax( 40, 100 )
+	end
+	gunData["Grenade Launcher"] = function()
+		EntType   = "dak_teautogun"
+		ShellLength = 27/50
+		ShellLengthExact = 3.5
+		AmmoTypes = { "High Explosive", "High Explosive Anti Tank", "High Explosive Squash Head", "Smoke" }
+		DermaNumSlider:SetMinMax( 20, 45 )
 	end
 	gunData["Autoloading Mortar"] = function()
 		EntType   = "dak_teautogun"
@@ -3190,6 +3199,10 @@ function TOOL.BuildCPanel( panel )
 					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*1.375)
 					ShellLenMult = 1.375
 					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
+				elseif AmmoBoxSelect:GetSelected() == "Grenade Launcher" then
+					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*3.5)
+					ShellLenMult = 3.5
+					ShellVolSquare = ( ( Caliber*0.0393701 )^2 )*(Caliber*0.0393701*(ShellLenMult*2))
 				elseif AmmoBoxSelect:GetSelected() == "Mortar" or  AmmoBoxSelect:GetSelected() == "AutoloadingMortar" then
 					ShellVol 	 = math.pi*( ( Caliber*0.01968505 )^2 )*Caliber*(0.0393701*2*2.75)
 					ShellLenMult = 2.75
@@ -3302,6 +3315,7 @@ function TOOL.BuildCPanel( panel )
 	AmmoBoxSelect:AddChoice( "Howitzer" )
 	AmmoBoxSelect:AddChoice( "Machine Gun" )
 	AmmoBoxSelect:AddChoice( "Smoke Launcher" )
+	AmmoBoxSelect:AddChoice( "Grenade Launcher" )
 	AmmoBoxSelect:AddChoice( "Mortar" )
 	AmmoBoxSelect.OnSelect = function( panel, index, value )
 		GunType = value

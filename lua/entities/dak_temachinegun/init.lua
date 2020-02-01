@@ -124,6 +124,7 @@ function ENT:Think()
 				end
 			end
 		end
+		
 		--SmokeLauncher
 		if self.DakGunType == "Smoke Launcher" then
 			self.DakName = self.DakCaliber.."mm Smoke Launcher"

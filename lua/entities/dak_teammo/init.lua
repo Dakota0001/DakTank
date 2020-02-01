@@ -137,6 +137,12 @@ function ENT:Think()
 					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*5.5)
 					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 				end
+				--Grenade Launcher
+				if string.Split( self.DakName, "m" )[3][1] == "G" and string.Split( self.DakName, "m" )[3][2] == "L" then
+					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*7)
+					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*7)
+					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
+				end
 				--Smoke Launcher
 				if string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "L" then
 					self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*2.75)
@@ -425,6 +431,11 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		if string.Split( self.DakName, "m" )[3][1] == "M" and string.Split( self.DakName, "m" )[3][2] ~= "G" then
 			self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*5.5)
 			self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*5.5)
+			self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
+		end
+		if string.Split( self.DakName, "m" )[3][1] == "G" and string.Split( self.DakName, "m" )[3][2] == "L" then
+			self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*7)
+			self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*7)
 			self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
 		end
 		if string.Split( self.DakName, "m" )[3][1] == "S" and string.Split( self.DakName, "m" )[3][2] == "L" then

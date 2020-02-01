@@ -25,6 +25,16 @@ function ENT:Think()
 			self:SetCollisionBounds( mins1, Vector(-mins2.x,maxs1.y,maxs1.z) )
 			self:PhysicsInitBox( mins1, Vector(-mins2.x,maxs1.y,maxs1.z) )
 		end
+		if self:GetModel() == "models/daktanks/smokelauncher100mm.mdl" then
+			local mins1, maxs1 = self:GetHitBoxBounds( 0, 0 )
+			self:SetCollisionBounds( mins1, maxs1 )
+			self:PhysicsInitBox( mins1, maxs1 )
+		end
+		if self:GetModel() == "models/daktanks/grenadelauncher100mm.mdl" then
+			local mins1, maxs1 = self:GetHitBoxBounds( 0, 0 )
+			self:SetCollisionBounds( mins1, maxs1 )
+			self:PhysicsInitBox( mins1, maxs1 )
+		end
 		self.Scaled = 1
 	end
 	if self:GetModel() == "models/daktanks/mortar100mm2.mdl" then

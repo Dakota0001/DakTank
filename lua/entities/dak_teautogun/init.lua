@@ -511,7 +511,78 @@ function ENT:Think()
 				end
 			end
 		end
+		--Grenade Launcher
+		if self.DakGunType == "Grenade Launcher" then
+			self.DakName = self.DakCaliber.."mm Grenade Launcher"
+			self.DakCooldown = math.Round((self.DakCaliber/13 + self.DakCaliber/100)*0.05,2)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakArmor = self.DakCaliber*5
+			self.DakMass = math.Round(5+(2*math.Round(((((self.DakCaliber*3.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*27))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*27)))*0.001*7.8125)/1000)))
 
+			self.DakHE = math.Round(self.DakCaliber,2).."mmGLHEAmmo"
+			self.DakHEAT = math.Round(self.DakCaliber,2).."mmGLHEATAmmo"
+			self.DakHESH = math.Round(self.DakCaliber,2).."mmGLHESHAmmo"
+			self.DakSM = math.Round(self.DakCaliber,2).."mmGLSMAmmo"
+
+			self.BaseDakShellDamage = (math.pi*((self.DakCaliber*0.02*0.5)^2)*(self.DakCaliber*0.02*3.5))*25
+			--get the volume of shell and multiply by density of steel
+			--pi*radius^2 * height * density
+			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75, GL 3.5
+			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*3.5))*7700
+			self.DakShellSplashDamage = self.DakCaliber*0.0375
+			self.BaseDakShellPenetration = (self.DakCaliber*2)*(27/50)
+			--self.DakShellExplosive = false
+			self.ShellLengthMult = 27/50
+			self.DakShellBlastRadius = (((self.DakCaliber/155)*50)*39)*(-0.005372093*(self.ShellLengthMult*50)+1.118186)
+			self.DakBaseShellFragPen = (2.137015-0.1086095*self.DakCaliber+0.002989107*self.DakCaliber^2)*(-0.005372093+1.118186)
+
+			self.DakFireEffect = "dakteballisticfire"
+			self.DakFirePitch = 100
+			self.DakShellTrail = "dakteballistictracer"
+			self.BaseDakShellVelocity = self.BasicVelocity*27/50
+			self.DakPellets = 10
+
+			self.DakMagazine = math.Round(800/self.DakCaliber)
+			self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
+
+			if self.DakCaliber <= 75 then
+				self.DakShellPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+				self.ReloadSound = "daktanks/dakreloadlight.mp3"
+			end
+			if self.DakCaliber > 75 and self.DakCaliber < 120 then
+				self.DakShellPenSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadmedium.mp3"
+			end
+			if self.DakCaliber >= 120 then
+				self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+				self.ReloadSound = "daktanks/dakreloadheavy.mp3"
+			end
+			if self.DakFireSound1 == nil then
+				if self.DakCaliber <= 30 then
+					self.DakFireSound1 = "daktanks/new/cannons/25mm/cannon_25mm_72k_shot_01.mp3"
+				end
+				if self.DakCaliber > 40 then
+					self.DakFireSound1 = "daktanks/new/cannons/37mm/cannon_37mm_flak36_shot_01.mp3"
+				end
+			end
+			if not(self.SortedAmmo == nil) then
+				local found = 0
+				local box = 1
+				local distance = 0
+				while found == 0 and box <= #self.SortedAmmo do
+					if IsValid(self.SortedAmmo[box][1]) then
+						if self.SortedAmmo[box][1].DakAmmoType == self.DakAmmoType then
+							if self.SortedAmmo[box][1].DakAmmo > 0 then
+								self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
+								found = 1
+							end
+						end
+					end
+					box = box + 1
+				end
+			end
+			self.Loaded=1
+		end
 		if self.DakGunType == "HMG" then
 			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
 			self.DakMaxHealth = self.DakCaliber
@@ -1840,7 +1911,7 @@ function ENT:DakTEAutoGunAmmoSwap()
 end
 
 function ENT:DakTEAutoGunReload()
-	if self.DakShotsCounter > 0 then
+	if self.DakShotsCounter > 1 then
 		self.DakIsReloading = 1
 		self.DakShotsCounter = 0
 		self.DakLastReload = CurTime()
