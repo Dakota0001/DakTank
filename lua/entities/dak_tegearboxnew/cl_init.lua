@@ -274,7 +274,7 @@ function ENT:Draw()
 				LeftWheelNodes[#LeftWheelNodes+1] = NewPos
 			end
 		end
-		local TreadSideOffset = -Base:WorldToLocal(ForwardEnt:GetPos()).y
+		local TreadSideOffset = ForwardEnt:WorldToLocal(Base:GetPos()).y
 		local LeftTreadPoints = quickhull(LeftWheelNodes)
 		for i=1, #LeftTreadPoints-1 do
 			mat = Matrix()

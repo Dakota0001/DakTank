@@ -197,8 +197,6 @@ function EFFECT:Init( data )
 			end
 		end
 	end
-	print(dustsize)
-	print(size)
 	for i = 1,3.75*size do
 		local ang = math.Rand(0,360) * math.pi/180
 

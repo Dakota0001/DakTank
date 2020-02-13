@@ -776,8 +776,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								else
 									sound.Play( BounceSounds[math.random(1,#BounceSounds)], HitPos, 100, 100, 1 )
 								end
-							Shell.DakVelocity = Shell.DakVelocity*0.5
-							Shell.DakVelocity = ((Normal)+((HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1)):Forward()
+							Shell.DakVelocity = 0.5*Shell.DakBaseVelocity*((Normal)+((HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1)):Forward()
 							Shell.DakPenetration = Shell.DakPenetration*0.5
 							Shell.DakDamage = Shell.DakDamage*0.5
 							Shell.LifeTime = 0.0
@@ -805,8 +804,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								else
 									sound.Play( BounceSounds[math.random(1,#BounceSounds)], HitPos, 100, 100, 1 )
 								end
-								Shell.DakVelocity = Shell.DakVelocity*0.025
-								Shell.DakVelocity = ((Normal)+((HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized() --+ Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
+								Shell.DakVelocity = Shell.DakBaseVelocity*0.025*((Normal)+((HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized() --+ Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
 								Shell.DakPenetration = 0
 								Shell.DakDamage = 0
 								Shell.LifeTime = 0.0
@@ -1620,8 +1618,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 									else
 										sound.Play( BounceSounds[math.random(1,#BounceSounds)], ContShellTrace.HitPos, 100, 100, 1 )
 									end
-								Shell.DakVelocity = Shell.DakVelocity*0.5
-								Shell.DakVelocity = ((Normal)+((ContShellTrace.HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1)):Forward()
+								Shell.DakVelocity = Shell.DakBaseVelocity*0.5*((Normal)+((ContShellTrace.HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1)):Forward()
 								Shell.DakPenetration = Shell.DakPenetration*0.5
 								Shell.DakDamage = Shell.DakDamage*0.5
 								Shell.LifeTime = 0.0
@@ -1649,8 +1646,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 									else
 										sound.Play( BounceSounds[math.random(1,#BounceSounds)], ContShellTrace.HitPos, 100, 100, 1 )
 									end
-									Shell.DakVelocity = Shell.DakVelocity*0.025
-									Shell.DakVelocity = ((Normal)+((ContShellTrace.HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized() --+ Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
+									Shell.DakVelocity = Shell.DakBaseVelocity*0.025*((Normal)+((ContShellTrace.HitPos-Start):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized() --+ Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))
 									Shell.DakPenetration = 0
 									Shell.DakDamage = 0
 									Shell.LifeTime = 0.0

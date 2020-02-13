@@ -1587,7 +1587,7 @@ function ENT:DakTEAutoFire()
 				end
 
 				self.DakShotsCounter = self.DakShotsCounter + 1
-				if self.DakShotsCounter >= self.DakMagazine then
+				if self.DakShotsCounter >= self.DakMagazine and self.DakMagazine > 1 then
 					self.DakIsReloading = 1
 					self.DakShotsCounter = 0
 					self.DakLastReload = CurTime()

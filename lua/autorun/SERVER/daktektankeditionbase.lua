@@ -178,8 +178,8 @@ if SERVER then
 									ShellList[i].DakVelocity = ShellList[i].DakVelocity - (((DragForce/(ShellList[i].DakMass/2))*DakTankBulletThinkDelay)*39.37)*ShellList[i].DakVelocity:GetNormalized()
 								end
 								if ShellList[i].JustBounced == 1 then
-									trace.start = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime-DakTankBulletThinkDelay)) - (-physenv.GetGravity()*((ShellList[i].LifeTime-DakTankBulletThinkDelay)^2)/2)
-									trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+DakTankBulletThinkDelay)) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
+									trace.start = ShellList[i].Pos
+									trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
 									ShellList[i].JustBounced = 0
 								else
 									if ShellList[i].LifeTime == 0 then
@@ -200,6 +200,7 @@ if SERVER then
 							effectdata:SetOrigin(ShellTrace.HitPos)
 							effectdata:SetScale((ShellList[i].DakCaliber*0.0393701))
 							if ShellTrace.Hit then
+								util.Effect(ShellList[i].DakTrail, effectdata, true, true)
 							else
 								util.Effect(ShellList[i].DakTrail, effectdata, true, true)
 							end

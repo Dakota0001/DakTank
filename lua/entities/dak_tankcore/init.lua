@@ -749,6 +749,13 @@ function ENT:Think()
 								else
 									self.Tread[#self.Tread+1]=CurrentRes
 								end
+								---TEST
+								if CurrentRes:GetClass()=="prop_physics" then
+									--CurrentRes:AddEFlags( EFL_SERVER_ONLY )
+									--CurrentRes:AddEFlags( EFL_DORMANT )
+								end
+
+								---END TEST
 							end
 						end
 						if self.Modern == 1 then
@@ -1021,6 +1028,16 @@ function ENT:Think()
 									self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult*25
 								end
 								self.HitBox[i].DakHealth = self.CurrentHealth
+
+								if self.HitBox[i]:GetClass()=="prop_physics" then
+									--self.HitBox[i]:AddEFlags( EFL_SERVER_ONLY )
+									--self.HitBox[i]:AddEFlags( EFL_DORMANT )
+									--self.HitBox[i]:AddEFlags( EFL_NO_GAME_PHYSICS_SIMULATION )
+
+									--self.HitBox[i]:RemoveEFlags( EFL_SERVER_ONLY )
+									--self.HitBox[i]:RemoveEFlags( EFL_DORMANT )
+								end
+
 							end
 							self.DakHealth = self.CurrentHealth
 							
