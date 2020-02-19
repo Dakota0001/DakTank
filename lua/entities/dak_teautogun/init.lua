@@ -561,7 +561,7 @@ function ENT:Think()
 				if self.DakCaliber <= 30 then
 					self.DakFireSound1 = "daktanks/new/cannons/25mm/cannon_25mm_72k_shot_01.mp3"
 				end
-				if self.DakCaliber > 40 then
+				if self.DakCaliber > 30 then
 					self.DakFireSound1 = "daktanks/new/cannons/37mm/cannon_37mm_flak36_shot_01.mp3"
 				end
 			end

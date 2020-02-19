@@ -35,7 +35,7 @@ SWEP.ViewModel  = "models/weapons/cstrike/c_pist_deagle.mdl"
 SWEP.WorldModel = "models/weapons/w_pist_deagle.mdl"
 
 SWEP.Primary.ClipSize		= 7
-SWEP.Primary.DefaultClip	= 21
+SWEP.Primary.DefaultClip	= 35
 SWEP.Primary.Automatic		= false
 SWEP.Primary.Ammo			= "Pistol"
 

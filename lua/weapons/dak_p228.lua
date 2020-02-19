@@ -36,7 +36,7 @@ SWEP.ViewModel  = "models/weapons/cstrike/c_pist_p228.mdl"
 SWEP.WorldModel = "models/weapons/w_pist_p228.mdl"
 
 SWEP.Primary.ClipSize		= 13
-SWEP.Primary.DefaultClip	= 39
+SWEP.Primary.DefaultClip	= 130
 SWEP.Primary.Automatic		= false
 SWEP.Primary.Ammo			= "Pistol"
 

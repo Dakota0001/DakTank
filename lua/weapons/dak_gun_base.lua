@@ -104,10 +104,16 @@ end
  
 function SWEP:Think()
 	if self.LastTime+0.1 < CurTime() then
+		self.DakOwner = self.Owner
 		if self.SpreadStacks>0 then
 			self.SpreadStacks = self.SpreadStacks - (0.1*self.SpreadStacks)
 		end
 		self.LastTime = CurTime()
+
+		if self.Owner.PerkType == 1 and self.AmmoGiven == nil then
+			self.AmmoGiven = 1
+			self.Owner:GiveAmmo( self.Primary.DefaultClip, self:GetPrimaryAmmoType(), true )
+		end
 	end
 end
 
@@ -150,7 +156,6 @@ function SWEP:PrimaryAttack()
 						shell.DakPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 						shell.DakBasePenetration = (self.DakCaliber*2)*self.ShellLengthMult
 					end
-
 
 					if self.DakShellType == "HEAT" or self.DakShellType == "HEATFS" or self.DakShellType == "ATGM" then
 						shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)*0.5
@@ -199,6 +204,7 @@ function SWEP:PrimaryAttack()
 			if self.IsRifle == true then
 				FinalRecoil = FinalRecoil * 0.5
 			end
+			if self.Owner.PerkType == 5 then FinalRecoil = FinalRecoil * 0.5 end
 			if self.SpreadStacks<5 then
 				self.SpreadStacks = self.SpreadStacks + (ShotForce/10000)
 			end

@@ -164,16 +164,7 @@ function ENT:Think()
 						local ArmorVal1 = 0
 						local addpos
 						local count = 0
-						local blocks50 = 0
-						local blocks100 = 0
-						local blocks150 = 0
-						local blocks200 = 0
-						local blocks300 = 0
-						local blocks400 = 0
-						local blocks500 = 0
-						local blocks650 = 0
-						local blocks850 = 0
-						local blocks1000 = 0
+						local blocks = 0
 						local gunhit = 0
 						local gearhit = 0
 						local forward = Angle(0,self.Gearbox:GetAngles().yaw,0):Forward()
@@ -181,216 +172,584 @@ function ENT:Think()
 						local up = Angle(0,self.Gearbox:GetAngles().yaw,0):Up()
 						--FRONT
 						local startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
+						local ArmorValTable = {}
 						for i=1, 25 do
 							for j=1, 25 do
 								addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
 								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos+forward*500, startpos+addpos-forward*500, "AP", 75, player.GetAll())
 								if IsValid(ent) then
 									if gunhit==0 and ent.Controller == self then
-										count = count+1
-										if ArmorVal1>50 then
-											blocks50 = blocks50 + 1
-										end
-										if ArmorVal1>100 then
-											blocks100 = blocks100 + 1
-										end
-										if ArmorVal1>150 then
-											blocks150 = blocks150 + 1
-										end
-										if ArmorVal1>200 then
-											blocks200 = blocks200 + 1
-										end
-										if ArmorVal1>300 then
-											blocks300 = blocks300 + 1
-										end
-										if ArmorVal1>400 then
-											blocks400 = blocks400 + 1
-										end
-										if ArmorVal1>500 then
-											blocks500 = blocks500 + 1
-										end
-										if ArmorVal1>650 then
-											blocks650 = blocks650 + 1
-										end
-										if ArmorVal1>850 then
-											blocks850 = blocks850 + 1
-										end
-										if ArmorVal1>1000 then
-											blocks1000 = blocks1000 + 1
-										end
+										ArmorValTable[#ArmorValTable+1] = ArmorVal1
 									end
 								end
 							end
 						end
-						self.FrontalArmor = (((blocks50/count)+(blocks100/count)+(blocks150/count)+(blocks200/count)+(blocks300/count)+(blocks400/count)+(blocks500/count)+(blocks650/count)+(blocks850/count)+(blocks1000/count))/10)
+						table.sort( ArmorValTable, function(a, b) return a < b end )
+						for i=1, #ArmorValTable do
+							if i <= #ArmorValTable*0.25 then
+								count = count+4
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 76
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 72
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 68
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 64
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 60
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 56
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 52
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 48
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 44
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 40
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 36
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 32
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 28
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 24
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 20
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 4
+								end
+							elseif i <= #ArmorValTable*0.50 then
+								count = count+2
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 38
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 36
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 34
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 32
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 30
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 28
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 26
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 24
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 22
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 20
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 18
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 14
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 10
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 6
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 4
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 2
+								end
+							elseif i >= #ArmorValTable*0.9 then
+							else
+								count = count+1
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 19
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 18
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 17
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 15
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 14
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 13
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 11
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 10
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 9
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 7
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 6
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 5
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 4
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 3
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 2
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 1
+								end
+							end
+						end
+						self.FrontalArmor = (blocks/count)/10
 						--REAR
 						count = 0
-						blocks50 = 0
-						blocks100 = 0
-						blocks150 = 0
-						blocks200 = 0
-						blocks300 = 0
-						blocks400 = 0
-						blocks500 = 0
-						blocks650 = 0
-						blocks850 = 0
-						blocks1000 = 0
+						blocks = 0
 						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
-						for i=1, 25 do
-							for j=1, 25 do
-								addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
+						ArmorValTable = {}
+						for i=1, 50 do
+							for j=1, 50 do
+								addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
 								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos-forward*500, startpos+addpos+forward*500, "AP", 75, player.GetAll())
 								if IsValid(ent) then
 									if gunhit==0 and ent.Controller == self then
-										count = count+1
-										if ArmorVal1>50 then
-											blocks50 = blocks50 + 1
-										end
-										if ArmorVal1>100 then
-											blocks100 = blocks100 + 1
-										end
-										if ArmorVal1>150 then
-											blocks150 = blocks150 + 1
-										end
-										if ArmorVal1>200 then
-											blocks200 = blocks200 + 1
-										end
-										if ArmorVal1>300 then
-											blocks300 = blocks300 + 1
-										end
-										if ArmorVal1>400 then
-											blocks400 = blocks400 + 1
-										end
-										if ArmorVal1>500 then
-											blocks500 = blocks500 + 1
-										end
-										if ArmorVal1>650 then
-											blocks650 = blocks650 + 1
-										end
-										if ArmorVal1>850 then
-											blocks850 = blocks850 + 1
-										end
-										if ArmorVal1>1000 then
-											blocks1000 = blocks1000 + 1
-										end
+										ArmorValTable[#ArmorValTable+1] = ArmorVal1
 									end
 								end
 							end
 						end
-						self.RearArmor = (((blocks50/count)+(blocks100/count)+(blocks150/count)+(blocks200/count)+(blocks300/count)+(blocks400/count)+(blocks500/count)+(blocks650/count)+(blocks850/count)+(blocks1000/count))/10)
+						table.sort( ArmorValTable, function(a, b) return a < b end )
+						for i=1, #ArmorValTable do
+							if i <= #ArmorValTable*0.25 then
+								count = count+4
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 76
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 72
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 68
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 64
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 60
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 56
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 52
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 48
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 44
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 40
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 36
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 32
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 28
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 24
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 20
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 4
+								end
+							elseif i <= #ArmorValTable*0.50 then
+								count = count+2
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 38
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 36
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 34
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 32
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 30
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 28
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 26
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 24
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 22
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 20
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 18
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 14
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 10
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 6
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 4
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 2
+								end
+							elseif i >= #ArmorValTable*0.9 then
+							else
+								count = count+1
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 19
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 18
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 17
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 15
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 14
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 13
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 11
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 10
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 9
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 7
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 6
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 5
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 4
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 3
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 2
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 1
+								end
+							end
+						end
+						self.RearArmor = (blocks/count)/10
 						--LEFT
 						count = 0
-						blocks50 = 0
-						blocks100 = 0
-						blocks150 = 0
-						blocks200 = 0
-						blocks300 = 0
-						blocks400 = 0
-						blocks500 = 0
-						blocks650 = 0
-						blocks850 = 0
-						blocks1000 = 0
+						blocks = 0
 						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
+						ArmorValTable = {}
 						for i=1, 25 do
 							for j=1, 25 do
 								addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
 								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos+right*500, startpos+addpos-right*500, "AP", 75, player.GetAll())
 								if IsValid(ent) then
 									if gunhit==0 and ent.Controller == self then
-										count = count+1
-										if ArmorVal1>50 then
-											blocks50 = blocks50 + 1
-										end
-										if ArmorVal1>100 then
-											blocks100 = blocks100 + 1
-										end
-										if ArmorVal1>150 then
-											blocks150 = blocks150 + 1
-										end
-										if ArmorVal1>200 then
-											blocks200 = blocks200 + 1
-										end
-										if ArmorVal1>300 then
-											blocks300 = blocks300 + 1
-										end
-										if ArmorVal1>400 then
-											blocks400 = blocks400 + 1
-										end
-										if ArmorVal1>500 then
-											blocks500 = blocks500 + 1
-										end
-										if ArmorVal1>650 then
-											blocks650 = blocks650 + 1
-										end
-										if ArmorVal1>850 then
-											blocks850 = blocks850 + 1
-										end
-										if ArmorVal1>1000 then
-											blocks1000 = blocks1000 + 1
-										end
+										ArmorValTable[#ArmorValTable+1] = ArmorVal1
 									end
 								end
 							end
 						end
-						local LeftArmor = (((blocks50/count)+(blocks100/count)+(blocks150/count)+(blocks200/count)+(blocks300/count)+(blocks400/count)+(blocks500/count)+(blocks650/count)+(blocks850/count)+(blocks1000/count))/10)
+						table.sort( ArmorValTable, function(a, b) return a < b end )
+						for i=1, #ArmorValTable do
+							if i <= #ArmorValTable*0.25 then
+								count = count+4
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 76
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 72
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 68
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 64
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 60
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 56
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 52
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 48
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 44
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 40
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 36
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 32
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 28
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 24
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 20
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 4
+								end
+							elseif i <= #ArmorValTable*0.50 then
+								count = count+2
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 38
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 36
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 34
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 32
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 30
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 28
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 26
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 24
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 22
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 20
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 18
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 14
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 10
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 6
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 4
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 2
+								end
+							elseif i >= #ArmorValTable*0.9 then
+							else
+								count = count+1
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 19
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 18
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 17
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 15
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 14
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 13
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 11
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 10
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 9
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 7
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 6
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 5
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 4
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 3
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 2
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 1
+								end
+							end
+						end
+						local LeftArmor = (blocks/count)/10
 						--RIGHT
 						count = 0
-						blocks50 = 0
-						blocks100 = 0
-						blocks150 = 0
-						blocks200 = 0
-						blocks300 = 0
-						blocks400 = 0
-						blocks500 = 0
-						blocks650 = 0
-						blocks850 = 0
-						blocks1000 = 0
+						blocks = 0
 						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
+						ArmorValTable = {}
 						for i=1, 25 do
 							for j=1, 25 do
 								addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
 								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos-right*500, startpos+addpos+right*500, "AP", 75, player.GetAll())
 								if IsValid(ent) then
 									if gunhit==0 and ent.Controller == self then
-										count = count+1
-										if ArmorVal1>50 then
-											blocks50 = blocks50 + 1
-										end
-										if ArmorVal1>100 then
-											blocks100 = blocks100 + 1
-										end
-										if ArmorVal1>150 then
-											blocks150 = blocks150 + 1
-										end
-										if ArmorVal1>200 then
-											blocks200 = blocks200 + 1
-										end
-										if ArmorVal1>300 then
-											blocks300 = blocks300 + 1
-										end
-										if ArmorVal1>400 then
-											blocks400 = blocks400 + 1
-										end
-										if ArmorVal1>500 then
-											blocks500 = blocks500 + 1
-										end
-										if ArmorVal1>650 then
-											blocks650 = blocks650 + 1
-										end
-										if ArmorVal1>850 then
-											blocks850 = blocks850 + 1
-										end
-										if ArmorVal1>1000 then
-											blocks1000 = blocks1000 + 1
-										end
+										ArmorValTable[#ArmorValTable+1] = ArmorVal1
 									end
 								end
 							end
 						end
-						local RightArmor = (((blocks50/count)+(blocks100/count)+(blocks150/count)+(blocks200/count)+(blocks300/count)+(blocks400/count)+(blocks500/count)+(blocks650/count)+(blocks850/count)+(blocks1000/count))/10)
+						table.sort( ArmorValTable, function(a, b) return a < b end )
+						for i=1, #ArmorValTable do
+							if i <= #ArmorValTable*0.25 then
+								count = count+4
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 76
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 72
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 68
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 64
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 60
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 56
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 52
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 48
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 44
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 40
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 36
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 32
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 28
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 24
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 20
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 4
+								end
+							elseif i <= #ArmorValTable*0.50 then
+								count = count+2
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 38
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 36
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 34
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 32
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 30
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 28
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 26
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 24
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 22
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 20
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 18
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 14
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 10
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 6
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 4
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 2
+								end
+							elseif i >= #ArmorValTable*0.9 then
+							else
+								count = count+1
+								if ArmorValTable[i]>2200 then
+									blocks = blocks + 19
+								elseif ArmorValTable[i]>1750 then
+									blocks = blocks + 18
+								elseif ArmorValTable[i]>1560 then
+									blocks = blocks + 17
+								elseif ArmorValTable[i]>1250 then
+									blocks = blocks + 16
+								elseif ArmorValTable[i]>1000 then
+									blocks = blocks + 15
+								elseif ArmorValTable[i]>840 then
+									blocks = blocks + 14
+								elseif ArmorValTable[i]>670 then
+									blocks = blocks + 13
+								elseif ArmorValTable[i]>480 then
+									blocks = blocks + 12
+								elseif ArmorValTable[i]>380 then
+									blocks = blocks + 11
+								elseif ArmorValTable[i]>320 then
+									blocks = blocks + 10
+								elseif ArmorValTable[i]>250 then
+									blocks = blocks + 9
+								elseif ArmorValTable[i]>180 then
+									blocks = blocks + 8
+								elseif ArmorValTable[i]>160 then
+									blocks = blocks + 7
+								elseif ArmorValTable[i]>120 then
+									blocks = blocks + 6
+								elseif ArmorValTable[i]>80 then
+									blocks = blocks + 5
+								elseif ArmorValTable[i]>60 then
+									blocks = blocks + 4
+								elseif ArmorValTable[i]>40 then
+									blocks = blocks + 3
+								elseif ArmorValTable[i]>25 then
+									blocks = blocks + 2
+								elseif ArmorValTable[i]>15 then
+									blocks = blocks + 1
+								end
+							end
+						end
+						local RightArmor = (blocks/count)/10
 						self.SideArmor = (RightArmor+LeftArmor)/2
-
-						local armormult = (self.FrontalArmor*0.7)+(self.SideArmor*0.2)+(self.RearArmor*0.1)
+						local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
 
 						local shellvol = ((100*0.0393701)^2)*(100*0.0393701*13)
 						local shells = 0
@@ -464,7 +823,7 @@ function ENT:Think()
 						end
 
 						local speedmult = math.Clamp((1+((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05))*0.5,0,1.5)
-						armormult = armormult+0.5
+						armormult = armormult+0.1
 						--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
 
 						local KEPen = {0}
@@ -968,6 +1327,7 @@ function ENT:Think()
 							end
 
 							self.DamageCycle = 0
+							self.LastDamagedBy = NULL
 							if self.DakHealth < self.CurrentHealth then
 								self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.DakHealth)
 								self.DakLastDamagePos = self.DakLastDamagePos	
@@ -993,7 +1353,8 @@ function ENT:Think()
 												table.RemoveByValue( self.HitBox, NULL )
 											end
 											self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.HitBox[i].DakHealth)
-											self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos	
+											self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos
+											self.LastDamagedBy = self.HitBox[i].LastDamagedBy
 										end
 									end
 								end
@@ -1108,7 +1469,8 @@ function ENT:Think()
 																sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.TurretControls[j].Turret[l]:GetPos(), 100, 100, 0.25 )
 																if self.TurretControls[j].Turret[l]:IsVehicle() then
 																	if IsValid(self.TurretControls[j].Turret[l]:GetDriver()) then
-																		self.TurretControls[j].Turret[l]:GetDriver():Kill()
+																		self.TurretControls[j].Turret[l]:GetDriver():TakeDamage( 1000000, self.LastDamagedBy, self )
+																		--self.TurretControls[j].Turret[l]:GetDriver():Kill()
 																	end
 																	self.TurretControls[j].Turret[l]:Remove()
 																end
@@ -1190,7 +1552,8 @@ function ENT:Think()
 													end
 													if self.Contraption[i]:IsVehicle() then
 														if IsValid(self.Contraption[i]:GetDriver()) then
-															self.Contraption[i]:GetDriver():Kill()
+															self.Contraption[i]:GetDriver():TakeDamage( 1000000, self.LastDamagedBy, self )
+															--self.Contraption[i]:GetDriver():Kill()
 														end
 														self.Contraption[i]:Remove()
 													end

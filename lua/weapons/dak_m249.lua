@@ -37,7 +37,7 @@ SWEP.WorldModel = "models/weapons/w_mach_m249para.mdl"
 SWEP.Primary.ClipSize		= 200
 SWEP.Primary.DefaultClip	= 600
 SWEP.Primary.Automatic		= true
-SWEP.Primary.Ammo			= "AR2"
+SWEP.Primary.Ammo			= "SMG1"
 
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1

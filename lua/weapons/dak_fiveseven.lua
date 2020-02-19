@@ -35,7 +35,7 @@ SWEP.ViewModel  = "models/weapons/cstrike/c_pist_fiveseven.mdl"
 SWEP.WorldModel = "models/weapons/w_pist_fiveseven.mdl"
 
 SWEP.Primary.ClipSize		= 20
-SWEP.Primary.DefaultClip	= 60
+SWEP.Primary.DefaultClip	= 160
 SWEP.Primary.Automatic		= false
 SWEP.Primary.Ammo			= "Pistol"
 

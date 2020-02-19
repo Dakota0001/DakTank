@@ -36,9 +36,9 @@ SWEP.ViewModel  = "models/weapons/cstrike/c_smg_mac10.mdl"
 SWEP.WorldModel = "models/weapons/w_smg_mac10.mdl"
 
 SWEP.Primary.ClipSize		= 30
-SWEP.Primary.DefaultClip	= 90
+SWEP.Primary.DefaultClip	= 150
 SWEP.Primary.Automatic		= true
-SWEP.Primary.Ammo			= "SMG1"
+SWEP.Primary.Ammo			= "AR2"
 
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1

@@ -35,7 +35,7 @@ SWEP.ViewModel  = "models/weapons/cstrike/c_pist_glock18.mdl"
 SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
 
 SWEP.Primary.ClipSize		= 33
-SWEP.Primary.DefaultClip	= 99
+SWEP.Primary.DefaultClip	= 165
 SWEP.Primary.Automatic		= true
 SWEP.Primary.Ammo			= "Pistol"
 

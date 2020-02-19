@@ -35,7 +35,7 @@ SWEP.ViewModel  = "models/weapons/cstrike/c_rif_m4a1.mdl"
 SWEP.WorldModel = "models/weapons/w_rif_m4a1.mdl"
 
 SWEP.Primary.ClipSize		= 30
-SWEP.Primary.DefaultClip	= 90
+SWEP.Primary.DefaultClip	= 120
 SWEP.Primary.Automatic		= true
 SWEP.Primary.Ammo			= "AR2"
 

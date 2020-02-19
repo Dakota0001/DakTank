@@ -397,6 +397,8 @@ function ENT:Think()
 			        	--DO BRAKES BOTH
 			        	self.RightBrake = 1
 			        	self.LeftBrake = 1
+			        	self.LeftForce = 0
+			        	self.RightForce = 0
 			        	if #self.DakTankCore.Motors>0 then
 							for i=1, #self.DakTankCore.Motors do
 								if IsValid(self.DakTankCore.Motors[i]) then

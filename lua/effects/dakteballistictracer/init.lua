@@ -84,9 +84,7 @@ function EFFECT:Think()
 	return true
 end
 
---function EFFECT:Render()
-	--local Laser = Material( "dak/beamsmall" )
-	--render.SetMaterial( Laser )
-	--render.SetColorModulation( 1, 0, 0 )
-	--render.DrawBeam( self.StartPos, self.EndPos, 5, 0, 0.5, Color( 255, 255, 255, 255 ) ) 
---end
+function EFFECT:Render()
+	--render.SetMaterial( self.Mat )
+	--render.DrawBeam( self.StartPos, self.EndPos, self.Caliber, 1, 0, Color( 255,175,50, 255 ) )
+end
