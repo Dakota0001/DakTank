@@ -352,12 +352,17 @@ function CheckClip(Ent, HitPos)
 end
 
 function DTShellHit(Start,End,HitEnt,Shell,Normal)
-	if Shell.Hits>50 then 
+	if Shell.Hits~=nil and Shell.Hits>50 then 
 		Shell.RemoveNow = 1
 		print("ERROR, RECURSE")
 	return end
 	Shell.Hits = 1
-	Start = End-(Shell.DakVelocity:GetNormalized()*1000)
+	if Shell.FinishedBouncing == 1 and Shell.LifeTime == 0.1 then
+		Start = End
+		Shell.FinishedBouncing = 0
+	else
+		Start = End-(Shell.DakVelocity:GetNormalized()*1000)
+	end
 	if Shell.LifeTime == 0.1 then
 		Start = End
 	end
@@ -759,6 +764,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 						sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 					else
+						Shell.Filter[#Shell.Filter+1] = HitEnt
 						if Shell.DakDamage >= 0 then
 							util.Decal( "Impact.Glass", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*5), Shell.DakGun)
 							if HitEnt:GetClass()=="dak_crew" then
@@ -808,8 +814,9 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								Shell.LifeTime = 0.0
 								Shell.Pos = HitPos + (Normal*2*Shell.DakCaliber*0.02)
 								Shell.ShellThinkTime = 0
-								--Shell.JustBounced = 1
+								Shell.JustBounced = 1
 								DTShellContinue(HitPos + (Normal*2*Shell.DakCaliber*0.02),Shell.DakVelocity:GetNormalized()*1000,Shell,Normal,true)
+								Shell.FinishedBouncing = 1
 							else
 								Shell.Crushed = 1
 								effectdata:SetOrigin(HitPos)
@@ -847,7 +854,6 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								end
 							end
 						end
-						Shell.Filter[#Shell.Filter+1] = HitEnt
 					end
 					--soundhere bounce sound
 				end
@@ -1609,6 +1615,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 							sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 						else
+							Shell.Filter[#Shell.Filter+1] = HitEnt
 							if Shell.DakDamage >= 0 then
 								util.Decal( "Impact.Glass", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*5), Shell.DakGun)
 								if HitEnt:GetClass()=="dak_crew" then
@@ -1658,8 +1665,9 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 									Shell.LifeTime = 0.0
 									Shell.Pos = ContShellTrace.HitPos + (Normal*2*Shell.DakCaliber*0.02)
 									Shell.ShellThinkTime = 0
-									--Shell.JustBounced = 1
+									Shell.JustBounced = 1
 									DTShellContinue(ContShellTrace.HitPos + (Normal*2*Shell.DakCaliber*0.02),Shell.DakVelocity:GetNormalized()*1000,Shell,Normal,true)
+									Shell.FinishedBouncing = 1
 								else
 									Shell.Crushed = 1
 									effectdata:SetOrigin(ContShellTrace.HitPos)
@@ -1697,7 +1705,6 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 									end
 								end
 							end
-							Shell.Filter[#Shell.Filter+1] = HitEnt
 						end
 					end
 					if HitEnt.DakHealth <= 0 and HitEnt.DakPooled==0 then
@@ -2481,6 +2488,14 @@ end
 
 util.AddNetworkString( "daktankexplosion" )
 function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt)
+	local newtrace = {}
+		newtrace.start = Pos - (Shell.DakVelocity:GetNormalized()*1000)
+		newtrace.endpos = Pos + (Shell.DakVelocity:GetNormalized()*1000)
+		newtrace.filter = Shell.Filter
+		newtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+		newtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+	local HitCheckShellTrace = util.TraceHull( newtrace )
+	Pos = HitCheckShellTrace.HitPos
 	--if Shell.DakCaliber >= 75 then
 		net.Start( "daktankexplosion" )
 		net.WriteVector( Pos )
@@ -2525,7 +2540,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt)
 					local Caliber = Shell.DakCaliber
 					if Targets[i]:GetClass() == "dak_tankcore" then
 						local traces = math.Round(Caliber/2)
-						local Filter = {HitEnt}
+						local Filter = {}
 						for i=1, traces do
 							local Direction = (Targets[i]:GetPos()-Pos):GetNormalized() + Angle(math.Rand(-10,10),math.Rand(-10,10),math.Rand(-10,10)):Forward()
 							local trace = {}

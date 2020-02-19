@@ -179,7 +179,6 @@ if SERVER then
 								ShellList[i].DakVelocity = ShellList[i].DakVelocity - (((DragForce/(ShellList[i].DakMass/2))*DakTankBulletThinkDelay)*39.37)*ShellList[i].DakVelocity:GetNormalized()
 							end
 							if ShellList[i].JustBounced == 1 then
-								print("JUST BOUNCED")
 								trace.start = ShellList[i].Pos
 								trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
 								ShellList[i].JustBounced = 0
@@ -217,9 +216,9 @@ if SERVER then
 
 							if ShellTrace.Hit then
 								if ShellList[i].IsGuided then
-									DTShellHit(ShellTrace.StartPos,ShellList[i].SimPos + (ShellList[i].DakVelocity*DakTankBulletThinkDelay),ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 								else
-									DTShellHit(ShellTrace.StartPos,ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2),ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 								end
 							end
 						end
