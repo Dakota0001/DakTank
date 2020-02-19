@@ -352,7 +352,16 @@ function CheckClip(Ent, HitPos)
 end
 
 function DTShellHit(Start,End,HitEnt,Shell,Normal)
+	if Shell.Hits>50 then 
+		Shell.RemoveNow = 1
+		print("ERROR, RECURSE")
+	return end
 	Shell.Hits = 1
+	Start = End-(Shell.DakVelocity:GetNormalized()*1000)
+	if Shell.LifeTime == 0.1 then
+		Start = End
+	end
+	End = End+(Shell.DakVelocity:GetNormalized()*1000)
 	local newtrace = {}
 		newtrace.start = Start
 		newtrace.endpos = End
@@ -799,7 +808,8 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								Shell.LifeTime = 0.0
 								Shell.Pos = HitPos + (Normal*2*Shell.DakCaliber*0.02)
 								Shell.ShellThinkTime = 0
-								Shell.JustBounced = 1
+								--Shell.JustBounced = 1
+								DTShellContinue(HitPos + (Normal*2*Shell.DakCaliber*0.02),Shell.DakVelocity:GetNormalized()*1000,Shell,Normal,true)
 							else
 								Shell.Crushed = 1
 								effectdata:SetOrigin(HitPos)
@@ -1648,7 +1658,8 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 									Shell.LifeTime = 0.0
 									Shell.Pos = ContShellTrace.HitPos + (Normal*2*Shell.DakCaliber*0.02)
 									Shell.ShellThinkTime = 0
-									Shell.JustBounced = 1
+									--Shell.JustBounced = 1
+									DTShellContinue(ContShellTrace.HitPos + (Normal*2*Shell.DakCaliber*0.02),Shell.DakVelocity:GetNormalized()*1000,Shell,Normal,true)
 								else
 									Shell.Crushed = 1
 									effectdata:SetOrigin(ContShellTrace.HitPos)
