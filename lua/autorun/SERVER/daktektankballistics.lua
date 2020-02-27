@@ -361,12 +361,12 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 		Start = End
 		Shell.FinishedBouncing = 0
 	else
-		Start = End-(Shell.DakVelocity:GetNormalized()*1000)
+		Start = End-(Shell.DakVelocity*0.1)
 	end
 	if Shell.LifeTime == 0.1 then
 		Start = End
 	end
-	End = End+(Shell.DakVelocity:GetNormalized()*1000)
+	End = End+(Shell.DakVelocity*0.1)
 	local newtrace = {}
 		newtrace.start = Start
 		newtrace.endpos = End
