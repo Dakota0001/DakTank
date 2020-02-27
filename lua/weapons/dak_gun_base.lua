@@ -146,6 +146,8 @@ function SWEP:PrimaryAttack()
 
 					shell.DakMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
 					shell.DakDamage = shell.DakMass*((self.DakVelocity*0.0254)*(self.DakVelocity*0.0254))*0.01*0.002
+					shell.IsMissile = self.IsMissile
+					shell.IsTandem = self.IsTandem
 
 					shell.DakIsPellet = false
 					shell.DakSplashDamage = self.DakCaliber*0.375

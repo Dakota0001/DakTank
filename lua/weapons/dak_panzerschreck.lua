@@ -13,7 +13,7 @@ if SERVER then
  
 elseif CLIENT then
  
-	SWEP.PrintName = "M47 Dragon"
+	SWEP.PrintName = "Panzerschreck"
  
 	SWEP.Slot = 5
 	SWEP.SlotPos = 1
@@ -24,7 +24,7 @@ end
  
 SWEP.Author = "DakTank"
 SWEP.Purpose = "Shoots Things."
-SWEP.Instructions = "staring contest consolidation prize, Caliber: 140mm, Velocity: 200m/s, Damage: 17 vs armor, RPM: 30, Pen: 300mm"
+SWEP.Instructions = "Tank scare, Caliber: 88mm, Velocity: 110m/s, Damage: 5 vs armor, RPM: 30, Pen: 230mm"
 
 SWEP.Category = "DakTank"
  
@@ -35,7 +35,7 @@ SWEP.ViewModel  = "models/weapons/v_RPG.mdl"
 SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
 
 SWEP.Primary.ClipSize		= 1
-SWEP.Primary.DefaultClip	= 2
+SWEP.Primary.DefaultClip	= 3
 SWEP.Primary.Automatic		= true
 SWEP.Primary.Ammo			= "RPG_Round"
 
@@ -73,6 +73,9 @@ function SWEP:Initialize()
 	self.PrimaryLastFire = 0
 	self.Fired = 0
 
+	self.ShellList = {}
+ 	self.RemoveList = {}
+
  	--gun info
  	self.ShotCount = 1
 	self.Spread = 0.05 --0.1 for pistols, 0.075 for smgs, 0.05 for rifles
@@ -82,29 +85,14 @@ function SWEP:Initialize()
 
  	--shell info
  	self.DakTrail = "daktemissiletracer"
-	self.DakCaliber = 140
-	self.DakShellType = "ATGM"
+	self.DakCaliber = 88
+	self.DakShellType = "HEAT"
 	self.DakPenLossPerMeter = 0.0
 	self.DakExplosive = true
-	self.DakVelocity = 3960
-	self.DakIsGuided = true
+	self.DakVelocity = 4331
 	self.ShellLengthMult = self.DakVelocity/29527.6
 	self.Zoom = 55
 
 	self.IsMissile = true
-	self.PenOverride = 300
+	self.PenOverride = 230
 end
- 
-function SWEP:Think()
-	if self.LastTime+0.1 < CurTime() then
-		if self.SpreadStacks>0 then
-			self.SpreadStacks = self.SpreadStacks - (0.1*self.SpreadStacks)
-		end
-		self.LastTime = CurTime()
-	end
-	if self.Owner.PerkType == 1 and self.AmmoGiven == nil then
-		self.AmmoGiven = 1
-		self.Owner:GiveAmmo( self.Primary.DefaultClip, self:GetPrimaryAmmoType(), true )
-	end
-end
-

@@ -1319,24 +1319,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),5,25)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Machine Gun"
-			if self.DakCaliber < 9 then
-				self.DakModel = "models/daktanks/mg5mm.mdl"
-			end
-			if self.DakCaliber >= 9 and self.DakCaliber < 13 then
-				self.DakModel = "models/daktanks/mg9mm.mdl"
-			end
-			if self.DakCaliber >= 13 and self.DakCaliber < 17 then
-				self.DakModel = "models/daktanks/mg13mm.mdl"
-			end
-			if self.DakCaliber >= 17 and self.DakCaliber < 21 then
-				self.DakModel = "models/daktanks/mg17mm.mdl"
-			end
-			if self.DakCaliber >= 21 and self.DakCaliber < 25 then
-				self.DakModel = "models/daktanks/mg21mm.mdl"
-			end
-			if self.DakCaliber >= 25 then
-				self.DakModel = "models/daktanks/mg25mm.mdl"
-			end
+			self.DakModel = "models/daktanks/machinegun100mm.mdl"
 
 			if self.DakCaliber < 7.62 then
 				self.DakFireSound = "daktanks/5mm.mp3"
@@ -1943,6 +1926,7 @@ function TOOL:LeftClick( trace )
 		if self.DakModel == "models/daktanks/mortar100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/smokelauncher100mm.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/machinegun100mm.mdl" then self.ScalingGun = 1 end
 
 		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_tegearbox") and not(trace.Entity:GetClass() == "dak_tegearboxnew") and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
 			self.spawnedent:Spawn()
@@ -2330,8 +2314,18 @@ function TOOL:RightClick( trace )
 				else
 					ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompKEMult),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompCEMult),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
 				end
-				else
-				ply:ChatPrint(TarName..", ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+			else
+				if Target:GetClass() ~= "dak_tankcore" then
+					if Target.EntityMods.ArmorType then
+						ply:ChatPrint(Target.EntityMods.ArmorType.." Plate, ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+					else
+						if TarName == "Armor" then
+							ply:ChatPrint("RHA Plate, ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+						else
+							ply:ChatPrint(TarName..", ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+						end
+					end
+				end
 			end
 			if Target:GetClass() == "dak_teammo" then
 				if Target.DakAmmo and Target.DakMaxAmmo then
@@ -2351,6 +2345,7 @@ function TOOL:RightClick( trace )
 			end
 			if Target:GetClass() == "dak_tankcore" then
 				if Target.Modern and Target.ColdWar then
+					ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 					if Target.Modern == 1 then
 						ply:ChatPrint("Modern Tank, no limits, autocannon/HMG reload and mag size improved, carousel autoloader functionality gained")
 					elseif Target.ColdWar == 1 then
@@ -2360,14 +2355,30 @@ function TOOL:RightClick( trace )
 					end
 					if Target.Cost~=nil then
 						if Target.CanSpawn == true then
-							ply:ChatPrint("Tank Cost: "..Target.Cost..", breakdown below:")
-							ply:ChatPrint("Component Cost: "..Target.ComponentCost)
-							ply:ChatPrint("Ammo Cost: "..Target.AmmoCost)
-							ply:ChatPrint("Cost multiplier for Armor: "..Target.ArmorMult)
-							ply:ChatPrint("Cost multiplier for Speed: "..Target.SpeedMult)
-							ply:ChatPrint("Cost multiplier for Firepower: "..Target.FirepowerMult)
+							--ply:ChatPrint("Tank Cost: "..Target.Cost..", breakdown below:")
+							--ply:ChatPrint("Component Cost: "..Target.ComponentCost..", Ammo Cost: "..Target.AmmoCost)
+							--ply:ChatPrint("Cost multiplier for Armor: "..Target.ArmorMult)
+							--ply:ChatPrint("Cost multiplier for Speed: "..Target.SpeedMult)
+							--ply:ChatPrint("Cost multiplier for Firepower: "..Target.FirepowerMult)
+							--ply:ChatPrint("Cost multiplier for Gun Handling: "..Target.GunHandlingMult)
+							local Era = "WWII"
+							if Target.ColdWar == 1 then
+								Era = "Cold War"
+							end
+							if Target.Modern == 1 then
+								Era = "Modern"
+							end
+							ply:ChatPrint(Target.Cost.." point "..Era.." tank.")
+							ply:ChatPrint("Base Costs")
+							ply:ChatPrint("Armor: "..(Target.ArmorMult*50).." points, Firepower: "..(Target.FirepowerMult*50).." points.")
+							ply:ChatPrint("Multipliers")
+							ply:ChatPrint("Flanking: "..Target.SpeedMult.."x, Gun Handling: "..Target.GunHandlingMult.."x.")
+							ply:ChatPrint("Misc")
+							ply:ChatPrint("Best Average Armor: "..(Target.ArmorMult*420).."mm, Best Round Pen: "..Target.MaxPen.."mm, Top Speed: "..math.Round(Target.Gearbox.TopSpeed,2).."kph.")
+							ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 						else
 							ply:ChatPrint("Calculating Tank Cost")
+							ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 						end
 					end
 				end

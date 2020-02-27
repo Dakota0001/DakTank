@@ -444,6 +444,11 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end 
 					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" then
 						CompArmor = CompArmor*HitEnt.EntityMods.CompCEMult
+						if Shell.IsTandem == true then
+							if HitEnt.IsERA == 1 then
+								CompArmor = 0
+							end
+						end
 					else
 						CompArmor = CompArmor*HitEnt.EntityMods.CompKEMult
 					end
@@ -1293,6 +1298,11 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end 
 						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" then
 							CompArmor = CompArmor*HitEnt.EntityMods.CompCEMult
+							if Shell.IsTandem == true then
+								if HitEnt.IsERA == 1 then
+									CompArmor = 0
+								end
+							end
 						else
 							CompArmor = CompArmor*HitEnt.EntityMods.CompKEMult
 						end
@@ -3389,6 +3399,11 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*HEATTrace.Entity.EntityMods.CompCEMult
+						if Shell.IsTandem == true then
+							if HEATTrace.Entity.IsERA == 1 then
+								EffArmor = 0
+							end
+						end
 					end
 					if EffArmor < math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen) and HEATTrace.Entity.IsDakTekFutureTech == nil then
 						Filter[#Filter+1] = HEATTrace.Entity
@@ -3564,6 +3579,11 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*HEATTrace.Entity.EntityMods.CompCEMult
+						if Shell.IsTandem == true then
+							if HEATTrace.Entity.IsERA == 1 then
+								EffArmor = 0
+							end
+						end
 					end
 					if EffArmor < math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen) and HEATTrace.Entity.IsDakTekFutureTech == nil then
 						Filter[#Filter+1] = HEATTrace.Entity
@@ -3751,6 +3771,11 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 					if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 					if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
 					EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*HEATTrace.Entity.EntityMods.CompCEMult
+					if Shell.IsTandem == true then
+						if HEATTrace.Entity.IsERA == 1 then
+							EffArmor = 0
+						end
+					end
 				end
 				if EffArmor < (Pen-HeatPenLoss) and HEATTrace.Entity.IsDakTekFutureTech == nil then
 					--decals don't like using the adjusted by normal Pos

@@ -113,7 +113,7 @@ if SERVER then
 			local RemoveList = {}
 			for i = 1, #ShellList do
 				if ShellList[i].ShellThinkTime == nil then
-					ShellList[i].ShellThinkTime = CurTime()-DakTankBulletThinkDelay
+					ShellList[i].ShellThinkTime = 0
 				end
 				if CurTime()-DakTankBulletThinkDelay >= ShellList[i].ShellThinkTime then
 					ShellList[i].ShellThinkTime = CurTime()
@@ -178,9 +178,12 @@ if SERVER then
 							else
 								ShellList[i].DakVelocity = ShellList[i].DakVelocity - (((DragForce/(ShellList[i].DakMass/2))*DakTankBulletThinkDelay)*39.37)*ShellList[i].DakVelocity:GetNormalized()
 							end
+							if ShellList[i].IsMissile == true then
+								ShellList[i].DakVelocity = ShellList[i].DakVelocity:GetNormalized() * (ShellList[i].DakBaseVelocity*(ShellList[i].LifeTime+1))
+							end
 							if ShellList[i].JustBounced == 1 then
 								trace.start = ShellList[i].Pos
-								trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
+								trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+0.1)) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
 								ShellList[i].JustBounced = 0
 							else
 								if ShellList[i].LifeTime == 0 then
@@ -193,7 +196,7 @@ if SERVER then
 									end
 								end
 								if ShellList[i].RemoveNow ~= 1 then
-									trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * ShellList[i].LifeTime) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
+									trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+0.1)) - (-physenv.GetGravity()*(ShellList[i].LifeTime^2)/2)
 								end
 							end
 						end

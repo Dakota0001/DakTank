@@ -12,10 +12,8 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Float", 	2, "YawMin", 	{ KeyName = "yawmin", 	Edit = { type = "Float", 		order = 3, min = 0, max = 360 } } )
 	self:NetworkVar( "Float", 	3, "YawMax", 	{ KeyName = "yawmax", 	Edit = { type = "Float", 		order = 4, min = 0, max = 360 } } )
 
-
-		--self.StrideLength = 2.2
-        --self.StrideHeight = 0.3
-        --self.HipBobMultiplier = 1
-       	--self.CrouchPercent = 0.9
+	self:NetworkVar( "Bool", 	0, "ShortStopStabilizer", 	{ KeyName = "shortstopstabilizer", 	Edit = { type = "Boolean", 		order = 5} } )
+	self:NetworkVar( "Bool", 	1, "Stabilizer", 	{ KeyName = "stabilizer", 	Edit = { type = "Boolean", 		order = 6} } )
+	self:NetworkVar( "Bool", 	2, "FCS", 	{ KeyName = "fcs", 	Edit = { type = "Boolean", 		order = 7} } )
 
 end

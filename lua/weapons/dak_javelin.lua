@@ -13,7 +13,7 @@ if SERVER then
  
 elseif CLIENT then
  
-	SWEP.PrintName = "M47 Dragon"
+	SWEP.PrintName = "FGM-148 Javelin"
  
 	SWEP.Slot = 5
 	SWEP.SlotPos = 1
@@ -24,7 +24,7 @@ end
  
 SWEP.Author = "DakTank"
 SWEP.Purpose = "Shoots Things."
-SWEP.Instructions = "staring contest consolidation prize, Caliber: 140mm, Velocity: 200m/s, Damage: 17 vs armor, RPM: 30, Pen: 300mm"
+SWEP.Instructions = "No top attack today, Caliber: 127mm, Velocity: 200m/s, Damage: 13 vs armor, RPM: 30, Pen: 750mm, Tandem"
 
 SWEP.Category = "DakTank"
  
@@ -82,7 +82,7 @@ function SWEP:Initialize()
 
  	--shell info
  	self.DakTrail = "daktemissiletracer"
-	self.DakCaliber = 140
+	self.DakCaliber = 127
 	self.DakShellType = "ATGM"
 	self.DakPenLossPerMeter = 0.0
 	self.DakExplosive = true
@@ -92,7 +92,8 @@ function SWEP:Initialize()
 	self.Zoom = 55
 
 	self.IsMissile = true
-	self.PenOverride = 300
+	self.IsTandem = true
+	self.PenOverride = 750
 end
  
 function SWEP:Think()

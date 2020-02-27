@@ -311,7 +311,9 @@ function ENT:Think()
 			self:SetMoveType(MOVETYPE_VPHYSICS)
 			self:SetSolid(SOLID_VPHYSICS)
 		end
-		if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
+		if self.AddonMass ~= nil then
+			if self:GetPhysicsObject():GetMass() ~= self.DakMass+self.AddonMass then self:GetPhysicsObject():SetMass(self.DakMass+self.AddonMass) end
+		end
 		self.MoveForward = self.Inputs.Forward.Value
 		self.MoveReverse = self.Inputs.Reverse.Value
 		self.MoveLeft = self.Inputs.Left.Value
@@ -346,6 +348,7 @@ function ENT:Think()
 	 		end
 
 	    	if self.TotalMass then
+	    		if self.AddonMass == nil then self.AddonMass = math.Round(self.TotalMass*0.1), self:GetPhysicsObject():SetMass(self:GetPhysicsObject():GetMass()+math.Round(self.TotalMass*0.1)) end
 		    	self.DakSpeed = self.DakSpeed*(10000/self.TotalMass)
 		    	self.TopSpeed = (29.851*self.DakSpeed)*self.GearRatio
 				if(self:GetParent():IsValid()) then
@@ -395,8 +398,8 @@ function ENT:Think()
 		        	if self.Brakes>0 then
 						self.Perc = 0
 			        	--DO BRAKES BOTH
-			        	self.RightBrake = 1
-			        	self.LeftBrake = 1
+			        	self.RightBrake = 2
+			        	self.LeftBrake = 2
 			        	self.LeftForce = 0
 			        	self.RightForce = 0
 			        	if #self.DakTankCore.Motors>0 then
@@ -820,7 +823,7 @@ function ENT:Think()
 					lastchange = (CurTraceDist-self.RightChanges[i])/TickInt
 					self.RightChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.RightPosChanges[i]
-					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(self.RightBrake,1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
+					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.RightBrake,0.01),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
 					self.RightPosChanges[i] = CurTraceHitPos
 					if i==WheelsPerSide then 
 						RidePos = (CurTraceDist - RideHeight + FrontWheelRaise) - RideHeight
@@ -866,7 +869,7 @@ function ENT:Think()
 					lastchange = (CurTraceDist-self.LeftChanges[i])/TickInt
 					self.LeftChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.LeftPosChanges[i]
-					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(self.LeftBrake,1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
+					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.LeftBrake,0.01),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
 					self.LeftPosChanges[i] = CurTraceHitPos
 					if i==WheelsPerSide then 
 						RidePos = (CurTraceDist - RideHeight + FrontWheelRaise) - RideHeight

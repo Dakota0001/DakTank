@@ -11,6 +11,7 @@ function EFFECT:Init( data )
 
 	self.TracerTime = math.min( 1, self.StartPos:Distance( self.EndPos ) / 10000 )
 	self.DieTime = CurTime() + 0.25
+	self.Started = CurTime()
 
 	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
 
@@ -23,7 +24,8 @@ function EFFECT:Init( data )
 		if particle == nil then particle = emitter:Add( "sprites/light_glow02_add.vmt", self.StartPos)  end
 		
 		if (particle) then
-			particle:SetVelocity(self.Dir*12600 + Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
+			--particle:SetVelocity(self.Dir*12600 + Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
+			particle:SetVelocity(self.Dir*math.Rand(5*self.Dist*0.95,5*self.Dist*1.05) + Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
 			particle:SetLifeTime(0) 
 			particle:SetDieTime(0.25) 
 			particle:SetStartAlpha(200)
@@ -76,9 +78,11 @@ function EFFECT:Think()
 end
 
 function EFFECT:Render( )
-	local model = {}
-		model.model = "models/daktanks/test/lrmrocket.mdl"
-		model.pos = self.EndPos
-		model.angle = self.Dir:Angle()
-	render.Model( model )
+	if CurTime()-self.Started < 0.1 then
+		local model = {}
+			model.model = "models/daktanks/test/lrmrocket.mdl"
+			model.pos = self.StartPos + ((self.Dir*self.Dist)*((CurTime()-self.Started)/0.1)) + ((self.Dir*self.Dist)*0.5)
+			model.angle = self.Dir:Angle()
+		render.Model( model )
+	end
 end

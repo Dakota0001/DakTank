@@ -71,6 +71,23 @@ function TOOL:LeftClick( trace )
 			end
 
 			local Target = trace.Entity
+
+			if Target:GetClass() == "dak_tankcore" then
+				if (SERVER) or (game.SinglePlayer()) then
+					for i=1, #Target.Contraption do
+						if Target.Contraption[i]:GetClass()=="prop_physics" then
+							if Target.Contraption[i].IsComposite ~= 1 then
+								Target.Contraption[i].EntityMods.ArmorType = self:GetClientInfo("ArmorType")
+							end
+						end
+					end
+				end
+				if (CLIENT) or (game.SinglePlayer()) then
+					self:GetOwner():EmitSound("npc/manhack/grind1.wav")
+					self:GetOwner():ChatPrint("All non composite armor set to "..self:GetClientInfo("ArmorType")..".")
+				end
+			end
+
 			if not(string.Explode("_",Target:GetClass(),false)[1] == "dak") then
 				--local Volume = trace.Entity:GetPhysicsObject():GetVolume()
 				if trace.Entity.DakIsTread == 1 then

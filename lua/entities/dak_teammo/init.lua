@@ -155,7 +155,7 @@ function ENT:Think()
 					self.ShellMass = self.ShellVolume*0.044
 					self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
 					self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
-					self.DakMaxAmmo = math.Round(self.DakMaxAmmo*(1/1.5))
+					self.DakMaxAmmo = math.floor(self.DakMaxAmmo*(1/1.5))
 					self.ShellVolume = self.ShellVolume*1.5
 				end
 				self.ShellMass = self.ShellVolume*0.044
@@ -448,7 +448,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 			self.ShellMass = self.ShellVolume*0.044
 			self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
 			self.DakMaxAmmo = math.floor(self:GetPhysicsObject():GetVolume()/self.ShellSquareVolume)
-			self.DakMaxAmmo = math.Round(self.DakMaxAmmo*(1/1.5))
+			self.DakMaxAmmo = math.floor(self.DakMaxAmmo*(1/1.5))
 			self.ShellVolume = self.ShellVolume*1.5
 		end
 		self.ShellMass = self.ShellVolume*0.044

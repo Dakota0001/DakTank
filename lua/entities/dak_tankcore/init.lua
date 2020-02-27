@@ -10,6 +10,8 @@ ENT.HitBox = {}
 ENT.DakActive = 0
 ENT.DakFuel = nil
 
+--cause self to delete self if not properly unfrozen
+
 function ENT:Initialize()
 	self:SetModel( "models/bull/gates/logic.mdl" )
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -39,6 +41,8 @@ function ENT:Initialize()
 	self.FrontalArmor = 0
 	self.SideArmor = 0
 	self.RearArmor = 0
+	self.Modern = 0
+	self.ColdWar = 0
 end
 
 
@@ -184,135 +188,11 @@ function ENT:Think()
 								end
 							end
 						end
-						table.sort( ArmorValTable, function(a, b) return a < b end )
+						local totalarmor = 0
 						for i=1, #ArmorValTable do
-							if i <= #ArmorValTable*0.25 then
-								count = count+4
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 76
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 72
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 68
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 64
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 60
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 56
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 52
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 48
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 44
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 40
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 36
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 32
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 28
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 24
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 20
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 4
-								end
-							elseif i <= #ArmorValTable*0.50 then
-								count = count+2
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 38
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 36
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 34
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 32
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 30
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 28
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 26
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 24
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 22
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 20
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 18
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 14
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 10
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 6
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 4
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 2
-								end
-							elseif i >= #ArmorValTable*0.9 then
-							else
-								count = count+1
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 19
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 18
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 17
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 15
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 14
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 13
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 11
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 10
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 9
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 7
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 6
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 5
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 4
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 3
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 2
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 1
-								end
-							end
+							totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
 						end
-						self.FrontalArmor = (blocks/count)/10
+						self.FrontalArmor = totalarmor/#ArmorValTable
 						--REAR
 						count = 0
 						blocks = 0
@@ -329,135 +209,11 @@ function ENT:Think()
 								end
 							end
 						end
-						table.sort( ArmorValTable, function(a, b) return a < b end )
+						totalarmor = 0
 						for i=1, #ArmorValTable do
-							if i <= #ArmorValTable*0.25 then
-								count = count+4
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 76
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 72
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 68
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 64
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 60
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 56
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 52
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 48
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 44
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 40
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 36
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 32
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 28
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 24
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 20
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 4
-								end
-							elseif i <= #ArmorValTable*0.50 then
-								count = count+2
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 38
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 36
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 34
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 32
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 30
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 28
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 26
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 24
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 22
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 20
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 18
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 14
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 10
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 6
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 4
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 2
-								end
-							elseif i >= #ArmorValTable*0.9 then
-							else
-								count = count+1
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 19
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 18
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 17
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 15
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 14
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 13
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 11
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 10
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 9
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 7
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 6
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 5
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 4
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 3
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 2
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 1
-								end
-							end
+							totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
 						end
-						self.RearArmor = (blocks/count)/10
+						self.RearArmor = totalarmor/#ArmorValTable
 						--LEFT
 						count = 0
 						blocks = 0
@@ -474,135 +230,11 @@ function ENT:Think()
 								end
 							end
 						end
-						table.sort( ArmorValTable, function(a, b) return a < b end )
+						totalarmor = 0
 						for i=1, #ArmorValTable do
-							if i <= #ArmorValTable*0.25 then
-								count = count+4
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 76
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 72
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 68
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 64
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 60
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 56
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 52
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 48
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 44
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 40
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 36
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 32
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 28
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 24
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 20
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 4
-								end
-							elseif i <= #ArmorValTable*0.50 then
-								count = count+2
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 38
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 36
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 34
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 32
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 30
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 28
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 26
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 24
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 22
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 20
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 18
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 14
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 10
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 6
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 4
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 2
-								end
-							elseif i >= #ArmorValTable*0.9 then
-							else
-								count = count+1
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 19
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 18
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 17
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 15
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 14
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 13
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 11
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 10
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 9
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 7
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 6
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 5
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 4
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 3
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 2
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 1
-								end
-							end
+							totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
 						end
-						local LeftArmor = (blocks/count)/10
+						local LeftArmor = totalarmor/#ArmorValTable
 						--RIGHT
 						count = 0
 						blocks = 0
@@ -619,137 +251,16 @@ function ENT:Think()
 								end
 							end
 						end
-						table.sort( ArmorValTable, function(a, b) return a < b end )
+						totalarmor = 0
 						for i=1, #ArmorValTable do
-							if i <= #ArmorValTable*0.25 then
-								count = count+4
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 76
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 72
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 68
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 64
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 60
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 56
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 52
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 48
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 44
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 40
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 36
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 32
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 28
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 24
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 20
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 4
-								end
-							elseif i <= #ArmorValTable*0.50 then
-								count = count+2
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 38
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 36
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 34
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 32
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 30
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 28
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 26
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 24
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 22
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 20
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 18
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 14
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 10
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 6
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 4
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 2
-								end
-							elseif i >= #ArmorValTable*0.9 then
-							else
-								count = count+1
-								if ArmorValTable[i]>2200 then
-									blocks = blocks + 19
-								elseif ArmorValTable[i]>1750 then
-									blocks = blocks + 18
-								elseif ArmorValTable[i]>1560 then
-									blocks = blocks + 17
-								elseif ArmorValTable[i]>1250 then
-									blocks = blocks + 16
-								elseif ArmorValTable[i]>1000 then
-									blocks = blocks + 15
-								elseif ArmorValTable[i]>840 then
-									blocks = blocks + 14
-								elseif ArmorValTable[i]>670 then
-									blocks = blocks + 13
-								elseif ArmorValTable[i]>480 then
-									blocks = blocks + 12
-								elseif ArmorValTable[i]>380 then
-									blocks = blocks + 11
-								elseif ArmorValTable[i]>320 then
-									blocks = blocks + 10
-								elseif ArmorValTable[i]>250 then
-									blocks = blocks + 9
-								elseif ArmorValTable[i]>180 then
-									blocks = blocks + 8
-								elseif ArmorValTable[i]>160 then
-									blocks = blocks + 7
-								elseif ArmorValTable[i]>120 then
-									blocks = blocks + 6
-								elseif ArmorValTable[i]>80 then
-									blocks = blocks + 5
-								elseif ArmorValTable[i]>60 then
-									blocks = blocks + 4
-								elseif ArmorValTable[i]>40 then
-									blocks = blocks + 3
-								elseif ArmorValTable[i]>25 then
-									blocks = blocks + 2
-								elseif ArmorValTable[i]>15 then
-									blocks = blocks + 1
-								end
-							end
+							totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
 						end
-						local RightArmor = (blocks/count)/10
+						local RightArmor = totalarmor/#ArmorValTable
 						self.SideArmor = (RightArmor+LeftArmor)/2
-						local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
+
+						local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
+						armormult = Total/420
+						--local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
 
 						local shellvol = ((100*0.0393701)^2)*(100*0.0393701*13)
 						local shells = 0
@@ -823,7 +334,8 @@ function ENT:Think()
 						end
 
 						local speedmult = math.Clamp((1+((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05))*0.5,0,1.5)
-						armormult = armormult+0.1
+						--local speedmult = math.Clamp((((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05)),0,2)
+						--armormult = armormult+0.1
 						--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
 
 						local KEPen = {0}
@@ -864,32 +376,80 @@ function ENT:Think()
 								ShotsPerSecond = 1/(self.Guns[g].DakCooldown+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
 								DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
 							end
-							if self.Guns[g]:GetClass() == "dak_tegun" or self.Guns[g]:GetClass() == "dak_temachinegun" then
-								if self.Guns[g]:GetClass() == "dak_temachinegun" then self.Guns[g].ShellLengthExact = 6.5 end
+							if self.Guns[g]:GetClass() == "dak_tegun" then
 								ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
 								DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
 							end
-							local shellmult = 1
-							--if self.Guns[g].ShellLengthMult then shellmult = self.Guns[g].ShellLengthMult end
-							TotalDPS = TotalDPS + DPS*shellmult
+							if self.Guns[g]:GetClass() == "dak_temachinegun" then
+								self.Guns[g].ShellLengthExact = 6.5
+								ShotsPerSecond = 1/self.Guns[g].DakCooldown
+								DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+							end
+							TotalDPS = TotalDPS + DPS
 						end
 						table.sort( KEPen, function( a, b ) return a > b end )
 						table.sort( CEPen, function( a, b ) return a > b end )
-						local Pen = math.max(KEPen[1],CEPen[1])		
-						local firepowermult = Pen*0.003
-						if Pen>500 then firepowermult = math.log(Pen,500)+0.5 end
+						local Pen = math.max(KEPen[1],CEPen[1])	
+						self.MaxPen = Pen
+						local firepowermult = Pen/420
 						local altfirepowermult = 0.005*TotalDPS^1
 						--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
 						math.max(0.1,firepowermult)
 						firepowermult = (altfirepowermult+firepowermult)*0.5
 						firepowermult = math.max((self.DakMaxHealth/25000),firepowermult)
+
+						local GunHandlingMult
+						if self.TurretControls[1] then
+							local MainTurret = self.TurretControls[1]
+							local TotalTurretMass = 0 
+							for i=1, #self.TurretControls do
+								TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
+							end
+							local StabMults = 0
+							local FCSMults = 0
+							local GunPercentage
+							local RotationSpeeds = 0
+							local HullMounts = 0
+							for i=1, #self.TurretControls do
+								GunPercentage = self.TurretControls[i].GunMass/TotalTurretMass
+								if self.TurretControls[i]:GetFCS() == true then
+									self.ColdWar = 1
+									FCSMults = FCSMults + 1.5 * GunPercentage
+								end
+								if self.TurretControls[i]:GetStabilizer() == true then
+									self.ColdWar = 1
+									StabMults = StabMults + 1.25 * GunPercentage
+								elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
+									StabMults = StabMults + 1 * GunPercentage
+								else
+									StabMults = StabMults + 0.75 * GunPercentage
+								end
+								RotationSpeeds = RotationSpeeds + self.TurretControls[i].RotationSpeed * GunPercentage
+								if self.TurretControls[i]:GetYawMin()<=45 and self.TurretControls[i]:GetYawMax()<=45 then
+									HullMounts = HullMounts + GunPercentage
+								end
+							end
+							GunHandlingMult = math.log(RotationSpeeds*100,100)
+							GunHandlingMult = GunHandlingMult * math.Max(FCSMults,1)
+							GunHandlingMult = GunHandlingMult * StabMults
+							GunHandlingMult = GunHandlingMult * (1-(0.50*HullMounts))
+						end
+
 						self.FirepowerMult = math.Round(math.max((self.DakMaxHealth/25000),firepowermult),2)
 						self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
 						self.ArmorMult = math.Round(math.max(0.1,armormult),2)
+						self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
 						self.AmmoCost = math.Round(ammocosts)
 						self.ComponentCost = math.Round(self.PreCost)
-						self.PreCost = (self.PreCost + ammocosts + 100)*0.5
-						self.PreCost = self.PreCost*(armormult*speedmult*firepowermult)
+						--self.PreCost = (self.PreCost + ammocosts + 100)*0.5
+						--self.PreCost = (self.PreCost + ammocosts)
+
+						self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.TextoliteWeight+self.ERAWeight
+						local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
+						armormult = armormult * ArmorTypeMult
+						self.PreCost = armormult*50 + self.FirepowerMult*50
+						--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
+						self.PreCost = self.PreCost*((self.SpeedMult+self.GunHandlingMult)*0.5)
 						self.Cost = math.Round(self.PreCost)
 					end
 				end
@@ -951,9 +511,7 @@ function ENT:Think()
 					       		hash[v] = true
 					   		end
 						end
-
-						self.Modern = 0
-						self.ColdWar = 0
+						
 						self.Contraption={}
 						self.Ammoboxes={}
 						self.TurretControls={}
@@ -963,9 +521,19 @@ function ENT:Think()
 						self.Fuel={}
 						self.Tread={}
 						self.ERA={}
+						self.Seats={}
 						self.PreCost = 0
 						self.GunCount = 0
 						self.MachineGunCount = 0
+
+						self.RHAWeight = 0
+						self.CHAWeight = 0
+						self.HHAWeight = 0
+						self.NERAWeight = 0
+						self.TextoliteWeight = 0
+						self.ERAWeight = 0
+
+
 						local CurrentRes
 						for i=1, #res do
 							CurrentRes = res[i]
@@ -1023,6 +591,9 @@ function ENT:Think()
 									CurrentRes.DakContraption = res
 									CurrentRes.DakCore = self
 								end
+								if CurrentRes:GetClass()=="prop_vehicle_prisoner_pod" then
+									self.Seats[#self.Seats+1]=CurrentRes
+								end
 								if CurrentRes:GetClass()=="dak_crew" then
 									self.Crew[#self.Crew+1]=CurrentRes
 								end
@@ -1050,40 +621,48 @@ function ENT:Think()
 									if CurrentRes.EntityMods==nil then
 									else
 										if CurrentRes.EntityMods.CompositeType == nil or CurrentRes.IsComposite == nil then
+											
 											if CurrentRes.EntityMods.ArmorType == nil then
 												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()
+												self.RHAWeight = self.RHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 											else
 												if CurrentRes.EntityMods.ArmorType == "RHA" then
 													CurrentRes.EntityMods.Density = 7.8125
 													CurrentRes.EntityMods.ArmorMult = 1
 													CurrentRes.EntityMods.Ductility = 1
 													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()
+													self.RHAWeight = self.RHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 												if CurrentRes.EntityMods.ArmorType == "CHA" then
 													CurrentRes.EntityMods.Density = 7.8125
 													CurrentRes.EntityMods.ArmorMult = 1
 													CurrentRes.EntityMods.Ductility = 1.5
 													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*0.75
+													self.CHAWeight = self.CHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 												if CurrentRes.EntityMods.ArmorType == "HHA" then
 													CurrentRes.EntityMods.Density = 7.8125
 													CurrentRes.EntityMods.ArmorMult = 1
 													CurrentRes.EntityMods.Ductility = 1.5
 													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.25
+													self.HHAWeight = self.HHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 											end
 										else
 											if CurrentRes.EntityMods.CompositeType == "NERA" then
 												self.Modern = 1
 												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.75
+												self.NERAWeight = self.NERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1
 												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.5
+												self.TextoliteWeight = self.TextoliteWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "ERA" then
 												self.ColdWar = 1
 												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.25
+												self.ERAWeight = self.ERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												self.ERA[#self.ERA+1]=CurrentRes
 											end
 										end
@@ -1431,7 +1010,7 @@ function ENT:Think()
 					--####################OPTIMIZE ZONE END###################--
 
 							if self.DakHealth then
-								if (self.DakHealth <= 0 or #self.Crew <= 0) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
+								if (self.DakHealth <= 0 or #self.Crew <= 0 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
 									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
 
 									self.RemoveTurretList = {}
@@ -1581,6 +1160,7 @@ function ENT:Think()
 				else
 					if self.DeathTime then
 						if self.DeathTime+30<CurTime() then
+							self.AutoRemoved = true
 							for j=1, #self.RemoveTurretList do
 								if IsValid(self.RemoveTurretList[j]) then
 									self.RemoveTurretList[j]:Remove()
@@ -1719,6 +1299,30 @@ function ENT:OnRemove()
 		for i = 1, table.Count(self.HitBox) do
 			self.HitBox[i].DakPooled = 0
 			self.HitBox[i].DakController = nil
+		end
+	end
+	if gmod.GetGamemode().Name=="DakTank" then
+		if self.LastDamagedBy:IsValid() and self.AutoRemoved~=true then
+			if self.LastDamagedBy:Team() ~= self.DakOwner:Team() then
+				local PointsGained
+				if Era == "WWII" then
+					PointsGained = 5
+				elseif Era == "Cold War" then
+					PointsGained = 10
+				else
+					PointsGained = 20
+				end
+				net.Start( "DT_killnotification" )
+					net.WriteInt(2, 32)
+					net.WriteInt(PointsGained, 32)
+				net.Send( self.LastDamagedBy )
+				if not(self.LastDamagedBy:InVehicle()) then self.LastDamagedBy:addPoints( PointsGained ) end
+				if self.DakOwner:Team() == 1 then
+					SetGlobalFloat("DakTankRedResources", GetGlobalFloat("DakTankRedResources") - 5 )
+				elseif self.DakOwner:Team() == 2 then
+					SetGlobalFloat("DakTankBlueResources", GetGlobalFloat("DakTankBlueResources") - 5 )
+				end
+			end
 		end
 	end
 end
