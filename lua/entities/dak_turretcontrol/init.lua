@@ -82,6 +82,10 @@ local function angNumClamp(ang,clamp1,clamp2)
 	return Angle(math.Clamp(ang.pitch,clamp1,clamp2),math.Clamp(ang.yaw,clamp1,clamp2),math.Clamp(ang.roll,clamp1,clamp2))
 end
 
+local function angNumRotationSpeedClamp(ang,clamp1,clamp2,elevationmult)
+	return Angle(math.Clamp(ang.pitch,clamp1*elevationmult,clamp2*elevationmult),math.Clamp(ang.yaw,clamp1,clamp2),math.Clamp(ang.roll,clamp1,clamp2))
+end
+
 local function heading(originpos,originangle,pos)
 	pos = WorldToLocal(Vector(pos[1],pos[2],pos[3]),Angle(0,0,0),Vector(originpos[1],originpos[2],originpos[3]),Angle(originangle[1],originangle[2],originangle[3]))
 
@@ -130,7 +134,7 @@ function ENT:Initialize()
 
 	
 
-	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]", "Lock" })
+	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]", "Lock", "CamTrace2 [RANGER]", "Active2" })
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.ErrorTime = CurTime()
@@ -145,6 +149,7 @@ function ENT:Initialize()
  	self.Locked = 0
  	self.Off = true
  	self.OffTicks = 0
+ 	self.Accel = 0
 
  	self.ShortStop = self:GetShortStopStabilizer()
 	self.Stabilizer = self:GetStabilizer()
@@ -163,7 +168,7 @@ end
 
 function ENT:Think()
 	local RotMult = 0.1
-
+	
 	if #self.DakContraption > 0 then
 		local GunEnt = self.Inputs.Gun.Value
 
@@ -179,7 +184,17 @@ function ENT:Think()
 				local Depression = self:GetDepression()
 				local YawMin = self:GetYawMin()
 				local YawMax = self:GetYawMax()
+				local RotationMult = self:GetRotationSpeedMultiplier()
+				if self.FCS ~= true then
+					if self:GetTable().Inputs.CamTrace.Path and self:GetTable().Inputs.CamTrace.Path[1].Entity:GetClass()~="gmod_wire_cameracontroller" then self.FCS = true end
+					if self:GetTable().Inputs.CamTrace2.Path and self:GetTable().Inputs.CamTrace2.Path[1].Entity:GetClass()~="gmod_wire_cameracontroller" then self.FCS = true end
+					if self.FCS == true then
+						self.DakOwner:ChatPrint("Custom FCS E2 detected, gun handling multiplier affected.")
+					end
+					self.CustomFCS = true
+				end
 				self.DakActive = self.Inputs.Active.Value
+				self.DakActive2 = self.Inputs.Active2.Value
 				local DakTurret = self.Inputs.Turret.Value
 				if #self.DakTurretMotors > 0 then
 					for i = 1, #self.DakTurretMotors do
@@ -255,6 +270,8 @@ function ENT:Think()
 					end
 				end
 				if IsValid(self.DakGun) then
+					local BasePlate = self.Controller:GetParent():GetParent()
+					if self.LastVel == nil then self.LastVel = 0 end
 					if self.DakParented == 0 then
 						if self.SentError == 0 then
 							self.SentError = 1
@@ -280,10 +297,14 @@ function ENT:Think()
 							end
 						end
 					end
-					self.RotationSpeed = RotMult * (15000/self.GunMass) * (66/(1/engine.TickInterval()))
-					self.DakCamTrace = self.Inputs.CamTrace.Value
+					self.RotationSpeed = RotMult * (15000/self.GunMass) * (66/(1/engine.TickInterval())) * RotationMult
+					if self.DakActive > 0 then
+						self.DakCamTrace = self.Inputs.CamTrace.Value
+					end
+					if self.DakActive2 > 0 then
+						self.DakCamTrace = self.Inputs.CamTrace2.Value
+					end
 					if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
-						
 						if not(self.Inertia) then
 							self.Inertia = Angle(self.DakGun:GetPhysicsObject():GetInertia().y,self.DakGun:GetPhysicsObject():GetInertia().z,self.DakGun:GetPhysicsObject():GetInertia().x)
 						end
@@ -298,13 +319,11 @@ function ENT:Think()
 								self.TurAng = self:WorldToLocalAngles(DakTurret:GetAngles())-Angle(0,self.YawDiff,0)
 							end
 						end
-						local BasePlate = self.Controller:GetParent():GetParent()
-						if self.DakActive > 0 then
+						
+						if self.DakActive > 0 or self.DakActive2 > 0 then
 							if self.Inputs.Lock.Value > 0 then
 								self.LastAngles = self:GetAngles()
 								if self.LastPos == nil then self.LastPos = BasePlate:GetPos() end
-								self.LastVel = Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)
-								self.LastPos = BasePlate:GetPos()
 								if IsValid(self.DakCore.Base) then
 									if self.Locked == 0 then
 										constraint.Weld( self.DakGun, self.DakCore.Base, 0, 0, 0, false, false )
@@ -323,11 +342,8 @@ function ENT:Think()
 					        		self.Locked = 0
 					        	end
 
-					        	
-
-
 								if self.DakCamTrace then
-										if self.FCS==true then
+										if self.FCS==true and not(self.CustomFCS==true) then
 											local traceFCS = {}
 												traceFCS.start = self.DakCamTrace.StartPos
 												traceFCS.endpos = self.DakCamTrace.StartPos + self.DakCamTrace.Normal*9999999999
@@ -336,7 +352,7 @@ function ENT:Think()
 
 											if self.NoTarTicks == nil then self.NoTarTicks = 0 end
 
-											local G = -physenv.GetGravity().z
+											local G = math.abs(physenv.GetGravity().z)
 											local Caliber = GunEnt.DakMaxHealth
 											local ShellType = GunEnt.DakShellAmmoType
 											local V = GunEnt.DakShellVelocity * (GunEnt:GetPropellant()*0.01)
@@ -351,32 +367,30 @@ function ENT:Think()
 											    VelLoss = ((Drag/(ShellMass/2))*39.37)
 											end
 
-											local Tar = nil
-											local CamTarPos = nil
-											if PreCamTrace.Entity then
-												Tar = PreCamTrace.Entity
-												CamTarPos = PreCamTrace.HitPos
+											if PreCamTrace.Entity and not(PreCamTrace.Entity:IsWorld()) or self.Tar==nil then
+												self.Tar = PreCamTrace.Entity
+												self.CamTarPos = PreCamTrace.HitPos
 											else 
 												self.NoTarTicks = self.NoTarTicks + 1 
 											end
 											if self.NoTarTicks>15 then
-												Tar = PreCamTrace.Entity
+												self.Tar = PreCamTrace.Entity
 												self.NoTarTicks = 0
 											end
 
 											local TarPos0
 											local GunPos=GunEnt:GetPos()
-											if Tar and Tar:IsValid() then
-												TarPos0 = Tar:GetPos() + (CamTarPos-Tar:GetPos())
+											if self.Tar and self.Tar:IsValid() then
+												TarPos0 = self.Tar:GetPos() + (self.CamTarPos-self.Tar:GetPos())
 											else
 												TarPos0 = PreCamTrace.HitPos
 											end
 
-											local TarVel = Tar:GetVelocity()
-											if Tar:GetParent() and Tar:GetParent():IsValid() then
-											    TarVel=Tar:GetParent():GetVelocity()
-											    if Tar:GetParent():GetParent() and Tar:GetParent():GetParent():IsValid() then
-											        TarVel=Tar:GetParent():GetParent():GetVelocity()
+											local TarVel = self.Tar:GetVelocity()
+											if self.Tar:GetParent() and self.Tar:GetParent():IsValid() then
+											    TarVel=self.Tar:GetParent():GetVelocity()
+											    if self.Tar:GetParent():GetParent() and self.Tar:GetParent():GetParent():IsValid() then
+											        TarVel=self.Tar:GetParent():GetParent():GetVelocity()
 											    end
 											end
 											local SelfVel = self.Controller:GetParent():GetParent():GetVelocity()
@@ -396,11 +410,10 @@ function ENT:Think()
 											    X = Vector(Diff.x,Diff.y,0):Length()
 											    Y = Diff.z
 											    Disc = VelValue^4 - G*(G*X*X + 2*Y*VelValue*VelValue)
-											    Ang = math.atan(-(VelValue^2 - math.sqrt(Disc))/(G*X))*57.2958
-											    TravelTime = X/(VelValue*(math.cos(Ang)*57.2958))
+											    Ang = math.atan(-(VelValue^2 - math.sqrt(Disc))/(G*X))*57.29577951
+											    TravelTime = X/(VelValue*math.cos(Ang*0.017453293))
 											    VelLossFull = VelLoss * TravelTime 
-											end 
-
+											end
 											local traceFCS2 = {}
 												traceFCS2.start = GunPos
 												traceFCS2.endpos = GunPos + Angle(Ang,Diff:Angle().yaw,0):Forward()*1000
@@ -414,19 +427,16 @@ function ENT:Think()
 											self.CamTrace = util.TraceLine( trace )
 										end
 									
-
+									self.Shake = Angle(0,0,0)
 									if self.Stabilizer==false then
 										local X = math.abs(self.DakGun:OBBMins().x)+math.abs(self.DakGun:OBBMaxs().x)
 										local Y = math.abs(self.DakGun:OBBMins().y)+math.abs(self.DakGun:OBBMaxs().y)
 										local Z = math.abs(self.DakGun:OBBMins().z)+math.abs(self.DakGun:OBBMaxs().z)
 
 										if self.LastPos == nil then self.LastPos = BasePlate:GetPos() end
-										if self.LastVel == nil then self.LastVel = 0 end
-										if self.LastAccel == nil then self.LastAccel = 0 end
 										if self.LastAngles == nil then self.LastAngles = Angle(0,0,0) end
 										local Speed = Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)									
 
-										local Shake = Angle()
 										if self.ShakeAmpX == nil then self.ShakeAmpX = 0 end
 										self.ShakeAmpX = self.ShakeAmpX + math.random(-1,1)
 										if self.ShakeAmpX > 5 then self.ShakeAmpX = 5 end
@@ -441,40 +451,19 @@ function ENT:Think()
 										if self.ShakeAmpY > 0 then self.ShakeAmpY = self.ShakeAmpY - 0.05 end 
 										if self.ShakeAmpY < 0 then self.ShakeAmpY = self.ShakeAmpY + 0.05 end 
 
-										if IsValid(DakTurret) then
-											if self.ShortStop==false then
-												Shake = (Angle(10000*self.ShakeAmpX*self.Inertia.pitch,1000*self.ShakeAmpY*self.TurInertia.yaw,0) * (Speed * 0.1)) + (Angle(((self:GetAngles().pitch - self.LastAngles.pitch)*-250000),0,0)*self.Inertia.pitch)
-											else
-												Shake = Angle(10000*self.ShakeAmpX*self.Inertia.pitch,1000*self.ShakeAmpY*self.TurInertia.yaw,0) * (Speed * 0.05)
-											end
+										if self.ShortStop==false then
+											Shake = (Angle(1*self.ShakeAmpX,0.1*self.ShakeAmpY,0) * (Speed * 0.025))+Angle(-self.Accel*25,0,0)--+(Angle(((self:GetAngles().pitch - self.LastAngles.pitch))*5,0,0))
 										else
-											if self.ShortStop==false then
-												Shake = (Angle(10000*self.ShakeAmpX*self.Inertia.pitch,1000*self.ShakeAmpY*self.Inertia.yaw,0) * (Speed * 0.1)) + (Angle(((self:GetAngles().pitch - self.LastAngles.pitch)*-250000),0,0)*self.Inertia.pitch)
-											else
-												Shake = Angle(10000*self.ShakeAmpX*self.Inertia.pitch,1000*self.ShakeAmpY*self.Inertia.yaw,0) * (Speed * 0.05)
-											end
+											Shake = Angle(1*self.ShakeAmpX,0.1*self.ShakeAmpY,0) * (Speed * 0.0125)
 										end
+										self.Shake = Shake
 										self.LastAngles = self:GetAngles()
-										self.LastVel = Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)
-										self.LastPos = BasePlate:GetPos()
-										if self.Off == false then
-											
-											if IsValid(DakTurret) then
-												self:ApplyForce(self.DakGun, Angle(Shake,0,0))
-												if (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll > 1 or (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll < -1 then
-													self:ApplyForce(DakTurret, Angle(Shake.yaw,0,0))
-												else
-													self:ApplyForce(DakTurret, Angle(0,Shake.yaw,0))
-												end
-											else
-												self:ApplyForce(self.DakGun, Shake)
-											end
-										end
 									end
 
 							    	GunDir = normalizedVector(self.CamTrace.HitPos - self.CamTrace.StartPos+(self.CamTrace.StartPos-self.DakGun:GetPos()))
-							    	self.GunAng = angnorm(angClamp(self.GunAng - angNumClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-								    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(self.GunAng):Forward())
+							    	self.GunAng = angnorm(angClamp(self.GunAng - angNumRotationSpeedClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed, 1), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
+								    self.GunAng = self.GunAng
+								    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(  angClamp(self.GunAng+self.Shake,Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1))  ):Forward())
 								    Ang = Angle(Ang.pitch*1250,Ang.yaw*1250,Ang.roll*1250)
 								    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
 								    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
@@ -544,11 +533,23 @@ function ENT:Think()
 							self.Off = true
 							self.OffTicks = 0
 							if self.LastPos == nil then self.LastPos = BasePlate:GetPos() end
-							self.LastVel = Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)
-							self.LastPos = BasePlate:GetPos()
 							self.LastAngles = self:GetAngles()
 						end
 					end
+					if self.SpeedTable == nil then self.SpeedTable = {} end
+					if self.LastAccel == nil then self.LastAccel = 0 end
+
+					self.SpeedTable[#self.SpeedTable+1] = (Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)-self.LastVel)
+					if #self.SpeedTable >= 5 then
+						 table.remove( self.SpeedTable, 1 )
+					end
+					local totalspeed = 0
+					for i=1, #self.SpeedTable do
+						totalspeed = totalspeed + self.SpeedTable[i]
+					end
+					self.Accel = (totalspeed/#self.SpeedTable)
+					self.LastVel = Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)
+					self.LastPos = BasePlate:GetPos()
 				end
 			end
 		end

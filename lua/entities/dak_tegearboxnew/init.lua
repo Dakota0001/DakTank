@@ -23,7 +23,6 @@ function ENT:Initialize()
 	self.DakSpeed = 2
 	--local phys = self:GetPhysicsObject()
 	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "CarTurning", "ForwardFacingEntity [ENTITY]" })
-	self.Soundtime = CurTime()
  	self.Perc = 0
  	self.TurnPerc = 0
  	self.YawAng = Angle(0,self:GetAngles().yaw,0)
@@ -89,7 +88,6 @@ function ENT:Think()
  	self.FrontWheelHeight = self:GetFrontWheelHeight()
  	self.RearWheelHeight = self:GetRearWheelHeight()
 
- 	self.ForwardBias = self:GetForwardBias()
  	if CurTime()>=self.SlowThinkTime+1 then
  		self.SlowThinkTime=CurTime()
 
@@ -212,10 +210,6 @@ function ENT:Think()
 			effectdata:SetMagnitude(.5)
 			effectdata:SetScale(1)
 			util.Effect("daktedamage", effectdata)
-			if CurTime()>=self.Soundtime+3 then
-				--self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.4, 6)
-				self.Soundtime=CurTime()
-			end
 		end
 		if self.DakHealth<=(self.DakMaxHealth*0.60) and self.DakHealth>(self.DakMaxHealth*0.40) then
 			local effectdata = EffectData()
@@ -225,10 +219,6 @@ function ENT:Think()
 			effectdata:SetMagnitude(.5)
 			effectdata:SetScale(2)
 			util.Effect("daktedamage", effectdata)
-			if CurTime()>=self.Soundtime+2 then
-				--self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.5, 6)
-				self.Soundtime=CurTime()
-			end
 		end
 		if self.DakHealth<=(self.DakMaxHealth*0.40) and self.DakHealth>(self.DakMaxHealth*0.20) then
 			local effectdata = EffectData()
@@ -238,10 +228,6 @@ function ENT:Think()
 			effectdata:SetMagnitude(.5)
 			effectdata:SetScale(3)
 			util.Effect("daktedamage", effectdata)
-			if CurTime()>=self.Soundtime+1 then
-				--self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.6, 6)
-				self.Soundtime=CurTime()
-			end
 		end
 		if self.DakHealth<=(self.DakMaxHealth*0.20) then
 			local effectdata = EffectData()
@@ -251,10 +237,6 @@ function ENT:Think()
 			effectdata:SetMagnitude(.5)
 			effectdata:SetScale(4)
 			util.Effect("daktedamage", effectdata)
-			if CurTime()>=self.Soundtime+0.5 then
-				--self:EmitSound( "daktanks/shock.wav", 60, math.Rand(60,150), 0.75, 6)
-				self.Soundtime=CurTime()
-			end
 		end
 		self.SparkTime=CurTime()
 	end
@@ -398,8 +380,8 @@ function ENT:Think()
 		        	if self.Brakes>0 then
 						self.Perc = 0
 			        	--DO BRAKES BOTH
-			        	self.RightBrake = 2
-			        	self.LeftBrake = 2
+			        	self.RightBrake = 1
+			        	self.LeftBrake = 1
 			        	self.LeftForce = 0
 			        	self.RightForce = 0
 			        	if #self.DakTankCore.Motors>0 then
@@ -508,7 +490,7 @@ function ENT:Think()
 			       			self.LeftBrake = 0
 							if self.Speed < G1Speed then
 								--self.Gear = 1
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*4),0,8*math.abs(self.Perc))
+								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*5.3),0,8*math.abs(self.Perc))
 								self.CurTopSpeed = G1Speed
 								self.LastTopSpeed = 0
 								self.MaxSpeedDif = G1Speed
@@ -518,7 +500,7 @@ function ENT:Think()
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*4),0,8*math.abs(self.Perc)) )
 							elseif self.Speed < G2Speed then
 								--self.Gear = 2
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc))
+								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*5.5),0,4*math.abs(self.Perc))
 								self.CurTopSpeed = G2Speed
 								self.LastTopSpeed = G1Speed
 								self.MaxSpeedDif = G2Speed - self.TopSpeed*0.1
@@ -528,7 +510,7 @@ function ENT:Think()
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc)) )
 							elseif self.Speed < G3Speed then
 								--self.Gear = 3
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*2),0,2*math.abs(self.Perc))
+								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*1.5),0,2*math.abs(self.Perc))
 								self.CurTopSpeed = G3Speed
 								self.LastTopSpeed = G2Speed
 								self.MaxSpeedDif = G3Speed - G2Speed
@@ -538,7 +520,7 @@ function ENT:Think()
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2),0,2*math.abs(self.Perc)) )
 							else
 								--self.Gear = 4
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc))
+								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*1.125),0,2*math.abs(self.Perc))
 								self.CurTopSpeed = G4Speed
 								self.LastTopSpeed = G3Speed
 								self.MaxSpeedDif = G4Speed - G3Speed
@@ -547,6 +529,12 @@ function ENT:Think()
 								--LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc)) )
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc)) )
 							end
+
+							
+							local newspeed = self.phy:GetVelocity():Length()*(0.277778*0.254)
+
+							--print(newspeed-self.Speed)
+
 							if self.Speed > 0 and self.Speed < G1Speed and not(self.Gear == 1) then
 								self.Gear = 1 
 								if #self.DakTankCore.Motors>0 then
@@ -622,7 +610,8 @@ function ENT:Think()
 
 
 						if self.CarTurning==0 then
-							local TorqueBoost = 0.15*self.HPperTon 
+							local TorqueBoost = 0.15*self.HPperTon
+
 							if self.MoveLeft>0 or self.MoveRight>0 then
 								if self.turnperc < 1 then
 									self.turnperc = self.turnperc + 0.02
@@ -648,30 +637,68 @@ function ENT:Think()
 							self.MoveRightOld = self.MoveRight
 							self.MoveLeftOld = self.MoveLeft
 							if self.Speed > 10 then
+								--[[
+								if self.Perc>=0 then
+									if self.LastYaw-self.base:GetAngles().yaw > 0.01 then
+										self.LBoost = 0
+										self.RBoost = 1
+									end
+									if self.LastYaw-self.base:GetAngles().yaw < -0.01 then
+										self.LBoost = 1
+										self.RBoost = 0
+									end
+								else
+									if self.LastYaw-self.base:GetAngles().yaw > 0.01 then
+										self.LBoost = 1
+										self.RBoost = 0
+									end
+									if self.LastYaw-self.base:GetAngles().yaw < -0.01 then
+										self.LBoost = 0
+										self.RBoost = 1
+									end
+								end
+								]]--
+
 								if self.MoveLeft>0 and self.MoveRight==0 then
 									if self.MoveReverse>0 then 
 										self.RightForce = 0
-										self.RightBrake = 1
+										if math.abs(self.LastYaw-self.base:GetAngles().yaw)<1 then
+											self.RightBrake = 1
+										else
+											self.RightBrake = 0
+										end
+										self.LeftForce = 0
 			        					self.LeftBrake = 0
-										self.LeftForce = self.LeftForce*2
 									else
 										self.LeftForce = 0
 										self.RightBrake = 0
-			        					self.LeftBrake = 1
-										self.RightForce = self.RightForce*2
+										if math.abs(self.LastYaw-self.base:GetAngles().yaw)<1 then
+											self.LeftBrake = 1
+										else
+											self.LeftBrake = 0
+										end
+										self.RightForce = 0
 									end
 								end
 								if self.MoveRight>0 and self.MoveLeft==0 then
 									if self.MoveReverse>0 then 
 										self.LeftForce = 0
 										self.RightBrake = 0
-			        					self.LeftBrake = 1
-										self.RightForce = self.RightForce*2
+										if math.abs(self.LastYaw-self.base:GetAngles().yaw)<1 then
+											self.LeftBrake = 1
+										else
+											self.LeftBrake = 0
+										end
+										self.RightForce = 0
 									else
 										self.RightForce = 0
-										self.RightBrake = 1
+										if math.abs(self.LastYaw-self.base:GetAngles().yaw)<1 then
+											self.RightBrake = 1
+										else
+											self.RightBrake = 0
+										end
+										self.LeftForce = 0
 			        					self.LeftBrake = 0
-										self.LeftForce = self.LeftForce*2
 									end
 								end
 							else
@@ -684,7 +711,6 @@ function ENT:Think()
 											end
 										end
 									end
-									--print(math.abs(self.LastYaw-self.base:GetAngles().yaw))
 								end
 								--OLD FORMULA
 								--LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.Turn*self:GetRight()*10*math.Clamp( (0.13*(1/self.GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
@@ -731,7 +757,7 @@ function ENT:Think()
 								end
 							end
 						end
-						self.LastYaw = self.base:GetAngles().yaw
+						--self.LastYaw = self.base:GetAngles().yaw
 					end
 		        else
 		        	self.LeftForce = 0
@@ -750,7 +776,7 @@ function ENT:Think()
 							end
 						end
 					end
-		        	self.LastYaw = self.base:GetAngles().yaw
+		        	--self.LastYaw = self.base:GetAngles().yaw
 		        end
 
 				local GravxTicks = physenv.GetGravity()*(1/66.66)
@@ -762,7 +788,6 @@ function ENT:Think()
 				local RidePos
 				local SuspensionForce
 				local SuspensionAbsorb
-				local TotalRideHeight = 0
 				local lastchange
 				local lastvel
 				local AbsorbForce
@@ -786,10 +811,10 @@ function ENT:Think()
 				local up = ForwardEnt:GetUp()
 				--local selfpos = self:GetPos()
 				local CurTraceHitPos
-
 				local weightforce = self.PhysicalMass*-GravxTicks --note, raise tick interval if I increase interval
-				local wheelforce = weightforce/(WheelsPerSide*2)
-				local wheelweightforce = physenv.GetGravity()
+				local wheelforce = weightforce/((WheelsPerSide-2)*2)
+
+				local wheelweightforce = Vector(0,0,(self.AddonMass/(WheelsPerSide*2))*-9.8*engine.TickInterval())
 				if self.LastWheelsPerSide ~= WheelsPerSide then
 			        for i=1, WheelsPerSide do
 						self.RightChanges[i] = 0
@@ -799,131 +824,101 @@ function ENT:Think()
 					end
 				end
 				local traceline = util.TraceLine
-				--local dist = Distance
 				local TickInt = (1/66.66)
 				local clamp = math.Clamp
 				local abs = math.abs
 				local max = math.Max
-				local Val = self.ForwardBias
 				if self.RightGroundedLast == nil then self.RightGroundedLast = WheelsPerSide end
 				if self.LeftGroundedLast == nil then self.LeftGroundedLast = WheelsPerSide end
+				local CurRideHeight = 0
 				local RightGrounded = 0
 				local LeftGrounded = 0
+				local BrakeMult = 0
 				--Right side
 				for i=1, WheelsPerSide do
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*self.SideDist)
+					if i==WheelsPerSide then 
+						CurRideHeight = RideHeight - FrontWheelRaise
+					elseif i==1 then
+						CurRideHeight = RideHeight - RearWheelRaise
+					else
+						CurRideHeight = RideHeight
+					end
 					trace = {
-						start = Pos + up*RideHeight,
-						endpos = Pos + up*-RideHeight,
+						start = Pos + up*(-CurRideHeight+100),
+						endpos = Pos + up*-CurRideHeight,
 						mask = MASK_SOLID_BRUSHONLY
 					}
 					CurTrace = traceline( trace )
 					CurTraceHitPos = CurTrace.HitPos
-					CurTraceDist = CurTrace.StartPos:Distance(CurTraceHitPos)
+					CurTraceDist = (CurTrace.StartPos-(CurTraceHitPos)):Length()
 					lastchange = (CurTraceDist-self.RightChanges[i])/TickInt
 					self.RightChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.RightPosChanges[i]
-					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.RightBrake,0.01),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
+					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.RightBrake,0.0),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
 					self.RightPosChanges[i] = CurTraceHitPos
-					if i==WheelsPerSide then 
-						RidePos = (CurTraceDist - RideHeight + FrontWheelRaise) - RideHeight
-					elseif i==1 then
-						RidePos = (CurTraceDist - RideHeight + RearWheelRaise) - RideHeight
-					else
-						RidePos = (CurTraceDist - RideHeight) - RideHeight
-					end
-					if RidePos/RideLimit < 0 then
-						SuspensionForce = Vector(0,0, math.Max((wheelforce + ((clamp((RidePos*RidePos)/RideLimit,0,10)*SuspensionForceMult)*wheelforce)).z,0) )
-						if self.LeftGroundedLast+self.RightGroundedLast == 0 then
-							FrictionForce = 0
-						else
-							FrictionForce = (self.PhysicalMass*-GravxTicks).z * 0.9/(self.LeftGroundedLast+self.RightGroundedLast) --0.9 coef of rubber on pavement
-						end
+					RidePos = (CurTraceDist - 100)
+					if RidePos<-0.1 then
 						AbsorbForce = 0.2 *(5/WheelsPerSide)
-						RightGrounded = RightGrounded + 1
-						SuspensionForce = SuspensionForce * (1 + ((((i-1)/(WheelsPerSide-1))*(Val*2))-(Val)))
+						FrictionForce = 2*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 					else
-						SuspensionForce = wheelweightforce--*clamp(RidePos/RideLimit,-1,1)
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
-					
-					TotalRideHeight = TotalRideHeight + clamp(RidePos/RideLimit,-1,1)
+					SuspensionForce = ((500*(100/RideLimit))*Vector(0,0,1)*math.abs(RidePos)) + wheelweightforce
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
-					lastvelnorm = lastvel:GetNormalized()
+					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
-					self.phy:ApplyForceOffset( self.TimeMult*(forward*3*self.RightForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
+					--print(FrictionForceFinal) ----------FIX ISSUE WHERE THIS SPERGS OUT AND GETS BIG FOR NO RAISIN
+					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*self.RightForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
-				self.RightGroundedLast = RightGrounded 
+
 				--Left side
 				for i=1, WheelsPerSide do
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*self.SideDist)
+					if i==WheelsPerSide then 
+						CurRideHeight = RideHeight - FrontWheelRaise
+					elseif i==1 then
+						CurRideHeight = RideHeight - RearWheelRaise
+					else
+						CurRideHeight = RideHeight
+					end
+
 					trace = {
-						start = Pos + up*RideHeight,
-						endpos = Pos + up*-RideHeight,
+						start = Pos + up*(-CurRideHeight+100),
+						endpos = Pos + up*-CurRideHeight,
 						mask = MASK_SOLID_BRUSHONLY
 					}
 					CurTrace = traceline( trace )
 					CurTraceHitPos = CurTrace.HitPos
-					CurTraceDist = CurTrace.StartPos:Distance(CurTraceHitPos)
+					CurTraceDist = (CurTrace.StartPos-(CurTraceHitPos)):Length()
 					lastchange = (CurTraceDist-self.LeftChanges[i])/TickInt
 					self.LeftChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.LeftPosChanges[i]
-					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.LeftBrake,0.01),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
+					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.LeftBrake,0.0),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
 					self.LeftPosChanges[i] = CurTraceHitPos
-					if i==WheelsPerSide then 
-						RidePos = (CurTraceDist - RideHeight + FrontWheelRaise) - RideHeight
-					elseif i==1 then
-						RidePos = (CurTraceDist - RideHeight + RearWheelRaise) - RideHeight
-					else
-						RidePos = (CurTraceDist - RideHeight) - RideHeight
-					end
+					RidePos = (CurTraceDist - 100)
 
-					if RidePos/RideLimit < 0 then
-						SuspensionForce = Vector(0,0,math.Max((wheelforce + ((clamp((RidePos*RidePos)/RideLimit,0,10)*SuspensionForceMult)*wheelforce)).z,0))
-						if self.LeftGroundedLast+self.RightGroundedLast == 0 then
-							FrictionForce = 0
-						else
-							FrictionForce = (self.PhysicalMass*-GravxTicks).z * 0.9/(self.LeftGroundedLast+self.RightGroundedLast) --0.9 coef of rubber on pavement
-						end
+					if RidePos<-0.1 then
 						AbsorbForce = 0.2 *(5/WheelsPerSide)
-						LeftGrounded = LeftGrounded + 1
-						SuspensionForce = SuspensionForce * (1 + ((((i-1)/(WheelsPerSide-1))*(Val*2))-(Val)))
+						FrictionForce = 2*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 					else
-						SuspensionForce = wheelweightforce--*clamp(RidePos/RideLimit,-1,1)
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
-					
-					TotalRideHeight = TotalRideHeight + clamp(RidePos/RideLimit,-1,1)
+					SuspensionForce = ((500*(100/RideLimit))*Vector(0,0,1)*math.abs(RidePos)) + wheelweightforce
+
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
-					lastvelnorm = lastvel:GetNormalized()
+					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
-					self.phy:ApplyForceOffset( self.TimeMult*(forward*3*self.LeftForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
-					--if i==1 then print(self.TimeMult*(forward*3*self.LeftForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z)))) end
+					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*self.LeftForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
-				self.LeftGroundedLast = LeftGrounded 
-				--self.phy:ApplyForceCenter(self.TimeMult*(-Vector(0,0,self.PhysicalMass*self.base:GetVelocity().z) * 0.05 ))
-				--print(self.TimeMult)
 				
 				self.LastWheelsPerSide = WheelsPerSide
-				
 
-		        if #self.Prev>=5 then 
-		        	table.remove( self.Prev, 1 ) 
-		        end
-		        self.NewPos = self:GetPos()
-		        self.Dist = self.NewPos:Distance(self.PrevPos)
-		        self.PrevPos = self.NewPos
-
-		        table.insert(self.Prev,1, ( (self.Dist/(CurTime()-self.Time))/(84480/1609) ) )
-		        self.Time = CurTime()
-		        if #self.Prev>=5 then 
-		        	self.Speed = ((self.Prev[1]+self.Prev[2]+self.Prev[3]+self.Prev[4]+self.Prev[5])/5)*3.6*5
-		        else
-		        	self.Speed = 0
-		        end
+		        self.Speed = Vector(0,0,0):Distance(self.phy:GetVelocity())*(0.277778*0.254)
 		    end
+		    self.LastYaw = self:GetParent():GetParent():GetAngles().yaw
 		else
 			--NO TANKCORE, INACTIVE
 	    end
@@ -948,8 +943,8 @@ function ENT:Think()
 			end
 		end
 	end
-	
-    self:NextThink(CurTime()+self.TimeScale)
+	--print(self.TimeScale)
+    self:NextThink(CurTime())
     return true
 end
 

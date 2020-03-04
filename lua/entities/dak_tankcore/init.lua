@@ -156,127 +156,214 @@ function ENT:Think()
 		if IsValid(self:GetParent()) then
 			if IsValid(self:GetParent():GetParent()) then
 				self.Base = self:GetParent():GetParent()
-				if self.PreCost and self.PreCost>0 then
-					if not(self.PreCostTimerFirst) then
-						self.PreCostTimerFirst = CurTime()
-						self.PreCostTimer = 0	
+				if not(self.PreCostTimerFirst) then
+					self.PreCostTimerFirst = CurTime()
+					self.PreCostTimer = 0	
+				end
+				self.PreCostTimer = CurTime() - self.PreCostTimerFirst
+				if self.PreCostTimer > 5 and self.CanSpawn ~= true and IsValid(self.Gearbox) then
+					self.CanSpawn = true
+
+					local ArmorVal1 = 0
+					local addpos
+					local count = 0
+					local blocks = 0
+					local gunhit = 0
+					local gearhit = 0
+					local HitCrit = 0
+					local forward = Angle(0,self.Gearbox:GetAngles().yaw,0):Forward()
+					local right = Angle(0,self.Gearbox:GetAngles().yaw,0):Right()
+					local up = Angle(0,self.Gearbox:GetAngles().yaw,0):Up()
+					--FRONT
+					local startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
+					local basesize = self:GetParent():GetParent():OBBMaxs()
+					local distance = math.Max(basesize.x, basesize.y, basesize.z)*3
+					local ArmorValTable = {}
+					for i=1, 25 do
+						for j=1, 25 do
+							addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll())
+							if IsValid(ent) then
+								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
+									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+								end
+							end
+						end
 					end
-					self.PreCostTimer = CurTime() - self.PreCostTimerFirst
-					if self.PreCostTimer > 5 and self.CanSpawn ~= true and IsValid(self.Gearbox) then
-						self.CanSpawn = true
+					local totalarmor = 0
+					table.sort( ArmorValTable, function(a, b) return a < b end )
+					local Ave = 0
+					local AveCount = 0
+					for i=1, #ArmorValTable do
+						totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
+						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
+							Ave = Ave + math.min(ArmorValTable[i],2200)
+							AveCount = AveCount + 1
+						end
+					end
+					self.FrontalArmor = Ave/AveCount
+					--REAR
+					count = 0
+					blocks = 0
+					HitCrit = 0
+					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
+					ArmorValTable = {}
+					for i=1, 50 do
+						for j=1, 50 do
+							addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos, "AP", 75, player.GetAll())
+							if IsValid(ent) then
+								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
+									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+								end
+							end
+						end
+					end
+					Ave = 0
+					AveCount = 0
+					totalarmor = 0
+					for i=1, #ArmorValTable do
+						totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
+						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
+							Ave = Ave + math.min(ArmorValTable[i],2200)
+							AveCount = AveCount + 1
+						end
+					end
+					self.RearArmor = Ave/AveCount
+					--LEFT
+					count = 0
+					blocks = 0
+					HitCrit = 0
+					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
+					ArmorValTable = {}
+					for i=1, 25 do
+						for j=1, 25 do
+							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos, "AP", 75, player.GetAll())
+							if IsValid(ent) then
+								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
+									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+								end
+							end
+						end
+					end
+					Ave = 0
+					AveCount = 0
+					totalarmor = 0
+					for i=1, #ArmorValTable do
+						totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
+						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
+							Ave = Ave + math.min(ArmorValTable[i],2200)
+							AveCount = AveCount + 1
+						end
+					end
+					local LeftArmor = Ave/AveCount
+					--RIGHT
+					count = 0
+					blocks = 0
+					HitCrit = 0
+					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
+					ArmorValTable = {}
+					for i=1, 25 do
+						for j=1, 25 do
+							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos, "AP", 75, player.GetAll())
+							if IsValid(ent) then
+								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
+									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+								end
+							end
+						end
+					end
+					Ave = 0
+					AveCount = 0
+					totalarmor = 0
+					for i=1, #ArmorValTable do
+						totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
+						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
+							Ave = Ave + math.min(ArmorValTable[i],2200)
+							AveCount = AveCount + 1
+						end
+					end
+					local RightArmor = Ave/AveCount
+					self.SideArmor = (RightArmor+LeftArmor)/2
 
-						local ArmorVal1 = 0
-						local addpos
-						local count = 0
-						local blocks = 0
-						local gunhit = 0
-						local gearhit = 0
-						local forward = Angle(0,self.Gearbox:GetAngles().yaw,0):Forward()
-						local right = Angle(0,self.Gearbox:GetAngles().yaw,0):Right()
-						local up = Angle(0,self.Gearbox:GetAngles().yaw,0):Up()
-						--FRONT
-						local startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
-						local ArmorValTable = {}
-						for i=1, 25 do
-							for j=1, 25 do
-								addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
-								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos+forward*500, startpos+addpos-forward*500, "AP", 75, player.GetAll())
-								if IsValid(ent) then
-									if gunhit==0 and ent.Controller == self then
-										ArmorValTable[#ArmorValTable+1] = ArmorVal1
-									end
-								end
-							end
-						end
-						local totalarmor = 0
-						for i=1, #ArmorValTable do
-							totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
-						end
-						self.FrontalArmor = totalarmor/#ArmorValTable
-						--REAR
-						count = 0
-						blocks = 0
-						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
-						ArmorValTable = {}
-						for i=1, 50 do
-							for j=1, 50 do
-								addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
-								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos-forward*500, startpos+addpos+forward*500, "AP", 75, player.GetAll())
-								if IsValid(ent) then
-									if gunhit==0 and ent.Controller == self then
-										ArmorValTable[#ArmorValTable+1] = ArmorVal1
-									end
-								end
-							end
-						end
-						totalarmor = 0
-						for i=1, #ArmorValTable do
-							totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
-						end
-						self.RearArmor = totalarmor/#ArmorValTable
-						--LEFT
-						count = 0
-						blocks = 0
-						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
-						ArmorValTable = {}
-						for i=1, 25 do
-							for j=1, 25 do
-								addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
-								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos+right*500, startpos+addpos-right*500, "AP", 75, player.GetAll())
-								if IsValid(ent) then
-									if gunhit==0 and ent.Controller == self then
-										ArmorValTable[#ArmorValTable+1] = ArmorVal1
-									end
-								end
-							end
-						end
-						totalarmor = 0
-						for i=1, #ArmorValTable do
-							totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
-						end
-						local LeftArmor = totalarmor/#ArmorValTable
-						--RIGHT
-						count = 0
-						blocks = 0
-						startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
-						ArmorValTable = {}
-						for i=1, 25 do
-							for j=1, 25 do
-								addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
-								ArmorVal1, ent, _, _, gunhit, gearhit = DTGetArmorRecurse(startpos+addpos-right*500, startpos+addpos+right*500, "AP", 75, player.GetAll())
-								if IsValid(ent) then
-									if gunhit==0 and ent.Controller == self then
-										ArmorValTable[#ArmorValTable+1] = ArmorVal1
-									end
-								end
-							end
-						end
-						totalarmor = 0
-						for i=1, #ArmorValTable do
-							totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
-						end
-						local RightArmor = totalarmor/#ArmorValTable
-						self.SideArmor = (RightArmor+LeftArmor)/2
+					local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
+					armormult = Total/420
+					--local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
+					--print(self.FrontalArmor)
+					--print(self.SideArmor)
+					--print(self.RearArmor)
+					local shellvol = ((100*0.0393701)^2)*(100*0.0393701*13)
+					local shells = 0
+					local ammocosts = 0
 
-						local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
-						armormult = Total/420
-						--local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
 
-						local shellvol = ((100*0.0393701)^2)*(100*0.0393701*13)
-						local shells = 0
-						local ammocosts = 0
-						local hasAPFSDS = 0
-						local hasHEATFS = 0
-						local hasAPDS = 0
-						local hasHVAP = 0
-						local hasATGM = 0
-						for k=1, #self.Ammoboxes do 
-							local boxname = (string.Split( self.Ammoboxes[k].DakAmmoType, "" ))
+					for i = 1, #self.Guns do
+						self.Guns[i].AmmoBoxes = {}
+						for j = 1, #self.Ammoboxes do
+							if not(self.Ammoboxes[j].DakAmmoType == "Flamethrower Fuel") then
+								if self.Guns[i].DakGunType == "Short Cannon" or self.Guns[i].DakGunType == "Short Autoloader" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "S" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Cannon" or self.Guns[i].DakGunType == "Autoloader" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "C" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Long Cannon" or self.Guns[i].DakGunType == "Long Autoloader" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "L" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Howitzer" or self.Guns[i].DakGunType == "Autoloading Howitzer" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "H" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "M" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Mortar" or self.Guns[i].DakGunType == "Autoloading Mortar" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "G" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Smoke Launcher" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "S" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "L" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Flamethrower" then
+									if self.Ammoboxes[j].DakAmmoType == "Flamethrower Fuel" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "MG" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "G" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Grenade Launcher" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "G" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "L" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "HMG" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "H" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][3] == "G" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Autocannon" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "A" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								else
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "C" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								end
+							end
+						end
+					end
+
+					local MaxPen = 0
+					for i = 1, #self.Guns do
+						for j = 1, #self.Guns[i].AmmoBoxes do
+							local boxname = (string.Split( self.Guns[i].AmmoBoxes[j].DakAmmoType, "" ))
 							local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
 							local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
 							local name2 = boxname[#boxname-5]..boxname[#boxname-4]
-							--check longest to shortest names, with if then ifelse then else
-							local name 
+							local name
 							if name6 == "APFSDS" or name6 == "HEATFS" then
 								name = name6
 							elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
@@ -284,174 +371,182 @@ function ENT:Think()
 							elseif name2 == "AP" or name2 == "HE" then
 								name = name2
 							end
-
 							if name == "APFSDS" then
-								hasAPFSDS = 1
-							end
-							if name == "HEATFS" then
-								hasHEATFS = 1
-							end
-							if name == "APDS" then
-								hasAPDS = 1
-							end
-							if name == "HVAP" then
-								hasHVAP = 1
-							end
-							if name == "ATGM" then
-								hasATGM = 1
-							end
-
-							shells = self.Ammoboxes[k]:GetPhysicsObject():GetVolume()/shellvol
-							local cost = 0
-							if name == "HE" then
-								cost = shells * 0.1
-							elseif name == "HESH" then
-								cost = shells * 0.26
-							elseif name == "AP" or name == "APHE" or name == "HEAT" then
-								if name == "HEAT" and self.ColdWar == 1 then
-									cost = shells * 0.41
-								else
-									cost = shells * 0.25
-								end
-							elseif name == "HVAP" then
-								cost = shells * 0.38
+								if self.Guns[i].BaseDakShellPenetration*7.8*0.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*7.8*0.5 end
 							elseif name == "APDS" then
-								cost = shells * 0.42
-							elseif name == "HEATFS" or name == "APFSDS" then
-								if name == "HEATFS" and self.ColdWar == 1 and self.Modern == 0 then
-									cost = shells * 0.62
-								else
-									cost = shells * 1
-								end
+								if self.Guns[i].BaseDakShellPenetration*1.67 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.67 end
+							elseif name == "HVAP" then
+								if self.Guns[i].BaseDakShellPenetration*1.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.5 end
+							elseif name == "AP" then
+								if self.Guns[i].BaseDakShellPenetration > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration end
+							elseif name == "APHE" then
+								if self.Guns[i].BaseDakShellPenetration*0.825 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*0.825 end
 							elseif name == "ATGM" then
-								if self.ColdWar == 1 and self.Modern == 0 then
-									cost = shells * 1.0
-								else
-									cost = shells * 1.25
-								end
-							end
-							ammocosts = ammocosts + cost
-						end
-
-						local speedmult = math.Clamp((1+((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05))*0.5,0,1.5)
-						--local speedmult = math.Clamp((((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05)),0,2)
-						--armormult = armormult+0.1
-						--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
-
-						local KEPen = {0}
-						local CEPen = {0}
-						local DPS = 0
-						local TotalDPS = 0
-						local ShotsPerSecond
-						for g=1, #self.Guns do 
-							if hasAPFSDS==1 then
-								KEPen[#KEPen+1] = self.Guns[g].BaseDakShellPenetration*7.8*0.5
-							elseif hasAPDS==1 then
-								KEPen[#KEPen+1] = self.Guns[g].BaseDakShellPenetration*1.67
-							elseif hasHVAP==1 then	
-								KEPen[#KEPen+1] = self.Guns[g].BaseDakShellPenetration*1.5
-							else
-								KEPen[#KEPen+1] = self.Guns[g].BaseDakShellPenetration
-							end
-							if hasATGM==1 then
 								if self.Modern==1 then
-									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*6.40
+									if self.Guns[i].DakMaxHealth*6.40 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40 end
 								else
-									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*6.40*0.45
+									if self.Guns[i].DakMaxHealth*6.40*0.45 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40*0.45 end
 								end
-							elseif hasHEATFS==1 then
+							elseif name == "HEATFS" then
 								if self.Modern==1 then
-									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*5.4
+									if self.Guns[i].DakMaxHealth*5.4 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4 end
 								else
-									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*5.40*0.658
+									if self.Guns[i].DakMaxHealth*5.40*0.658 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.40*0.658 end
 								end
-							else
-								if self.ColdWar==1 then
-									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*5.4*0.431
+							elseif name == "HEAT" then
+								if self.Modern==1 then
+									if self.Guns[i].DakMaxHealth*5.4*0.431 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4*0.431 end
 								else
-									CEPen[#CEPen+1] = self.Guns[g].DakMaxHealth*1.20
+									if self.Guns[i].DakMaxHealth*1.20 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.20 end
 								end
+							elseif name == "HESH" then
+								if self.Guns[i].DakMaxHealth*1.25 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.25 end
+							elseif name == "HE" then
+								if self.Guns[i].DakMaxHealth*0.2 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*0.2 end
 							end
-							if self.Guns[g]:GetClass() == "dak_teautogun" then
-								ShotsPerSecond = 1/(self.Guns[g].DakCooldown+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
-								DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
-							end
-							if self.Guns[g]:GetClass() == "dak_tegun" then
-								ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
-								DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
-							end
-							if self.Guns[g]:GetClass() == "dak_temachinegun" then
-								self.Guns[g].ShellLengthExact = 6.5
-								ShotsPerSecond = 1/self.Guns[g].DakCooldown
-								DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
-							end
-							TotalDPS = TotalDPS + DPS
 						end
-						table.sort( KEPen, function( a, b ) return a > b end )
-						table.sort( CEPen, function( a, b ) return a > b end )
-						local Pen = math.max(KEPen[1],CEPen[1])	
-						self.MaxPen = Pen
-						local firepowermult = Pen/420
-						local altfirepowermult = 0.005*TotalDPS^1
-						--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
-						math.max(0.1,firepowermult)
-						firepowermult = (altfirepowermult+firepowermult)*0.5
-						firepowermult = math.max((self.DakMaxHealth/25000),firepowermult)
-
-						local GunHandlingMult
-						if self.TurretControls[1] then
-							local MainTurret = self.TurretControls[1]
-							local TotalTurretMass = 0 
-							for i=1, #self.TurretControls do
-								TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
-							end
-							local StabMults = 0
-							local FCSMults = 0
-							local GunPercentage
-							local RotationSpeeds = 0
-							local HullMounts = 0
-							for i=1, #self.TurretControls do
-								GunPercentage = self.TurretControls[i].GunMass/TotalTurretMass
-								if self.TurretControls[i]:GetFCS() == true then
-									self.ColdWar = 1
-									FCSMults = FCSMults + 1.5 * GunPercentage
-								end
-								if self.TurretControls[i]:GetStabilizer() == true then
-									self.ColdWar = 1
-									StabMults = StabMults + 1.25 * GunPercentage
-								elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
-									StabMults = StabMults + 1 * GunPercentage
-								else
-									StabMults = StabMults + 0.75 * GunPercentage
-								end
-								RotationSpeeds = RotationSpeeds + self.TurretControls[i].RotationSpeed * GunPercentage
-								if self.TurretControls[i]:GetYawMin()<=45 and self.TurretControls[i]:GetYawMax()<=45 then
-									HullMounts = HullMounts + GunPercentage
-								end
-							end
-							GunHandlingMult = math.log(RotationSpeeds*100,100)
-							GunHandlingMult = GunHandlingMult * math.Max(FCSMults,1)
-							GunHandlingMult = GunHandlingMult * StabMults
-							GunHandlingMult = GunHandlingMult * (1-(0.50*HullMounts))
-						end
-
-						self.FirepowerMult = math.Round(math.max((self.DakMaxHealth/25000),firepowermult),2)
-						self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
-						self.ArmorMult = math.Round(math.max(0.1,armormult),2)
-						self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
-						self.AmmoCost = math.Round(ammocosts)
-						self.ComponentCost = math.Round(self.PreCost)
-						--self.PreCost = (self.PreCost + ammocosts + 100)*0.5
-						--self.PreCost = (self.PreCost + ammocosts)
-
-						self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.TextoliteWeight+self.ERAWeight
-						local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
-						armormult = armormult * ArmorTypeMult
-						self.PreCost = armormult*50 + self.FirepowerMult*50
-						--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
-						self.PreCost = self.PreCost*((self.SpeedMult+self.GunHandlingMult)*0.5)
-						self.Cost = math.Round(self.PreCost)
 					end
+
+
+					for k=1, #self.Ammoboxes do 
+						local boxname = (string.Split( self.Ammoboxes[k].DakAmmoType, "" ))
+						local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+						local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+						local name2 = boxname[#boxname-5]..boxname[#boxname-4]
+						--check longest to shortest names, with if then ifelse then else
+						local name 
+						if name6 == "APFSDS" or name6 == "HEATFS" then
+							name = name6
+						elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
+							name = name4
+						elseif name2 == "AP" or name2 == "HE" then
+							name = name2
+						end
+						shells = self.Ammoboxes[k]:GetPhysicsObject():GetVolume()/shellvol
+						local cost = 0
+						if name == "HE" then
+							cost = shells * 0.1
+						elseif name == "HESH" then
+							cost = shells * 0.26
+						elseif name == "AP" or name == "APHE" or name == "HEAT" then
+							if name == "HEAT" and self.ColdWar == 1 then
+								cost = shells * 0.41
+							else
+								cost = shells * 0.25
+							end
+						elseif name == "HVAP" then
+							cost = shells * 0.38
+						elseif name == "APDS" then
+							cost = shells * 0.42
+						elseif name == "HEATFS" or name == "APFSDS" then
+							if name == "HEATFS" and self.ColdWar == 1 and self.Modern == 0 then
+								cost = shells * 0.62
+							else
+								cost = shells * 1
+							end
+						elseif name == "ATGM" then
+							if self.ColdWar == 1 and self.Modern == 0 then
+								cost = shells * 1.0
+							else
+								cost = shells * 1.25
+							end
+						end
+						ammocosts = ammocosts + cost
+					end
+
+					local speedmult = math.Clamp((1+((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05))*0.5,0,1.5)
+					--local speedmult = math.Clamp((((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05)),0,2)
+					--armormult = armormult+0.1
+					--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
+
+					local DPS = 0
+					local TotalDPS = 0
+					local ShotsPerSecond
+					for g=1, #self.Guns do 
+						if self.Guns[g]:GetClass() == "dak_teautogun" then
+							ShotsPerSecond = 1/(self.Guns[g].DakCooldown+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
+							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+						end
+						if self.Guns[g]:GetClass() == "dak_tegun" then
+							ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
+							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+						end
+						if self.Guns[g]:GetClass() == "dak_temachinegun" then
+							self.Guns[g].ShellLengthExact = 6.5
+							ShotsPerSecond = 1/self.Guns[g].DakCooldown
+							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+						end
+						TotalDPS = TotalDPS + DPS
+					end
+					self.MaxPen = MaxPen
+					local firepowermult = MaxPen/420
+					local altfirepowermult = 0.005*TotalDPS^1
+					--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
+					math.max(0.1,firepowermult)
+					firepowermult = (altfirepowermult+firepowermult)*0.5
+					firepowermult = math.max((self.DakMaxHealth/25000),firepowermult)
+
+					local GunHandlingMult = 0
+					if self.TurretControls[1] then
+						local MainTurret = self.TurretControls[1]
+						local TotalTurretMass = 0 
+						for i=1, #self.TurretControls do
+							TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
+						end
+						local StabMults = 0
+						local FCSMults = 0
+						local GunPercentage
+						local RotationSpeeds = 0
+						local HullMounts = 0
+						for i=1, #self.TurretControls do
+							GunPercentage = self.TurretControls[i].GunMass/TotalTurretMass
+							if self.TurretControls[i]:GetFCS() == true then
+								self.ColdWar = 1
+								FCSMults = FCSMults + 1.5 * GunPercentage
+							end
+							if self.TurretControls[i]:GetStabilizer() == true then
+								self.ColdWar = 1
+								StabMults = StabMults + 1.25 * GunPercentage
+							elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
+								StabMults = StabMults + 1 * GunPercentage
+							else
+								StabMults = StabMults + 0.75 * GunPercentage
+							end
+							RotationSpeeds = RotationSpeeds + self.TurretControls[i].RotationSpeed * GunPercentage
+							if self.TurretControls[i]:GetYawMin()<=45 and self.TurretControls[i]:GetYawMax()<=45 then
+								HullMounts = HullMounts + GunPercentage
+							end
+						end
+						GunHandlingMult = math.log(RotationSpeeds*100,100)
+						GunHandlingMult = GunHandlingMult * math.Max(FCSMults,1)
+						GunHandlingMult = GunHandlingMult * StabMults
+						GunHandlingMult = GunHandlingMult * (1-(0.50*HullMounts))
+					end
+
+					--print("Highest Armor: "..(armormult*50))
+					--print("Side Armor "..self.SideArmor)
+					--print("Side Armor Mult: "..(self.SideArmor/100))
+					--print("Adjusted Armor: "..((armormult*50)*(self.SideArmor/100)))
+
+					self.FirepowerMult = math.Round(math.max((self.DakMaxHealth/25000),firepowermult),2)
+					self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
+					self.ArmorMult = math.Round(math.max(0.1,armormult),2)
+					self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
+
+					self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.TextoliteWeight+self.ERAWeight
+					local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
+
+					self.ArmorMult = self.ArmorMult * ArmorTypeMult
+					self.PreCost = self.ArmorMult*50 + self.FirepowerMult*50
+					--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
+					self.PreCost = self.PreCost*((self.SpeedMult+self.GunHandlingMult)*0.5)
+					self.Cost = math.Round(self.PreCost)
+
+
+					local curera = "WWII"
+					if self.ColdWar == 1 then curera = "Cold War" end
+					if self.Modern == 1 then curera = "Modern" end
+					self.DakOwner:ChatPrint("Tank Analysis Complete: "..self.Cost.." point "..curera.." tank. Right click tank core with spawner for detailed readout.")
 				end
 
 				if not(self.Dead) then
@@ -522,7 +617,6 @@ function ENT:Think()
 						self.Tread={}
 						self.ERA={}
 						self.Seats={}
-						self.PreCost = 0
 						self.GunCount = 0
 						self.MachineGunCount = 0
 
@@ -606,7 +700,6 @@ function ENT:Think()
 											CurrentRes.EntityMods.CompCEMult = 18.4
 											CurrentRes.EntityMods.DakName = "NERA"
 											self.Modern = 1
-											self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.75
 										else
 											if CurrentRes.EntityMods.CompositeType == nil then
 												CurrentRes.EntityMods.CompositeType = "NERA"
@@ -614,7 +707,6 @@ function ENT:Think()
 												CurrentRes.EntityMods.CompCEMult = 18.4
 												CurrentRes.EntityMods.DakName = "NERA"
 												self.Modern = 1
-												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.75
 											end
 										end
 									end
@@ -623,57 +715,42 @@ function ENT:Think()
 										if CurrentRes.EntityMods.CompositeType == nil or CurrentRes.IsComposite == nil then
 											
 											if CurrentRes.EntityMods.ArmorType == nil then
-												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()
 												self.RHAWeight = self.RHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 											else
 												if CurrentRes.EntityMods.ArmorType == "RHA" then
 													CurrentRes.EntityMods.Density = 7.8125
 													CurrentRes.EntityMods.ArmorMult = 1
 													CurrentRes.EntityMods.Ductility = 1
-													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()
 													self.RHAWeight = self.RHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 												if CurrentRes.EntityMods.ArmorType == "CHA" then
 													CurrentRes.EntityMods.Density = 7.8125
 													CurrentRes.EntityMods.ArmorMult = 1
 													CurrentRes.EntityMods.Ductility = 1.5
-													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*0.75
 													self.CHAWeight = self.CHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 												if CurrentRes.EntityMods.ArmorType == "HHA" then
 													CurrentRes.EntityMods.Density = 7.8125
 													CurrentRes.EntityMods.ArmorMult = 1
 													CurrentRes.EntityMods.Ductility = 1.5
-													self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.25
 													self.HHAWeight = self.HHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 											end
 										else
 											if CurrentRes.EntityMods.CompositeType == "NERA" then
 												self.Modern = 1
-												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.75
 												self.NERAWeight = self.NERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1
-												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.5
 												self.TextoliteWeight = self.TextoliteWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "ERA" then
 												self.ColdWar = 1
-												self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.25
 												self.ERAWeight = self.ERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												self.ERA[#self.ERA+1]=CurrentRes
 											end
 										end
-									end
-								else
-									if CurrentRes:GetClass()=="dak_teautogun"  then
-										self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*1.5
-									elseif CurrentRes:GetClass()=="dak_temachinegun" then
-										self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()*0.5
-									else
-										self.PreCost = self.PreCost + CurrentRes:GetPhysicsObject():GetMass()
 									end
 								end
 								Mass = Mass + CurrentRes:GetPhysicsObject():GetMass()
@@ -695,13 +772,6 @@ function ENT:Think()
 
 								---END TEST
 							end
-						end
-						if self.Modern == 1 then
-							self.PreCost = math.Round(self.PreCost*0.001)
-						elseif self.ColdWar == 1 then
-							self.PreCost = math.Round(self.PreCost*0.001)
-						else
-							self.PreCost = math.Round(self.PreCost*0.001)
 						end
 						--PrintTable(self.Contraption)
 						self.CrewCount = #self.Crew

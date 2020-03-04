@@ -10,10 +10,10 @@ function ENT:SetupDataTables()
 	--Mobility
 	self:NetworkVar( "Float", 	0, "GearRatio", 	{ KeyName = "gearratio", 	Edit = {category = "Mobility",title = "Top Speed Bias", type = "Float", order = 1, min = 50, max = 100 } } )
 	if self:GetGearRatio()==0 then self:SetGearRatio( 100 ) end
-	self:NetworkVar( "Float", 	4, "RideLimit", 	{ KeyName = "ridelimit", 	Edit = {category = "Mobility",title = "Suspension Give", type = "Float", order = 5, min = 1, max = 1000 } } )
-	if self:GetRideLimit()==0 then self:SetRideLimit( 100 ) end
-	self:NetworkVar( "Float", 	14, "ForwardBias", 	{ KeyName = "forwardbias", 	Edit = {category = "Mobility",title = "Suspension Forward Bias", type = "Float", order = 6, min = -1, max = 1 } } )
-	if self:GetForwardBias()==0 then self:SetForwardBias( 0 ) end
+	self:NetworkVar( "Float", 	4, "RideLimit", 	{ KeyName = "ridelimit", 	Edit = {category = "Mobility",title = "Suspension Give", type = "Float", order = 5, min = 50, max = 1000 } } )
+	if self:GetRideLimit()==0 then self:SetRideLimit( 250 ) end
+	--self:NetworkVar( "Float", 	14, "ForwardBias", 	{ KeyName = "forwardbias", 	Edit = {category = "Mobility",title = "Suspension Forward Bias", type = "Float", order = 6, min = -1, max = 1 } } )
+	--if self:GetForwardBias()==0 then self:SetForwardBias( 0 ) end
 	--Dimensions
 	self:NetworkVar( "Float", 	1, "TrackLength", 	{ KeyName = "tracklength", 	Edit = {category = "Dimensions",title = "Track Length", type = "Float", order = 2, min = 0, max = 1000 } } )
 	if self:GetTrackLength()==0 then self:SetTrackLength( 200 ) end

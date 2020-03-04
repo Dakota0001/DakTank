@@ -126,7 +126,7 @@ function ENT:Draw()
 	--print(WheelColor)
 	wheelmodel:SetColor(Color( 255, 0, 0, 255 ))
  	--check for base and forward ent are not null
- 	if ForwardEnt:IsValid() then
+ 	if ForwardEnt:IsValid() and Base:IsValid() then
 	 	if (self.RightAngTable == nil and WheelsPerSide>0) or self.LastWheelsPerSide~=WheelsPerSide then
 			self.RightAngTable = {}
 			self.RightPosTable = {}

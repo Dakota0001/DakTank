@@ -47,7 +47,7 @@ function ENT:Initialize()
 	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "MaxCooldown", "Ammo", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
  	self.Soundtime = CurTime()
- 	self.SlowThinkTime = CurTime()
+ 	self.SlowThinkTime = 0
  	self.MidThinkTime = CurTime()
  	self.LastFireTime = CurTime()
  	self.CurrentAmmoType = 1
@@ -64,6 +64,38 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
+	if not(self:GetModel() == self.DakModel) then
+		self:SetModel(self.DakModel)
+		--self:PhysicsInit(SOLID_VPHYSICS)
+		self:SetMoveType(MOVETYPE_VPHYSICS)
+		self:SetSolid(SOLID_VPHYSICS)
+	end
+	if IsValid(self.DakTankCore) then
+		if self.ScalingFinished == nil then
+			local ScalingGun = 0
+			if self.DakModel == "models/daktanks/mortar100mm2.mdl" then ScalingGun = 1 end
+			if self.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then ScalingGun = 1 end
+			if self.DakModel == "models/daktanks/smokelauncher100mm.mdl" then ScalingGun = 1 end
+			if self.DakModel == "models/daktanks/machinegun100mm.mdl" then ScalingGun = 1 end
+			if ScalingGun == 1 then
+				local Caliber = self.DakCaliber
+				self:SetModelScale(1)
+				self:SetModelScale( self:GetModelScale() * (Caliber/100), 0 )
+				self:EnableCustomCollisions( true )
+				self:Activate()
+				self.ScalingFinished = true
+			else
+				self.ScalingFinished = true
+			end
+			if self:GetParent():IsValid() == false then
+				self.DakOwner:ChatPrint("Parenting Error on "..self.DakName..". Please reparent, make sure the gate is parented to the aimer prop and the gun is parented to the gate.")
+			else
+				if self:GetParent():GetParent():IsValid() == false then
+					self.DakOwner:ChatPrint("Parenting Error on "..self.DakName..". Please reparent, make sure the gate is parented to the aimer prop and the gun is parented to the gate.")
+				end
+			end
+		end
+	end
 	if CurTime()>=self.SlowThinkTime+1 then
 		--Machine Guns
 		if self.DakGunType == "MG" then
@@ -201,13 +233,6 @@ function ENT:Think()
 			end
 		end
 
-		if not(self:GetModel() == self.DakModel) then
-			self:SetModel(self.DakModel)
-			--self:PhysicsInit(SOLID_VPHYSICS)
-			self:SetMoveType(MOVETYPE_VPHYSICS)
-			self:SetSolid(SOLID_VPHYSICS)
-		end
-
 		if self.DakHealth > self.DakMaxHealth then
 			self.DakHealth = self.DakMaxHealth
 		end
@@ -221,7 +246,7 @@ function ENT:Think()
 		self.SlowThinkTime = CurTime()
 	end
 
-	if CurTime()>=self.MidThinkTime+0.33 then
+	if CurTime()>=self.MidThinkTime+0.33 and self.BaseDakShellDamage ~= nil then
 		self:DakTEAmmoCheck()
 
 		WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
@@ -272,7 +297,7 @@ function ENT:DakTEAmmoCheck()
 		WireLib.TriggerOutput(self, "Penetration", self.DakShellPenetration)
 	end
 	if IsValid(self.DakTankCore) then
-		self.AmmoCount = 0 
+		self.AmmoCount = 0
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -394,11 +419,11 @@ function ENT:DakTEFire()
 				if (self:IsValid()) then
 					if(self.DakTankCore:GetParent():IsValid()) then
 						if(self.DakTankCore:GetParent():GetParent():IsValid()) then
-							self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/(self.DakTankCore.TotalMass/self.DakTankCore.PhysMass)/(self.DakTankCore.TotalMass/20000), self:GetPos() )
+							self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( 0.1*self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass()*((-self:GetForward()*((0.5*self.BaseDakShellMass)*((self.DakShellVelocity*0.0254)^2)))/self.DakTankCore.TotalMass) , self:GetPos() )
 						end
 					end
 					if not(self.DakTankCore:GetParent():IsValid()) then
-						self:GetPhysicsObject():ApplyForceCenter( -self:GetForward()*self.DakShellVelocity*self.BaseDakShellMass/20/(self.DakTankCore.TotalMass/self.DakTankCore.PhysMass)/(self.DakTankCore.TotalMass/20000) )
+						self:GetPhysicsObject():ApplyForceCenter( 0.1*self:GetPhysicsObject():GetMass()*((-self:GetForward()*((0.5*self.BaseDakShellMass)*((self.DakShellVelocity*0.0254)^2)))/self.DakTankCore.TotalMass) )
 					end
 				end
 			end
@@ -472,6 +497,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
 		self.DakModel = Ent.EntityMods.DakTek.DakModel
 		self.DakCaliber = Ent.EntityMods.DakTek.DakCaliber
+		self:SetNWFloat("Caliber",self.DakCaliber)
 		self.DakGunType = Ent.EntityMods.DakTek.DakGunType
 		self.DakHealth = self.DakMaxHealth
 		if Ent.EntityMods.DakTek.DakFireSound and Ent.EntityMods.DakTek.DakFireSound1 == "" then
@@ -495,6 +521,18 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		Ent.EntityMods.DakTek = nil
 	end
 	self.BaseClass.PostEntityPaste( self, Player, Ent, CreatedEntities )
+	local ScalingGun = 0
+	if self.DakModel == "models/daktanks/mortar100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/smokelauncher100mm.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/machinegun100mm.mdl" then ScalingGun = 1 end
+
+	if ScalingGun == 1 then
+		local Caliber = self.DakCaliber
+		self:SetModelScale(1)
+		self:SetModelScale( self:GetModelScale() * (Caliber/100), 0 )
+		self:Activate()
+	end
 
 end
 
