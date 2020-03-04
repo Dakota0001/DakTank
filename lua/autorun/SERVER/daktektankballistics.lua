@@ -74,7 +74,6 @@ function DTSimpleTrace(Start, End, Caliber, Filter, Gun)
 		trace.maxs = Vector(Caliber*0.02,Caliber*0.02,Caliber*0.02)
 		trace.ignoreworld = true
 	local SimpleTrace = util.TraceLine( trace )
-
 	local Stop = 1
 	local Ent = SimpleTrace.Entity
 	local Pos = SimpleTrace.HitPos

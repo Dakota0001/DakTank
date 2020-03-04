@@ -491,7 +491,9 @@ function ENT:Think()
 						local MainTurret = self.TurretControls[1]
 						local TotalTurretMass = 0 
 						for i=1, #self.TurretControls do
-							TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
+							if self.TurretControls[i].GunMass ~= nil then
+								TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
+							end
 						end
 						local StabMults = 0
 						local FCSMults = 0
@@ -499,22 +501,24 @@ function ENT:Think()
 						local RotationSpeeds = 0
 						local HullMounts = 0
 						for i=1, #self.TurretControls do
-							GunPercentage = self.TurretControls[i].GunMass/TotalTurretMass
-							if self.TurretControls[i]:GetFCS() == true then
-								self.ColdWar = 1
-								FCSMults = FCSMults + 1.5 * GunPercentage
-							end
-							if self.TurretControls[i]:GetStabilizer() == true then
-								self.ColdWar = 1
-								StabMults = StabMults + 1.25 * GunPercentage
-							elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
-								StabMults = StabMults + 1 * GunPercentage
-							else
-								StabMults = StabMults + 0.75 * GunPercentage
-							end
-							RotationSpeeds = RotationSpeeds + self.TurretControls[i].RotationSpeed * GunPercentage
-							if self.TurretControls[i]:GetYawMin()<=45 and self.TurretControls[i]:GetYawMax()<=45 then
-								HullMounts = HullMounts + GunPercentage
+							if self.TurretControls[i].GunMass ~= nil then
+								GunPercentage = self.TurretControls[i].GunMass/TotalTurretMass
+								if self.TurretControls[i]:GetFCS() == true then
+									self.ColdWar = 1
+									FCSMults = FCSMults + 1.5 * GunPercentage
+								end
+								if self.TurretControls[i]:GetStabilizer() == true then
+									self.ColdWar = 1
+									StabMults = StabMults + 1.25 * GunPercentage
+								elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
+									StabMults = StabMults + 1 * GunPercentage
+								else
+									StabMults = StabMults + 0.75 * GunPercentage
+								end
+								RotationSpeeds = RotationSpeeds + self.TurretControls[i].RotationSpeed * GunPercentage
+								if self.TurretControls[i]:GetYawMin()<=45 and self.TurretControls[i]:GetYawMax()<=45 then
+									HullMounts = HullMounts + GunPercentage
+								end
 							end
 						end
 						GunHandlingMult = math.log(RotationSpeeds*100,100)
@@ -635,6 +639,7 @@ function ENT:Think()
 									self.Contraption[#self.Contraption+1] = CurrentRes
 								if CurrentRes:GetClass()=="dak_tegearbox" or CurrentRes:GetClass()=="dak_tegearboxnew" then
 									CurrentRes.DakTankCore = self
+									CurrentRes.Controller = self
 									self.Gearbox = CurrentRes
 								end
 								if CurrentRes:GetClass()=="dak_tefuel" then
@@ -667,16 +672,19 @@ function ENT:Think()
 								end
 								if CurrentRes:GetClass()=="dak_tegun" then
 									CurrentRes.DakTankCore = self
+									CurrentRes.Controller = self
 									self.GunCount = self.GunCount + 1
 									self.Guns[#self.Guns+1] = CurrentRes
 								end
 								if CurrentRes:GetClass()=="dak_teautogun" then
 									CurrentRes.DakTankCore = self
+									CurrentRes.Controller = self
 									self.GunCount = self.GunCount + 1
 									self.Guns[#self.Guns+1] = CurrentRes
 								end
 								if CurrentRes:GetClass()=="dak_temachinegun" then
 									CurrentRes.DakTankCore = self
+									CurrentRes.Controller = self
 									self.MachineGunCount = self.MachineGunCount + 1
 									self.Guns[#self.Guns+1] = CurrentRes
 								end
@@ -1064,6 +1072,7 @@ function ENT:Think()
 										salvage.DakModel = self.Crew[i]:GetModel()
 										salvage:SetPos( self.Crew[i]:GetPos())
 										salvage:SetAngles( self.Crew[i]:GetAngles())
+										salvage:SetModelScale(self.Crew[i]:GetModelScale())
 										salvage:Spawn()
 										self.Crew[i]:Remove()
 									end
@@ -1162,6 +1171,7 @@ function ENT:Think()
 															self.salvage.DakModel = self.Contraption[i]:GetModel()
 															self.salvage:SetPos( self.Contraption[i]:GetPos())
 															self.salvage:SetAngles( self.Contraption[i]:GetAngles())
+															self.salvage:SetModelScale(self.Contraption[i]:GetModelScale())
 															self.salvage:Spawn()
 															self.Contraption[i]:Remove()
 														else
@@ -1196,6 +1206,7 @@ function ENT:Think()
 														self.salvage.DakModel = self.Contraption[i]:GetModel()
 														self.salvage:SetPos( self.Contraption[i]:GetPos())
 														self.salvage:SetAngles( self.Contraption[i]:GetAngles())
+														self.salvage:SetModelScale(self.Contraption[i]:GetModelScale())
 														self.salvage:Spawn()
 														self.Contraption[i]:Remove()
 													end

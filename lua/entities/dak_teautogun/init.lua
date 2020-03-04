@@ -1232,7 +1232,7 @@ function ENT:Think()
 			end
 		end
 
-		if self:GetParent():IsValid() and self:GetParent():GetParent():IsValid() and self.IsAutoLoader==1 then
+		if self:GetParent():IsValid() and self:GetParent():GetParent():IsValid() and self.IsAutoLoader==1 and self.Controller~=nil then
 			local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*self:OBBMins().x) , (self:GetPos()+self:GetForward()*self:OBBMins().x)-(self:GetForward()*1000), self.DakCaliber, {self, self:GetParent(), self:GetParent():GetParent()}, self)
 			local ShellSize = (self.ShellLengthMult*10*self.DakCaliber*0.0393701)
 			if self.ReloadMult == nil then
