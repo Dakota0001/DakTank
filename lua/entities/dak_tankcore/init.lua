@@ -488,7 +488,6 @@ function ENT:Think()
 
 					local GunHandlingMult = 0
 					if self.TurretControls[1] then
-						local MainTurret = self.TurretControls[1]
 						local TotalTurretMass = 0 
 						for i=1, #self.TurretControls do
 							if self.TurretControls[i].GunMass ~= nil then

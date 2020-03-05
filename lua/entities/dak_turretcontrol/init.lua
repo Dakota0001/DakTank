@@ -241,15 +241,13 @@ function ENT:Think()
 						self.Turret = res
 						self.TurretBase = DakTurret
 						local Mass = 0
-						local SA = 0
 
 						for i=1, #res do
 							if res[i]:IsSolid() then
-								Mass = Mass + res[i]:GetPhysicsObject():GetMass()
-								if res[i]:GetPhysicsObject():GetSurfaceArea() then
-									if res[i]:GetPhysicsObject():GetMass()>1 then
-										SA = SA + res[i]:GetPhysicsObject():GetSurfaceArea()
-									end
+								if res[i]:GetClass() == "dak_tegun" or res[i]:GetClass() == "dak_teautogun" or res[i]:GetClass() == "dak_temachinegun" then
+									Mass = Mass + res[i].DakMass
+								else
+									Mass = Mass + res[i]:GetPhysicsObject():GetMass()
 								end
 							end
 							if res[i]:IsValid() then
@@ -260,7 +258,6 @@ function ENT:Think()
 							end
 						end
 						self.GunMass = Mass
-						self.TurretArea = SA
 						self.DakParented = 1
 						if IsValid(DakTurret) then
 							self.YawDiff = DakTurret:GetAngles().yaw-self.DakGun:GetAngles().yaw
