@@ -158,15 +158,15 @@ function TOOL:LeftClick( trace )
 		--Engines
 		if Selection == "MicroEngine" then
 			self.DakName = "Micro Engine"
-			self.DakHealth = 15
-			self.DakMaxHealth = 15
+			self.DakHealth = 5
+			self.DakMaxHealth = 5
 			self.DakModel = "models/daktanks/engine1.mdl"
 			self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 		end
 		if Selection == "SmallEngine" then
 			self.DakName = "Small Engine"
-			self.DakHealth = 30
-			self.DakMaxHealth = 30
+			self.DakHealth = 20
+			self.DakMaxHealth = 20
 			self.DakModel = "models/daktanks/engine2.mdl"
 			self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
 		end
@@ -179,36 +179,36 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "LargeEngine" then
 			self.DakName = "Large Engine"
-			self.DakHealth = 60
-			self.DakMaxHealth = 60
+			self.DakHealth = 90
+			self.DakMaxHealth = 90
 			self.DakModel = "models/daktanks/engine4.mdl"
 			self.DakSound = "vehicles/crane/crane_idle_loop3.wav"
 		end
 		if Selection == "HugeEngine" then
 			self.DakName = "Huge Engine"
-			self.DakHealth = 75
-			self.DakMaxHealth = 75
+			self.DakHealth = 150
+			self.DakMaxHealth = 150
 			self.DakModel = "models/daktanks/engine5.mdl"
 			self.DakSound = "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"
 		end
 		if Selection == "UltraEngine" then
 			self.DakName = "Ultra Engine"
-			self.DakHealth = 90
-			self.DakMaxHealth = 90
+			self.DakHealth = 360
+			self.DakMaxHealth = 360
 			self.DakModel = "models/daktanks/engine6.mdl"
 			self.DakSound = "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"
 		end
 		--GEARBOXES
 		if Selection == "MicroGearboxF" then
 			self.DakName = "Micro Frontal Mount Gearbox"
-			self.DakHealth = 15
-			self.DakMaxHealth = 15
+			self.DakHealth = 7.5
+			self.DakMaxHealth = 7.5
 			self.DakModel = "models/daktanks/gearbox1f1.mdl"
 		end
 		if Selection == "SmallGearboxF" then
 			self.DakName = "Small Frontal Mount Gearbox"
-			self.DakHealth = 35
-			self.DakMaxHealth = 35
+			self.DakHealth = 25
+			self.DakMaxHealth = 25
 			self.DakModel = "models/daktanks/gearbox1f2.mdl"
 		end
 		if Selection == "StandardGearboxF" then
@@ -219,32 +219,32 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "LargeGearboxF" then
 			self.DakName = "Large Frontal Mount Gearbox"
-			self.DakHealth = 95
-			self.DakMaxHealth = 95
+			self.DakHealth = 120
+			self.DakMaxHealth = 120
 			self.DakModel = "models/daktanks/gearbox1f4.mdl"
 		end
 		if Selection == "HugeGearboxF" then
 			self.DakName = "Huge Frontal Mount Gearbox"
-			self.DakHealth = 140
-			self.DakMaxHealth = 140
+			self.DakHealth = 200
+			self.DakMaxHealth = 200
 			self.DakModel = "models/daktanks/gearbox1f5.mdl"
 		end
 		if Selection == "UltraGearboxF" then
 			self.DakName = "Ultra Frontal Mount Gearbox"
-			self.DakHealth = 250
-			self.DakMaxHealth = 250
+			self.DakHealth = 480
+			self.DakMaxHealth = 480
 			self.DakModel = "models/daktanks/gearbox1f6.mdl"
 		end
 		if Selection == "MicroGearboxR" then
 			self.DakName = "Micro Rear Mount Gearbox"
-			self.DakHealth = 15
-			self.DakMaxHealth = 15
+			self.DakHealth = 7.5
+			self.DakMaxHealth = 7.5
 			self.DakModel = "models/daktanks/gearbox1r1.mdl"
 		end
 		if Selection == "SmallGearboxR" then
 			self.DakName = "Small Rear Mount Gearbox"
-			self.DakHealth = 35
-			self.DakMaxHealth = 35
+			self.DakHealth = 25
+			self.DakMaxHealth = 25
 			self.DakModel = "models/daktanks/gearbox1r2.mdl"
 		end
 		if Selection == "StandardGearboxR" then
@@ -255,20 +255,20 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "LargeGearboxR" then
 			self.DakName = "Large Rear Mount Gearbox"
-			self.DakHealth = 95
-			self.DakMaxHealth = 95
+			self.DakHealth = 120
+			self.DakMaxHealth = 120
 			self.DakModel = "models/daktanks/gearbox1r4.mdl"
 		end
 		if Selection == "HugeGearboxR" then
 			self.DakName = "Huge Rear Mount Gearbox"
-			self.DakHealth = 140
-			self.DakMaxHealth = 140
+			self.DakHealth = 200
+			self.DakMaxHealth = 200
 			self.DakModel = "models/daktanks/gearbox1r5.mdl"
 		end
 		if Selection == "UltraGearboxR" then
 			self.DakName = "Ultra Rear Mount Gearbox"
-			self.DakHealth = 250
-			self.DakMaxHealth = 250
+			self.DakHealth = 480
+			self.DakMaxHealth = 480
 			self.DakModel = "models/daktanks/gearbox1r6.mdl"
 		end
 		--CLIPS--
@@ -2376,7 +2376,7 @@ function TOOL:RightClick( trace )
 							ply:ChatPrint("Multipliers")
 							ply:ChatPrint("Flanking: "..Target.SpeedMult.."x, Gun Handling: "..Target.GunHandlingMult.."x.")
 							ply:ChatPrint("Misc")
-							ply:ChatPrint("Best Average Armor: "..(math.Round(Target.ArmorMult*420,2)).."mm, Best Round Pen: "..Target.MaxPen.."mm, HP/T: "..math.Round(Target.Gearbox.HPperTon,2)..".")
+							ply:ChatPrint("Best Average Armor: "..(math.Round(Target.ArmorMult*420,2)).."mm, Best Round Pen: "..Target.MaxPen.."mm, HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2)..".")
 							ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 						else
 							ply:ChatPrint("Calculating Tank Cost")
@@ -2410,7 +2410,7 @@ function TOOL:RightClick( trace )
 			end
 			if Target:GetClass() == "dak_crew" then
 				if Target.DakEntity.DakName ~= nil then
-					ply:ChatPrint("Crew for "..Target.DakEntity.DakName)
+					ply:ChatPrint("Crew for "..Target.DakEntity.DakName.." #"..Target.DakEntity:EntIndex())
 				else
 					ply:ChatPrint("Crew idle")
 				end

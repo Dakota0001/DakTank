@@ -75,6 +75,7 @@ function ENT:Initialize()
  		self:NetworkVar("String",0,"Model")
  	end
  	self:SetNWFloat("Caliber",self.DakCaliber)
+ 	self.FireRateMod = self:GetRateOfFire()
 end
 
 function ENT:Think()
@@ -561,7 +562,7 @@ function ENT:Think()
 			--pi*radius^2 * height * density
 			--Shell length ratio: Cannon - 6.5, Howitzer - 4, Mortar - 2.75, GL 3.5
 			self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*3.5))*7700
-			self.DakShellSplashDamage = self.DakCaliber*0.0375
+			self.DakShellSplashDamage = self.DakCaliber*5
 			self.BaseDakShellPenetration = (self.DakCaliber*2)*(27/50)
 			--self.DakShellExplosive = false
 			self.ShellLengthMult = 27/50
@@ -1204,19 +1205,21 @@ function ENT:Think()
 
 
 
-		if not(self.BaseDakShellDamage==nil) then self.DakShellSplashDamage = self.BaseDakShellDamage/2 end
+		--if not(self.BaseDakShellDamage==nil) then self.DakShellSplashDamage = self.BaseDakShellDamage/2 end
 		self.Loaders = 0
 		if self.DakTankCore and self.TurretController then
 			if self.DakTankCore.Crew then
 				if #self.DakTankCore.Crew>0 then
 					for i=1, #self.DakTankCore.Crew do
-						if self.DakTankCore.Crew[i].DakEntity == self then
+						if self.DakTankCore.Crew[i].DakEntity == self and self.DakTankCore.Crew[i].DakDead ~= true then
 							if IsValid(self.TurretController.TurretBase) and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
 								if self.DakTankCore.Crew[i]:GetParent():GetParent() == self.TurretController.TurretBase or self.DakTankCore.Crew[i]:GetParent():GetParent() == self:GetParent():GetParent() then
-									self.Loaders = self.Loaders + 1	
+									self.Loaders = self.Loaders + 1
+									self.DakTankCore.Crew[i].Job = 3
 								end
 							else
-								self.Loaders = self.Loaders + 1	
+								self.Loaders = self.Loaders + 1
+								self.DakTankCore.Crew[i].Job = 3
 							end
 						end
 					end
@@ -1244,9 +1247,14 @@ function ENT:Think()
 			end
 			if math.Round(BackDist,2) > math.Round(ShellSize*0.5,2) and math.Round(BackDist,2) <= math.Round(ShellSize,2) then
 				self.DakCooldown = self.DakCooldown * 2
+				self.ReloadMult = 2
 			elseif math.Round(BackDist,2) < math.Round(ShellSize,2) then
 				self.DakCooldown = self.DakCooldown * math.huge
+				self.ReloadMult = math.huge
 			end
+		end
+		if self.IsAutoloader~=1 then
+			self.DakCooldown = self.DakCooldown * (1/self.FireRateMod)
 		end
 
 		if self.DakHealth > self.DakMaxHealth then
@@ -1506,16 +1514,16 @@ function ENT:DakTEAutoAmmoCheck()
 		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
 end
-
+util.AddNetworkString( "daktankshotfired" )
 function ENT:DakTEAutoFire()
-	if self.Firing and self.DakIsReloading==0 and self.Loaded==1 then
+	if self.Firing and self.DakIsReloading==0 and self.Loaded==1 and self.DakDead ~= true then
 		if IsValid(self.DakTankCore) then
 			self.AmmoCount = 0 
 			if not(self.SortedAmmo == nil) then
 				for i = 1, #self.SortedAmmo do
 					if IsValid(self.SortedAmmo[i][1]) then
 						if (self.HasMag == 0 and self.IsAutoLoader == 1) and self.TurretController and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
-							if self.TurretController.TurretBase == self.SortedAmmo[i][1]:GetParent():GetParent() then
+							if self.TurretController.TurretBase == self.SortedAmmo[i][1]:GetParent():GetParent() or self:GetParent():GetParent() == self.SortedAmmo[i][1]:GetParent():GetParent() then
 								if self.SortedAmmo[i][1].DakAmmoType == self.DakAmmoType then
 									self.AmmoCount = self.AmmoCount + self.SortedAmmo[i][1].DakAmmo
 								end
@@ -1616,16 +1624,22 @@ function ENT:DakTEAutoFire()
 
 				self:SetNWString("FireSound",FiringSound[math.random(1,3)])
 				self:SetNWInt("FirePitch",self.DakFirePitch)
-				self:SetNWFloat("Caliber",self.DakCaliber)
+				self:SetNWFloat("Energy",(self.DakShellMass*self.DakShellVelocity))
 
-				if self.DakCaliber>=40 then
-					self:SetNWBool("Firing",true)
-					timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
-						self:SetNWBool("Firing",false)
-					end)
-				else
-					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.Rand(0.95, 1.05), 1 )
-				end
+				net.Start( "daktankshotfired" )
+				net.WriteVector( self:GetPos() )
+				net.WriteFloat( self.DakCaliber )
+				net.WriteString( FiringSound[math.random(1,3)] )
+				net.Broadcast()
+
+				--if self.DakCaliber>=40 then
+				--	self:SetNWBool("Firing",true)
+				--	timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
+				--		self:SetNWBool("Firing",false)
+				--	end)
+				--else
+				--	sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.Rand(0.95, 1.05), 1 )
+				--end
 
 				self.DakShotsCounter = self.DakShotsCounter + 1
 				if self.DakShotsCounter >= self.DakMagazine and self.DakMagazine > 1 then

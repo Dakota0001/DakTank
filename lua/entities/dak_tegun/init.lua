@@ -488,7 +488,7 @@ function ENT:Think()
 				end
 			end
 		end
-
+		
 		if self.DakAmmoType == self.DakATGM then
 			if self.DakCaliber ~= nil then
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*self.CooldownWeightMod
@@ -496,25 +496,27 @@ function ENT:Think()
 			end
 		end
 
-		if not(self.BaseDakShellDamage==nil) then self.DakShellSplashDamage = self.BaseDakShellDamage/2 end
+		--if not(self.BaseDakShellDamage==nil) then self.DakShellSplashDamage = self.BaseDakShellDamage/2 end
 		self.Loaders = 0
 		if self.DakTankCore and self.TurretController then
 			if self.DakTankCore.Crew then
 				if #self.DakTankCore.Crew>0 then
 					for i=1, #self.DakTankCore.Crew do
-						if self.DakTankCore.Crew[i].DakEntity == self then
+						if self.DakTankCore.Crew[i].DakEntity == self and self.DakTankCore.Crew[i].DakDead ~= true then
 							if IsValid(self.TurretController.TurretBase) and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
 								if self.DakTankCore.Crew[i]:IsValid() then
 									if self.DakTankCore.Crew[i]:GetParent():IsValid() then
 										if self.DakTankCore.Crew[i]:GetParent():GetParent():IsValid() then
 											if self.DakTankCore.Crew[i]:GetParent():GetParent() == self.TurretController.TurretBase or self.DakTankCore.Crew[i]:GetParent():GetParent() == self:GetParent():GetParent() then
 												self.Loaders = self.Loaders + 1	
+												self.DakTankCore.Crew[i].Job = 3
 											end
 										end
 									end
 								end
 							else
 								self.Loaders = self.Loaders + 1	
+								self.DakTankCore.Crew[i].Job = 3
 							end
 						end
 					end
@@ -545,7 +547,7 @@ function ENT:Think()
 				self.DakCooldown = self.DakCooldown * 2
 			end
 		end
-
+		self.DakCooldown = math.max(self.DakCooldown,1.25)
 		if self.DakHealth > self.DakMaxHealth then
 			self.DakHealth = self.DakMaxHealth
 		end
@@ -809,9 +811,9 @@ function ENT:DakTEAmmoCheck()
 		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
 end
-
+util.AddNetworkString( "daktankshotfired" )
 function ENT:DakTEFire()
-	if( self.Firing ) then
+	if ( self.Firing and self.DakDead ~= true) then
 		if IsValid(self.DakTankCore) then
 			self.AmmoCount = 0 
 			if not(self.SortedAmmo == nil) then
@@ -913,14 +915,21 @@ function ENT:DakTEFire()
 				self:SetNWInt("FirePitch",self.DakFirePitch)
 				self:SetNWFloat("Caliber",self.DakCaliber)
 
-				if self.DakCaliber>=40 then
-					self:SetNWBool("Firing",true)
-					timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
-						self:SetNWBool("Firing",false)
-					end)
-				else
-					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.Rand(0.95, 1.05), 1 )
-				end
+				net.Start( "daktankshotfired" )
+				net.WriteVector( self:GetPos() )
+				net.WriteFloat( self.DakCaliber )
+				net.WriteString( FiringSound[math.random(1,3)] )
+				net.Broadcast()
+
+				--if self.DakCaliber>=40 then
+				--	self:SetNWBool("Firing",true)
+				--	timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
+				--		self:SetNWBool("Firing",false)
+				--	end)
+				--else
+				--	sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.Rand(0.95, 1.05), 1 )
+				--end
+
 
 				timer.Create( "ReloadFinishTimer"..self:EntIndex()..CurTime(), self.DakCooldown-SoundDuration(self.ReloadSound), 1, function()
 					if IsValid(self) then

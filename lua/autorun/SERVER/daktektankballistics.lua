@@ -90,6 +90,8 @@ function DTSimpleRecurseTrace(Start, End, Caliber, Filter, Gun)
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
+	--instead of ignoring ent maybe ignore position in particular hit
+	--also figure out what is going on with tube turrets
 	local newEnt = Ent
 	local LastPos = Pos
 	if Stop == 1 then
@@ -127,7 +129,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 		DakTekTankEditionSetupNewEnt(HitEnt)
 	end
 	if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth and not(HitEnt.DakHealth <= 0)) then
-		if not((CheckClip(HitEnt,ShellSimTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
+		if not((CheckClip(HitEnt,ShellSimTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" or HitEnt.DakDead==true) then
 			if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
 				DakTekTankEditionSetupNewEnt(HitEnt)
 			end
@@ -152,7 +154,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 			if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_teautogun" or HitEnt:GetClass() == "dak_temachinegun" then
 				HitGun = 1
 			end
-			if HitEnt:GetClass() == "dak_tegearbox" then
+			if HitEnt:GetClass() == "dak_tegearbox" or HitEnt:GetClass() == "dak_tegearboxnew" then
 				HitGear = 1
 			end
 			local TDRatio = HitEnt.DakArmor/Caliber
@@ -458,7 +460,7 @@ end
 function DTShellHit(Start,End,HitEnt,Shell,Normal)
 	if Shell.Hits~=nil and Shell.Hits>50 then 
 		Shell.RemoveNow = 1
-		print("ERROR, RECURSE")
+		print("ERROR: Shell Recurse Loop")
 	return end
 	Shell.Hits = 1
 	if Shell.FinishedBouncing == 1 and Shell.LifeTime == 0.1 then --figure out if this really is at lifetime 0.1 or 0 after trace fix
@@ -486,8 +488,8 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 		if HitEnt.DakHealth == nil then
 			DakTekTankEditionSetupNewEnt(HitEnt)
 		end
-		if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth and not(HitEnt.DakHealth <= 0) or (HitEnt.DakName=="Damaged Component")) then
-			if (CheckClip(HitEnt,HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" then
+		if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth and not(HitEnt.DakHealth <= 0) or (HitEnt.DakName=="Damaged Component") or (HitEnt.DakDead==true)) then
+			if (CheckClip(HitEnt,HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" or HitEnt.DakDead==true then
 				if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
 					DakTekTankEditionSetupNewEnt(HitEnt)
 				end
@@ -537,7 +539,6 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				local CurrentPen = Shell.DakPenetration-Shell.DakPenetration*(Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.LifeTime*(Shell.DakPenLossPerMeter/52.49)
 
 				local HitAng = math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() )))
-
 				
 				local TDRatio = 0
 				local PenRatio = 0
@@ -851,7 +852,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 										Targets[i]:Ignite(5,1)
 									end
 								end
-								if Targets[i]:GetClass() == "dak_tegearbox" then
+								if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
 									if not(Targets[i]:IsOnFire()) then 
 										Targets[i]:Ignite(5,1)
 									end
@@ -975,14 +976,37 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 					Shell.Filter[#Shell.Filter+1] = HitEnt
-					local salvage = ents.Create( "dak_tesalvage" )
-					Shell.salvage = salvage
-					salvage.DakModel = HitEnt:GetModel()
-					salvage:SetPos( HitEnt:GetPos())
-					salvage:SetAngles( HitEnt:GetAngles())
-					salvage:Spawn()
-					Shell.Filter[#Shell.Filter+1] = salvage
-					HitEnt:Remove()
+					if (string.Explode("_",HitEnt:GetClass(),false)[1] == "dak") then
+						local PrintEnt = HitEnt
+						if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+							if PrintEnt:GetClass() == "dak_crew" then
+								if PrintEnt.Job == 1 then
+									PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+								elseif PrintEnt.Job == 2 then
+									PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+								elseif PrintEnt.Job == 3 then
+									PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+								else
+									PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+								end
+								PrintEnt:SetMaterial("models/flesh")
+							else
+								PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+								PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+								PrintEnt:SetColor(Color(100,100,100,255))
+							end
+						end
+						PrintEnt.DakDead = true
+					else
+						local salvage = ents.Create( "dak_tesalvage" )
+						Shell.salvage = salvage
+						salvage.DakModel = HitEnt:GetModel()
+						salvage:SetPos( HitEnt:GetPos())
+						salvage:SetAngles( HitEnt:GetAngles())
+						salvage:Spawn()
+						Shell.Filter[#Shell.Filter+1] = salvage
+						HitEnt:Remove()
+					end
 					if Shell.salvage then
 						Shell.Filter[#Shell.Filter+1] = Shell.salvage
 					end
@@ -1080,7 +1104,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 										Targets[i]:Ignite(5,1)
 									end
 								end
-								if Targets[i]:GetClass() == "dak_tegearbox" then
+								if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
 									if not(Targets[i]:IsOnFire()) then 
 										Targets[i]:Ignite(5,1)
 									end
@@ -1139,6 +1163,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 			end
 		end
 		if HitEnt:IsWorld() or Shell.ExplodeNow==true then
+			Shell.ExplodeNow=false
 			if Shell.DakExplosive then
 				local effectdata = EffectData()
 				effectdata:SetOrigin(HitPos)
@@ -1168,12 +1193,15 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					end
 					sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 100, 1 )	
 				end
-				if Shell.DakShellType == "HESH" then
-					DTShockwave(HitPos+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-				else
-					DTShockwave(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-					--DTExplosion(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+				if Shell.Exploded ~= true then
+					if Shell.DakShellType == "HESH" then
+						DTShockwave(HitPos+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+					else
+						DTShockwave(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+						--DTExplosion(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+					end
 				end
+				Shell.Exploded = true
 			else
 				local effectdata = EffectData()
 				if Shell.DakIsFlame == 1 then
@@ -1192,7 +1220,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 										Targets[i]:Ignite(5,1)
 									end
 								end
-								if Targets[i]:GetClass() == "dak_tegearbox" then
+								if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
 									if not(Targets[i]:IsOnFire()) then 
 										Targets[i]:Ignite(5,1)
 									end
@@ -1296,11 +1324,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 		effectdata:SetEntity(Shell.DakGun)
 		effectdata:SetAttachment(1)
 		effectdata:SetMagnitude(.5)
-		if Shell.DakShellType == "APHE" then
-			effectdata:SetScale(Shell.DakBlastRadius*0.25)
-		else
-			effectdata:SetScale(Shell.DakBlastRadius)
-		end
+		effectdata:SetScale(Shell.DakBlastRadius)
 		effectdata:SetNormal( Normal )
 		if Shell.DakShellType == "SM" then
 			util.Effect("daktescalingsmoke", effectdata, true, true)
@@ -1322,12 +1346,15 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			end
 			sound.Play( ExpSounds[math.random(1,#ExpSounds)], Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()), 100, 100, 1 )	
 		end
-		if Shell.DakShellType == "APHE" then
-			DTAPHE(Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-		else
-			DTShockwave(Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-			--DTExplosion(Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+		if Shell.Exploded ~= true then
+			if Shell.DakShellType == "APHE" then
+				DTAPHE(Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+			else
+				DTShockwave(Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+				--DTExplosion(Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+			end
 		end
+		Shell.Exploded = true
 	else
 		local HitEnt = ContShellTrace.Entity
 		--local End = ContShellTrace.HitPos
@@ -1341,8 +1368,8 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			if HitEnt.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(HitEnt)
 			end
-			if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth and not(HitEnt.DakHealth <= 0) or (HitEnt.DakName=="Damaged Component")) then
-				if (CheckClip(HitEnt,ContShellTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" then
+			if HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth and not(HitEnt.DakHealth <= 0) or (HitEnt.DakName=="Damaged Component") or (HitEnt.DakDead==true))  then
+				if (CheckClip(HitEnt,ContShellTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" or HitEnt.DakDead==true then
 					if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(HitEnt)
 					end
@@ -1707,7 +1734,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 											Targets[i]:Ignite(5,1)
 										end
 									end
-									if Targets[i]:GetClass() == "dak_tegearbox" then
+									if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
 										if not(Targets[i]:IsOnFire()) then 
 											Targets[i]:Ignite(5,1)
 										end
@@ -1830,14 +1857,37 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 						end
 						Shell.Filter[#Shell.Filter+1] = HitEnt
-						local salvage = ents.Create( "dak_tesalvage" )
-						Shell.salvage = salvage
-						salvage.DakModel = HitEnt:GetModel()
-						salvage:SetPos( HitEnt:GetPos())
-						salvage:SetAngles( HitEnt:GetAngles())
-						salvage:Spawn()
-						Shell.Filter[#Shell.Filter+1] = salvage
-						HitEnt:Remove()
+						if (string.Explode("_",HitEnt:GetClass(),false)[1] == "dak") then
+							local PrintEnt = HitEnt
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							Shell.salvage = salvage
+							salvage.DakModel = HitEnt:GetModel()
+							salvage:SetPos( HitEnt:GetPos())
+							salvage:SetAngles( HitEnt:GetAngles())
+							salvage:Spawn()
+							Shell.Filter[#Shell.Filter+1] = salvage
+							HitEnt:Remove()
+						end
 						if Shell.salvage then
 							Shell.Filter[#Shell.Filter+1] = Shell.salvage
 						end
@@ -1928,7 +1978,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 											Targets[i]:Ignite(5,1)
 										end
 									end
-									if Targets[i]:GetClass() == "dak_tegearbox" then
+									if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
 										if not(Targets[i]:IsOnFire()) then 
 											Targets[i]:Ignite(5,1)
 										end
@@ -1987,6 +2037,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 				end
 			end
 			if HitEnt:IsWorld() or Shell.ExplodeNow==true then
+				Shell.ExplodeNow=false
 				if Shell.DakExplosive then
 					local effectdata = EffectData()
 					effectdata:SetOrigin(ContShellTrace.HitPos)
@@ -2016,12 +2067,15 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 						sound.Play( ExpSounds[math.random(1,#ExpSounds)], ContShellTrace.HitPos, 100, 100, 1 )	
 					end
-					if Shell.DakShellType == "HESH" then
-						DTShockwave(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-					else
-						DTShockwave(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-						--DTExplosion(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+					if Shell.Exploded ~= true then
+						if Shell.DakShellType == "HESH" then
+							DTShockwave(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+						else
+							DTShockwave(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+							--DTExplosion(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+						end
 					end
+					Shell.Exploded = true
 				else
 					local effectdata = EffectData()
 					if Shell.DakIsFlame == 1 then
@@ -2040,7 +2094,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 											Targets[i]:Ignite(5,1)
 										end
 									end
-									if Targets[i]:GetClass() == "dak_tegearbox" then
+									if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
 										if not(Targets[i]:IsOnFire()) then 
 											Targets[i]:Ignite(5,1)
 										end
@@ -2133,7 +2187,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 			if ExpTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 			end
-			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component")) then
+			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true)) then
 				if ExpTrace.Entity:GetClass()=="dak_crew" then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 				end
@@ -2215,14 +2269,37 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 							end
 						end
 						Filter[#Filter+1] = ExpTrace.Entity
-						local salvage = ents.Create( "dak_tesalvage" )
-						Shell.salvage = salvage
-						salvage.DakModel = ExpTrace.Entity:GetModel()
-						salvage:SetPos( ExpTrace.Entity:GetPos())
-						salvage:SetAngles( ExpTrace.Entity:GetAngles())
-						salvage:Spawn()
-						Filter[#Filter+1] = salvage
-						ExpTrace.Entity:Remove()
+						if (string.Explode("_",ExpTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = ExpTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							Shell.salvage = salvage
+							salvage.DakModel = ExpTrace.Entity:GetModel()
+							salvage:SetPos( ExpTrace.Entity:GetPos())
+							salvage:SetAngles( ExpTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							ExpTrace.Entity:Remove()
+						end
 					end
 				end
 				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
@@ -2296,7 +2373,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 			if ExpTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 			end
-			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component")) then
+			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true)) then
 				if ExpTrace.Entity:GetClass()=="dak_crew" then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 				end
@@ -2378,14 +2455,37 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 							end
 						end
 						Filter[#Filter+1] = ExpTrace.Entity
-						local salvage = ents.Create( "dak_tesalvage" )
-						Shell.salvage = salvage
-						salvage.DakModel = ExpTrace.Entity:GetModel()
-						salvage:SetPos( ExpTrace.Entity:GetPos())
-						salvage:SetAngles( ExpTrace.Entity:GetAngles())
-						salvage:Spawn()
-						Filter[#Filter+1] = salvage
-						ExpTrace.Entity:Remove()
+						if (string.Explode("_",ExpTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = ExpTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							Shell.salvage = salvage
+							salvage.DakModel = ExpTrace.Entity:GetModel()
+							salvage:SetPos( ExpTrace.Entity:GetPos())
+							salvage:SetAngles( ExpTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							ExpTrace.Entity:Remove()
+						end
 					end
 				end
 				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
@@ -2450,13 +2550,13 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 	local ExpTrace = util.TraceHull( trace )
 	local ExpTraceLine = util.TraceLine( trace )
 
-	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
+	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius*2 then
 		--decals don't like using the adjusted by normal Pos
 		util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), IgnoreEnt)
 		if ExpTrace.Entity.DakHealth == nil then
 			DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 		end
-		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component")) then
+		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true)) then
 			if ExpTrace.Entity:GetClass()=="dak_crew" then
 				util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), IgnoreEnt)
 			end
@@ -2540,14 +2640,37 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 						end
 					end
 					Filter[#Filter+1] = ExpTrace.Entity
-					local salvage = ents.Create( "dak_tesalvage" )
-					Shell.salvage = salvage
-					salvage.DakModel = ExpTrace.Entity:GetModel()
-					salvage:SetPos( ExpTrace.Entity:GetPos())
-					salvage:SetAngles( ExpTrace.Entity:GetAngles())
-					salvage:Spawn()
-					Filter[#Filter+1] = salvage
-					ExpTrace.Entity:Remove()
+					if (string.Explode("_",ExpTrace.Entity:GetClass(),false)[1] == "dak") then
+						local PrintEnt = ExpTrace.Entity
+						if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+							if PrintEnt:GetClass() == "dak_crew" then
+								if PrintEnt.Job == 1 then
+									PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+								elseif PrintEnt.Job == 2 then
+									PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+								elseif PrintEnt.Job == 3 then
+									PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+								else
+									PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+								end
+								PrintEnt:SetMaterial("models/flesh")
+							else
+								PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+								PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+								PrintEnt:SetColor(Color(100,100,100,255))
+							end
+						end
+						PrintEnt.DakDead = true
+					else
+						local salvage = ents.Create( "dak_tesalvage" )
+						Shell.salvage = salvage
+						salvage.DakModel = ExpTrace.Entity:GetModel()
+						salvage:SetPos( ExpTrace.Entity:GetPos())
+						salvage:SetAngles( ExpTrace.Entity:GetAngles())
+						salvage:Spawn()
+						Filter[#Filter+1] = salvage
+						ExpTrace.Entity:Remove()
+					end
 				end
 			end
 			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
@@ -2621,136 +2744,143 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt)
 	Shell.DakDamageList = {}
 	Shell.RemoveList = {}
 	Shell.IgnoreList = {}
-	local Targets = ents.FindInSphere( Pos, Radius )
-	if table.Count(Targets) > 0 then
-		for i = 1, #Targets do
-			if Targets[i]:IsValid() then
-				if Targets[i].DakArmor == nil or Targets[i].DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(Targets[i])
-				end
-				if hook.Run("DakTankDamageCheck", Targets[i], Owner, Shell.DakGun) ~= false then
-				else
-					table.insert(Shell.IgnoreList,Targets[i])
-				end
-				if Targets[i].DakHealth == nil then
-					DakTekTankEditionSetupNewEnt(Targets[i])
-				end
-				if not(Targets[i].DakHealth == nil) then
-					if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 then
-						if IsValid(Targets[i]:GetPhysicsObject()) then
-							if Targets[i]:GetPhysicsObject():GetMass()<=1 then
-								table.insert(Shell.IgnoreList,Targets[i])
-							end
-						end
-						table.insert(Shell.IgnoreList,Targets[i])
-					end
-				end
+
+
+	if Shell.DakShellType == "HE" then
+		local Caliber = Shell.DakCaliber
+		local traces = Caliber--math.Round(Caliber/2)
+		local Filter = {}
+		for i=1, traces do
+			local Direction = VectorRand()
+			local trace = {}
+				trace.start = Pos
+				trace.endpos = Pos + Direction*Radius*2
+				trace.filter = Filter
+				trace.mins = Vector(-(Caliber/traces)*0.02,-(Caliber/traces)*0.02,-(Caliber/traces)*0.02)
+				trace.maxs = Vector((Caliber/traces)*0.02,(Caliber/traces)*0.02,(Caliber/traces)*0.02)
+			local ExpTrace = util.TraceHull( trace )
+			local ExpTraceLine = util.TraceLine( trace )
+
+			if ExpTrace.Hit then
+				local effectdata = EffectData()
+				effectdata:SetOrigin(ExpTrace.HitPos)
+				effectdata:SetEntity(Shell.DakGun)
+				effectdata:SetAttachment(1)
+				effectdata:SetMagnitude(.5)
+				effectdata:SetScale(12.7*0.25)
+				util.Effect("dakteshellimpact", effectdata, true, true)
 			end
-		end
 
-		if Shell.DakShellType ~= "HESH" then
-			local Caliber = Shell.DakCaliber
-			local traces = math.Round(Caliber/2)
-			local Filter = {}
-			for i=1, traces do
-				local Direction = VectorRand()
-				local trace = {}
-					trace.start = Pos
-					trace.endpos = Pos + Direction*Radius*2
-					trace.filter = Filter
-					trace.mins = Vector(-(Caliber/traces)*0.02,-(Caliber/traces)*0.02,-(Caliber/traces)*0.02)
-					trace.maxs = Vector((Caliber/traces)*0.02,(Caliber/traces)*0.02,(Caliber/traces)*0.02)
-				local ExpTrace = util.TraceHull( trace )
-				local ExpTraceLine = util.TraceLine( trace )
-
-				if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
-					--decals don't like using the adjusted by normal Pos
-					util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), HitEnt)
-					if ExpTrace.Entity.DakHealth == nil then
-						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+			if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner, Shell.DakGun) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius*2 then
+				--decals don't like using the adjusted by normal Pos
+				util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), HitEnt)
+				if ExpTrace.Entity.DakHealth == nil then
+					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+				end
+				if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true)) then
+					if ExpTrace.Entity:GetClass()=="dak_crew" then
+						util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 					end
-					if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component")) then
-						if ExpTrace.Entity:GetClass()=="dak_crew" then
-							util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
+					if (CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
+						if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
+							DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 						end
-						if (CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
-							if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-								DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-							end
-							local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-							if ExpTrace.Entity.IsDakTekFutureTech == 1 then
-								ExpTrace.Entity.DakArmor = 1000
-							else
-								if SA == nil then
-									--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
-									ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
-									ExpTrace.Entity.DakIsTread = 1
-								else
-									if ExpTrace.Entity:GetClass()=="prop_physics" then 
-										DTArmorSanityCheck(ExpTrace.Entity)
-									end
-								end
-							end
-							ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
+						local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+						if ExpTrace.Entity.IsDakTekFutureTech == 1 then
+							ExpTrace.Entity.DakArmor = 1000
 						else
-							if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-								DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-							end
-							local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-							if ExpTrace.Entity.IsDakTekFutureTech == 1 then
-								ExpTrace.Entity.DakArmor = 1000
+							if SA == nil then
+								--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
+								ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
+								ExpTrace.Entity.DakIsTread = 1
 							else
-								if SA == nil then
-									--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
-									ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
-									ExpTrace.Entity.DakIsTread = 1
-								else
-									if ExpTrace.Entity:GetClass()=="prop_physics" then 
-										DTArmorSanityCheck(ExpTrace.Entity)
-									end
+								if ExpTrace.Entity:GetClass()=="prop_physics" then 
+									DTArmorSanityCheck(ExpTrace.Entity)
 								end
 							end
-							
-							ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
+						end
+						ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
+					else
+						if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
+							DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+						end
+						local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+						if ExpTrace.Entity.IsDakTekFutureTech == 1 then
+							ExpTrace.Entity.DakArmor = 1000
+						else
+							if SA == nil then
+								--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
+								ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
+								ExpTrace.Entity.DakIsTread = 1
+							else
+								if ExpTrace.Entity:GetClass()=="prop_physics" then 
+									DTArmorSanityCheck(ExpTrace.Entity)
+								end
+							end
+						end
+						
+						ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-							if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
-								if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
-									if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-										DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
-									else	
-										DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
-									end
-								end
-							else
+						if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+							if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 								if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
-								else
+								else	
 									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
 								end
 							end
-							local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-							if ExpTrace.Entity.IsComposite == 1 then
-								if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
-								if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end 
-								EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*ExpTrace.Entity.EntityMods.CompKEMult
+						else
+							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
+								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
+							else
+								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
 							end
-							if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
-								util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
-								if ExpTrace.Entity:GetClass()=="dak_crew" then
-									util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
-									util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
-								end
-								ContEXP(Filter,ExpTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Radius,Caliber,Pen-EffArmor,Owner,Direction,Shell)
+						end
+						local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
+						if ExpTrace.Entity.IsComposite == 1 then
+							if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
+							if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end 
+							EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*ExpTrace.Entity.EntityMods.CompKEMult
+						end
+						if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
+							util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
+							if ExpTrace.Entity:GetClass()=="dak_crew" then
+								util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
+								util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
 							end
-							if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
-								if ExpTrace.Entity:GetClass()=="dak_crew" then
-									if ExpTrace.Entity.DakHealth <= 0 then
-										for blood=1, 15 do
-											util.Decal( "Blood", ExpTrace.Entity:GetPos(), ExpTrace.Entity:GetPos()+(VectorRand()*500), ExpTrace.Entity)
-										end
+							ContEXP(Filter,ExpTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Radius,Caliber,Pen-EffArmor,Owner,Direction,Shell)
+						end
+						if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
+							if ExpTrace.Entity:GetClass()=="dak_crew" then
+								if ExpTrace.Entity.DakHealth <= 0 then
+									for blood=1, 15 do
+										util.Decal( "Blood", ExpTrace.Entity:GetPos(), ExpTrace.Entity:GetPos()+(VectorRand()*500), ExpTrace.Entity)
 									end
 								end
-								Filter[#Filter+1] = ExpTrace.Entity
+							end
+							Filter[#Filter+1] = ExpTrace.Entity
+							if (string.Explode("_",ExpTrace.Entity:GetClass(),false)[1] == "dak") then
+								local PrintEnt = ExpTrace.Entity
+								if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+									if PrintEnt:GetClass() == "dak_crew" then
+										if PrintEnt.Job == 1 then
+											PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+										elseif PrintEnt.Job == 2 then
+											PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+										elseif PrintEnt.Job == 3 then
+											PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+										else
+											PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+										end
+										PrintEnt:SetMaterial("models/flesh")
+									else
+										PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+										PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+										PrintEnt:SetColor(Color(100,100,100,255))
+									end
+								end
+								PrintEnt.DakDead = true
+							else
 								local salvage = ents.Create( "dak_tesalvage" )
 								Shell.salvage = salvage
 								salvage.DakModel = ExpTrace.Entity:GetModel()
@@ -2761,241 +2891,298 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt)
 								ExpTrace.Entity:Remove()
 							end
 						end
-						if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
-							if(ExpTrace.Entity:GetParent():IsValid()) then
-								if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-									ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-								end
-							end
-							if not(ExpTrace.Entity:GetParent():IsValid()) then
-								ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-							end
-						end	
 					end
-					if ExpTrace.Entity:IsValid() then
-						if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity.Base == "base_nextbot" then
-							if ExpTrace.Entity:GetClass() == "dak_bot" then
-								ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
-								if ExpTrace.Entity:Health() <= 0 and ExpTrace.Entity.revenge==0 then
-									--local body = ents.Create( "prop_ragdoll" )
-									body:SetPos( ExpTrace.Entity:GetPos() )
-									body:SetModel( ExpTrace.Entity:GetModel() )
-									body:Spawn()
-									body.DakHealth=1000000
-									body.DakMaxHealth=1000000
-									--ExpTrace.Entity:Remove()
-									local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-									body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-									timer.Simple( 5, function()
-										body:Remove()
-									end )
-								end
-							else
-								local Pain = DamageInfo()
-								Pain:SetDamageForce( Direction*(Damage/traces)*5000*Shell.DakMass )
-								Pain:SetDamage( (Damage/traces)*500 )
-								if Owner:IsPlayer() and Shell and Shell.DakGun then
-									Pain:SetAttacker( Owner )
-									Pain:SetInflictor( Shell.DakGun )
-								else
-									Pain:SetAttacker( game.GetWorld() )
-									Pain:SetInflictor( game.GetWorld() )
-								end
-								Pain:SetReportedPosition( Shell.DakGun:GetPos() )
-								Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
-								Pain:SetDamageType(DMG_BLAST)
-								ExpTrace.Entity:TakeDamageInfo( Pain )
+					if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
+						if(ExpTrace.Entity:GetParent():IsValid()) then
+							if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
+								ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 							end
+						end
+						if not(ExpTrace.Entity:GetParent():IsValid()) then
+							ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 						end
 					end	
 				end
+				--print((Damage/traces)*1)
+				if ExpTrace.Entity:IsValid() then
+					if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity.Base == "base_nextbot" then
+						if ExpTrace.Entity:GetClass() == "dak_bot" then
+							ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*1)
+							if ExpTrace.Entity:Health() <= 0 and ExpTrace.Entity.revenge==0 then
+								--local body = ents.Create( "prop_ragdoll" )
+								body:SetPos( ExpTrace.Entity:GetPos() )
+								body:SetModel( ExpTrace.Entity:GetModel() )
+								body:Spawn()
+								body.DakHealth=1000000
+								body.DakMaxHealth=1000000
+								--ExpTrace.Entity:Remove()
+								local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+								body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+								timer.Simple( 5, function()
+									body:Remove()
+								end )
+							end
+						else
+							local Pain = DamageInfo()
+							Pain:SetDamageForce( Direction*(Damage/traces)*10*Shell.DakMass )
+							Pain:SetDamage( (Damage/traces)*1 )
+							if Owner:IsPlayer() and Shell and Shell.DakGun then
+								Pain:SetAttacker( Owner )
+								Pain:SetInflictor( Shell.DakGun )
+							else
+								Pain:SetAttacker( game.GetWorld() )
+								Pain:SetInflictor( game.GetWorld() )
+							end
+							Pain:SetReportedPosition( Shell.DakGun:GetPos() )
+							Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
+							Pain:SetDamageType(DMG_BLAST)
+							ExpTrace.Entity:TakeDamageInfo( Pain )
+						end
+					end
+				end	
 			end
 		end
+	end
 
+	local Targets = ents.FindInSphere( Pos, Radius )
+	if table.Count(Targets) > 0 then
 		for i = 1, #Targets do
-			if Targets[i]:IsValid() or Targets[i]:IsPlayer() or Targets[i]:IsNPC() then
-				local trace = {}
-				trace.start = Pos
-				trace.endpos = Pos + (Targets[i]:NearestPoint( Pos )-Pos)*Radius
-				trace.filter = Shell.IgnoreList
-				trace.mins = Vector(-0.1,-0.1,-0.1)
-				trace.maxs = Vector(0.1,0.1,0.1)
-				local ExpTrace = util.TraceHull( trace )
-				if ExpTrace.Entity == Targets[i] and (not(CheckClip(Targets[i],ExpTrace.HitPos))) then
-					if not(string.Explode("_",Targets[i]:GetClass(),false)[2] == "wire") and not(Targets[i]:IsVehicle()) and not(Targets[i]:GetClass() == "dak_salvage") and not(Targets[i]:GetClass() == "dak_tesalvage") and Targets[i].DakIsTread==nil and not(Targets[i]:GetClass() == "dak_turretcontrol") then
-						if (not(ExpTrace.Entity:IsPlayer())) and (not(ExpTrace.Entity:IsNPC())) and (not(ExpTrace.Entity.Base == "base_nextbot")) then
-							if ExpTrace.Entity:GetPhysicsObject():IsValid() and ExpTrace.Entity:GetPhysicsObject():GetMass()>1 then
-								if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-									DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-								end
-								table.insert(Shell.DakDamageList,ExpTrace.Entity)
-								if ExpTrace.Entity:GetClass()=="dak_crew" then
-									util.Decal( "Blood", ExpTrace.HitPos-(ExpTrace.Normal*5), ExpTrace.HitPos+(ExpTrace.Normal*500), Shell.IgnoreList)
-									util.Decal( "Blood", ExpTrace.HitPos-(ExpTrace.Normal*5), ExpTrace.HitPos+(ExpTrace.Normal*500), ExpTrace.Entity)
-								end
+			if Targets[i]:IsValid() then
+				if Targets[i].DakArmor == nil or Targets[i].DakBurnStacks == nil then
+					DakTekTankEditionSetupNewEnt(Targets[i])
+				end
+				if hook.Run("DakTankDamageCheck", Targets[i], Owner, Shell.DakGun) ~= false then
+				else
+					Shell.IgnoreList[#Shell.IgnoreList+1] = Targets[i]
+					--table.insert(Shell.IgnoreList,Targets[i])
+				end
+				if Targets[i].DakHealth == nil then
+					DakTekTankEditionSetupNewEnt(Targets[i])
+				end
+				if not(Targets[i].DakHealth == nil) then
+					if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 then
+						if IsValid(Targets[i]:GetPhysicsObject()) then
+							if Targets[i]:GetPhysicsObject():GetMass()<=1 then
+								Shell.IgnoreList[#Shell.IgnoreList+1] = Targets[i]
+								--table.insert(Shell.IgnoreList,Targets[i])
 							end
-						else
-							if Targets[i]:GetClass() == "dak_bot" then
-								if Shell.DakShellType == "SM" then
-									Targets[i]:SetHealth(Targets[i]:Health() - 50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)))
-									Targets[i]:Extinguish()
-									Targets[i]:Ignite(25*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)),1)
-								else
-									Targets[i]:SetHealth(Targets[i]:Health() - Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000))*500)
-								end
-								if Targets[i]:Health() <= 0 and Shell.revenge==0 then
-									--local body = ents.Create( "prop_ragdoll" )
-									body:SetPos( Targets[i]:GetPos() )
-									body:SetModel( Targets[i]:GetModel() )
-									body:Spawn()
-									--Targets[i]:Remove()
-									local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-									body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-									timer.Simple( 5, function()
-										body:Remove()
-									end )
+						end
+						Shell.IgnoreList[#Shell.IgnoreList+1] = Targets[i]
+						--table.insert(Shell.IgnoreList,Targets[i])
+					end
+				end
+			end
+		end
+		for i = 1, #Targets do
+			local CurShockwaveTarget = Targets[i]
+			local Class = CurShockwaveTarget:GetClass()
+			if Class == "dak_bot" or Class == "dak_crew" or CurShockwaveTarget:IsPlayer() or CurShockwaveTarget:IsNPC() then
+				if CurShockwaveTarget:IsValid() then
+					local trace = {}
+					trace.start = Pos
+					trace.endpos = Pos + (CurShockwaveTarget:NearestPoint( Pos )-Pos)*Radius
+					trace.filter = Shell.IgnoreList
+					trace.mins = Vector(-0.1,-0.1,-0.1)
+					trace.maxs = Vector(0.1,0.1,0.1)
+					local ExpTrace = util.TraceHull( trace )
+					if ExpTrace.Entity == CurShockwaveTarget and (not(CheckClip(CurShockwaveTarget,ExpTrace.HitPos))) then
+						if not(string.Explode("_",CurShockwaveTarget:GetClass(),false)[2] == "wire") and not(CurShockwaveTarget:IsVehicle()) and not(CurShockwaveTarget:GetClass() == "dak_salvage") and not(CurShockwaveTarget:GetClass() == "dak_tesalvage") and CurShockwaveTarget.DakIsTread==nil and not(CurShockwaveTarget:GetClass() == "dak_turretcontrol") then
+							if (not(ExpTrace.Entity:IsPlayer())) and (not(ExpTrace.Entity:IsNPC())) and (not(ExpTrace.Entity.Base == "base_nextbot")) then
+								if ExpTrace.Entity:GetPhysicsObject():IsValid() and ExpTrace.Entity:GetPhysicsObject():GetMass()>1 then
+									if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
+										DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+									end
+									Shell.DakDamageList[#Shell.DakDamageList+1] = ExpTrace.Entity[i]
+									--table.insert(Shell.DakDamageList,ExpTrace.Entity)
+									if ExpTrace.Entity:GetClass()=="dak_crew" then
+										util.Decal( "Blood", ExpTrace.HitPos-(ExpTrace.Normal*5), ExpTrace.HitPos+(ExpTrace.Normal*500), Shell.IgnoreList)
+										util.Decal( "Blood", ExpTrace.HitPos-(ExpTrace.Normal*5), ExpTrace.HitPos+(ExpTrace.Normal*500), ExpTrace.Entity)
+									end
 								end
 							else
-								local ExpPain = DamageInfo()
-								if Shell.DakShellType == "SM" then
-									ExpPain:SetDamageForce( ExpTrace.Normal*50*Shell.DakMass*(Shell.DakVelocity:Distance( Vector(0,0,0) )) )
-									ExpPain:SetDamage( 50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)) )
-									ExpTrace.Entity:Extinguish()
-									ExpTrace.Entity:Ignite(25*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)),1)
+								if CurShockwaveTarget:GetClass() == "dak_bot" then
+									if Shell.DakShellType == "SM" then
+										CurShockwaveTarget:SetHealth(CurShockwaveTarget:Health() - 50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)))
+										CurShockwaveTarget:Extinguish()
+										CurShockwaveTarget:Ignite(25*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)),1)
+									else
+										CurShockwaveTarget:SetHealth(CurShockwaveTarget:Health() - Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000))*500)
+									end
+									if CurShockwaveTarget:Health() <= 0 and Shell.revenge==0 then
+										--local body = ents.Create( "prop_ragdoll" )
+										body:SetPos( CurShockwaveTarget:GetPos() )
+										body:SetModel( CurShockwaveTarget:GetModel() )
+										body:Spawn()
+										--CurShockwaveTarget:Remove()
+										local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+										body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+										timer.Simple( 5, function()
+											body:Remove()
+										end )
+									end
 								else
-									ExpPain:SetDamageForce( ExpTrace.Normal*Damage*Shell.DakMass*(Shell.DakVelocity:Distance( Vector(0,0,0) )) )
-									ExpPain:SetDamage( Damage*50*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/1000)) )
+									local ExpPain = DamageInfo()
+									local Dist = ExpTrace.Entity:GetPos():Distance(Pos)
+									if Shell.DakShellType == "SM" then
+										ExpPain:SetDamageForce( ExpTrace.Normal*(1*(1-(Dist/Radius))) )
+										ExpPain:SetDamage( 1*(1-(Dist/Radius)) )
+										ExpTrace.Entity:Extinguish()
+										ExpTrace.Entity:Ignite(25*(1-(ExpTrace.Entity:GetPos():Distance(Pos)/Radius)),1)
+									else
+										if Dist > Radius*0.5 then
+											ExpPain:SetDamageForce( ExpTrace.Normal*(Damage*250*(1-(Dist/Radius))) )
+											ExpPain:SetDamage( Damage*2.5*(1-(Dist/Radius)) )
+										else
+											ExpPain:SetDamageForce( ExpTrace.Normal*(Damage*100*(1-(Dist/Radius))) )
+											ExpPain:SetDamage( Damage*1*(1-(Dist/Radius)) )
+										end
+										
+									end
+									if Owner:IsPlayer() and Shell and Shell.DakGun then
+										ExpPain:SetAttacker( Owner )
+										ExpPain:SetInflictor( Shell.DakGun )
+									else
+										ExpPain:SetAttacker( game.GetWorld() )
+										ExpPain:SetInflictor( game.GetWorld() )
+									end
+									ExpPain:SetReportedPosition( Shell.DakGun:GetPos() )
+									ExpPain:SetDamagePosition( ExpTrace.Entity:WorldSpaceCenter() )
+									ExpPain:SetDamageType(DMG_BLAST)
+									ExpTrace.Entity:TakeDamageInfo( ExpPain )
 								end
-								if Owner:IsPlayer() and Shell and Shell.DakGun then
-									ExpPain:SetAttacker( Owner )
-									ExpPain:SetInflictor( Shell.DakGun )
-								else
-									ExpPain:SetAttacker( game.GetWorld() )
-									ExpPain:SetInflictor( game.GetWorld() )
-								end
-								ExpPain:SetReportedPosition( Shell.DakGun:GetPos() )
-								ExpPain:SetDamagePosition( ExpTrace.Entity:WorldSpaceCenter() )
-								ExpPain:SetDamageType(DMG_BLAST)
-								ExpTrace.Entity:TakeDamageInfo( ExpPain )
 							end
 						end
 					end
 				end
 			end
 		end
+		
 		for i = 1, #Shell.DakDamageList do
-			--[[
-			if(Shell.DakDamageList[i]:IsValid()) then
-				if not(Shell.DakDamageList[i].Base == "base_nextbot") then
-					if(Shell.DakDamageList[i]:GetParent():IsValid()) then
-						if(Shell.DakDamageList[i]:GetParent():GetParent():IsValid()) then
-						Shell.DakDamageList[i]:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*Shell.DakDamageList[i]:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000)) )
-						end
-					end
-					if not(Shell.DakDamageList[i]:GetParent():IsValid()) then
-						Shell.DakDamageList[i]:GetPhysicsObject():ApplyForceCenter( (Shell.DakDamageList[i]:GetPos()-Pos):GetNormalized()*(Damage/table.Count(Shell.DakDamageList))*Shell.DakDamageList[i]:GetPhysicsObject():GetMass()*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/1000))  )
-					end
-				end
-			end
-			--]]
+			local CurTarget = CurTarget
 			local HPPerc = 0
-			if Shell.DakDamageList[i].SPPOwner and Shell.DakDamageList[i].SPPOwner:IsPlayer() then
-				if Shell.DakDamageList[i].SPPOwner:IsWorld() then
-					if Shell.DakDamageList[i].DakIsTread==nil then
-						if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then
-							if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-								DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+			if CurTarget.SPPOwner and CurTarget.SPPOwner:IsPlayer() then
+				if CurTarget.SPPOwner:IsWorld() then
+					if CurTarget.DakIsTread==nil then
+						if CurTarget:GetPos():Distance(Pos) > Radius/2 then
+							if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							else
-								DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							end
 						else
-							if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-								DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							else
-								DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							end
 						end
 					end
-					Shell.DakDamageList[i].DakLastDamagePos = Pos
-					if Shell.DakDamageList[i].DakHealth <= 0 and Shell.DakDamageList[i].DakPooled==0 then
-						if Shell.DakDamageList[i]:GetClass()=="dak_crew" then
-							if Shell.DakDamageList[i].DakHealth <= 0 then
+					CurTarget.DakLastDamagePos = Pos
+					if CurTarget.DakHealth <= 0 and CurTarget.DakPooled==0 then
+						if CurTarget:GetClass()=="dak_crew" then
+							if CurTarget.DakHealth <= 0 then
 								for blood=1, 15 do
-									util.Decal( "Blood", Shell.DakDamageList[i]:GetPos(), Shell.DakDamageList[i]:GetPos()+(VectorRand()*500), Shell.DakDamageList[i])
+									util.Decal( "Blood", CurTarget:GetPos(), CurTarget:GetPos()+(VectorRand()*500), CurTarget)
 								end
 							end
 						end
-						table.insert(Shell.RemoveList,Shell.DakDamageList[i])
+						Shell.RemoveList[#Shell.RemoveList+1] = CurTarget
+						--table.insert(Shell.RemoveList,CurTarget)
 					end
 				else
-					if Shell.DakDamageList[i].SPPOwner:HasGodMode()==false and not(Shell.DakDamageList[i].SPPOwner:IsWorld()) then	
-						if Shell.DakDamageList[i].DakIsTread==nil then
-							if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
-								if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-									DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+					if CurTarget.SPPOwner:HasGodMode()==false and not(CurTarget.SPPOwner:IsWorld()) then	
+						if CurTarget.DakIsTread==nil then
+							if CurTarget:GetPos():Distance(Pos) > Radius/2 then 
+								if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								else
-									DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								end
 							else
-								if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-									DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+								if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								else
-									DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								end
 							end
 						end
-						Shell.DakDamageList[i].DakLastDamagePos = Pos
-						if Shell.DakDamageList[i].DakHealth <= 0 and Shell.DakDamageList[i].DakPooled==0 then
-							if Shell.DakDamageList[i]:GetClass()=="dak_crew" then
-								if Shell.DakDamageList[i].DakHealth <= 0 then
+						CurTarget.DakLastDamagePos = Pos
+						if CurTarget.DakHealth <= 0 and CurTarget.DakPooled==0 then
+							if CurTarget:GetClass()=="dak_crew" then
+								if CurTarget.DakHealth <= 0 then
 									for blood=1, 15 do
-										util.Decal( "Blood", Shell.DakDamageList[i]:GetPos(), Shell.DakDamageList[i]:GetPos()+(VectorRand()*500), Shell.DakDamageList[i])
+										util.Decal( "Blood", CurTarget:GetPos(), CurTarget:GetPos()+(VectorRand()*500), CurTarget)
 									end
 								end
 							end
-							table.insert(Shell.RemoveList,Shell.DakDamageList[i])
+							Shell.RemoveList[#Shell.RemoveList+1] = CurTarget
+							--table.insert(Shell.RemoveList,CurTarget)
 						end
 					end
 				end
 			else
-				if Shell.DakDamageList[i].DakIsTread==nil then
-					if Shell.DakDamageList[i]:GetPos():Distance(Pos) > Radius/2 then 
-						if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-							DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+				if CurTarget.DakIsTread==nil then
+					if CurTarget:GetPos():Distance(Pos) > Radius/2 then 
+						if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+							DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
-							DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*(1-(Shell.DakDamageList[i]:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end
 					else
-						if Shell.DakDamageList[i]:GetClass() == "dak_tegun" or Shell.DakDamageList[i]:GetClass() == "dak_temachinegun" or Shell.DakDamageList[i]:GetClass() == "dak_teautogun" then
-							DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+						if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+							DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
-							DTDealDamage(Shell.DakDamageList[i], math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(Shell.DakDamageList[i], Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end
 					end
 				end
-				Shell.DakDamageList[i].DakLastDamagePos = Pos
-				if Shell.DakDamageList[i].DakHealth <= 0 and Shell.DakDamageList[i].DakPooled==0 then
-					if Shell.DakDamageList[i]:GetClass()=="dak_crew" then
-						if Shell.DakDamageList[i].DakHealth <= 0 then
+				CurTarget.DakLastDamagePos = Pos
+				if CurTarget.DakHealth <= 0 and CurTarget.DakPooled==0 then
+					if CurTarget:GetClass()=="dak_crew" then
+						if CurTarget.DakHealth <= 0 then
 							for blood=1, 15 do
-								util.Decal( "Blood", Shell.DakDamageList[i]:GetPos(), Shell.DakDamageList[i]:GetPos()+(VectorRand()*500), Shell.DakDamageList[i])
+								util.Decal( "Blood", CurTarget:GetPos(), CurTarget:GetPos()+(VectorRand()*500), CurTarget)
 							end
 						end
 					end
-					table.insert(Shell.RemoveList,Shell.DakDamageList[i])
+					Shell.RemoveList[#Shell.RemoveList+1] = CurTarget
+					--table.insert(Shell.RemoveList,CurTarget)
 				end
 			end
 
 		end
 		for i = 1, #Shell.RemoveList do
-			Shell.salvage = ents.Create( "dak_tesalvage" )
-			Shell.salvage.DakModel = Shell.RemoveList[i]:GetModel()
-			Shell.salvage:SetPos( Shell.RemoveList[i]:GetPos())
-			Shell.salvage:SetAngles( Shell.RemoveList[i]:GetAngles())
-			Shell.salvage.DakLastDamagePos = Pos
-			Shell.salvage:Spawn()
-			Shell.Filter[#Shell.Filter+1] = salvage
-			Shell.RemoveList[i]:Remove()
+			if (string.Explode("_",Shell.RemoveList[i]:GetClass(),false)[1] == "dak") then
+				local PrintEnt = Shell.RemoveList[i]
+				if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+					if PrintEnt:GetClass() == "dak_crew" then
+						if PrintEnt.Job == 1 then
+							PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+						elseif PrintEnt.Job == 2 then
+							PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+						elseif PrintEnt.Job == 3 then
+							PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+						else
+							PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+						end
+						PrintEnt:SetMaterial("models/flesh")
+					else
+						PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+						PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+						PrintEnt:SetColor(Color(100,100,100,255))
+					end
+				end
+				PrintEnt.DakDead = true
+			else
+				Shell.salvage = ents.Create( "dak_tesalvage" )
+				Shell.salvage.DakModel = Shell.RemoveList[i]:GetModel()
+				Shell.salvage:SetPos( Shell.RemoveList[i]:GetPos())
+				Shell.salvage:SetAngles( Shell.RemoveList[i]:GetAngles())
+				Shell.salvage.DakLastDamagePos = Pos
+				Shell.salvage:Spawn()
+				Shell.Filter[#Shell.Filter+1] = salvage
+				Shell.RemoveList[i]:Remove()
+			end
 		end
 	end
 end
@@ -3060,7 +3247,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 			if SpallTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
 			end
-			if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and (SpallTrace.Entity.DakHealth and not(SpallTrace.Entity.DakHealth <= 0) or (SpallTrace.Entity.DakName=="Damaged Component")) then
+			if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and (SpallTrace.Entity.DakHealth and not(SpallTrace.Entity.DakHealth <= 0) or (SpallTrace.Entity.DakName=="Damaged Component") or (SpallTrace.Entity.DakDead==true)) then
 				if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
 					if SpallTrace.Entity.DakArmor == nil or SpallTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
@@ -3080,7 +3267,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 						end
 					end
 					Filter[#Filter+1] = HitEnt
-					ContSpall(Filter,SpallTrace.Entity,Pos,SpallDamage,SpallPen,Owner,Direction,Shell,10)
+					ContSpall(Filter,SpallTrace.Entity,Pos,SpallDamage,SpallPen,Owner,Direction,Shell,1)
 				else
 					if SpallTrace.Entity.DakArmor == nil or SpallTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
@@ -3126,14 +3313,37 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 							end
 						end
 						Filter[#Filter+1] = SpallTrace.Entity
-						local salvage = ents.Create( "dak_tesalvage" )
-						Shell.salvage = salvage
-						salvage.DakModel = SpallTrace.Entity:GetModel()
-						salvage:SetPos( SpallTrace.Entity:GetPos())
-						salvage:SetAngles( SpallTrace.Entity:GetAngles())
-						salvage:Spawn()
-						Filter[#Filter+1] = salvage
-						SpallTrace.Entity:Remove()
+						if (string.Explode("_",SpallTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = SpallTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							Shell.salvage = salvage
+							salvage.DakModel = SpallTrace.Entity:GetModel()
+							salvage:SetPos( SpallTrace.Entity:GetPos())
+							salvage:SetAngles( SpallTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							SpallTrace.Entity:Remove()
+						end
 					end
 					local EffArmor = (DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(SpallTrace.HitNormal:Dot(Direction)))
 					if SpallTrace.Entity.IsComposite == 1 then
@@ -3152,7 +3362,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 						end
 
 						Filter[#Filter+1] = HitEnt
-						ContSpall(Filter,SpallTrace.Entity,Pos,SpallDamage*(1-EffArmor/SpallPen),SpallPen-EffArmor,Owner,Direction,Shell,10)
+						ContSpall(Filter,SpallTrace.Entity,Pos,SpallDamage*(1-EffArmor/SpallPen),SpallPen-EffArmor,Owner,Direction,Shell,1)
 					else
 						--decals don't like using the adjusted by normal Pos
 						--util.Decal( "Impact.Glass", Pos, Pos+(Direction*1000), {Shell.DakGun,HitEnt})
@@ -3160,12 +3370,12 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
 						end
 						--SpallBounceHere
-						local HitAng = math.deg(math.acos(SpallTrace.HitNormal:Dot(-SpallTrace.Normal)))
-						local Energy = 10 - (HitAng * 0.1)
-						if Energy > 10 then
-							local newDir = (((SpallTrace.HitNormal)+((SpallTrace.HitPos-Pos):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized():Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))):Forward()
-							ContSpall({},Shell.DakGun,SpallTrace.HitPos+SpallTrace.HitNormal*2,SpallDamage*(Energy/10),SpallPen*(Energy/10),Owner,newDir,Shell,Energy)
-						end
+						--local HitAng = math.deg(math.acos(SpallTrace.HitNormal:Dot(-SpallTrace.Normal)))
+						--local Energy = 10 - (HitAng * 0.1)
+						--if Energy > 10 then
+						--	local newDir = (((SpallTrace.HitNormal)+((SpallTrace.HitPos-Pos):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized():Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))):Forward()
+						--	ContSpall({},Shell.DakGun,SpallTrace.HitPos+SpallTrace.HitNormal*2,SpallDamage*(Energy/10),SpallPen*(Energy/10),Owner,newDir,Shell,Energy)
+						--end
 					end
 				end
 			end
@@ -3223,171 +3433,199 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 end
 
 function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
-	local trace = {}
-		trace.start = Pos - Direction*2
-		trace.endpos = Pos + Direction*1000
-		trace.filter = Filter
-		trace.mins = Vector(-Shell.DakCaliber*0.002,-Shell.DakCaliber*0.002,-Shell.DakCaliber*0.002)
-		trace.maxs = Vector(Shell.DakCaliber*0.002,Shell.DakCaliber*0.002,Shell.DakCaliber*0.002)
-	local SpallTrace = util.TraceLine( trace )
-	if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
-		if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and not(SpallTrace.Entity.DakHealth == 0)then
-			if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
-				if SpallTrace.Entity.DakArmor == nil or SpallTrace.Entity.DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
-				end
-				local SA = SpallTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-				if SpallTrace.Entity.IsDakTekFutureTech == 1 then
-					SpallTrace.Entity.DakArmor = 1000
-				else
-					if SA == nil then
-						--Volume = (4/3)*math.pi*math.pow( SpallTrace.Entity:OBBMaxs().x, 3 )
-						SpallTrace.Entity.DakArmor = SpallTrace.Entity:OBBMaxs().x/2
-						SpallTrace.Entity.DakIsTread = 1
+	Energy = Energy + 1
+	if Energy <= 25 then
+		local trace = {}
+			trace.start = Pos - Direction*2
+			trace.endpos = Pos + Direction*1000
+			trace.filter = Filter
+			trace.mins = Vector(-Shell.DakCaliber*0.002,-Shell.DakCaliber*0.002,-Shell.DakCaliber*0.002)
+			trace.maxs = Vector(Shell.DakCaliber*0.002,Shell.DakCaliber*0.002,Shell.DakCaliber*0.002)
+		local SpallTrace = util.TraceLine( trace )
+		if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
+			if SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and not(SpallTrace.Entity.DakHealth == 0)then
+				if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
+					if SpallTrace.Entity.DakArmor == nil or SpallTrace.Entity.DakBurnStacks == nil then
+						DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
+					end
+					local SA = SpallTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+					if SpallTrace.Entity.IsDakTekFutureTech == 1 then
+						SpallTrace.Entity.DakArmor = 1000
 					else
-						if SpallTrace.Entity:GetClass()=="prop_physics" then 
-							DTArmorSanityCheck(SpallTrace.Entity)
+						if SA == nil then
+							--Volume = (4/3)*math.pi*math.pow( SpallTrace.Entity:OBBMaxs().x, 3 )
+							SpallTrace.Entity.DakArmor = SpallTrace.Entity:OBBMaxs().x/2
+							SpallTrace.Entity.DakIsTread = 1
+						else
+							if SpallTrace.Entity:GetClass()=="prop_physics" then 
+								DTArmorSanityCheck(SpallTrace.Entity)
+							end
 						end
 					end
-				end
-				Filter[#Filter+1] = IgnoreEnt
-				ContSpall(Filter,SpallTrace.Entity,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
-			else
-				if SpallTrace.Entity.DakArmor == nil or SpallTrace.Entity.DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
-				end
-				local SA = SpallTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-				if SpallTrace.Entity.IsDakTekFutureTech == 1 then
-					SpallTrace.Entity.DakArmor = 1000
+					Filter[#Filter+1] = IgnoreEnt
+					ContSpall(Filter,SpallTrace.Entity,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 				else
-					if SA == nil then
-						--Volume = (4/3)*math.pi*math.pow( SpallTrace.Entity:OBBMaxs().x, 3 )
-						SpallTrace.Entity.DakArmor = SpallTrace.Entity:OBBMaxs().x/2
-						SpallTrace.Entity.DakIsTread = 1
+					if SpallTrace.Entity.DakArmor == nil or SpallTrace.Entity.DakBurnStacks == nil then
+						DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
+					end
+					local SA = SpallTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+					if SpallTrace.Entity.IsDakTekFutureTech == 1 then
+						SpallTrace.Entity.DakArmor = 1000
 					else
-						if SpallTrace.Entity:GetClass()=="prop_physics" then 
-							DTArmorSanityCheck(SpallTrace.Entity)
+						if SA == nil then
+							--Volume = (4/3)*math.pi*math.pow( SpallTrace.Entity:OBBMaxs().x, 3 )
+							SpallTrace.Entity.DakArmor = SpallTrace.Entity:OBBMaxs().x/2
+							SpallTrace.Entity.DakIsTread = 1
+						else
+							if SpallTrace.Entity:GetClass()=="prop_physics" then 
+								DTArmorSanityCheck(SpallTrace.Entity)
+							end
 						end
 					end
-				end
-				
-				SpallTrace.Entity.DakLastDamagePos = SpallTrace.HitPos
-				if SpallTrace.Entity.SPPOwner and SpallTrace.Entity.SPPOwner:IsPlayer() and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
-					if SpallTrace.Entity.SPPOwner:HasGodMode()==false and SpallTrace.Entity.DakIsTread == nil then	
+					
+					SpallTrace.Entity.DakLastDamagePos = SpallTrace.HitPos
+					if SpallTrace.Entity.SPPOwner and SpallTrace.Entity.SPPOwner:IsPlayer() and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
+						if SpallTrace.Entity.SPPOwner:HasGodMode()==false and SpallTrace.Entity.DakIsTread == nil then	
+							if SpallTrace.Entity:GetClass() == "dak_tegun" or SpallTrace.Entity:GetClass() == "dak_temachinegun" or SpallTrace.Entity:GetClass() == "dak_teautogun" then
+								DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+							else
+								DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							end
+						end
+					else
 						if SpallTrace.Entity:GetClass() == "dak_tegun" or SpallTrace.Entity:GetClass() == "dak_temachinegun" or SpallTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
 						else
 							DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end
 					end
-				else
-					if SpallTrace.Entity:GetClass() == "dak_tegun" or SpallTrace.Entity:GetClass() == "dak_temachinegun" or SpallTrace.Entity:GetClass() == "dak_teautogun" then
-						DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
-					else
-						DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-					end
-				end
-				if SpallTrace.Entity.DakHealth <= 0 and SpallTrace.Entity.DakPooled==0 then
-					if SpallTrace.Entity:GetClass()=="dak_crew" then
-						if SpallTrace.Entity.DakHealth <= 0 then
-							for blood=1, 15 do
-								util.Decal( "Blood", SpallTrace.Entity:GetPos(), SpallTrace.Entity:GetPos()+(VectorRand()*500), SpallTrace.Entity)
+					if SpallTrace.Entity.DakHealth <= 0 and SpallTrace.Entity.DakPooled==0 then
+						if SpallTrace.Entity:GetClass()=="dak_crew" then
+							if SpallTrace.Entity.DakHealth <= 0 then
+								for blood=1, 15 do
+									util.Decal( "Blood", SpallTrace.Entity:GetPos(), SpallTrace.Entity:GetPos()+(VectorRand()*500), SpallTrace.Entity)
+								end
 							end
 						end
+						Filter[#Filter+1] = SpallTrace.Entity
+						if (string.Explode("_",SpallTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = SpallTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							Shell.salvage = salvage
+							salvage.DakModel = SpallTrace.Entity:GetModel()
+							salvage:SetPos( SpallTrace.Entity:GetPos())
+							salvage:SetAngles( SpallTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							SpallTrace.Entity:Remove()
+						end
 					end
-					Filter[#Filter+1] = SpallTrace.Entity
-					local salvage = ents.Create( "dak_tesalvage" )
-					Shell.salvage = salvage
-					salvage.DakModel = SpallTrace.Entity:GetModel()
-					salvage:SetPos( SpallTrace.Entity:GetPos())
-					salvage:SetAngles( SpallTrace.Entity:GetAngles())
-					salvage:Spawn()
-					Filter[#Filter+1] = salvage
-					SpallTrace.Entity:Remove()
-				end
-				local EffArmor = (DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(SpallTrace.HitNormal:Dot(Direction)))
-				if SpallTrace.Entity.IsComposite == 1 then
-					if SpallTrace.Entity.EntityMods.CompKEMult == nil then SpallTrace.Entity.EntityMods.CompKEMult = 9.2 end 
-					if SpallTrace.Entity.EntityMods.CompCEMult == nil then SpallTrace.Entity.EntityMods.CompCEMult = 18.4 end
-					EffArmor = (SpallTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*SpallTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal, Filter  )*SpallTrace.Entity.EntityMods.CompKEMult
-				end
-				if EffArmor < Pen and SpallTrace.Entity.IsDakTekFutureTech == nil then
-					--decals don't like using the adjusted by normal Pos
-					--util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
-					--util.Decal( "Impact.Concrete", SpallTrace.HitPos+(Direction*5), Pos, {Shell.DakGun})
+					local EffArmor = (DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(SpallTrace.HitNormal:Dot(Direction)))
+					if SpallTrace.Entity.IsComposite == 1 then
+						if SpallTrace.Entity.EntityMods.CompKEMult == nil then SpallTrace.Entity.EntityMods.CompKEMult = 9.2 end 
+						if SpallTrace.Entity.EntityMods.CompCEMult == nil then SpallTrace.Entity.EntityMods.CompCEMult = 18.4 end
+						EffArmor = (SpallTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*SpallTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal, Filter  )*SpallTrace.Entity.EntityMods.CompKEMult
+					end
+					if EffArmor < Pen and SpallTrace.Entity.IsDakTekFutureTech == nil then
+						--decals don't like using the adjusted by normal Pos
+						--util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
+						--util.Decal( "Impact.Concrete", SpallTrace.HitPos+(Direction*5), Pos, {Shell.DakGun})
 
-					if SpallTrace.Entity:GetClass()=="dak_crew" then
-						util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
-						util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), SpallTrace.Entity)
-					end
+						if SpallTrace.Entity:GetClass()=="dak_crew" then
+							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
+							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), SpallTrace.Entity)
+						end
 
-					Filter[#Filter+1] = IgnoreEnt
-					ContSpall(Filter,SpallTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Pen-EffArmor,Owner,Direction,Shell,Energy)
-				else
-					--decals don't like using the adjusted by normal Pos
-					--util.Decal( "Impact.Glass", Pos, Pos+(Direction*1000), {Shell.DakGun,HitEnt})
-					if SpallTrace.Entity:GetClass()=="dak_crew" then
-						util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
-					end
-					--SpallBounceHere
-					local HitAng = math.deg(math.acos(SpallTrace.HitNormal:Dot(-SpallTrace.Normal)))
-					Energy = Energy - (HitAng * 0.1)
-					if Energy > 10 then
-						Pen = Pen*(Energy/10)
-						Damage = Damage*(Energy/10)
-						local newDir = (((SpallTrace.HitNormal)+((SpallTrace.HitPos-Pos):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized():Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))):Forward()
-						ContSpall({},Shell.DakGun,SpallTrace.HitPos+SpallTrace.HitNormal*2,Damage,Pen,Owner,newDir,Shell,Energy)
-					end
-				end
-			end
-		end
-		if SpallTrace.Entity:IsValid() then
-			if SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() or SpallTrace.Entity.Base == "base_nextbot" then
-				if SpallTrace.Entity:GetClass() == "dak_bot" then
-					SpallTrace.Entity:SetHealth(SpallTrace.Entity:Health() - (Damage)*500)
-					if SpallTrace.Entity:Health() <= 0 and SpallTrace.Entity.revenge==0 then
-						--local body = ents.Create( "prop_ragdoll" )
-						body:SetPos( SpallTrace.Entity:GetPos() )
-						body:SetModel( SpallTrace.Entity:GetModel() )
-						body:Spawn()
-						body.DakHealth=1000000
-						body.DakMaxHealth=1000000
-						--SpallTrace.Entity:Remove()
-						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-						timer.Simple( 5, function()
-							body:Remove()
-						end )
-					end
-				else
-					local Pain = DamageInfo()
-					Pain:SetDamageForce( Direction*(Damage)*5000*Shell.DakMass )
-					Pain:SetDamage( (Damage)*500 )
-					if Owner:IsPlayer() and Shell and Shell.DakGun then
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( Shell.DakGun )
+						Filter[#Filter+1] = IgnoreEnt
+						ContSpall(Filter,SpallTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Pen-EffArmor,Owner,Direction,Shell,Energy)
 					else
-						Pain:SetAttacker( game.GetWorld() )
-						Pain:SetInflictor( game.GetWorld() )
+						--decals don't like using the adjusted by normal Pos
+						--util.Decal( "Impact.Glass", Pos, Pos+(Direction*1000), {Shell.DakGun,HitEnt})
+						if SpallTrace.Entity:GetClass()=="dak_crew" then
+							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
+						end
+						--SpallBounceHere
+						--local HitAng = math.deg(math.acos(SpallTrace.HitNormal:Dot(-SpallTrace.Normal)))
+						--Energy = Energy - (HitAng * 0.1)
+						--if Energy > 10 then
+						--	Pen = Pen*(Energy/10)
+						--	Damage = Damage*(Energy/10)
+						--	local newDir = (((SpallTrace.HitNormal)+((SpallTrace.HitPos-Pos):GetNormalized()*1*(45/(90-HitAng)))):GetNormalized():Angle() + Angle(math.Rand(-1,1),math.Rand(-1,1),math.Rand(-1,1))):Forward()
+						--	ContSpall({},Shell.DakGun,SpallTrace.HitPos+SpallTrace.HitNormal*2,Damage,Pen,Owner,newDir,Shell,Energy)
+						--end
 					end
-					Pain:SetReportedPosition( Shell.DakGun:GetPos() )
-					Pain:SetDamagePosition( SpallTrace.Entity:GetPos() )
-					Pain:SetDamageType(DMG_BLAST)
-					SpallTrace.Entity:TakeDamageInfo( Pain )
 				end
 			end
-			--local effectdata = EffectData()
-			--effectdata:SetStart(Pos)
-			--effectdata:SetOrigin(SpallTrace.HitPos)
-			--effectdata:SetScale(Shell.DakCaliber*0.00393701)
-			--util.Effect("dakteballistictracer", effectdata)
-		else
-			--local effectdata = EffectData()
-			--effectdata:SetStart(Pos)
-			--effectdata:SetOrigin(Pos + Direction*1000)
-			--effectdata:SetScale(Shell.DakCaliber*0.00393701)
-			--util.Effect("dakteballistictracer", effectdata)
-		end	
+			if SpallTrace.Entity:IsValid() then
+				if SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() or SpallTrace.Entity.Base == "base_nextbot" then
+					if SpallTrace.Entity:GetClass() == "dak_bot" then
+						SpallTrace.Entity:SetHealth(SpallTrace.Entity:Health() - (Damage)*500)
+						if SpallTrace.Entity:Health() <= 0 and SpallTrace.Entity.revenge==0 then
+							--local body = ents.Create( "prop_ragdoll" )
+							body:SetPos( SpallTrace.Entity:GetPos() )
+							body:SetModel( SpallTrace.Entity:GetModel() )
+							body:Spawn()
+							body.DakHealth=1000000
+							body.DakMaxHealth=1000000
+							--SpallTrace.Entity:Remove()
+							local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+							body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+							timer.Simple( 5, function()
+								body:Remove()
+							end )
+						end
+					else
+						local Pain = DamageInfo()
+						Pain:SetDamageForce( Direction*(Damage)*5000*Shell.DakMass )
+						Pain:SetDamage( (Damage)*500 )
+						if Owner:IsPlayer() and Shell and Shell.DakGun then
+							Pain:SetAttacker( Owner )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
+						Pain:SetReportedPosition( Shell.DakGun:GetPos() )
+						Pain:SetDamagePosition( SpallTrace.Entity:GetPos() )
+						Pain:SetDamageType(DMG_BLAST)
+						SpallTrace.Entity:TakeDamageInfo( Pain )
+					end
+				end
+				--local effectdata = EffectData()
+				--effectdata:SetStart(Pos)
+				--effectdata:SetOrigin(SpallTrace.HitPos)
+				--effectdata:SetScale(Shell.DakCaliber*0.00393701)
+				--util.Effect("dakteballistictracer", effectdata)
+			else
+				--local effectdata = EffectData()
+				--effectdata:SetStart(Pos)
+				--effectdata:SetOrigin(Pos + Direction*1000)
+				--effectdata:SetScale(Shell.DakCaliber*0.00393701)
+				--util.Effect("dakteballistictracer", effectdata)
+			end	
+		end
+	else
+		print("ERROR: Spalling Recurse Loop")
 	end
 end
 
@@ -3409,7 +3647,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 			if HEATTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
 			end
-			if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth and not(HEATTrace.Entity.DakHealth <= 0) or (HEATTrace.Entity.DakName=="Damaged Component")) then
+			if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth and not(HEATTrace.Entity.DakHealth <= 0) or (HEATTrace.Entity.DakName=="Damaged Component") or (HEATTrace.Entity.DakDead==true)) then
 				if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 					if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
@@ -3485,14 +3723,37 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 							end
 						end
 						Filter[#Filter+1] = HEATTrace.Entity
-						local salvage = ents.Create( "dak_tesalvage" )
-						Shell.salvage = salvage
-						salvage.DakModel = HEATTrace.Entity:GetModel()
-						salvage:SetPos( HEATTrace.Entity:GetPos())
-						salvage:SetAngles( HEATTrace.Entity:GetAngles())
-						salvage:Spawn()
-						Filter[#Filter+1] = salvage
-						HEATTrace.Entity:Remove()
+						if (string.Explode("_",HEATTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = HEATTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							Shell.salvage = salvage
+							salvage.DakModel = HEATTrace.Entity:GetModel()
+							salvage:SetPos( HEATTrace.Entity:GetPos())
+							salvage:SetAngles( HEATTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							HEATTrace.Entity:Remove()
+						end
 					end
 					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
 					if HEATTrace.Entity.IsComposite == 1 then
@@ -3591,7 +3852,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 			if HEATTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
 			end
-			if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth and not(HEATTrace.Entity.DakHealth <= 0) or (HEATTrace.Entity.DakName=="Damaged Component")) then
+			if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth and not(HEATTrace.Entity.DakHealth <= 0) or (HEATTrace.Entity.DakName=="Damaged Component") or (HEATTrace.Entity.DakDead==true)) then
 				if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 					if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
@@ -3665,14 +3926,37 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 							end
 						end
 						Filter[#Filter+1] = HEATTrace.Entity
-						local salvage = ents.Create( "dak_tesalvage" )
-						Shell.salvage = salvage
-						salvage.DakModel = HEATTrace.Entity:GetModel()
-						salvage:SetPos( HEATTrace.Entity:GetPos())
-						salvage:SetAngles( HEATTrace.Entity:GetAngles())
-						salvage:Spawn()
-						Filter[#Filter+1] = salvage
-						HEATTrace.Entity:Remove()
+						if (string.Explode("_",HEATTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = HEATTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							Shell.salvage = salvage
+							salvage.DakModel = HEATTrace.Entity:GetModel()
+							salvage:SetPos( HEATTrace.Entity:GetPos())
+							salvage:SetAngles( HEATTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							HEATTrace.Entity:Remove()
+						end
 					end
 					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
 					if HEATTrace.Entity.IsComposite == 1 then
@@ -3756,195 +4040,224 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 	end
 end
 
-function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggered)
-	if isangle(Direction) then
-		Direction = Direction:Forward()
-	end
-	local trace = {}
-		trace.start = Pos - Direction*250
-		trace.endpos = Pos + Direction*1000
-		trace.filter = Filter
-		trace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
-		trace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
-	local HEATTrace = util.TraceHull( trace )
-	local HEATTraceLine = util.TraceLine( trace )
-
-	if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner, Shell.DakGun) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
-		if HEATTrace.Entity.DakHealth == nil then
-			DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
+function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggered,Recurse)
+	if Recurse == nil then Recurse = 1 end
+	Recurse = Recurse + 1 
+	if Recurse < 25 then
+		if isangle(Direction) then
+			Direction = Direction:Forward()
 		end
-		if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth and not(HEATTrace.Entity.DakHealth <= 0) or (HEATTrace.Entity.DakName=="Damaged Component")) then
-			if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
-				if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
-				end
-				local SA = HEATTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-				if HEATTrace.Entity.IsDakTekFutureTech == 1 then
-					HEATTrace.Entity.DakArmor = 1000
-				else
-					if SA == nil then
-						--Volume = (4/3)*math.pi*math.pow( HEATTrace.Entity:OBBMaxs().x, 3 )
-						HEATTrace.Entity.DakArmor = HEATTrace.Entity:OBBMaxs().x/2
-						HEATTrace.Entity.DakIsTread = 1
-					else
-						if HEATTrace.Entity:GetClass()=="prop_physics" then 
-							DTArmorSanityCheck(HEATTrace.Entity)
-						end
-					end
-				end
-				Filter[#Filter+1] = IgnoreEnt
-				ContHEAT(Filter,HEATTrace.Entity,Pos,Damage,Pen,Owner,Direction,Shell,false)
-			else
-				if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
-				end
-				local SA = HEATTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-				if HEATTrace.Entity.IsDakTekFutureTech == 1 then
-					HEATTrace.Entity.DakArmor = 1000
-				else
-					if SA == nil then
-						--Volume = (4/3)*math.pi*math.pow( HEATTrace.Entity:OBBMaxs().x, 3 )
-						HEATTrace.Entity.DakArmor = HEATTrace.Entity:OBBMaxs().x/2
-						HEATTrace.Entity.DakIsTread = 1
-					else
-						if HEATTrace.Entity:GetClass()=="prop_physics" then 
-							DTArmorSanityCheck(HEATTrace.Entity)
-						end
-					end
-				end
-				
-				HEATTrace.Entity.DakLastDamagePos = HEATTrace.HitPos
-				--lose 2.54mm of pen per inch of air
-				local HeatPenLoss = Pos:Distance(HEATTrace.HitPos)*2.54
+		local trace = {}
+			trace.start = Pos - Direction*250
+			trace.endpos = Pos + Direction*1000
+			trace.filter = Filter
+			trace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+			trace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+		local HEATTrace = util.TraceHull( trace )
+		local HEATTraceLine = util.TraceLine( trace )
 
-				if not(Triggered) then
-					local StandoffCalibers = 0
-					if Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
-						StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 1.65
+		if hook.Run("DakTankDamageCheck", HEATTrace.Entity, Owner, Shell.DakGun) ~= false and HEATTrace.HitPos:Distance(Pos)<=1000 then
+			if HEATTrace.Entity.DakHealth == nil then
+				DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
+			end
+			if HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth and not(HEATTrace.Entity.DakHealth <= 0) or (HEATTrace.Entity.DakName=="Damaged Component") or (HEATTrace.Entity.DakDead==true)) then
+				if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
+					if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
+						DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
 					end
-					if Shell.DakShellType == "HEAT" then
-						StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber)
-					end
-					if StandoffCalibers > 7.5 then
-						Pen = Pen * 1.4 / (StandoffCalibers/7.5)
+					local SA = HEATTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+					if HEATTrace.Entity.IsDakTekFutureTech == 1 then
+						HEATTrace.Entity.DakArmor = 1000
 					else
-						Pen = Pen * math.sqrt(math.sqrt(StandoffCalibers))/1.185
+						if SA == nil then
+							--Volume = (4/3)*math.pi*math.pow( HEATTrace.Entity:OBBMaxs().x, 3 )
+							HEATTrace.Entity.DakArmor = HEATTrace.Entity:OBBMaxs().x/2
+							HEATTrace.Entity.DakIsTread = 1
+						else
+							if HEATTrace.Entity:GetClass()=="prop_physics" then 
+								DTArmorSanityCheck(HEATTrace.Entity)
+							end
+						end
 					end
-				end
-				if HEATTrace.Entity.SPPOwner and HEATTrace.Entity.SPPOwner:IsPlayer() and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
-					if HEATTrace.Entity.SPPOwner:HasGodMode()==false and HEATTrace.Entity.DakIsTread == nil then
+					Filter[#Filter+1] = IgnoreEnt
+					ContHEAT(Filter,HEATTrace.Entity,Pos,Damage,Pen,Owner,Direction,Shell,false,Recurse)
+				else
+					if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
+						DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
+					end
+					local SA = HEATTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+					if HEATTrace.Entity.IsDakTekFutureTech == 1 then
+						HEATTrace.Entity.DakArmor = 1000
+					else
+						if SA == nil then
+							--Volume = (4/3)*math.pi*math.pow( HEATTrace.Entity:OBBMaxs().x, 3 )
+							HEATTrace.Entity.DakArmor = HEATTrace.Entity:OBBMaxs().x/2
+							HEATTrace.Entity.DakIsTread = 1
+						else
+							if HEATTrace.Entity:GetClass()=="prop_physics" then 
+								DTArmorSanityCheck(HEATTrace.Entity)
+							end
+						end
+					end
+					
+					HEATTrace.Entity.DakLastDamagePos = HEATTrace.HitPos
+					--lose 2.54mm of pen per inch of air
+					local HeatPenLoss = Pos:Distance(HEATTrace.HitPos)*2.54
+
+					if not(Triggered) then
+						local StandoffCalibers = 0
+						if Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
+							StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 1.65
+						end
+						if Shell.DakShellType == "HEAT" then
+							StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber)
+						end
+						if StandoffCalibers > 7.5 then
+							Pen = Pen * 1.4 / (StandoffCalibers/7.5)
+						else
+							Pen = Pen * math.sqrt(math.sqrt(StandoffCalibers))/1.185
+						end
+					end
+					if HEATTrace.Entity.SPPOwner and HEATTrace.Entity.SPPOwner:IsPlayer() and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
+						if HEATTrace.Entity.SPPOwner:HasGodMode()==false and HEATTrace.Entity.DakIsTread == nil then
+							if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
+								DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+							else
+								DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							end	
+						end
+					else
 						if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
 						else
 							DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end	
 					end
-				else
-					if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
-						DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
-					else
-						DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-					end	
-				end
-				--print("Secondary Impact Damage")
-				--print(math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2))
-				if HEATTrace.Entity.DakHealth <= 0 and HEATTrace.Entity.DakPooled==0 then
-					if HEATTrace.Entity:GetClass()=="dak_crew" then
-						if HEATTrace.Entity.DakHealth <= 0 then
-							for blood=1, 15 do
-								util.Decal( "Blood", HEATTrace.Entity:GetPos(), HEATTrace.Entity:GetPos()+(VectorRand()*500), HEATTrace.Entity)
+					--print("Secondary Impact Damage")
+					--print(math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2))
+					if HEATTrace.Entity.DakHealth <= 0 and HEATTrace.Entity.DakPooled==0 then
+						if HEATTrace.Entity:GetClass()=="dak_crew" then
+							if HEATTrace.Entity.DakHealth <= 0 then
+								for blood=1, 15 do
+									util.Decal( "Blood", HEATTrace.Entity:GetPos(), HEATTrace.Entity:GetPos()+(VectorRand()*500), HEATTrace.Entity)
+								end
+							end
+						end
+						Filter[#Filter+1] = HEATTrace.Entity
+						if (string.Explode("_",HEATTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = HEATTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							Shell.salvage = salvage
+							salvage.DakModel = HEATTrace.Entity:GetModel()
+							salvage:SetPos( HEATTrace.Entity:GetPos())
+							salvage:SetAngles( HEATTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							HEATTrace.Entity:Remove()
+						end
+					end
+					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
+					if HEATTrace.Entity.IsComposite == 1 then
+						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end 
+						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
+						EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*HEATTrace.Entity.EntityMods.CompCEMult
+						if Shell.IsTandem == true then
+							if HEATTrace.Entity.IsERA == 1 then
+								EffArmor = 0
 							end
 						end
 					end
-					Filter[#Filter+1] = HEATTrace.Entity
-					local salvage = ents.Create( "dak_tesalvage" )
-					Shell.salvage = salvage
-					salvage.DakModel = HEATTrace.Entity:GetModel()
-					salvage:SetPos( HEATTrace.Entity:GetPos())
-					salvage:SetAngles( HEATTrace.Entity:GetAngles())
-					salvage:Spawn()
-					Filter[#Filter+1] = salvage
-					HEATTrace.Entity:Remove()
-				end
-				local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
-				if HEATTrace.Entity.IsComposite == 1 then
-					if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end 
-					if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
-					EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*HEATTrace.Entity.EntityMods.CompCEMult
-					if Shell.IsTandem == true then
-						if HEATTrace.Entity.IsERA == 1 then
-							EffArmor = 0
+					if EffArmor < (Pen-HeatPenLoss) and HEATTrace.Entity.IsDakTekFutureTech == nil then
+						--decals don't like using the adjusted by normal Pos
+						util.Decal( "Impact.Concrete", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun})
+						util.Decal( "Impact.Concrete", HEATTrace.HitPos+(Direction*5), HEATTrace.HitPos-(Direction*5), {Shell.DakGun})
+						if HEATTrace.Entity:GetClass()=="dak_crew" then
+							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
+							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), HEATTrace.Entity)
+						end
+						Filter[#Filter+1] = IgnoreEnt
+						Filter[#Filter+1] = HEATTrace.Entity
+						DTSpall(Pos,EffArmor,HEATTrace.Entity,Shell.DakCaliber,math.Clamp(Pen-HeatPenLoss,Pen*0.05,Pen),Owner,Shell, Direction:Angle():Forward())
+						ContHEAT(Filter,HEATTrace.Entity,HEATTrace.HitPos,Damage*(1-EffArmor/(Pen-HeatPenLoss)),(Pen-HeatPenLoss)-EffArmor,Owner,Direction,Shell,true,Recurse)
+					else
+						--decals don't like using the adjusted by normal Pos
+						util.Decal( "Impact.Glass", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun, HitEnt})
+						if HEATTrace.Entity:GetClass()=="dak_crew" then
+							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
 						end
 					end
 				end
-				if EffArmor < (Pen-HeatPenLoss) and HEATTrace.Entity.IsDakTekFutureTech == nil then
-					--decals don't like using the adjusted by normal Pos
-					util.Decal( "Impact.Concrete", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun})
-					util.Decal( "Impact.Concrete", HEATTrace.HitPos+(Direction*5), HEATTrace.HitPos-(Direction*5), {Shell.DakGun})
-					if HEATTrace.Entity:GetClass()=="dak_crew" then
-						util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
-						util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), HEATTrace.Entity)
-					end
-					Filter[#Filter+1] = IgnoreEnt
-					Filter[#Filter+1] = HEATTrace.Entity
-					DTSpall(Pos,EffArmor,HEATTrace.Entity,Shell.DakCaliber,math.Clamp(Pen-HeatPenLoss,Pen*0.05,Pen),Owner,Shell, Direction:Angle():Forward())
-					ContHEAT(Filter,HEATTrace.Entity,HEATTrace.HitPos,Damage*(1-EffArmor/(Pen-HeatPenLoss)),(Pen-HeatPenLoss)-EffArmor,Owner,Direction,Shell,true)
-				else
-					--decals don't like using the adjusted by normal Pos
-					util.Decal( "Impact.Glass", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun, HitEnt})
-					if HEATTrace.Entity:GetClass()=="dak_crew" then
-						util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
-					end
-				end
 			end
-		end
-		if HEATTrace.Entity:IsValid() then
-			if HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() or HEATTrace.Entity.Base == "base_nextbot" then
-				if HEATTrace.Entity:GetClass() == "dak_bot" then
-					HEATTrace.Entity:SetHealth(HEATTrace.Entity:Health() - (Damage)*500)
-					if HEATTrace.Entity:Health() <= 0 and HEATTrace.Entity.revenge==0 then
-						--local body = ents.Create( "prop_ragdoll" )
-						body:SetPos( HEATTrace.Entity:GetPos() )
-						body:SetModel( HEATTrace.Entity:GetModel() )
-						body:Spawn()
-						body.DakHealth=1000000
-						body.DakMaxHealth=1000000
-						--HEATTrace.Entity:Remove()
-						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-						timer.Simple( 5, function()
-							body:Remove()
-						end )
-					end
-				else
-					local Pain = DamageInfo()
-					Pain:SetDamageForce( Direction*(Damage)*5000*Shell.DakMass )
-					Pain:SetDamage( (Damage)*500 )
-					if Owner:IsPlayer() and Shell and Shell.DakGun then
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( Shell.DakGun )
+			if HEATTrace.Entity:IsValid() then
+				if HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() or HEATTrace.Entity.Base == "base_nextbot" then
+					if HEATTrace.Entity:GetClass() == "dak_bot" then
+						HEATTrace.Entity:SetHealth(HEATTrace.Entity:Health() - (Damage)*500)
+						if HEATTrace.Entity:Health() <= 0 and HEATTrace.Entity.revenge==0 then
+							--local body = ents.Create( "prop_ragdoll" )
+							body:SetPos( HEATTrace.Entity:GetPos() )
+							body:SetModel( HEATTrace.Entity:GetModel() )
+							body:Spawn()
+							body.DakHealth=1000000
+							body.DakMaxHealth=1000000
+							--HEATTrace.Entity:Remove()
+							local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+							body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+							timer.Simple( 5, function()
+								body:Remove()
+							end )
+						end
 					else
-						Pain:SetAttacker( game.GetWorld() )
-						Pain:SetInflictor( game.GetWorld() )
+						local Pain = DamageInfo()
+						Pain:SetDamageForce( Direction*(Damage)*5000*Shell.DakMass )
+						Pain:SetDamage( (Damage)*500 )
+						if Owner:IsPlayer() and Shell and Shell.DakGun then
+							Pain:SetAttacker( Owner )
+							Pain:SetInflictor( Shell.DakGun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
+						Pain:SetReportedPosition( Shell.DakGun:GetPos() )
+						Pain:SetDamagePosition( HEATTrace.Entity:GetPos() )
+						Pain:SetDamageType(DMG_BLAST)
+						HEATTrace.Entity:TakeDamageInfo( Pain )
 					end
-					Pain:SetReportedPosition( Shell.DakGun:GetPos() )
-					Pain:SetDamagePosition( HEATTrace.Entity:GetPos() )
-					Pain:SetDamageType(DMG_BLAST)
-					HEATTrace.Entity:TakeDamageInfo( Pain )
 				end
-			end
-			local effectdata = EffectData()
-			effectdata:SetStart(Pos)
-			effectdata:SetOrigin(HEATTrace.HitPos)
-			effectdata:SetScale(Shell.DakCaliber*0.393701)
-			util.Effect("dakteballistictracer", effectdata)
-		else
-			local effectdata = EffectData()
-			effectdata:SetStart(Pos)
-			effectdata:SetOrigin(Pos + Direction*(Pen/2.54))
-			effectdata:SetScale(Shell.DakCaliber*0.393701)
-			util.Effect("dakteballistictracer", effectdata)
-		end	
+				local effectdata = EffectData()
+				effectdata:SetStart(Pos)
+				effectdata:SetOrigin(HEATTrace.HitPos)
+				effectdata:SetScale(Shell.DakCaliber*0.393701)
+				util.Effect("dakteballistictracer", effectdata)
+			else
+				local effectdata = EffectData()
+				effectdata:SetStart(Pos)
+				effectdata:SetOrigin(Pos + Direction*(Pen/2.54))
+				effectdata:SetScale(Shell.DakCaliber*0.393701)
+				util.Effect("dakteballistictracer", effectdata)
+			end	
+		end
+	else
+		print("ERROR: Heat Recurse Loop")
 	end
 end
 
@@ -3985,7 +4298,7 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 			if ExpTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 			end
-			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component")) then
+			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true)) then
 				if ExpTrace.Entity:GetClass()=="dak_crew" then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), self)
 				end
@@ -4075,14 +4388,37 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							end
 						end
 						Filter[#Filter+1] = ExpTrace.Entity
-						local salvage = ents.Create( "dak_tesalvage" )
-						self.salvage = salvage
-						salvage.DakModel = ExpTrace.Entity:GetModel()
-						salvage:SetPos( ExpTrace.Entity:GetPos())
-						salvage:SetAngles( ExpTrace.Entity:GetAngles())
-						salvage:Spawn()
-						Filter[#Filter+1] = salvage
-						ExpTrace.Entity:Remove()
+						if (string.Explode("_",ExpTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = ExpTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
+						else
+							local salvage = ents.Create( "dak_tesalvage" )
+							self.salvage = salvage
+							salvage.DakModel = ExpTrace.Entity:GetModel()
+							salvage:SetPos( ExpTrace.Entity:GetPos())
+							salvage:SetAngles( ExpTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							ExpTrace.Entity:Remove()
+						end
 					end
 				end
 				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
@@ -4123,9 +4459,9 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 						else
 							Pain:SetAttacker( game.GetWorld() )
 						end
-						if self and Shell and Shell.DakGun then
+						if self then
 							Pain:SetAttacker( self )
-							Pain:SetInflictor( Shell.DakGun )
+							Pain:SetInflictor( self )
 						else
 							Pain:SetAttacker( game.GetWorld() )
 							Pain:SetInflictor( game.GetWorld() )
@@ -4141,69 +4477,83 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 	end
 end
 
-function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
-	local traces = math.Round(Caliber/2)
-	local trace = {}
-		trace.start = Pos
-		trace.endpos = Pos + Direction*Radius*10
-		trace.filter = Filter
-		trace.mins = Vector(-(Caliber/traces)*0.02,-(Caliber/traces)*0.02,-(Caliber/traces)*0.02)
-		trace.maxs = Vector((Caliber/traces)*0.02,(Caliber/traces)*0.02,(Caliber/traces)*0.02)
-	local ExpTrace = util.TraceHull( trace )
-	local ExpTraceLine = util.TraceLine( trace )
+function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Recurses)
+	if Recurses == nil then Recurses = 1 end
+	Recurses = Recurses + 1
+	if Recurses < 25 then
+		local traces = math.Round(Caliber/2)
+		local trace = {}
+			trace.start = Pos
+			trace.endpos = Pos + Direction*Radius*10
+			trace.filter = Filter
+			trace.mins = Vector(-(Caliber/traces)*0.02,-(Caliber/traces)*0.02,-(Caliber/traces)*0.02)
+			trace.maxs = Vector((Caliber/traces)*0.02,(Caliber/traces)*0.02,(Caliber/traces)*0.02)
+		local ExpTrace = util.TraceHull( trace )
+		local ExpTraceLine = util.TraceLine( trace )
 
-	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
-		--decals don't like using the adjusted by normal Pos
-		util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), IgnoreEnt)
-		if ExpTrace.Entity.DakHealth == nil then
-			DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-		end
-		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component")) then
-			if (CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
-				if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-				end
-				local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-				if ExpTrace.Entity.IsDakTekFutureTech == 1 then
-					ExpTrace.Entity.DakArmor = 1000
-				else
-					if SA == nil then
-						--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
-						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
-						ExpTrace.Entity.DakIsTread = 1
+		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
+			--decals don't like using the adjusted by normal Pos
+			util.Decal( "Impact.Concrete", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*5), IgnoreEnt)
+			if ExpTrace.Entity.DakHealth == nil then
+				DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+			end
+			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true)) then
+				if (CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
+					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
+						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+					end
+					local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+					if ExpTrace.Entity.IsDakTekFutureTech == 1 then
+						ExpTrace.Entity.DakArmor = 1000
 					else
-						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							DTArmorSanityCheck(ExpTrace.Entity)
+						if SA == nil then
+							--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
+							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
+							ExpTrace.Entity.DakIsTread = 1
+						else
+							if ExpTrace.Entity:GetClass()=="prop_physics" then 
+								DTArmorSanityCheck(ExpTrace.Entity)
+							end
 						end
 					end
-				end
-				Filter[#Filter+1] = IgnoreEnt
-				self:ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
-			else
-				if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-				end
-				local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-				if ExpTrace.Entity.IsDakTekFutureTech == 1 then
-					ExpTrace.Entity.DakArmor = 1000
+					Filter[#Filter+1] = IgnoreEnt
+					self:ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Recurses)
 				else
-					if SA == nil then
-						--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
-						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
-						ExpTrace.Entity.DakIsTread = 1
+					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
+						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
+					end
+					local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
+					if ExpTrace.Entity.IsDakTekFutureTech == 1 then
+						ExpTrace.Entity.DakArmor = 1000
 					else
-						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							DTArmorSanityCheck(ExpTrace.Entity)
+						if SA == nil then
+							--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
+							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
+							ExpTrace.Entity.DakIsTread = 1
+						else
+							if ExpTrace.Entity:GetClass()=="prop_physics" then 
+								DTArmorSanityCheck(ExpTrace.Entity)
+							end
 						end
 					end
-				end
-				
-				ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
+					
+					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-				if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
-					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
+					if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
+							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
+								DTDealDamage(ExpTrace.Entity,- math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+							else
+								if ExpTrace.Entity.IsERA == 1 then
+									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+								else
+									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+								end
+							end
+						end
+					else
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-							DTDealDamage(ExpTrace.Entity,- math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 						else
 							if ExpTrace.Entity.IsERA == 1 then
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
@@ -4212,98 +4562,115 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 							end
 						end
 					end
-				else
-					if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
-						DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
-					else
-						if ExpTrace.Entity.IsERA == 1 then
-							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
+					if ExpTrace.Entity.IsComposite == 1 then
+						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
+						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
+						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Filter )*ExpTrace.Entity.EntityMods.CompKEMult
+					end
+					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
+						util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), self)
+						Filter[#Filter+1] = IgnoreEnt
+						self:ContEXP(Filter,ExpTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Radius,Caliber,Pen-EffArmor,Owner,Direction,Recurses)
+					end
+					if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
+						if ExpTrace.Entity:GetClass()=="dak_crew" then
+							if ExpTrace.Entity.DakHealth <= 0 then
+								for blood=1, 15 do
+									util.Decal( "Blood", ExpTrace.Entity:GetPos(), ExpTrace.Entity:GetPos()+(VectorRand()*500), ExpTrace.Entity)
+								end
+							end
+						end
+						Filter[#Filter+1] = ExpTrace.Entity
+						if (string.Explode("_",ExpTrace.Entity:GetClass(),false)[1] == "dak") then
+							local PrintEnt = ExpTrace.Entity
+							if PrintEnt:GetClass() ~= "dak_tesalvage" and PrintEnt.DakOwner:IsValid() and PrintEnt.DakOwner:IsPlayer() and PrintEnt.DakDead ~= true then
+								if PrintEnt:GetClass() == "dak_crew" then
+									if PrintEnt.Job == 1 then
+										PrintEnt.DakOwner:ChatPrint("Gunner Killed!")
+									elseif PrintEnt.Job == 2 then
+										PrintEnt.DakOwner:ChatPrint("Driver Killed!")
+									elseif PrintEnt.Job == 3 then
+										PrintEnt.DakOwner:ChatPrint("Loader Killed!")
+									else
+										PrintEnt.DakOwner:ChatPrint("Passenger Killed!")
+									end
+									PrintEnt:SetMaterial("models/flesh")
+								else
+									PrintEnt.DakOwner:ChatPrint(PrintEnt.DakName.." Destroyed!")
+									PrintEnt:SetMaterial("models/props_buildings/plasterwall021a")
+									PrintEnt:SetColor(Color(100,100,100,255))
+								end
+							end
+							PrintEnt.DakDead = true
 						else
-							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+							local salvage = ents.Create( "dak_tesalvage" )
+							self.salvage = salvage
+							salvage.DakModel = ExpTrace.Entity:GetModel()
+							salvage:SetPos( ExpTrace.Entity:GetPos())
+							salvage:SetAngles( ExpTrace.Entity:GetAngles())
+							salvage:Spawn()
+							Filter[#Filter+1] = salvage
+							ExpTrace.Entity:Remove()
 						end
 					end
 				end
-				local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-				if ExpTrace.Entity.IsComposite == 1 then
-					if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
-					if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
-					EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Filter )*ExpTrace.Entity.EntityMods.CompKEMult
-				end
-				if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
-					util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), self)
-					Filter[#Filter+1] = IgnoreEnt
-					self:ContEXP(Filter,ExpTrace.Entity,Pos,Damage*(1-EffArmor/Pen),Radius,Caliber,Pen-EffArmor,Owner,Direction)
-				end
-				if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
-					if ExpTrace.Entity:GetClass()=="dak_crew" then
-						if ExpTrace.Entity.DakHealth <= 0 then
-							for blood=1, 15 do
-								util.Decal( "Blood", ExpTrace.Entity:GetPos(), ExpTrace.Entity:GetPos()+(VectorRand()*500), ExpTrace.Entity)
+				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
+					if(ExpTrace.Entity:GetParent():IsValid()) then
+						if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
+							if ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():IsValid() then
+								ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 							end
 						end
 					end
-					Filter[#Filter+1] = ExpTrace.Entity
-					local salvage = ents.Create( "dak_tesalvage" )
-					self.salvage = salvage
-					salvage.DakModel = ExpTrace.Entity:GetModel()
-					salvage:SetPos( ExpTrace.Entity:GetPos())
-					salvage:SetAngles( ExpTrace.Entity:GetAngles())
-					salvage:Spawn()
-					Filter[#Filter+1] = salvage
-					ExpTrace.Entity:Remove()
-				end
-			end
-			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
-				if(ExpTrace.Entity:GetParent():IsValid()) then
-					if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-						ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+					if not(ExpTrace.Entity:GetParent():IsValid()) then
+						ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 					end
-				end
-				if not(ExpTrace.Entity:GetParent():IsValid()) then
-					ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
+				end	
+			end
+			if ExpTrace.Entity:IsValid() then
+				if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity.Base == "base_nextbot" then
+					if ExpTrace.Entity:GetClass() == "dak_bot" then
+						ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
+						if ExpTrace.Entity:Health() <= 0 and ExpTrace.Entity.revenge==0 then
+							--local body = ents.Create( "prop_ragdoll" )
+							body:SetPos( ExpTrace.Entity:GetPos() )
+							body:SetModel( ExpTrace.Entity:GetModel() )
+							body:Spawn()
+							body.DakHealth=1000000
+							body.DakMaxHealth=1000000
+							--ExpTrace.Entity:Remove()
+							local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
+							body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
+							timer.Simple( 5, function()
+								body:Remove()
+							end )
+						end
+					else
+						local Pain = DamageInfo()
+						Pain:SetDamageForce( Direction*(Damage/traces)*5000*2 )
+						Pain:SetDamage( (Damage/traces)*500 )
+						if Owner:IsPlayer() then
+							Pain:SetAttacker( Owner )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+						end
+						if self then
+							Pain:SetAttacker( self )
+							Pain:SetInflictor( self )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
+						Pain:SetReportedPosition( self:GetPos() )
+						Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
+						Pain:SetDamageType(DMG_BLAST)
+						ExpTrace.Entity:TakeDamageInfo( Pain )
+					end
 				end
 			end	
 		end
-		if ExpTrace.Entity:IsValid() then
-			if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity.Base == "base_nextbot" then
-				if ExpTrace.Entity:GetClass() == "dak_bot" then
-					ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
-					if ExpTrace.Entity:Health() <= 0 and ExpTrace.Entity.revenge==0 then
-						--local body = ents.Create( "prop_ragdoll" )
-						body:SetPos( ExpTrace.Entity:GetPos() )
-						body:SetModel( ExpTrace.Entity:GetModel() )
-						body:Spawn()
-						body.DakHealth=1000000
-						body.DakMaxHealth=1000000
-						--ExpTrace.Entity:Remove()
-						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-						timer.Simple( 5, function()
-							body:Remove()
-						end )
-					end
-				else
-					local Pain = DamageInfo()
-					Pain:SetDamageForce( Direction*(Damage/traces)*5000*2 )
-					Pain:SetDamage( (Damage/traces)*500 )
-					if Owner:IsPlayer() then
-						Pain:SetAttacker( Owner )
-					else
-						Pain:SetAttacker( game.GetWorld() )
-					end
-					if self and Shell and Shell.DakGun then
-						Pain:SetAttacker( self )
-						Pain:SetInflictor( Shell.DakGun )
-					else
-						Pain:SetAttacker( game.GetWorld() )
-						Pain:SetInflictor( game.GetWorld() )
-					end
-					Pain:SetReportedPosition( Shell.DakGun:GetPos() )
-					Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
-					Pain:SetDamageType(DMG_BLAST)
-					ExpTrace.Entity:TakeDamageInfo( Pain )
-				end
-			end
-		end	
+	else
+		print("ERROR: Entity Explosion Recurse Loop")
 	end
 end

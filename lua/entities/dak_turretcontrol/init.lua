@@ -13,6 +13,7 @@ ENT.SentError = 0
 ENT.SentError2 = 0
 ENT.DakCore = NULL
 ENT.DakTurretMotors = {}
+ENT.DakCrew = NULL
 
 local function GetTurretParents( ent, Results )
 	local Results = Results or {}
@@ -295,6 +296,85 @@ function ENT:Think()
 						end
 					end
 					self.RotationSpeed = RotMult * (15000/self.GunMass) * (66/(1/engine.TickInterval())) * RotationMult
+					if self.DakCrew == NULL then
+						self.RotationSpeed = 0
+						if self.GunnerErrorMessageSent1 == nil then
+							self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not detected, gun unable to move. Please link a crew member to the turret controller.")
+							self.GunnerErrorMessageSent1 = true
+						end
+					else
+						if self.DakCrew.DakEntity ~= self then
+							self.RotationSpeed = 0
+						else
+							self.DakCrew.Job = 1
+							if self.DakCrew.DakDead == true then
+								self.RotationSpeed = 0
+							end
+							if not(self.Controller.ColdWar == 1 or self.Controller.Modern == 1) then
+								if IsValid(self.TurretBase) and self:GetYawMin()>45 and self:GetYawMax()>45 then
+									if self.DakCrew:IsValid() then
+										if self.DakCrew:GetParent():IsValid() then
+											if self.DakCrew:GetParent():GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase then
+													self.RotationSpeed = 0
+													if self.GunnerErrorMessageSent2 == nil then
+														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in turret, remote weapon systems are cold war and modern only.")
+														self.GunnerErrorMessageSent2 = true
+													end
+												end
+											end
+										end
+									end
+								end
+								if not(IsValid(self.TurretBase)) and self:GetYawMin()>45 and self:GetYawMax()>45 then
+									if self.DakCrew:IsValid() then
+										if self.DakCrew:GetParent():IsValid() then
+											if self.DakCrew:GetParent():GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() then
+													self.RotationSpeed = 0
+													if self.GunnerErrorMessageSent3 == nil then
+														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in hull, remote weapon systems are cold war and modern only.")
+														self.GunnerErrorMessageSent3 = true
+													end
+												end
+											end
+										end
+									end
+								end
+							else
+								if IsValid(self.TurretBase) and self:GetYawMin()>45 and self:GetYawMax()>45 then
+									if self.DakCrew:IsValid() then
+										if self.DakCrew:GetParent():IsValid() then
+											if self.DakCrew:GetParent():GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase then
+													if self.GunnerErrorMessageSent2 == nil then
+														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
+														self.GunnerErrorMessageSent2 = true
+														self.RemoteWeapon = true
+													end
+												end
+											end
+										end
+									end
+								end
+								if not(IsValid(self.TurretBase)) and self:GetYawMin()>45 and self:GetYawMax()>45 then
+									if self.DakCrew:IsValid() then
+										if self.DakCrew:GetParent():IsValid() then
+											if self.DakCrew:GetParent():GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() then
+													if self.GunnerErrorMessageSent3 == nil then
+														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
+														self.GunnerErrorMessageSent3 = true
+														self.RemoteWeapon = true
+													end
+												end
+											end
+										end
+									end
+								end
+							end
+						end
+					end
 					if self.DakActive > 0 then
 						self.DakCamTrace = self.Inputs.CamTrace.Value
 					end
@@ -358,7 +438,7 @@ function ENT:Think()
 											if ShellType=="HVAP" then Drag = (((V*0.0254)*(V*0.0254)) * (math.pi * ((Caliber/1000)*(Caliber/1000))))*0.0245 end
 											if ShellType=="APFSDS" then Drag = (((V*0.0254)*(V*0.0254)) * (math.pi * ((Caliber/1000)*(Caliber/1000))))*0.085 end
 											local VelLoss
-											if ShellType == "HEAT" or ShellType == "HVAP" or ShellType == "ATGM" or ShellType == "HEATFS" or ShellType == "APFSDS" then
+											if ShellType == "HEAT" or ShellType == "HVAP" or ShellType == "ATGM" or ShellType == "HEATFS" or ShellType == "APFSDS" or ShellType == "APDS" then
 											    VelLoss = ((Drag/(ShellMass*8/2))*39.37)
 											else
 											    VelLoss = ((Drag/(ShellMass/2))*39.37)
@@ -370,7 +450,7 @@ function ENT:Think()
 											else 
 												self.NoTarTicks = self.NoTarTicks + 1 
 											end
-											if self.NoTarTicks>15 then
+											if self.NoTarTicks>66 then
 												self.Tar = PreCamTrace.Entity
 												self.NoTarTicks = 0
 											end
@@ -391,7 +471,6 @@ function ENT:Think()
 											    end
 											end
 											local SelfVel = self.Controller:GetParent():GetParent():GetVelocity()
-											
 											local VelValue = V
 											local VelLossFull = VelLoss
 											local TravelTime=0
@@ -400,9 +479,10 @@ function ENT:Think()
 											local Y
 											local Disc
 											local Ang
+											local TarPos
 											for i=1, 2 do
 											    VelValue = V - VelLossFull
-											    TarPos = TarPos0 + (TarVel-SelfVel)*TravelTime
+											    TarPos = TarPos0 + ((TarVel-SelfVel)*(TravelTime+0.1))
 											    Diff = (TarPos-GunPos)
 											    X = Vector(Diff.x,Diff.y,0):Length()
 											    Y = Diff.z
@@ -413,7 +493,7 @@ function ENT:Think()
 											end
 											local traceFCS2 = {}
 												traceFCS2.start = GunPos
-												traceFCS2.endpos = GunPos + Angle(Ang,Diff:Angle().yaw,0):Forward()*1000
+												traceFCS2.endpos = GunPos + Angle(Ang,Diff:Angle().yaw,0):Forward()*100000000
 												traceFCS2.filter = self.DakContraption
 											self.CamTrace = util.TraceLine( traceFCS2 )
 										else
@@ -566,6 +646,7 @@ function ENT:PreEntityCopy()
 		end
 	end
 
+	info.CrewID = self.DakCrew:EntIndex()
 	info.DakName = self.DakName
 	info.DakHealth = self.DakHealth
 	info.DakMaxHealth = self.DakBaseMaxHealth
@@ -585,7 +666,10 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 				end
 			end
 		end
-
+		local Crew = CreatedEntities[ Ent.EntityMods.DakTek.CrewID ]
+		if Crew and IsValid(Crew) then
+			self.DakCrew = Crew
+		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth

@@ -156,7 +156,7 @@ function ENT:Think()
 
 	self.DakSpeed = self.DakSpeed * (self.DakHealth/self.DakMaxHealth) * self:GetHorsePowerMultiplier()
 	self.DakHP = self.DakHP * (self.DakHealth/self.DakMaxHealth) * self:GetHorsePowerMultiplier()
-
+	if self.DakDead == true then self.DakHP = 0 end
 	if self.initsound ~= self.DakSound then
 		self.initsound = self.DakSound
 		self.Sound:Stop()
@@ -175,15 +175,13 @@ function ENT:Think()
 	end
 	if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 
-	if self:IsOnFire() then
+	if self:IsOnFire() and self.DakDead ~= true then
 		self.DakHealth = self.DakHealth - self.DakMaxHealth*0.025*0.25
 		if self.DakHealth <= 0 then
-			local salvage = ents.Create( "dak_tesalvage" )
-			salvage.DakModel = self:GetModel()
-			salvage:SetPos( self:GetPos())
-			salvage:SetAngles( self:GetAngles())
-			salvage:Spawn()
-			self:Remove()
+			if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Destroyed!") end
+			self:SetMaterial("models/props_buildings/plasterwall021a")
+			self:SetColor(Color(100,100,100,255))
+			self.DakDead = true
 		end
 	end
     self:NextThink(CurTime()+0.25)

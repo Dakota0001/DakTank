@@ -195,75 +195,32 @@ function ENT:Think()
 		WireLib.TriggerOutput(self, "Ammo", self.DakAmmo)
 		WireLib.TriggerOutput(self, "MaxAmmo", self.DakMaxAmmo)
 
-		self.DakEjectAmmo = self.Inputs.EjectAmmo.Value
-		if self.DakEjectAmmo == 1 then
-			if CurTime()>=self.DumpTime+0.5 then
-				if self.DakAmmo>0 then
-					self.DakAmmo = self.DakAmmo - math.Round(self.DakMaxAmmo/10,0)
-					if self.DakAmmo < 0 then
-						self.DakAmmo = 0
+		if self.DakDead ~= true then
+			self.DakEjectAmmo = self.Inputs.EjectAmmo.Value
+			if self.DakEjectAmmo == 1 then
+				if CurTime()>=self.DumpTime+0.5 then
+					if self.DakAmmo>0 then
+						self.DakAmmo = self.DakAmmo - math.Round(self.DakMaxAmmo/10,0)
+						if self.DakAmmo < 0 then
+							self.DakAmmo = 0
+						end
+						self:EmitSound( "dak/Jam.wav", 100, 75, 1)
+						self.DumpTime = CurTime()
 					end
-					self:EmitSound( "dak/Jam.wav", 100, 75, 1)
-					self.DumpTime = CurTime()
 				end
 			end
-		end
-		if self.DakAmmo then
-			if self.DakAmmo>0 and self.DakHealth<(self.DakMaxHealth/2) and self.DakIsExplosive then
-				if self.DakIsHE then
-					local effectdata = EffectData()
-					effectdata:SetOrigin(self:GetPos())
-					effectdata:SetEntity(self)
-					effectdata:SetAttachment(1)
-					effectdata:SetMagnitude(.5)
-					effectdata:SetScale(500)
-					effectdata:SetNormal( Vector(0,0,-1) )
-					util.Effect("daktescalingexplosionold", effectdata, true, true)
-					timer.Create( "AmmoBurnTimer"..self:EntIndex(), 0.1, 5, function()
-						if not(self.DakAmmo == nil) then
-							if self.DakAmmo > 0 then
-								local effectdata2 = EffectData()
-								effectdata2:SetOrigin(self:GetPos())
-								effectdata2:SetEntity(self)
-								effectdata2:SetAttachment(1)
-								effectdata2:SetMagnitude(.5)
-								effectdata2:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
-								effectdata2:SetNormal( Vector(0,0,1) )
-								util.Effect("dakteammocook", effectdata2, true, true)
-							end
-						end
-					end )
-					self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,300,self.DakOwner)
-					--self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
-					sound.Play( "daktanks/ammoexplode.mp3", self:GetPos(), 100, 75, 1 )
-					timer.Create( "RemoveTimer"..self:EntIndex(), 0.5, 1, function()
-						if self:IsValid() then
-							self:Remove()
-						end
-					end)
-				else
-					if self.CookingOff == nil then
-						timer.Create( "AmmoDetTimer"..self:EntIndex(), math.Rand(0.5,2), self.DakAmmo, function()
-							if not(self.DakAmmo == nil) then
-								if self.DakAmmo > 0 then
-									local effectdata = EffectData()
-									effectdata:SetOrigin(self:GetPos())
-									effectdata:SetEntity(self)
-									effectdata:SetAttachment(1)
-									effectdata:SetMagnitude(.5)
-									effectdata:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
-									effectdata:SetNormal( Vector(0,0,-1) )
-									util.Effect("daktescalingexplosionold", effectdata, true, true)
-
-									self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,200,self.DakOwner)
-
-									--self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
-									sound.Play( "daktanks/ammoexplode.mp3", self:GetPos(), 100, 75, 1 )
-									self:Remove()
-								end
-							end
-						end)		
-						timer.Create( "AmmoBurnTimer"..self:EntIndex(), 0.25, 100, function()
+			if self.DakAmmo then
+				if self.DakAmmo>0 and self.DakHealth<(self.DakMaxHealth/2) and self.DakIsExplosive then
+					if self.DakIsHE then
+						local effectdata = EffectData()
+						effectdata:SetOrigin(self:GetPos())
+						effectdata:SetEntity(self)
+						effectdata:SetAttachment(1)
+						effectdata:SetMagnitude(.5)
+						effectdata:SetScale(500)
+						effectdata:SetNormal( Vector(0,0,-1) )
+						util.Effect("daktescalingexplosionold", effectdata, true, true)
+						timer.Create( "AmmoBurnTimer"..self:EntIndex(), 0.1, 5, function()
 							if not(self.DakAmmo == nil) then
 								if self.DakAmmo > 0 then
 									local effectdata2 = EffectData()
@@ -277,78 +234,128 @@ function ENT:Think()
 								end
 							end
 						end )
-						timer.Create( "AmmoCookTimer"..self:EntIndex(), math.Clamp((1/math.pow((self.DakMaxAmmo),0.5)),0.075,2)*math.Rand(0.75,1.25), self.DakAmmo, function()
-							if not(self.DakAmmo == nil) then
-								if self.DakAmmo > 0 then
-									local shootOrigin = self:GetPos()
-									local shootAngles = AngleRand()
-									if self.DakMaxAmmo<5 then
-										self.ShellSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
-									end
-									if self.DakMaxAmmo>=5 and self.DakMaxAmmo<=15 then
-										self.ShellSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
-									end
-									if self.DakMaxAmmo>15 then
-										self.ShellSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
-									end
-									local shell = {}
-					 				shell.Pos = shootOrigin + ( self:GetForward() * 1 )
-					 				shell.Ang = shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
-									shell.DakTrail = "dakshelltrail"
-									shell.DakVelocity = 5000
-									shell.DakDamage = math.Clamp(200/self.DakMaxAmmo,1,200)
-									shell.DakMass = 500/self.DakMaxAmmo
-									shell.DakIsPellet = false
-									shell.DakSplashDamage = 0
-									shell.DakPenetration = 150/self.DakMaxAmmo + 10
-									shell.DakExplosive = false
-									shell.DakBlastRadius = 0
-									shell.DakPenSounds = self.ShellSounds
-									shell.DakBasePenetration = 150/self.DakMaxAmmo + 10
-									shell.DakCaliber = 500/self.DakMaxAmmo + 5
-									shell.DakFireSound = self.ShellSounds[math.random(1,#self.ShellSounds)]
-									shell.DakFirePitch = 100
-									shell.DakGun = self
-									shell.Filter = {self}
-									shell.LifeTime = 0
-									shell.Gravity = 0
-									shell.DakPenLossPerMeter = 0.0005
-									if self.DakName == "Flamethrower" then
-										shell.DakIsFlame = 1
-									end
-									DakTankShellList[#DakTankShellList+1] = Shell
-									local effectdata = EffectData()
-									effectdata:SetOrigin( self:GetPos() )
-									effectdata:SetEntity(self)
-									effectdata:SetAttachment(1)
-									effectdata:SetMagnitude(.5)
-									effectdata:SetScale(50/self.DakMaxAmmo)
-									util.Effect("dakteshellimpact", effectdata, true, true)
-									--self:EmitSound( self.ShellSounds[math.random(1,#self.ShellSounds)], 100, 100, 1, 1)
-									sound.Play( self.ShellSounds[math.random(1,#self.ShellSounds)], self:GetPos(), 100, 100, 1 )
-
-									self.DakAmmo = self.DakAmmo - 1
-								end
+						self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,300,self.DakOwner)
+						--self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
+						sound.Play( "daktanks/ammoexplode.mp3", self:GetPos(), 100, 75, 1 )
+						timer.Create( "RemoveTimer"..self:EntIndex(), 0.5, 1, function()
+							if self:IsValid() then
+								if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Exploded!") end
+								self:SetMaterial("models/props_buildings/plasterwall021a")
+								self:SetColor(Color(100,100,100,255))
+								self.DakDead = true
 							end
-						end )
-						self.CookingOff = 1
+						end)
+					else
+						if self.CookingOff == nil then
+							timer.Create( "AmmoDetTimer"..self:EntIndex(), math.Rand(0.5,2), self.DakAmmo, function()
+								if not(self.DakAmmo == nil) then
+									if self.DakAmmo > 0 then
+										local effectdata = EffectData()
+										effectdata:SetOrigin(self:GetPos())
+										effectdata:SetEntity(self)
+										effectdata:SetAttachment(1)
+										effectdata:SetMagnitude(.5)
+										effectdata:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
+										effectdata:SetNormal( Vector(0,0,-1) )
+										util.Effect("daktescalingexplosionold", effectdata, true, true)
+
+										self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,200,self.DakOwner)
+
+										--self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
+										sound.Play( "daktanks/ammoexplode.mp3", self:GetPos(), 100, 75, 1 )
+										if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Cooked Off!") end
+										self:SetMaterial("models/props_buildings/plasterwall021a")
+										self:SetColor(Color(100,100,100,255))
+										self.DakDead = true
+									end
+								end
+							end)		
+							timer.Create( "AmmoBurnTimer"..self:EntIndex(), 0.25, 100, function()
+								if not(self.DakAmmo == nil) then
+									if self.DakAmmo > 0 then
+										local effectdata2 = EffectData()
+										effectdata2:SetOrigin(self:GetPos())
+										effectdata2:SetEntity(self)
+										effectdata2:SetAttachment(1)
+										effectdata2:SetMagnitude(.5)
+										effectdata2:SetScale((self.DakAmmo/self.DakMaxAmmo)*350)
+										effectdata2:SetNormal( Vector(0,0,1) )
+										util.Effect("dakteammocook", effectdata2, true, true)
+									end
+								end
+							end )
+							timer.Create( "AmmoCookTimer"..self:EntIndex(), math.Clamp((1/math.pow((self.DakMaxAmmo),0.5)),0.075,2)*math.Rand(0.75,1.25), self.DakAmmo, function()
+								if not(self.DakAmmo == nil) then
+									if self.DakAmmo > 0 then
+										local shootOrigin = self:GetPos()
+										local shootAngles = AngleRand()
+										if self.DakMaxAmmo<5 then
+											self.ShellSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
+										end
+										if self.DakMaxAmmo>=5 and self.DakMaxAmmo<=15 then
+											self.ShellSounds = {"daktanks/dakmedpen1.mp3","daktanks/dakmedpen2.mp3","daktanks/dakmedpen3.mp3","daktanks/dakmedpen4.mp3","daktanks/dakmedpen5.mp3"}
+										end
+										if self.DakMaxAmmo>15 then
+											self.ShellSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+										end
+										local shell = {}
+						 				shell.Pos = shootOrigin + ( self:GetForward() * 1 )
+						 				shell.Ang = shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
+										shell.DakTrail = "dakshelltrail"
+										shell.DakVelocity = 5000
+										shell.DakDamage = math.Clamp(200/self.DakMaxAmmo,1,200)
+										shell.DakMass = 500/self.DakMaxAmmo
+										shell.DakIsPellet = false
+										shell.DakSplashDamage = 0
+										shell.DakPenetration = 150/self.DakMaxAmmo + 10
+										shell.DakExplosive = false
+										shell.DakBlastRadius = 0
+										shell.DakPenSounds = self.ShellSounds
+										shell.DakBasePenetration = 150/self.DakMaxAmmo + 10
+										shell.DakCaliber = 500/self.DakMaxAmmo + 5
+										shell.DakFireSound = self.ShellSounds[math.random(1,#self.ShellSounds)]
+										shell.DakFirePitch = 100
+										shell.DakGun = self
+										shell.Filter = {self}
+										shell.LifeTime = 0
+										shell.Gravity = 0
+										shell.DakPenLossPerMeter = 0.0005
+										if self.DakName == "Flamethrower" then
+											shell.DakIsFlame = 1
+										end
+										DakTankShellList[#DakTankShellList+1] = Shell
+										local effectdata = EffectData()
+										effectdata:SetOrigin( self:GetPos() )
+										effectdata:SetEntity(self)
+										effectdata:SetAttachment(1)
+										effectdata:SetMagnitude(.5)
+										effectdata:SetScale(50/self.DakMaxAmmo)
+										util.Effect("dakteshellimpact", effectdata, true, true)
+										--self:EmitSound( self.ShellSounds[math.random(1,#self.ShellSounds)], 100, 100, 1, 1)
+										sound.Play( self.ShellSounds[math.random(1,#self.ShellSounds)], self:GetPos(), 100, 100, 1 )
+
+										self.DakAmmo = self.DakAmmo - 1
+									end
+								end
+							end )
+							self.CookingOff = 1
+						end
 					end
 				end
-
 			end
+		else
+			self.DakAmmo = 0
 		end
 		self.SlowThinkTime = CurTime()
 	end
 
-	if self:IsOnFire() then
+	if self:IsOnFire() and self.DakDead ~= true then
 		self.DakHealth = self.DakHealth - 0.1
 		if self.DakHealth <= 0 then
-			local salvage = ents.Create( "dak_tesalvage" )
-			salvage.DakModel = self:GetModel()
-			salvage:SetPos( self:GetPos())
-			salvage:SetAngles( self:GetAngles())
-			salvage:Spawn()
-			self:Remove()
+			if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Destroyed!") end
+			self:SetMaterial("models/props_buildings/plasterwall021a")
+			self:SetColor(Color(100,100,100,255))
+			self.DakDead = true
 		end
 	end
 	
@@ -477,251 +484,3 @@ function ENT:CheckClip(Ent, HitPos)
 	end
 	return HitClip
 end
---[[
-function ENT:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
-	local traces = math.Round(Caliber/2)
-	local Filter = {self}
-	for i=1, traces do
-		local Direction = VectorRand()
-		local trace = {}
-			trace.start = Pos
-			trace.endpos = Pos + Direction*Radius*10
-			trace.filter = Filter
-			trace.mins = Vector(-1,-1,-1)
-			trace.maxs = Vector(1,1,1)
-		local ExpTrace = util.TraceHull( trace )
-
-		if ExpTrace.Entity:IsValid() then
-			if ExpTrace.Entity:GetClass() == self:GetClass() then
-				ExpTrace.Entity =  NULL
-			end 
-		end
-		if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
-			--decals don't like using the adjusted by normal Pos
-			util.Decal( "Impact.Concrete", Pos, Pos+(Direction*Radius), self)
-			if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0)) then
-				if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
-					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-					end
-					local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-					if ExpTrace.Entity.IsDakTekFutureTech == 1 then
-						ExpTrace.Entity.DakArmor = 1000
-					else
-						if SA == nil then
-							--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
-							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
-							ExpTrace.Entity.DakIsTread = 1
-						else
-							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								DTArmorSanityCheck(ExpTrace.Entity)
-							end
-						end
-					end
-					self:DamageEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
-				else
-					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-					end
-					local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-					if ExpTrace.Entity.IsDakTekFutureTech == 1 then
-						ExpTrace.Entity.DakArmor = 1000
-					else
-						if SA == nil then
-							--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
-							ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
-							ExpTrace.Entity.DakIsTread = 1
-						else
-							if ExpTrace.Entity:GetClass()=="prop_physics" then 
-								DTArmorSanityCheck(ExpTrace.Entity)
-							end
-						end
-					end
-					
-					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
-
-					if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
-						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
-							ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-						end
-					else
-						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-					end
-					if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
-						Filter[#Filter+1] = ExpTrace.Entity
-						self.salvage = ents.Create( "dak_tesalvage" )
-						self.salvage.DakModel = ExpTrace.Entity:GetModel()
-						self.salvage:SetPos( ExpTrace.Entity:GetPos())
-						self.salvage:SetAngles( ExpTrace.Entity:GetAngles())
-						self.salvage:Spawn()
-						Filter[#Filter+1] = self.salvage
-						ExpTrace.Entity:Remove()
-					end
-				end
-			end
-			if ExpTrace.Entity:IsValid() then
-				if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity:GetClass() == "dak_bot" then
-					if ExpTrace.Entity:GetClass() == "dak_bot" then
-						ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
-						if ExpTrace.Entity:Health() <= 0 and self.revenge==0 then
-							local body = ents.Create( "prop_ragdoll" )
-							body:SetPos( ExpTrace.Entity:GetPos() )
-							body:SetModel( ExpTrace.Entity:GetModel() )
-							body:Spawn()
-							ExpTrace.Entity:Remove()
-							local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-							body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-							timer.Simple( 5, function()
-								body:Remove()
-							end )
-						end
-					else
-						local Pain = DamageInfo()
-						Pain:SetDamageForce( Direction*(Damage/traces)*5000*self:GetPhysicsObject():GetMass() )
-						Pain:SetDamage( (Damage/traces)*500 )
-						Pain:SetAttacker( Owner )
-						Pain:SetInflictor( self )
-						Pain:SetReportedPosition( Pos )
-						Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
-						Pain:SetDamageType(DMG_BLAST)
-						ExpTrace.Entity:TakeDamageInfo( Pain )
-					end
-				end
-			end
-
-			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
-				if(ExpTrace.Entity:GetParent():IsValid()) then
-					if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-						ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( 0.01*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-					end
-				end
-				if not(ExpTrace.Entity:GetParent():IsValid()) then
-					ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( 0.01*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-				end
-			end		
-		end
-	end
-end
-
-function ENT:DamageEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
-	local traces = math.Round(Caliber/2)
-	local trace = {}
-		trace.start = Pos
-		trace.endpos = Pos + Direction*Radius*10
-		Filter[#Filter+1] = IgnoreEnt
-		trace.filter = Filter
-		trace.mins = Vector(-1,-1,-1)
-		trace.maxs = Vector(1,1,1)
-	local ExpTrace = util.TraceHull( trace )
-
-	if ExpTrace.Entity:IsValid() then
-		if ExpTrace.Entity:GetClass() == self:GetClass() then
-			ExpTrace.Entity =  NULL
-		end 
-	end
-
-	if hook.Run("DakTankDamageCheck", ExpTrace.Entity, Owner) ~= false and ExpTrace.HitPos:Distance(Pos)<=Radius then
-		--decals don't like using the adjusted by normal Pos
-		util.Decal( "Impact.Concrete", Pos, Pos+(Direction*Radius), self)
-		if ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:GetClass()=="dak_bot") and (ExpTrace.Entity.DakHealth and not(ExpTrace.Entity.DakHealth <= 0)) then
-			if (self:CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
-				if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-				end
-				local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-				if ExpTrace.Entity.IsDakTekFutureTech == 1 then
-					ExpTrace.Entity.DakArmor = 1000
-				else
-					if SA == nil then
-						--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
-						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
-						ExpTrace.Entity.DakIsTread = 1
-					else
-						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							DTArmorSanityCheck(ExpTrace.Entity)
-						end
-					end
-				end
-				self:DamageEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
-			else
-				if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
-					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
-				end
-				local SA = ExpTrace.Entity:GetPhysicsObject():GetSurfaceArea()
-				if ExpTrace.Entity.IsDakTekFutureTech == 1 then
-					ExpTrace.Entity.DakArmor = 1000
-				else
-					if SA == nil then
-						--Volume = (4/3)*math.pi*math.pow( ExpTrace.Entity:OBBMaxs().x, 3 )
-						ExpTrace.Entity.DakArmor = ExpTrace.Entity:OBBMaxs().x/2
-						ExpTrace.Entity.DakIsTread = 1
-					else
-						if ExpTrace.Entity:GetClass()=="prop_physics" then 
-							DTArmorSanityCheck(ExpTrace.Entity)
-						end
-					end
-				end
-				
-				ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
-
-				if not(ExpTrace.Entity.SPPOwner==nil) and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
-					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
-						ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-					end
-				else
-					ExpTrace.Entity.DakHealth = ExpTrace.Entity.DakHealth- (Damage/traces)*2*(Pen/ExpTrace.Entity.DakArmor)
-				end
-				if ExpTrace.Entity.DakHealth <= 0 and ExpTrace.Entity.DakPooled==0 then
-					Filter[#Filter+1] = ExpTrace.Entity
-					self.salvage = ents.Create( "dak_tesalvage" )
-					self.salvage.DakModel = ExpTrace.Entity:GetModel()
-					self.salvage:SetPos( ExpTrace.Entity:GetPos())
-					self.salvage:SetAngles( ExpTrace.Entity:GetAngles())
-					self.salvage:Spawn()
-					Filter[#Filter+1] = self.salvage
-					ExpTrace.Entity:Remove()
-				end
-			end
-		end
-		if ExpTrace.Entity:IsValid() then
-			if ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() or ExpTrace.Entity:GetClass() == "dak_bot" then
-				if ExpTrace.Entity:GetClass() == "dak_bot" then
-					ExpTrace.Entity:SetHealth(ExpTrace.Entity:Health() - (Damage/traces)*500)
-					if ExpTrace.Entity:Health() <= 0 and self.revenge==0 then
-						local body = ents.Create( "prop_ragdoll" )
-						body:SetPos( ExpTrace.Entity:GetPos() )
-						body:SetModel( ExpTrace.Entity:GetModel() )
-						body:Spawn()
-						ExpTrace.Entity:Remove()
-						local SoundList = {"npc/metropolice/die1.wav","npc/metropolice/die2.wav","npc/metropolice/die3.wav","npc/metropolice/die4.wav","npc/metropolice/pain4.wav"}
-						body:EmitSound( SoundList[math.random(5)], 100, 100, 1, 2 )
-						timer.Simple( 5, function()
-							body:Remove()
-						end )
-					end
-				else
-					local Pain = DamageInfo()
-					Pain:SetDamageForce( Direction*(Damage/traces)*5000*self:GetPhysicsObject():GetMass() )
-					Pain:SetDamage( (Damage/traces)*500 )
-					Pain:SetAttacker( Owner )
-					Pain:SetInflictor( self )
-					Pain:SetReportedPosition( Pos )
-					Pain:SetDamagePosition( ExpTrace.Entity:GetPos() )
-					Pain:SetDamageType(DMG_BLAST)
-					ExpTrace.Entity:TakeDamageInfo( Pain )
-				end
-			end
-		end
-		if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
-			if(ExpTrace.Entity:GetParent():IsValid()) then
-				if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-					ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( 0.01*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-				end
-			end
-			if not(ExpTrace.Entity:GetParent():IsValid()) then
-				ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( 0.01*(ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-			end
-		end		
-	end
-end
-]]--

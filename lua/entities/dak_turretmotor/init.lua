@@ -122,17 +122,18 @@ function ENT:Think()
 	if self.DakRotMult then
 		self.DakRotMult = self.DakRotMult * self.DakHealth/self.DakMaxHealth
 	end
+	if self.DakDead == true then
+		self.DakRotMult = 0
+	end
 	if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 	
-	if self:IsOnFire() then
+	if self:IsOnFire() and self.DakDead ~= true then
 		self.DakHealth = self.DakHealth - 1*0.33
 		if self.DakHealth <= 0 then
-			local salvage = ents.Create( "dak_tesalvage" )
-			salvage.DakModel = self:GetModel()
-			salvage:SetPos( self:GetPos())
-			salvage:SetAngles( self:GetAngles())
-			salvage:Spawn()
-			self:Remove()
+			if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Destroyed!") end
+			self:SetMaterial("models/props_buildings/plasterwall021a")
+			self:SetColor(Color(100,100,100,255))
+			self.DakDead = true
 		end
 	end
 

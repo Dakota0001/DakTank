@@ -150,7 +150,7 @@ function SWEP:PrimaryAttack()
 					shell.IsTandem = self.IsTandem
 
 					shell.DakIsPellet = false
-					shell.DakSplashDamage = self.DakCaliber*0.375
+					shell.DakSplashDamage = self.DakCaliber*5
 					if self.IsMissile then
 						shell.DakPenetration = self.PenOverride
 						shell.DakBasePenetration = self.PenOverride

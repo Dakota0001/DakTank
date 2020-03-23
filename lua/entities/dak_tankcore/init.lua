@@ -453,8 +453,20 @@ function ENT:Think()
 						end
 						ammocosts = ammocosts + cost
 					end
-
-					local speedmult = math.Clamp((1+((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05))*0.5,0,1.5)
+					local speedmult = 1
+					if self.Gearbox:IsValid() then
+						if self.Gearbox.DakHP ~= nil and self.Gearbox.MaxHP ~= nil and self.Gearbox.TotalMass ~= nil and self.Gearbox.HPperTon ~= nil then
+							if self.Gearbox:GetClass() == "dak_tegearboxnew" then
+								speedmult = math.Clamp((1+(math.Round(math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/((self.Gearbox.TotalMass*1.1)/1000),2)*0.05))*0.5,0,1.5)
+							else
+								speedmult = math.Clamp((1+(math.Round(math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000),2)*0.05))*0.5,0,1.5)
+							end
+						else
+							self.DakOwner:ChatPrint("Please finish setting up the gearbox to get a correct cost for your tank.")
+						end
+					else
+						self.DakOwner:ChatPrint("Please give your tank a gearbox so that it may calculate its cost properly.")
+					end
 					--local speedmult = math.Clamp((((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05)),0,2)
 					--armormult = armormult+0.1
 					--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
@@ -464,7 +476,9 @@ function ENT:Think()
 					local ShotsPerSecond
 					for g=1, #self.Guns do 
 						if self.Guns[g]:GetClass() == "dak_teautogun" then
-							ShotsPerSecond = 1/(self.Guns[g].DakCooldown+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
+							ShotsPerSecond = 1/((self.Guns[g].DakCooldown * (1/self.Guns[g].FireRateMod))+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
+							--print(1/((self.Guns[g].DakCooldown)+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime)))
+							--print(ShotsPerSecond)
 							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
 						end
 						if self.Guns[g]:GetClass() == "dak_tegun" then
@@ -473,7 +487,7 @@ function ENT:Think()
 						end
 						if self.Guns[g]:GetClass() == "dak_temachinegun" then
 							self.Guns[g].ShellLengthExact = 6.5
-							ShotsPerSecond = 1/self.Guns[g].DakCooldown
+							ShotsPerSecond = 1/(self.Guns[g].DakCooldown*(1/self.Guns[g].FireRateMod))
 							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
 						end
 						TotalDPS = TotalDPS + DPS
@@ -484,7 +498,7 @@ function ENT:Think()
 					--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
 					math.max(0.1,firepowermult)
 					firepowermult = (altfirepowermult+firepowermult)*0.5
-					firepowermult = math.max((self.DakMaxHealth/25000),firepowermult)
+					firepowermult = math.max((self.DakMaxHealth/250000),firepowermult)
 
 					local GunHandlingMult = 0
 					if self.TurretControls[1] then
@@ -496,12 +510,16 @@ function ENT:Think()
 						end
 						local StabMults = 0
 						local FCSMults = 0
+						local RemoteWeaponMults = 0
 						local GunPercentage
 						local RotationSpeeds = 0
 						local HullMounts = 0
 						for i=1, #self.TurretControls do
 							if self.TurretControls[i].GunMass ~= nil then
 								GunPercentage = self.TurretControls[i].GunMass/TotalTurretMass
+								if self.TurretControls[i].RemoteWeapon == true then
+									RemoteWeaponMults = RemoteWeaponMults + 1.5 * GunPercentage
+								end
 								if self.TurretControls[i]:GetFCS() == true then
 									self.ColdWar = 1
 									FCSMults = FCSMults + 1.5 * GunPercentage
@@ -521,6 +539,7 @@ function ENT:Think()
 							end
 						end
 						GunHandlingMult = math.log(RotationSpeeds*100,100)
+						GunHandlingMult = GunHandlingMult * math.Max(RemoteWeaponMults,1)
 						GunHandlingMult = GunHandlingMult * math.Max(FCSMults,1)
 						GunHandlingMult = GunHandlingMult * StabMults
 						GunHandlingMult = GunHandlingMult * (1-(0.50*HullMounts))
@@ -530,12 +549,10 @@ function ENT:Think()
 					--print("Side Armor "..self.SideArmor)
 					--print("Side Armor Mult: "..(self.SideArmor/100))
 					--print("Adjusted Armor: "..((armormult*50)*(self.SideArmor/100)))
-
-					self.FirepowerMult = math.Round(math.max((self.DakMaxHealth/25000),firepowermult),2)
+					self.FirepowerMult = math.Round(math.max((self.DakMaxHealth/250000),firepowermult),2)
 					self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
 					self.ArmorMult = math.Round(math.max(0.1,armormult),2)
 					self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
-
 					self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.TextoliteWeight+self.ERAWeight
 					local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
 
@@ -635,7 +652,7 @@ function ENT:Think()
 						for i=1, #res do
 							CurrentRes = res[i]
 							if CurrentRes:IsSolid() then
-									self.Contraption[#self.Contraption+1] = CurrentRes
+								self.Contraption[#self.Contraption+1] = CurrentRes
 								if CurrentRes:GetClass()=="dak_tegearbox" or CurrentRes:GetClass()=="dak_tegearboxnew" then
 									CurrentRes.DakTankCore = self
 									CurrentRes.Controller = self
@@ -691,12 +708,14 @@ function ENT:Think()
 									self.TurretControls[#self.TurretControls+1]=CurrentRes
 									CurrentRes.DakContraption = res
 									CurrentRes.DakCore = self
+									CurrentRes.Controller = self
 								end
 								if CurrentRes:GetClass()=="prop_vehicle_prisoner_pod" then
 									self.Seats[#self.Seats+1]=CurrentRes
 								end
 								if CurrentRes:GetClass()=="dak_crew" then
 									self.Crew[#self.Crew+1]=CurrentRes
+									CurrentRes.Controller = self
 								end
 								if CurrentRes:GetClass()=="prop_physics" then
 									if CurrentRes.IsComposite == 1 then
@@ -870,9 +889,13 @@ function ENT:Think()
 					--####################OPTIMIZE ZONE START###################--
 					if self.DakActive == 1 and table.Count(self.HitBox)~=0 and self.CurrentHealth then
 						if table.Count(self.HitBox) > 0 then
+							self.LivingCrew = 0
 							if self.Crew then
 								if table.Count(self.Crew) > 0 then
 									for i = 1, table.Count(self.Crew) do
+										if self.Crew[i].DakDead ~= true then
+											self.LivingCrew = self.LivingCrew + 1
+										end
 										if not(IsValid(self.Crew[i])) then
 											table.remove( self.Crew, i )
 										end
@@ -1067,13 +1090,19 @@ function ENT:Think()
 									self.Crew[i].DakHealth = self.Crew[i].DakHealth - ((curvel:Distance(self.LastVel)-1000)/100)
 
 									if self.Crew[i].DakHealth <= 0 then
-										local salvage = ents.Create( "dak_tesalvage" )
-										salvage.DakModel = self.Crew[i]:GetModel()
-										salvage:SetPos( self.Crew[i]:GetPos())
-										salvage:SetAngles( self.Crew[i]:GetAngles())
-										salvage:SetModelScale(self.Crew[i]:GetModelScale())
-										salvage:Spawn()
-										self.Crew[i]:Remove()
+										if self.Crew[i].DakOwner:IsPlayer() then
+											if self.Crew[i].Job == 1 then
+												self.Crew[i].DakOwner:ChatPrint("Gunner Killed!") 
+											elseif self.Crew[i].Job == 2 then
+												self.Crew[i].DakOwner:ChatPrint("Driver Killed!") 
+											elseif self.Crew[i].Job == 3 then
+												self.Crew[i].DakOwner:ChatPrint("Loader Killed!") 
+											else
+												self.Crew[i].DakOwner:ChatPrint("Passenger Killed!") 
+											end
+										end
+										self.Crew[i]:SetMaterial("models/flesh")
+										self.Crew[i].DakDead = true
 									end
 
 								end
@@ -1088,7 +1117,7 @@ function ENT:Think()
 					--####################OPTIMIZE ZONE END###################--
 
 							if self.DakHealth then
-								if (self.DakHealth <= 0 or #self.Crew <= 0 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
+								if (self.DakHealth <= 0 or #self.Crew <= 0 or self.LivingCrew <= 0 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
 									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
 
 									self.RemoveTurretList = {}

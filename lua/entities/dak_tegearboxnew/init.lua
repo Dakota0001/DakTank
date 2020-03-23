@@ -53,14 +53,19 @@ function ENT:Initialize()
  	self.RideLimit = self:GetRideLimit()
 	self.RightChanges = {}
 	self.RightPosChanges = {}
+	self.RightRidePosChanges = {}
 	self.LeftChanges = {}
 	self.LeftPosChanges = {}
+	self.LeftRidePosChanges = {}
 	self.SlowThinkTime = CurTime()
+	self.RealYaw = 0
 	for i=1, self.WheelsPerSide do
 		self.RightChanges[i] = 0
 		self.LeftChanges[i] = 0
 		self.RightPosChanges[i] = self:GetPos()
 		self.LeftPosChanges[i] = self:GetPos()
+		self.RightRidePosChanges[i] = 0
+		self.LeftRidePosChanges[i] = 0
 	end
 	self.LastWheelsPerSide = self.WheelsPerSide
 
@@ -244,7 +249,6 @@ function ENT:Think()
 		self.FirstCheck = true
 		self.DakHealth = self.DakMaxHealth
 	end
-
 	if IsValid(self.DakTankCore) and IsValid(self.DakTankCore.Motors[1]) then
 		self.DakSpeed = 0
 		self.DakFuel = 0
@@ -276,11 +280,20 @@ function ENT:Think()
 		end
 		self.DakSpeed = (self.DakSpeed * math.Clamp(self.DakFuel/self.DakFuelReq,0,1)) * math.Clamp(self.MaxHP/self.DakHP,0,1)
 
+		self.CrewAlive = 1
 		if self.DakCrew == NULL then
-			self.DakSpeed = self.DakSpeed * 0.6
+			self.DakSpeed = 0
+			self.CrewAlive = 0
 		else
 			if self.DakCrew.DakEntity ~= self then
-				self.DakSpeed = self.DakSpeed * 0.6
+				self.DakSpeed = 0
+				self.CrewAlive = 0
+			else
+				self.DakCrew.Job = 2
+				if self.DakCrew.DakDead == true then
+					self.DakSpeed = 0
+					self.CrewAlive = 0
+				end
 			end
 		end
 
@@ -347,7 +360,11 @@ function ENT:Think()
 					self:SetNWEntity("Base",self.base)
 					self.Lastbase = self.base
 				end
-				self.HPperTon = self.DakHP/(self.TotalMass/1000)
+				if self.DakDead ~= true then
+					self.HPperTon = self.DakHP/(self.TotalMass/1000)
+				else
+					self.HPperTon = 0
+				end
 		        if (self.Active>0) then
 		        	if not(self.MoveForward>0) and not(self.MoveReverse>0) and not(self.MoveLeft>0) and not(self.MoveRight>0) then
 						if self.RPM > 600 then
@@ -429,23 +446,26 @@ function ENT:Think()
 								--print(self.LastYaw-self.base:GetAngles().yaw)
 							if self.MoveRight==0 and self.MoveLeft==0 then
 								if self.Speed > 0 then
+									local TurnVal = self.LastYaw-self.base:GetAngles().yaw
+									local ControlForce = math.Min(math.abs(self.RealYaw*2.5),10)
 									if self.Perc>=0 then
-										if self.LastYaw-self.base:GetAngles().yaw > 0.01 then
-											self.LBoost = 0
-											self.RBoost = 1
+										if self.RealYaw > 0.05 then
+											--math.abs(TurnVal)
+											self.LBoost = 0-ControlForce
+											self.RBoost = 2+ControlForce
 										end
-										if self.LastYaw-self.base:GetAngles().yaw < -0.01 then
-											self.LBoost = 1
-											self.RBoost = 0
+										if self.RealYaw < -0.05 then
+											self.LBoost = 2+ControlForce
+											self.RBoost = 0-ControlForce
 										end
 									else
-										if self.LastYaw-self.base:GetAngles().yaw > 0.01 then
-											self.LBoost = 1
-											self.RBoost = 0
+										if self.RealYaw > 0.05 then
+											self.LBoost = 2+ControlForce
+											self.RBoost = 0-ControlForce
 										end
-										if self.LastYaw-self.base:GetAngles().yaw < -0.01 then
-											self.LBoost = 0
-											self.RBoost = 1
+										if self.RealYaw < -0.05 then
+											self.LBoost = 0-ControlForce
+											self.RBoost = 2+ControlForce
 										end
 									end
 								else
@@ -637,68 +657,58 @@ function ENT:Think()
 							self.MoveRightOld = self.MoveRight
 							self.MoveLeftOld = self.MoveLeft
 							if self.Speed > 10 then
-								--[[
-								if self.Perc>=0 then
-									if self.LastYaw-self.base:GetAngles().yaw > 0.01 then
-										self.LBoost = 0
-										self.RBoost = 1
-									end
-									if self.LastYaw-self.base:GetAngles().yaw < -0.01 then
-										self.LBoost = 1
-										self.RBoost = 0
-									end
-								else
-									if self.LastYaw-self.base:GetAngles().yaw > 0.01 then
-										self.LBoost = 1
-										self.RBoost = 0
-									end
-									if self.LastYaw-self.base:GetAngles().yaw < -0.01 then
-										self.LBoost = 0
-										self.RBoost = 1
-									end
-								end
-								]]--
-
 								if self.MoveLeft>0 and self.MoveRight==0 then
 									if self.MoveReverse>0 then 
-										self.RightForce = 0
-										if math.abs(self.LastYaw-self.base:GetAngles().yaw)<1 then
+										if math.abs(self.RealYaw)<1.5 then
+											self.LeftBrake = 0
 											self.RightBrake = 1
+											self.LeftForce = 0
+											self.RightForce = 0
 										else
-											self.RightBrake = 0
-										end
-										self.LeftForce = 0
-			        					self.LeftBrake = 0
-									else
-										self.LeftForce = 0
-										self.RightBrake = 0
-										if math.abs(self.LastYaw-self.base:GetAngles().yaw)<1 then
 											self.LeftBrake = 1
+											self.RightBrake = 0
+											self.LeftForce = 0
+											self.RightForce = 0
+										end
+									else
+										if math.abs(self.RealYaw)<1.5 then
+											self.LeftBrake = 1
+											self.RightBrake = 0
+											self.LeftForce = 0
+											self.RightForce = 0
 										else
 											self.LeftBrake = 0
+											self.RightBrake = 1
+											self.LeftForce = 0
+											self.RightForce = 0
 										end
-										self.RightForce = 0
 									end
 								end
 								if self.MoveRight>0 and self.MoveLeft==0 then
 									if self.MoveReverse>0 then 
-										self.LeftForce = 0
-										self.RightBrake = 0
-										if math.abs(self.LastYaw-self.base:GetAngles().yaw)<1 then
+										if math.abs(self.RealYaw)<1.5 then
 											self.LeftBrake = 1
+											self.RightBrake = 0
+											self.LeftForce = 0
+											self.RightForce = 0
 										else
 											self.LeftBrake = 0
-										end
-										self.RightForce = 0
-									else
-										self.RightForce = 0
-										if math.abs(self.LastYaw-self.base:GetAngles().yaw)<1 then
 											self.RightBrake = 1
-										else
-											self.RightBrake = 0
+											self.LeftForce = 0
+											self.RightForce = 0
 										end
-										self.LeftForce = 0
-			        					self.LeftBrake = 0
+									else
+										if math.abs(self.RealYaw)<1.5 then
+											self.LeftBrake = 0
+											self.RightBrake = 1
+											self.LeftForce = 0
+											self.RightForce = 0
+										else
+											self.LeftBrake = 1
+											self.RightBrake = 0
+											self.LeftForce = 0
+											self.RightForce = 0
+										end
 									end
 								end
 							else
@@ -834,6 +844,12 @@ function ENT:Think()
 				local RightGrounded = 0
 				local LeftGrounded = 0
 				local BrakeMult = 0
+
+				if self.DakDead == true or self.CrewAlive == 0 then
+					self.RightForce = 0
+					self.LeftForce = 0
+				end
+
 				--Right side
 				for i=1, WheelsPerSide do
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*self.SideDist)
@@ -857,7 +873,7 @@ function ENT:Think()
 					lastvel = CurTraceHitPos - self.RightPosChanges[i]
 					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.RightBrake,0.0),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
 					self.RightPosChanges[i] = CurTraceHitPos
-					RidePos = (CurTraceDist - 100)
+					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
 						AbsorbForce = 0.2 *(5/WheelsPerSide)
 						FrictionForce = 2*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
@@ -865,10 +881,13 @@ function ENT:Think()
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
-					SuspensionForce = ((500*(100/RideLimit))*Vector(0,0,1)*math.abs(RidePos)) + wheelweightforce
+					
+					SuspensionForce = ((500*(100/RideLimit))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce
+					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
+					self.RightRidePosChanges[i] = RidePos
 					--print(FrictionForceFinal) ----------FIX ISSUE WHERE THIS SPERGS OUT AND GETS BIG FOR NO RAISIN
 					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*self.RightForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
@@ -897,7 +916,7 @@ function ENT:Think()
 					lastvel = CurTraceHitPos - self.LeftPosChanges[i]
 					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.LeftBrake,0.0),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
 					self.LeftPosChanges[i] = CurTraceHitPos
-					RidePos = (CurTraceDist - 100)
+					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 
 					if RidePos<-0.1 then
 						AbsorbForce = 0.2 *(5/WheelsPerSide)
@@ -906,11 +925,12 @@ function ENT:Think()
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
-					SuspensionForce = ((500*(100/RideLimit))*Vector(0,0,1)*math.abs(RidePos)) + wheelweightforce
+					SuspensionForce = ((500*(100/RideLimit))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce
 
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
+					self.LeftRidePosChanges[i] = RidePos
 					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*self.LeftForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
 				
@@ -918,7 +938,7 @@ function ENT:Think()
 
 		        self.Speed = Vector(0,0,0):Distance(self.phy:GetVelocity())*(0.277778*0.254)
 		    end
-		    self.LastYaw = self:GetParent():GetParent():GetAngles().yaw
+		    
 		else
 			--NO TANKCORE, INACTIVE
 	    end
@@ -931,17 +951,28 @@ function ENT:Think()
 	    	self.DakBurnStacks = self.DakBurnStacks - 0.1
 	    end
 
-	    if self:IsOnFire() then
+	    if self:IsOnFire() and self.DakDead ~= true then
 			self.DakHealth = self.DakHealth - self.DakMaxHealth*0.1*0.025
 			if self.DakHealth <= 0 then
-				local salvage = ents.Create( "dak_tesalvage" )
-				salvage.DakModel = self:GetModel()
-				salvage:SetPos( self:GetPos())
-				salvage:SetAngles( self:GetAngles())
-				salvage:Spawn()
-				self:Remove()
+				if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Destroyed!") end
+				self:SetMaterial("models/props_buildings/plasterwall021a")
+				self:SetColor(Color(100,100,100,255))
+				self.DakDead = true
 			end
 		end
+		if self.SpeedTable == nil then self.SpeedTable = {} end
+		if self.LastAccel == nil then self.LastAccel = 0 end
+
+		self.SpeedTable[#self.SpeedTable+1] = self.LastYaw-self.base:GetAngles().yaw
+		if #self.SpeedTable > 2 then
+			 table.remove( self.SpeedTable, 1 )
+		end
+		local totalspeed = 0
+		for i=1, #self.SpeedTable do
+			totalspeed = totalspeed + self.SpeedTable[i]
+		end
+		self.RealYaw = (totalspeed/#self.SpeedTable)
+		self.LastYaw = self:GetParent():GetParent():GetAngles().yaw
 	end
 	--print(self.TimeScale)
     self:NextThink(CurTime())

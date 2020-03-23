@@ -61,6 +61,7 @@ function ENT:Initialize()
  		self:NetworkVar("String",0,"Model")
  	end
  	self:SetNWFloat("Caliber",self.DakCaliber)
+ 	self.FireRateMod = self:GetRateOfFire()
 end
 
 function ENT:Think()
@@ -233,6 +234,8 @@ function ENT:Think()
 			end
 		end
 
+		self.DakCooldown = self.DakCooldown * (1/self.FireRateMod)
+
 		if self.DakHealth > self.DakMaxHealth then
 			self.DakHealth = self.DakMaxHealth
 		end
@@ -310,9 +313,9 @@ function ENT:DakTEAmmoCheck()
 		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
 end
-
+util.AddNetworkString( "daktankshotfired" )
 function ENT:DakTEFire()
-	if( self.Firing ) then
+	if ( self.Firing and self.DakDead ~= true) then
 		if IsValid(self.DakTankCore) then
 			self.AmmoCount = 0 
 			if not(self.DakTankCore.Ammoboxes == nil) then
@@ -398,14 +401,21 @@ function ENT:DakTEFire()
 				self:SetNWInt("FirePitch",self.DakFirePitch)
 				self:SetNWFloat("Caliber",self.DakCaliber)
 
-				if self.DakCaliber>=40 then
-					self:SetNWBool("Firing",true)
-					timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
-						self:SetNWBool("Firing",false)
-					end)
-				else
-					sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.Rand(0.95, 1.05), 1 )
-				end								
+				net.Start( "daktankshotfired" )
+				net.WriteVector( self:GetPos() )
+				net.WriteFloat( self.DakCaliber )
+				net.WriteString( FiringSound[math.random(1,3)] )
+				net.Broadcast()
+
+				--if self.DakCaliber>=40 then
+				--	self:SetNWBool("Firing",true)
+				--	timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
+				--		self:SetNWBool("Firing",false)
+				--	end)
+				--else
+				--	sound.Play( FiringSound[math.random(1,3)], self:GetPos(), 100, 100*math.Rand(0.95, 1.05), 1 )
+				--end
+							
 
 				local effectdata = EffectData()
 				effectdata:SetOrigin( self:GetAttachment( 1 ).Pos )

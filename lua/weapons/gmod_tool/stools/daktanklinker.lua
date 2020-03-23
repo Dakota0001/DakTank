@@ -26,7 +26,7 @@ TOOL.ClientConVar[ "ArmorType" ]   = "RHA"
 function TOOL:LeftClick( trace )
 	if CurTime()>self.LastLeftClick then
 		local Target = trace.Entity
-		if(string.Explode("_",Target:GetClass(),false)[1] == "dak") then
+		if (string.Explode("_",Target:GetClass(),false)[1] == "dak") then
 			if Target:GetClass()=="dak_tankcore" then
 				if (SERVER) or (game.SinglePlayer()) then
 					for i = 1, table.Count(Target.Composites) do
@@ -120,8 +120,8 @@ function TOOL:RightClick( trace )
 		local Target = trace.Entity
 		if IsValid(self.EntList[1]) then
 			if self.EntList[1]:GetClass() == "dak_crew" then
-				if(Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" or Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun") then
-					if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" then
+				if(Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" or Target:GetClass() == "dak_turretcontrol" or Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun") then
+					if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" or Target:GetClass() == "dak_turretcontrol" then
 						self.Ent2 = Target
 						self.EntList[1].DakEntity = self.Ent2
 						if (CLIENT) or (game.SinglePlayer()) then

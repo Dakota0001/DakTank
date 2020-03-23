@@ -11,12 +11,18 @@ function ENT:Think()
 	if self.CycleVal == nil then self.CycleVal = 0.05 end
 	if self.LastFire2 == nil then self.LastFire2 = false end
 	local Caliber = self:GetNWFloat("Caliber")
+	local Energy = self:GetNWFloat("Energy")
 
 	if Caliber > 0 and self.Scaled == 0 then
-		local mins1, maxs1 = self:GetModelBounds( 0, 0 )
-		self:PhysicsInitBox( mins1, maxs1 )
+		--self:PhysicsInit( SOLID_VPHYSICS )
+		local mins, maxs = self:GetModelBounds()
+		self:PhysicsInitBox( mins, maxs )
+		self:SetSolidFlags( 0 )
 		self.Scaled = 1
 	end
+	--self:SetSolid( SOLID_BBOX )
+	--self:SetMoveType( MOVETYPE_VPHYSICS )
+	--self:SetCollisionBounds( self:GetModelBounds( 0, 0 ) )
 
 	if self.Scaled == 1 then
 		if self:GetPhysicsObject():IsValid() then
@@ -40,38 +46,27 @@ function ENT:Think()
 		end
 		self.LastFire2 = self:GetNWBool("Firing")
 	end
-	
-	if Caliber >= 40 then
-		if (self:GetNWBool("Firing")) == true and self:GetNWBool("Firing")~=self.LastFire then
-			local pitch = math.Rand(0.95, 1.05)
-			local Dir = LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000)
-			local Vol = math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/5000 ),0,1)
-			--13503.9 speed of sound in inches
-			timer.Simple(LocalPlayer():GetPos():Distance(self:GetPos())/13503.9, function()
-				if self:IsValid() then
+	if (self:GetNWBool("Firing")) == true and self:GetNWBool("Firing")~=self.LastFire then
+		local pitch = math.Rand(0.95, 1.05)
+		local Dir = LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000)
+		local Vol = math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/5000 ),0,1)
+		--13503.9 speed of sound in inches
+		timer.Simple(LocalPlayer():GetPos():Distance(self:GetPos())/13503.9, function()
+			if self:IsValid() then
+				sound.Play( self:GetNWString("FireSound"), Dir, 100, 100*pitch, Vol )
+				if Energy >= 25000 then
 					sound.Play( self:GetNWString("FireSound"), Dir, 100, 100*pitch, Vol )
-					if Caliber >= 75 then
-						sound.Play( self:GetNWString("FireSound"), Dir, 100, 100*pitch, Vol )
-					end
-					if Caliber >= 100 then
-						sound.Play( self:GetNWString("FireSound"), Dir, 100, 100*pitch, Vol )
-					end
-					if Caliber >= 150 then
-						sound.Play( self:GetNWString("FireSound"), Dir, 100, 100*pitch, Vol )
-					end
-					if Caliber >= 250 then
-						sound.Play( self:GetNWString("FireSound"), Dir, 100, 100*pitch, Vol )
-					end
 				end
-				util.ScreenShake( self:GetPos(), math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/(500*Caliber) ),0,1) * 2.5, 2.5, 1.0, 5000000 )
-			end)
-		end
-		self.LastFire = self:GetNWBool("Firing")
+				if Energy >= 250000 then
+					sound.Play( self:GetNWString("FireSound"), Dir, 100, 100*pitch, Vol )
+				end
+				if Energy >= 2500000 then
+					sound.Play( self:GetNWString("FireSound"), Dir, 100, 100*pitch, Vol )
+				end
+			end
+			local mult = math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/(0.1*Energy) ),0,1) * 2.5
+			util.ScreenShake( self:GetPos(), mult * 2.5, 2.5, mult * 1, 5000000 )
+		end)
 	end
-	--if Caliber >= 75 then
-	--	if (self:GetNWBool("Exploding")) == true and self:GetNWBool("Exploding")~=self.LastExp then
-	--		sound.Play( "daktanks/distexp1.mp3", LocalPlayer():GetPos()+((self:GetPos()-LocalPlayer():GetPos()):GetNormalized()*1000), 100, 100, math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(self:GetPos())/(500*self:GetNWFloat("ExpDamage")) ),0,1) )
-	--	end
-	--	self.LastExp = self:GetNWBool("Exploding")
-	--end
+	self.LastFire = self:GetNWBool("Firing")
 end

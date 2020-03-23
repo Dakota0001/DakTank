@@ -3,6 +3,7 @@ function EFFECT:Init( data )
 	local size = data:GetScale()
 	local emitter = ParticleEmitter( Pos )
 	local dustsize = data:GetScale()/5
+
 	if dustsize > 0 then
 		local pregroundtrace = {}
 			pregroundtrace.start = Pos
