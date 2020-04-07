@@ -43,6 +43,7 @@ function ENT:Initialize()
 	self.RearArmor = 0
 	self.Modern = 0
 	self.ColdWar = 0
+	self.BoxVolume = 100000000
 end
 
 
@@ -163,7 +164,10 @@ function ENT:Think()
 				self.PreCostTimer = CurTime() - self.PreCostTimerFirst
 				if self.PreCostTimer > 5 and self.CanSpawn ~= true and IsValid(self.Gearbox) then
 					self.CanSpawn = true
-
+					self.BestHeight = 0
+					self.BestWidth = 0
+					self.BestLength = 0
+					local HitTable = {}
 					local ArmorVal1 = 0
 					local addpos
 					local count = 0
@@ -179,13 +183,17 @@ function ENT:Think()
 					local basesize = self:GetParent():GetParent():OBBMaxs()
 					local distance = math.Max(basesize.x, basesize.y, basesize.z)*3
 					local ArmorValTable = {}
+					local hitpos
 					for i=1, 25 do
 						for j=1, 25 do
 							addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll())
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll())
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+								end
+								if gunhit==0 and ent.Controller == self then
+									HitTable[#HitTable+1] = hitpos
 								end
 							end
 						end
@@ -211,10 +219,13 @@ function ENT:Think()
 					for i=1, 50 do
 						for j=1, 50 do
 							addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos, "AP", 75, player.GetAll())
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos, "AP", 75, player.GetAll())
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+								end
+								if gunhit==0 and ent.Controller == self then
+									HitTable[#HitTable+1] = hitpos
 								end
 							end
 						end
@@ -239,10 +250,13 @@ function ENT:Think()
 					for i=1, 25 do
 						for j=1, 25 do
 							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos, "AP", 75, player.GetAll())
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos, "AP", 75, player.GetAll())
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+								end
+								if gunhit==0 and ent.Controller == self then
+									HitTable[#HitTable+1] = hitpos
 								end
 							end
 						end
@@ -267,10 +281,13 @@ function ENT:Think()
 					for i=1, 25 do
 						for j=1, 25 do
 							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos, "AP", 75, player.GetAll())
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos, "AP", 75, player.GetAll())
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+								end
+								if gunhit==0 and ent.Controller == self then
+									HitTable[#HitTable+1] = hitpos
 								end
 							end
 						end
@@ -297,7 +314,6 @@ function ENT:Think()
 					local shellvol = ((100*0.0393701)^2)*(100*0.0393701*13)
 					local shells = 0
 					local ammocosts = 0
-
 
 					for i = 1, #self.Guns do
 						self.Guns[i].AmmoBoxes = {}
@@ -402,7 +418,7 @@ function ENT:Think()
 							elseif name == "HESH" then
 								if self.Guns[i].DakMaxHealth*1.25 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.25 end
 							elseif name == "HE" then
-								if self.Guns[i].DakMaxHealth*0.2 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*0.2 end
+								if self.Guns[i].DakBaseShellFragPen > MaxPen then MaxPen = self.Guns[i].DakBaseShellFragPen end
 							end
 						end
 					end
@@ -498,7 +514,20 @@ function ENT:Think()
 					--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
 					math.max(0.1,firepowermult)
 					firepowermult = (altfirepowermult+firepowermult)*0.5
-					firepowermult = math.max((self.DakMaxHealth/250000),firepowermult)
+
+					local basepos = self:GetParent():GetParent():GetPos()
+					self.BestLength = 0
+					self.BestWidth = 0
+					self.BestHeight = 0
+					for i=1, #HitTable do
+						local diff = basepos-HitTable[i]
+						if math.abs(diff.x) > self.BestWidth then self.BestWidth = math.abs(diff.x) end
+						if math.abs(diff.y) > self.BestLength then self.BestLength = math.abs(diff.y) end
+						if math.abs(diff.z) > self.BestHeight then self.BestHeight = math.abs(diff.z) end
+					end
+					self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
+
+					firepowermult = math.max((self.BoxVolume*0.01/250000),firepowermult)
 
 					local GunHandlingMult = 0
 					if self.TurretControls[1] then
@@ -549,7 +578,7 @@ function ENT:Think()
 					--print("Side Armor "..self.SideArmor)
 					--print("Side Armor Mult: "..(self.SideArmor/100))
 					--print("Adjusted Armor: "..((armormult*50)*(self.SideArmor/100)))
-					self.FirepowerMult = math.Round(math.max((self.DakMaxHealth/250000),firepowermult),2)
+					self.FirepowerMult = math.Round(math.max((self.BoxVolume*0.01/250000),firepowermult),2)
 					self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
 					self.ArmorMult = math.Round(math.max(0.1,armormult),2)
 					self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
@@ -561,7 +590,6 @@ function ENT:Think()
 					--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
 					self.PreCost = self.PreCost*((self.SpeedMult+self.GunHandlingMult)*0.5)
 					self.Cost = math.Round(self.PreCost)
-
 
 					local curera = "WWII"
 					if self.ColdWar == 1 then curera = "Cold War" end
@@ -868,8 +896,8 @@ function ENT:Think()
 							for i=1, table.Count(self.HitBox) do
 								self.HitBoxMass = self.HitBoxMass + self.HitBox[i]:GetPhysicsObject():GetMass()
 							end
-							self.CurrentHealth = self.HitBoxMass*0.01*self.SizeMult*25
-							self.DakMaxHealth = self.HitBoxMass*0.01*self.SizeMult*25
+							self.CurrentHealth = self.BoxVolume*0.01
+							self.DakMaxHealth = self.BoxVolume*0.01
 							for i=1, table.Count(self.HitBox) do
 								DakTekTankEditionSetupNewEnt(self.HitBox[i])
 								self.HitBox[i].DakHealth = self.CurrentHealth
@@ -1060,12 +1088,12 @@ function ENT:Think()
 								end
 							end
 							if self.CurrentHealth >= self.DakMaxHealth then
-								self.DakMaxHealth = self.CurMass*0.01*self.SizeMult*25
-								self.CurrentHealth = self.CurMass*0.01*self.SizeMult*25
+								self.DakMaxHealth = self.BoxVolume*0.01
+								self.CurrentHealth = self.BoxVolume*0.01
 							end
 							for i = 1, table.Count(self.HitBox) do
 								if self.CurrentHealth >= self.DakMaxHealth then
-									self.HitBox[i].DakMaxHealth = self.CurMass*0.01*self.SizeMult*25
+									self.HitBox[i].DakMaxHealth = self.BoxVolume*0.01
 								end
 								self.HitBox[i].DakHealth = self.CurrentHealth
 

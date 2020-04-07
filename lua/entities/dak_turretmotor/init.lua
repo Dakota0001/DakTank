@@ -124,6 +124,7 @@ function ENT:Think()
 	end
 	if self.DakDead == true then
 		self.DakRotMult = 0
+		self.DakHealth = 0
 	end
 	if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 	

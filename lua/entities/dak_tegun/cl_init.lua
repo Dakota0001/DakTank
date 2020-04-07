@@ -22,12 +22,12 @@ function ENT:Think()
 	end
 	--self:SetSolid( SOLID_BBOX )
 	--self:SetMoveType( MOVETYPE_VPHYSICS )
-	--self:SetCollisionBounds( self:GetModelBounds( 0, 0 ) )
+	self:SetCollisionBounds( self:GetRotatedAABB( self:GetModelBounds( 0, 0 ) ) )
 
 	if self.Scaled == 1 then
 		if self:GetPhysicsObject():IsValid() then
 			self:GetPhysicsObject():SetPos(self:GetPos())
-			self:GetPhysicsObject():SetAngles(self:GetAngles())
+			self:GetPhysicsObject():SetAngles(self:GetAngles()+Angle(0,-90,0))
 			self:GetPhysicsObject():EnableMotion( false )
 		end
 	end

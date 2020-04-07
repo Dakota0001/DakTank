@@ -91,6 +91,7 @@ function ENT:Think()
 		self.VO = math.random(1,6)
 	end
 	if self.DakDead == true then
+		self.DakHealth = 0
 		if self.Screamed == nil then self.Screamed = false end
 		if self.Screamed == false then
 			if self.VO == 1 then

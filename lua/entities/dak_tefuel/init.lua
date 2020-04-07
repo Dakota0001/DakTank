@@ -105,6 +105,8 @@ function ENT:Think()
 			end
 			self.SparkTime=CurTime()
 		end
+	else
+		self.DakHealth = 0
 	end
 
 	if self.DakName == "Micro Fuel Tank" then

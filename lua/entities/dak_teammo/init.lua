@@ -345,6 +345,7 @@ function ENT:Think()
 			end
 		else
 			self.DakAmmo = 0
+			self.DakHealth = 0
 		end
 		self.SlowThinkTime = CurTime()
 	end

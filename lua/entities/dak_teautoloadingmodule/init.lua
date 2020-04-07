@@ -156,6 +156,7 @@ function ENT:Think()
 		end
 	else
 		self.DakGun.Loaded = 0
+		self.DakHealth = 0
 	end
 
 	if self:IsOnFire() and self.DakDead ~= true then

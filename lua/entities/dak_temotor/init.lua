@@ -156,7 +156,10 @@ function ENT:Think()
 
 	self.DakSpeed = self.DakSpeed * (self.DakHealth/self.DakMaxHealth) * self:GetHorsePowerMultiplier()
 	self.DakHP = self.DakHP * (self.DakHealth/self.DakMaxHealth) * self:GetHorsePowerMultiplier()
-	if self.DakDead == true then self.DakHP = 0 end
+	if self.DakDead == true then 
+		self.DakHP = 0 
+		self.DakHealth = 0
+	end
 	if self.initsound ~= self.DakSound then
 		self.initsound = self.DakSound
 		self.Sound:Stop()

@@ -80,9 +80,31 @@ function ENT:Think()
 			if self.DakModel == "models/daktanks/machinegun100mm.mdl" then ScalingGun = 1 end
 			if ScalingGun == 1 then
 				local Caliber = self.DakCaliber
-				self:SetModelScale(1)
-				self:SetModelScale( self:GetModelScale() * (Caliber/100), 0 )
+				local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
+				--self:SetModelScale( self:GetModelScale() * (Caliber/1000), 0 )
+				local mins, maxs = self:GetCollisionBounds()
+				self:PhysicsDestroy()	
+				local x0 = mins[1] -- Define the min corner of the box
+				local y0 = mins[2]
+				local z0 = mins[3]
+				local x1 = maxs[1] -- Define the max corner of the box
+				local y1 = maxs[2]
+				local z1 = maxs[3]
+				self:PhysicsInitConvex( {
+				Vector( x0, y0, z0 ),
+				Vector( x0, y0, z1 ),
+				Vector( x0, y1, z0 ),
+				Vector( x0, y1, z1 ),
+				Vector( x1, y0, z0 ),
+				Vector( x1, y0, z1 ),
+				Vector( x1, y1, z0 ),
+				Vector( x1, y1, z1 )
+				} )
+				self:SetMoveType(MOVETYPE_VPHYSICS)
+				self:SetSolid(SOLID_VPHYSICS)
 				self:EnableCustomCollisions( true )
+				local mins2, maxs2 = self:GetHitBoxBounds( 0, 0 )
+				self:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
 				self:Activate()
 				self.ScalingFinished = true
 			else
@@ -539,8 +561,31 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 
 	if ScalingGun == 1 then
 		local Caliber = self.DakCaliber
-		self:SetModelScale(1)
-		self:SetModelScale( self:GetModelScale() * (Caliber/100), 0 )
+		local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
+		--self:SetModelScale( self:GetModelScale() * (Caliber/1000), 0 )
+		local mins, maxs = self:GetCollisionBounds()
+		self:PhysicsDestroy()	
+		local x0 = mins[1] -- Define the min corner of the box
+		local y0 = mins[2]
+		local z0 = mins[3]
+		local x1 = maxs[1] -- Define the max corner of the box
+		local y1 = maxs[2]
+		local z1 = maxs[3]
+		self:PhysicsInitConvex( {
+		Vector( x0, y0, z0 ),
+		Vector( x0, y0, z1 ),
+		Vector( x0, y1, z0 ),
+		Vector( x0, y1, z1 ),
+		Vector( x1, y0, z0 ),
+		Vector( x1, y0, z1 ),
+		Vector( x1, y1, z0 ),
+		Vector( x1, y1, z1 )
+		} )
+		self:SetMoveType(MOVETYPE_VPHYSICS)
+		self:SetSolid(SOLID_VPHYSICS)
+		self:EnableCustomCollisions( true )
+		local mins2, maxs2 = self:GetHitBoxBounds( 0, 0 )
+		self:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
 		self:Activate()
 	end
 

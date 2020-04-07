@@ -94,9 +94,31 @@ function ENT:Think()
 			if self.DakModel == "models/daktanks/machinegun100mm.mdl" then ScalingGun = 1 end
 			if ScalingGun == 1 then
 				local Caliber = self.DakCaliber
-				self:SetModelScale(1)
-				self:SetModelScale( self:GetModelScale() * (Caliber/100), 0 )
+				local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
+				--self:SetModelScale( self:GetModelScale() * (Caliber/1000), 0 )
+				local mins, maxs = self:GetCollisionBounds()
+				self:PhysicsDestroy()	
+				local x0 = mins[1] -- Define the min corner of the box
+				local y0 = mins[2]
+				local z0 = mins[3]
+				local x1 = maxs[1] -- Define the max corner of the box
+				local y1 = maxs[2]
+				local z1 = maxs[3]
+				self:PhysicsInitConvex( {
+				Vector( x0, y0, z0 ),
+				Vector( x0, y0, z1 ),
+				Vector( x0, y1, z0 ),
+				Vector( x0, y1, z1 ),
+				Vector( x1, y0, z0 ),
+				Vector( x1, y0, z1 ),
+				Vector( x1, y1, z0 ),
+				Vector( x1, y1, z1 )
+				} )
+				self:SetMoveType(MOVETYPE_VPHYSICS)
+				self:SetSolid(SOLID_VPHYSICS)
 				self:EnableCustomCollisions( true )
+				local mins2, maxs2 = self:GetHitBoxBounds( 0, 0 )
+				self:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
 				self:Activate()
 				self.ScalingFinished = true
 			else
@@ -1236,7 +1258,14 @@ function ENT:Think()
 		end
 
 		if self:GetParent():IsValid() and self:GetParent():GetParent():IsValid() and self.IsAutoLoader==1 and self.Controller~=nil then
-			local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*self:OBBMins().x) , (self:GetPos()+self:GetForward()*self:OBBMins().x)-(self:GetForward()*1000), self.DakCaliber, {self, self:GetParent(), self:GetParent():GetParent()}, self)
+			local breechoffset
+			if self:GetHitBoxCount( 0 ) == 2 then
+				_, breechoffset = self:GetHitBoxBounds( 1, 0 )
+			else
+				_, breechoffset = self:GetHitBoxBounds( 0, 0 )
+			end
+			breechoffset = math.abs(breechoffset.x) * -1
+			local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetForward()*1000), self.DakCaliber, {self, self:GetParent(), self:GetParent():GetParent()}, self)
 			local ShellSize = (self.ShellLengthMult*10*self.DakCaliber*0.0393701)
 			if self.ReloadMult == nil then
 				if math.Round(BackDist,2) > math.Round(ShellSize*0.5,2) and math.Round(BackDist,2) <= math.Round(ShellSize,2) then
@@ -1472,6 +1501,13 @@ function ENT:DakTEAutoAmmoCheck()
 	if IsValid(self.DakTankCore) then
 		self.AmmoCount = 0 
 		self.SortedAmmo = {}
+		local breechoffset
+		if self:GetHitBoxCount( 0 ) == 2 then
+			_, breechoffset = self:GetHitBoxBounds( 1, 0 )
+		else
+			_, breechoffset = self:GetHitBoxBounds( 0, 0 )
+		end
+		breechoffset = math.abs(breechoffset.x) * -1
 		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -1480,13 +1516,13 @@ function ENT:DakTEAutoAmmoCheck()
 							if self.DakTankCore.Ammoboxes[i].DakAmmoType == self.DakAmmoType then
 								self.AmmoCount = self.AmmoCount + self.DakTankCore.Ammoboxes[i].DakAmmo
 							end
-							self.SortedAmmo[#self.SortedAmmo+1] = {self.DakTankCore.Ammoboxes[i],self.DakTankCore.Ammoboxes[i]:GetPos():Distance(self:GetPos() + self:GetForward()*self:OBBMins().x)}
+							self.SortedAmmo[#self.SortedAmmo+1] = {self.DakTankCore.Ammoboxes[i],self.DakTankCore.Ammoboxes[i]:GetPos():Distance(self:GetPos() + self:GetForward()*breechoffset)}
 						end
 					else
 						if self.DakTankCore.Ammoboxes[i].DakAmmoType == self.DakAmmoType then
 							self.AmmoCount = self.AmmoCount + self.DakTankCore.Ammoboxes[i].DakAmmo
 						end
-						self.SortedAmmo[#self.SortedAmmo+1] = {self.DakTankCore.Ammoboxes[i],self.DakTankCore.Ammoboxes[i]:GetPos():Distance(self:GetPos() + self:GetForward()*self:OBBMins().x)}
+						self.SortedAmmo[#self.SortedAmmo+1] = {self.DakTankCore.Ammoboxes[i],self.DakTankCore.Ammoboxes[i]:GetPos():Distance(self:GetPos() + self:GetForward()*breechoffset)}
 					end
 				end
 			end
@@ -1498,7 +1534,7 @@ function ENT:DakTEAutoAmmoCheck()
 						if self.DakTankCore.Ammoboxes[i].DakAmmoType == self.DakAmmoType then
 							self.AmmoCount = self.AmmoCount + self.DakTankCore.Ammoboxes[i].DakAmmo
 						end
-						self.SortedAmmo[#self.SortedAmmo+1] = {self.DakTankCore.Ammoboxes[i],self.DakTankCore.Ammoboxes[i]:GetPos():Distance(self:GetPos() + self:GetForward()*self:OBBMins().x)}
+						self.SortedAmmo[#self.SortedAmmo+1] = {self.DakTankCore.Ammoboxes[i],self.DakTankCore.Ammoboxes[i]:GetPos():Distance(self:GetPos() + self:GetForward()*breechoffset)}
 					end
 				end
 			end
@@ -2087,8 +2123,31 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 
 	if ScalingGun == 1 then
 		local Caliber = self.DakCaliber
-		self:SetModelScale(1)
-		self:SetModelScale( self:GetModelScale() * (Caliber/100), 0 )
+		local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
+		--self:SetModelScale( self:GetModelScale() * (Caliber/1000), 0 )
+		local mins, maxs = self:GetCollisionBounds()
+		self:PhysicsDestroy()	
+		local x0 = mins[1] -- Define the min corner of the box
+		local y0 = mins[2]
+		local z0 = mins[3]
+		local x1 = maxs[1] -- Define the max corner of the box
+		local y1 = maxs[2]
+		local z1 = maxs[3]
+		self:PhysicsInitConvex( {
+		Vector( x0, y0, z0 ),
+		Vector( x0, y0, z1 ),
+		Vector( x0, y1, z0 ),
+		Vector( x0, y1, z1 ),
+		Vector( x1, y0, z0 ),
+		Vector( x1, y0, z1 ),
+		Vector( x1, y1, z0 ),
+		Vector( x1, y1, z1 )
+		} )
+		self:SetMoveType(MOVETYPE_VPHYSICS)
+		self:SetSolid(SOLID_VPHYSICS)
+		self:EnableCustomCollisions( true )
+		local mins2, maxs2 = self:GetHitBoxBounds( 0, 0 )
+		self:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
 		self:Activate()
 	end
 end

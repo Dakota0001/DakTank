@@ -38,7 +38,7 @@ function EFFECT:Init( data )
 			end
 		end
 	end
-	for i = 1,5*size do
+	for i = 1,1*size do
 		local particle = emitter:Add( "dak/smokey", Pos+Vector(math.random(-5,5),math.random(-5,5),math.random(-5,5)))  
 		if particle == nil then particle = emitter:Add( "dak/smokey", Pos) end
 		if (particle) then
@@ -61,7 +61,7 @@ function EFFECT:Init( data )
 		end
 	end
 
-	for i=1, 10*size do
+	for i=1, 1*size do
 		local Debris = emitter:Add( "effects/fleck_tile"..math.random(1,2), Pos )
 		if (Debris) then
 			Debris:SetVelocity (Vector(math.random(-250*size,250*size),math.random(-250*size,250*size),math.random(-250*size,250*size)))
