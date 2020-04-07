@@ -181,7 +181,7 @@ function ENT:Think()
 					--FRONT
 					local startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
 					local basesize = self:GetParent():GetParent():OBBMaxs()
-					local distance = math.Max(basesize.x, basesize.y, basesize.z)*3
+					local distance = math.Max((math.Max(basesize.x, basesize.y, basesize.z)*5),250)
 					local ArmorValTable = {}
 					local hitpos
 					for i=1, 25 do

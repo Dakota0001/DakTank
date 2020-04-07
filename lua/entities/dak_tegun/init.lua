@@ -87,7 +87,7 @@ function ENT:Think()
 				local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
 				--self:SetModelScale( self:GetModelScale() * (Caliber/1000), 0 )
 				local mins, maxs = self:GetCollisionBounds()
-				self:PhysicsDestroy()	
+				--self:PhysicsDestroy()	
 				local x0 = mins[1] -- Define the min corner of the box
 				local y0 = mins[2]
 				local z0 = mins[3]
@@ -1342,7 +1342,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
 		--self:SetModelScale( self:GetModelScale() * (Caliber/1000), 0 )
 		local mins, maxs = self:GetCollisionBounds()
-		self:PhysicsDestroy()	
+		--self:PhysicsDestroy()	
 		local x0 = mins[1] -- Define the min corner of the box
 		local y0 = mins[2]
 		local z0 = mins[3]
