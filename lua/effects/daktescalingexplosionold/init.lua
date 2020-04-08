@@ -85,9 +85,9 @@ function EFFECT:Init( data )
 
 	for i = 1,size*25 do
 
-		local particle = emitter:Add( "sprites/light_glow02_add.vmt", Pos + size*Vector( math.random(-20,20),math.random(-20,20),math.random(-20,20) ) ) 
+		local particle = emitter:Add( "effects/muzzleflash1.vtf", Pos + size*Vector( math.random(-20,20),math.random(-20,20),math.random(-20,20) ) ) 
 		 
-		if particle == nil then particle = emitter:Add( "sprites/light_glow02_add.vmt", Pos + size*Vector(   math.random(0,0),math.random(0,0),math.random(0,0) ) ) end
+		if particle == nil then particle = emitter:Add( "effects/muzzleflash1.vtf", Pos + size*Vector(   math.random(0,0),math.random(0,0),math.random(0,0) ) ) end
 		
 		if (particle) then
 			particle:SetVelocity(size*Vector(math.random(-200,200),math.random(-200,200),math.random(-200,200)))

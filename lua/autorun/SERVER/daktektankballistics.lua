@@ -1165,17 +1165,17 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 		if HitEnt:IsWorld() or Shell.ExplodeNow==true then
 			Shell.ExplodeNow=false
 			if Shell.DakExplosive then
-				local effectdata = EffectData()
-				effectdata:SetOrigin(HitPos)
-				effectdata:SetEntity(Shell.DakGun)
-				effectdata:SetAttachment(1)
-				effectdata:SetMagnitude(.5)
-				effectdata:SetScale(Shell.DakBlastRadius)
-				effectdata:SetNormal( Normal )
+				local effectdata3 = EffectData()
+				effectdata3:SetOrigin(HitPos)
+				effectdata3:SetEntity(Shell.DakGun)
+				effectdata3:SetAttachment(1)
+				effectdata3:SetMagnitude(.5)
+				effectdata3:SetScale(Shell.DakBlastRadius)
+				effectdata3:SetNormal( Normal )
 				if Shell.DakShellType == "SM" then
-					util.Effect("daktescalingsmoke", effectdata, true, true)
+					util.Effect("daktescalingsmoke", effectdata3, true, true)
 				else
-					util.Effect("daktescalingexplosion", effectdata, true, true)
+					util.Effect("daktescalingexplosion", effectdata3, true, true)
 				end
 
 				Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
@@ -1319,17 +1319,17 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			Shell.DieTime = CurTime()
 		end
 		Shell.RemoveNow = 1
-		local effectdata = EffectData()
-		effectdata:SetOrigin(Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()))
-		effectdata:SetEntity(Shell.DakGun)
-		effectdata:SetAttachment(1)
-		effectdata:SetMagnitude(.5)
-		effectdata:SetScale(Shell.DakBlastRadius)
-		effectdata:SetNormal( Normal )
+		local effectdata3 = EffectData()
+		effectdata3:SetOrigin(Shell.Pos + (Fuze * Shell.DakVelocity:GetNormalized()))
+		effectdata3:SetEntity(Shell.DakGun)
+		effectdata3:SetAttachment(1)
+		effectdata3:SetMagnitude(.5)
+		effectdata3:SetScale(Shell.DakBlastRadius)
+		effectdata3:SetNormal( Normal )
 		if Shell.DakShellType == "SM" then
-			util.Effect("daktescalingsmoke", effectdata, true, true)
+			util.Effect("daktescalingsmoke", effectdata3, true, true)
 		else
-			util.Effect("daktescalingexplosion", effectdata, true, true)
+			util.Effect("daktescalingexplosion", effectdata3, true, true)
 		end
 		Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
 		if Shell.DakCaliber>=75 then
@@ -2039,17 +2039,17 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			if HitEnt:IsWorld() or Shell.ExplodeNow==true then
 				Shell.ExplodeNow=false
 				if Shell.DakExplosive then
-					local effectdata = EffectData()
-					effectdata:SetOrigin(ContShellTrace.HitPos)
-					effectdata:SetEntity(Shell.DakGun)
-					effectdata:SetAttachment(1)
-					effectdata:SetMagnitude(.5)
-					effectdata:SetScale(Shell.DakBlastRadius)
-					effectdata:SetNormal( Normal )
+					local effectdata3 = EffectData()
+					effectdata3:SetOrigin(ContShellTrace.HitPos)
+					effectdata3:SetEntity(Shell.DakGun)
+					effectdata3:SetAttachment(1)
+					effectdata3:SetMagnitude(.5)
+					effectdata3:SetScale(Shell.DakBlastRadius)
+					effectdata3:SetNormal( Normal )
 					if Shell.DakShellType == "SM" then
-						util.Effect("daktescalingsmoke", effectdata, true, true)
+						util.Effect("daktescalingsmoke", effectdata3, true, true)
 					else
-						util.Effect("daktescalingexplosion", effectdata, true, true)
+						util.Effect("daktescalingexplosion", effectdata3, true, true)
 					end
 
 					Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)

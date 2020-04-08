@@ -36,6 +36,7 @@ ENT.DakReloadTime = 10
 ENT.IsAutoLoader = 0
 ENT.DakCrew = NULL
 ENT.BasicVelocity = 29527.6
+ENT.muzzle = NULL
 
 function ENT:Initialize()
 	--self:SetModel(self.DakModel)
@@ -76,6 +77,20 @@ function ENT:Initialize()
  	end
  	self:SetNWFloat("Caliber",self.DakCaliber)
  	self.FireRateMod = self:GetRateOfFire()
+
+ 	self.muzzle = ents.Create("prop_physics")
+ 	self.muzzle:SetAngles(self:GetAngles()+Angle(0,-90,0))
+ 	self.muzzle:SetPos(self:GetPos())
+ 	self.muzzle:SetMoveType(MOVETYPE_NONE)
+ 	self.muzzle:PhysicsInit(SOLID_NONE)
+ 	self.muzzle:SetParent(self)
+ 	self.muzzle:SetModel( self:GetModel() )
+ 	self.muzzle:SetColor( Color(255, 255, 255, 0) )
+ 	self.muzzle:SetRenderMode( RENDERMODE_TRANSCOLOR )
+ 	self.muzzle:Spawn()
+ 	self.muzzle:Activate()
+ 	self.muzzle:SetMoveType(MOVETYPE_NONE)
+ 	self.muzzle:PhysicsInit(SOLID_NONE)
 end
 
 function ENT:Think()
@@ -92,6 +107,10 @@ function ENT:Think()
 			if self.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then ScalingGun = 1 end
 			if self.DakModel == "models/daktanks/smokelauncher100mm.mdl" then ScalingGun = 1 end
 			if self.DakModel == "models/daktanks/machinegun100mm.mdl" then ScalingGun = 1 end
+			if self.DakModel == "models/daktanks/cannon100mm2.mdl" then ScalingGun = 1 end
+			if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then ScalingGun = 1 end
+			if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then ScalingGun = 1 end
+			if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then ScalingGun = 1 end
 			if ScalingGun == 1 then
 				local Caliber = self.DakCaliber
 				local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
@@ -121,8 +140,18 @@ function ENT:Think()
 				self:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
 				self:Activate()
 				self.ScalingFinished = true
+				local muzzlepos1
+				local muzzlepos2
+				muzzlepos1, muzzlepos2 = self:GetModelBounds()
+				local length = math.Max(math.abs(muzzlepos1.x),math.abs(muzzlepos1.y),math.abs(muzzlepos1.z),math.abs(muzzlepos2.x),math.abs(muzzlepos2.y),math.abs(muzzlepos2.z))*(self.DakCaliber/100)
+				self.muzzle:SetPos(self:GetPos()+self:GetForward()*length)
 			else
 				self.ScalingFinished = true
+				local muzzlepos1
+				local muzzlepos2
+				muzzlepos1, muzzlepos2 = self:GetModelBounds()
+				local length = math.Max(math.abs(muzzlepos1.x),math.abs(muzzlepos1.y),math.abs(muzzlepos1.z),math.abs(muzzlepos2.x),math.abs(muzzlepos2.y),math.abs(muzzlepos2.z))*(self.DakCaliber/100)
+				self.muzzle:SetPos(self:GetPos()+self:GetForward()*length)
 			end
 			if self:GetParent():IsValid() == false then
 				self.DakOwner:ChatPrint("Parenting Error on "..self.DakName..". Please reparent, make sure the gate is parented to the aimer prop and the gun is parented to the gate.")
@@ -1698,9 +1727,13 @@ function ENT:DakTEAutoFire()
 				end
 
 				local effectdata = EffectData()
-				effectdata:SetOrigin( self:GetAttachment( 1 ).Pos )
+				local muzzlepos1
+				local muzzlepos2
+				muzzlepos1, muzzlepos2 = self:GetModelBounds()
+				local length = math.Max(math.abs(muzzlepos1.x),math.abs(muzzlepos1.y),math.abs(muzzlepos1.z),math.abs(muzzlepos2.x),math.abs(muzzlepos2.y),math.abs(muzzlepos2.z))*(self.DakCaliber/100)
+				effectdata:SetOrigin( self:GetPos()+self:GetForward()*length )
 				effectdata:SetAngles( self:GetAngles() )
-				effectdata:SetEntity(self)
+				effectdata:SetEntity(self.muzzle)
 				effectdata:SetScale( self.DakMaxHealth*0.25 )
 				util.Effect( self.DakFireEffect, effectdata, true, true )
 				--self:EmitSound( self.DakFireSound1, 100, self.DakFirePitch, 1, 6)
@@ -2120,6 +2153,10 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if self.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/smokelauncher100mm.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/machinegun100mm.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/cannon100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then ScalingGun = 1 end
 
 	if ScalingGun == 1 then
 		local Caliber = self.DakCaliber
@@ -2148,6 +2185,6 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self:EnableCustomCollisions( true )
 		local mins2, maxs2 = self:GetHitBoxBounds( 0, 0 )
 		self:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
-		self:Activate()
+		--self:Activate()
 	end
 end

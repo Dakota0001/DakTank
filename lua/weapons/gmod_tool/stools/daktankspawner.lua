@@ -369,84 +369,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Cannon"
-			if self.DakCaliber < 32 then
-				self.DakModel = "models/daktanks/cannon25mm.mdl"
-			end
-			if self.DakCaliber >= 32 and self.DakCaliber < 39 then
-				self.DakModel = "models/daktanks/cannon32mm.mdl"
-			end
-			if self.DakCaliber >= 39 and self.DakCaliber < 46 then
-				self.DakModel = "models/daktanks/cannon39mm.mdl"
-			end
-			if self.DakCaliber >= 46 and self.DakCaliber < 53 then
-				self.DakModel = "models/daktanks/cannon46mm.mdl"
-			end
-			if self.DakCaliber >= 53 and self.DakCaliber < 60 then
-				self.DakModel = "models/daktanks/cannon53mm.mdl"
-			end
-			if self.DakCaliber >= 60 and self.DakCaliber < 67 then
-				self.DakModel = "models/daktanks/cannon60mm.mdl"
-			end
-			if self.DakCaliber >= 67 and self.DakCaliber < 74 then
-				self.DakModel = "models/daktanks/cannon67mm.mdl"
-			end
-			if self.DakCaliber >= 74 and self.DakCaliber < 81 then
-				self.DakModel = "models/daktanks/cannon74mm.mdl"
-			end
-			if self.DakCaliber >= 81 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/cannon81mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 95 then
-				self.DakModel = "models/daktanks/cannon88mm.mdl"
-			end
-			if self.DakCaliber >= 95 and self.DakCaliber < 102 then
-				self.DakModel = "models/daktanks/cannon95mm.mdl"
-			end
-			if self.DakCaliber >= 102 and self.DakCaliber < 109 then
-				self.DakModel = "models/daktanks/cannon102mm.mdl"
-			end
-			if self.DakCaliber >= 109 and self.DakCaliber < 116 then
-				self.DakModel = "models/daktanks/cannon109mm.mdl"
-			end
-			if self.DakCaliber >= 116 and self.DakCaliber < 123 then
-				self.DakModel = "models/daktanks/cannon116mm.mdl"
-			end
-			if self.DakCaliber >= 123 and self.DakCaliber < 130 then
-				self.DakModel = "models/daktanks/cannon123mm.mdl"
-			end
-			if self.DakCaliber >= 130 and self.DakCaliber < 137 then
-				self.DakModel = "models/daktanks/cannon130mm.mdl"
-			end
-			if self.DakCaliber >= 137 and self.DakCaliber < 144 then
-				self.DakModel = "models/daktanks/cannon137mm.mdl"
-			end
-			if self.DakCaliber >= 144 and self.DakCaliber < 151 then
-				self.DakModel = "models/daktanks/cannon144mm.mdl"
-			end
-			if self.DakCaliber >= 151 and self.DakCaliber < 158 then
-				self.DakModel = "models/daktanks/cannon151mm.mdl"
-			end
-			if self.DakCaliber >= 158 and self.DakCaliber < 165 then
-				self.DakModel = "models/daktanks/cannon158mm.mdl"
-			end
-			if self.DakCaliber >= 165 and self.DakCaliber < 172 then
-				self.DakModel = "models/daktanks/cannon165mm.mdl"
-			end
-			if self.DakCaliber >= 172 and self.DakCaliber < 179 then
-				self.DakModel = "models/daktanks/cannon172mm.mdl"
-			end
-			if self.DakCaliber >= 179 and self.DakCaliber < 186 then
-				self.DakModel = "models/daktanks/cannon179mm.mdl"
-			end
-			if self.DakCaliber >= 186 and self.DakCaliber < 193 then
-				self.DakModel = "models/daktanks/cannon186mm.mdl"
-			end
-			if self.DakCaliber >= 193 and self.DakCaliber < 200 then
-				self.DakModel = "models/daktanks/cannon193mm.mdl"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakModel = "models/daktanks/cannon200mm.mdl"
-			end
+			self.DakModel = "models/daktanks/cannon100mm2.mdl"
 
 			if self.DakCaliber < 37 then
 				self.DakFireSound = "daktanks/c25.mp3"
@@ -478,84 +401,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Long Cannon"
-			if self.DakCaliber < 32 then
-				self.DakModel = "models/daktanks/lcannon25mm.mdl"
-			end
-			if self.DakCaliber >= 32 and self.DakCaliber < 39 then
-				self.DakModel = "models/daktanks/lcannon32mm.mdl"
-			end
-			if self.DakCaliber >= 39 and self.DakCaliber < 46 then
-				self.DakModel = "models/daktanks/lcannon39mm.mdl"
-			end
-			if self.DakCaliber >= 46 and self.DakCaliber < 53 then
-				self.DakModel = "models/daktanks/lcannon46mm.mdl"
-			end
-			if self.DakCaliber >= 53 and self.DakCaliber < 60 then
-				self.DakModel = "models/daktanks/lcannon53mm.mdl"
-			end
-			if self.DakCaliber >= 60 and self.DakCaliber < 67 then
-				self.DakModel = "models/daktanks/lcannon60mm.mdl"
-			end
-			if self.DakCaliber >= 67 and self.DakCaliber < 74 then
-				self.DakModel = "models/daktanks/lcannon67mm.mdl"
-			end
-			if self.DakCaliber >= 74 and self.DakCaliber < 81 then
-				self.DakModel = "models/daktanks/lcannon74mm.mdl"
-			end
-			if self.DakCaliber >= 81 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/lcannon81mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 95 then
-				self.DakModel = "models/daktanks/lcannon88mm.mdl"
-			end
-			if self.DakCaliber >= 95 and self.DakCaliber < 102 then
-				self.DakModel = "models/daktanks/lcannon95mm.mdl"
-			end
-			if self.DakCaliber >= 102 and self.DakCaliber < 109 then
-				self.DakModel = "models/daktanks/lcannon102mm.mdl"
-			end
-			if self.DakCaliber >= 109 and self.DakCaliber < 116 then
-				self.DakModel = "models/daktanks/lcannon109mm.mdl"
-			end
-			if self.DakCaliber >= 116 and self.DakCaliber < 123 then
-				self.DakModel = "models/daktanks/lcannon116mm.mdl"
-			end
-			if self.DakCaliber >= 123 and self.DakCaliber < 130 then
-				self.DakModel = "models/daktanks/lcannon123mm.mdl"
-			end
-			if self.DakCaliber >= 130 and self.DakCaliber < 137 then
-				self.DakModel = "models/daktanks/lcannon130mm.mdl"
-			end
-			if self.DakCaliber >= 137 and self.DakCaliber < 144 then
-				self.DakModel = "models/daktanks/lcannon137mm.mdl"
-			end
-			if self.DakCaliber >= 144 and self.DakCaliber < 151 then
-				self.DakModel = "models/daktanks/lcannon144mm.mdl"
-			end
-			if self.DakCaliber >= 151 and self.DakCaliber < 158 then
-				self.DakModel = "models/daktanks/lcannon151mm.mdl"
-			end
-			if self.DakCaliber >= 158 and self.DakCaliber < 165 then
-				self.DakModel = "models/daktanks/lcannon158mm.mdl"
-			end
-			if self.DakCaliber >= 165 and self.DakCaliber < 172 then
-				self.DakModel = "models/daktanks/lcannon165mm.mdl"
-			end
-			if self.DakCaliber >= 172 and self.DakCaliber < 179 then
-				self.DakModel = "models/daktanks/lcannon172mm.mdl"
-			end
-			if self.DakCaliber >= 179 and self.DakCaliber < 186 then
-				self.DakModel = "models/daktanks/lcannon179mm.mdl"
-			end
-			if self.DakCaliber >= 186 and self.DakCaliber < 193 then
-				self.DakModel = "models/daktanks/lcannon186mm.mdl"
-			end
-			if self.DakCaliber >= 193 and self.DakCaliber < 200 then
-				self.DakModel = "models/daktanks/lcannon193mm.mdl"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakModel = "models/daktanks/lcannon200mm.mdl"
-			end
+			self.DakModel = "models/daktanks/longcannon100mm2.mdl"
 
 			if self.DakCaliber < 37 then
 				self.DakFireSound = "daktanks/c25.mp3"
@@ -588,84 +434,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Short Cannon"
-			if self.DakCaliber < 32 then
-				self.DakModel = "models/daktanks/scannon25mm.mdl"
-			end
-			if self.DakCaliber >= 32 and self.DakCaliber < 39 then
-				self.DakModel = "models/daktanks/scannon32mm.mdl"
-			end
-			if self.DakCaliber >= 39 and self.DakCaliber < 46 then
-				self.DakModel = "models/daktanks/scannon39mm.mdl"
-			end
-			if self.DakCaliber >= 46 and self.DakCaliber < 53 then
-				self.DakModel = "models/daktanks/scannon46mm.mdl"
-			end
-			if self.DakCaliber >= 53 and self.DakCaliber < 60 then
-				self.DakModel = "models/daktanks/scannon53mm.mdl"
-			end
-			if self.DakCaliber >= 60 and self.DakCaliber < 67 then
-				self.DakModel = "models/daktanks/scannon60mm.mdl"
-			end
-			if self.DakCaliber >= 67 and self.DakCaliber < 74 then
-				self.DakModel = "models/daktanks/scannon67mm.mdl"
-			end
-			if self.DakCaliber >= 74 and self.DakCaliber < 81 then
-				self.DakModel = "models/daktanks/scannon74mm.mdl"
-			end
-			if self.DakCaliber >= 81 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/scannon81mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 95 then
-				self.DakModel = "models/daktanks/scannon88mm.mdl"
-			end
-			if self.DakCaliber >= 95 and self.DakCaliber < 102 then
-				self.DakModel = "models/daktanks/scannon95mm.mdl"
-			end
-			if self.DakCaliber >= 102 and self.DakCaliber < 109 then
-				self.DakModel = "models/daktanks/scannon102mm.mdl"
-			end
-			if self.DakCaliber >= 109 and self.DakCaliber < 116 then
-				self.DakModel = "models/daktanks/scannon109mm.mdl"
-			end
-			if self.DakCaliber >= 116 and self.DakCaliber < 123 then
-				self.DakModel = "models/daktanks/scannon116mm.mdl"
-			end
-			if self.DakCaliber >= 123 and self.DakCaliber < 130 then
-				self.DakModel = "models/daktanks/scannon123mm.mdl"
-			end
-			if self.DakCaliber >= 130 and self.DakCaliber < 137 then
-				self.DakModel = "models/daktanks/scannon130mm.mdl"
-			end
-			if self.DakCaliber >= 137 and self.DakCaliber < 144 then
-				self.DakModel = "models/daktanks/scannon137mm.mdl"
-			end
-			if self.DakCaliber >= 144 and self.DakCaliber < 151 then
-				self.DakModel = "models/daktanks/scannon144mm.mdl"
-			end
-			if self.DakCaliber >= 151 and self.DakCaliber < 158 then
-				self.DakModel = "models/daktanks/scannon151mm.mdl"
-			end
-			if self.DakCaliber >= 158 and self.DakCaliber < 165 then
-				self.DakModel = "models/daktanks/scannon158mm.mdl"
-			end
-			if self.DakCaliber >= 165 and self.DakCaliber < 172 then
-				self.DakModel = "models/daktanks/scannon165mm.mdl"
-			end
-			if self.DakCaliber >= 172 and self.DakCaliber < 179 then
-				self.DakModel = "models/daktanks/scannon172mm.mdl"
-			end
-			if self.DakCaliber >= 179 and self.DakCaliber < 186 then
-				self.DakModel = "models/daktanks/scannon179mm.mdl"
-			end
-			if self.DakCaliber >= 186 and self.DakCaliber < 193 then
-				self.DakModel = "models/daktanks/scannon186mm.mdl"
-			end
-			if self.DakCaliber >= 193 and self.DakCaliber < 200 then
-				self.DakModel = "models/daktanks/scannon193mm.mdl"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakModel = "models/daktanks/scannon200mm.mdl"
-			end
+			self.DakModel = "models/daktanks/shortcannon100mm2.mdl"
 
 			if self.DakCaliber < 37 then
 				self.DakFireSound = "daktanks/c25.mp3"
@@ -853,84 +622,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Autoloader"
-			if self.DakCaliber < 32 then
-				self.DakModel = "models/daktanks/cannon25mm.mdl"
-			end
-			if self.DakCaliber >= 32 and self.DakCaliber < 39 then
-				self.DakModel = "models/daktanks/cannon32mm.mdl"
-			end
-			if self.DakCaliber >= 39 and self.DakCaliber < 46 then
-				self.DakModel = "models/daktanks/cannon39mm.mdl"
-			end
-			if self.DakCaliber >= 46 and self.DakCaliber < 53 then
-				self.DakModel = "models/daktanks/cannon46mm.mdl"
-			end
-			if self.DakCaliber >= 53 and self.DakCaliber < 60 then
-				self.DakModel = "models/daktanks/cannon53mm.mdl"
-			end
-			if self.DakCaliber >= 60 and self.DakCaliber < 67 then
-				self.DakModel = "models/daktanks/cannon60mm.mdl"
-			end
-			if self.DakCaliber >= 67 and self.DakCaliber < 74 then
-				self.DakModel = "models/daktanks/cannon67mm.mdl"
-			end
-			if self.DakCaliber >= 74 and self.DakCaliber < 81 then
-				self.DakModel = "models/daktanks/cannon74mm.mdl"
-			end
-			if self.DakCaliber >= 81 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/cannon81mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 95 then
-				self.DakModel = "models/daktanks/cannon88mm.mdl"
-			end
-			if self.DakCaliber >= 95 and self.DakCaliber < 102 then
-				self.DakModel = "models/daktanks/cannon95mm.mdl"
-			end
-			if self.DakCaliber >= 102 and self.DakCaliber < 109 then
-				self.DakModel = "models/daktanks/cannon102mm.mdl"
-			end
-			if self.DakCaliber >= 109 and self.DakCaliber < 116 then
-				self.DakModel = "models/daktanks/cannon109mm.mdl"
-			end
-			if self.DakCaliber >= 116 and self.DakCaliber < 123 then
-				self.DakModel = "models/daktanks/cannon116mm.mdl"
-			end
-			if self.DakCaliber >= 123 and self.DakCaliber < 130 then
-				self.DakModel = "models/daktanks/cannon123mm.mdl"
-			end
-			if self.DakCaliber >= 130 and self.DakCaliber < 137 then
-				self.DakModel = "models/daktanks/cannon130mm.mdl"
-			end
-			if self.DakCaliber >= 137 and self.DakCaliber < 144 then
-				self.DakModel = "models/daktanks/cannon137mm.mdl"
-			end
-			if self.DakCaliber >= 144 and self.DakCaliber < 151 then
-				self.DakModel = "models/daktanks/cannon144mm.mdl"
-			end
-			if self.DakCaliber >= 151 and self.DakCaliber < 158 then
-				self.DakModel = "models/daktanks/cannon151mm.mdl"
-			end
-			if self.DakCaliber >= 158 and self.DakCaliber < 165 then
-				self.DakModel = "models/daktanks/cannon158mm.mdl"
-			end
-			if self.DakCaliber >= 165 and self.DakCaliber < 172 then
-				self.DakModel = "models/daktanks/cannon165mm.mdl"
-			end
-			if self.DakCaliber >= 172 and self.DakCaliber < 179 then
-				self.DakModel = "models/daktanks/cannon172mm.mdl"
-			end
-			if self.DakCaliber >= 179 and self.DakCaliber < 186 then
-				self.DakModel = "models/daktanks/cannon179mm.mdl"
-			end
-			if self.DakCaliber >= 186 and self.DakCaliber < 193 then
-				self.DakModel = "models/daktanks/cannon186mm.mdl"
-			end
-			if self.DakCaliber >= 193 and self.DakCaliber < 200 then
-				self.DakModel = "models/daktanks/cannon193mm.mdl"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakModel = "models/daktanks/cannon200mm.mdl"
-			end
+			self.DakModel = "models/daktanks/cannon100mm2.mdl"
 
 			if self.DakCaliber < 37 then
 				self.DakFireSound = "daktanks/c25.mp3"
@@ -962,84 +654,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Long Autoloader"
-			if self.DakCaliber < 32 then
-				self.DakModel = "models/daktanks/lcannon25mm.mdl"
-			end
-			if self.DakCaliber >= 32 and self.DakCaliber < 39 then
-				self.DakModel = "models/daktanks/lcannon32mm.mdl"
-			end
-			if self.DakCaliber >= 39 and self.DakCaliber < 46 then
-				self.DakModel = "models/daktanks/lcannon39mm.mdl"
-			end
-			if self.DakCaliber >= 46 and self.DakCaliber < 53 then
-				self.DakModel = "models/daktanks/lcannon46mm.mdl"
-			end
-			if self.DakCaliber >= 53 and self.DakCaliber < 60 then
-				self.DakModel = "models/daktanks/lcannon53mm.mdl"
-			end
-			if self.DakCaliber >= 60 and self.DakCaliber < 67 then
-				self.DakModel = "models/daktanks/lcannon60mm.mdl"
-			end
-			if self.DakCaliber >= 67 and self.DakCaliber < 74 then
-				self.DakModel = "models/daktanks/lcannon67mm.mdl"
-			end
-			if self.DakCaliber >= 74 and self.DakCaliber < 81 then
-				self.DakModel = "models/daktanks/lcannon74mm.mdl"
-			end
-			if self.DakCaliber >= 81 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/lcannon81mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 95 then
-				self.DakModel = "models/daktanks/lcannon88mm.mdl"
-			end
-			if self.DakCaliber >= 95 and self.DakCaliber < 102 then
-				self.DakModel = "models/daktanks/lcannon95mm.mdl"
-			end
-			if self.DakCaliber >= 102 and self.DakCaliber < 109 then
-				self.DakModel = "models/daktanks/lcannon102mm.mdl"
-			end
-			if self.DakCaliber >= 109 and self.DakCaliber < 116 then
-				self.DakModel = "models/daktanks/lcannon109mm.mdl"
-			end
-			if self.DakCaliber >= 116 and self.DakCaliber < 123 then
-				self.DakModel = "models/daktanks/lcannon116mm.mdl"
-			end
-			if self.DakCaliber >= 123 and self.DakCaliber < 130 then
-				self.DakModel = "models/daktanks/lcannon123mm.mdl"
-			end
-			if self.DakCaliber >= 130 and self.DakCaliber < 137 then
-				self.DakModel = "models/daktanks/lcannon130mm.mdl"
-			end
-			if self.DakCaliber >= 137 and self.DakCaliber < 144 then
-				self.DakModel = "models/daktanks/lcannon137mm.mdl"
-			end
-			if self.DakCaliber >= 144 and self.DakCaliber < 151 then
-				self.DakModel = "models/daktanks/lcannon144mm.mdl"
-			end
-			if self.DakCaliber >= 151 and self.DakCaliber < 158 then
-				self.DakModel = "models/daktanks/lcannon151mm.mdl"
-			end
-			if self.DakCaliber >= 158 and self.DakCaliber < 165 then
-				self.DakModel = "models/daktanks/lcannon158mm.mdl"
-			end
-			if self.DakCaliber >= 165 and self.DakCaliber < 172 then
-				self.DakModel = "models/daktanks/lcannon165mm.mdl"
-			end
-			if self.DakCaliber >= 172 and self.DakCaliber < 179 then
-				self.DakModel = "models/daktanks/lcannon172mm.mdl"
-			end
-			if self.DakCaliber >= 179 and self.DakCaliber < 186 then
-				self.DakModel = "models/daktanks/lcannon179mm.mdl"
-			end
-			if self.DakCaliber >= 186 and self.DakCaliber < 193 then
-				self.DakModel = "models/daktanks/lcannon186mm.mdl"
-			end
-			if self.DakCaliber >= 193 and self.DakCaliber < 200 then
-				self.DakModel = "models/daktanks/lcannon193mm.mdl"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakModel = "models/daktanks/lcannon200mm.mdl"
-			end
+			self.DakModel = "models/daktanks/longcannon100mm2.mdl"
 
 			if self.DakCaliber < 37 then
 				self.DakFireSound = "daktanks/c25.mp3"
@@ -1072,84 +687,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),25,200)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Short Autoloader"
-			if self.DakCaliber < 32 then
-				self.DakModel = "models/daktanks/scannon25mm.mdl"
-			end
-			if self.DakCaliber >= 32 and self.DakCaliber < 39 then
-				self.DakModel = "models/daktanks/scannon32mm.mdl"
-			end
-			if self.DakCaliber >= 39 and self.DakCaliber < 46 then
-				self.DakModel = "models/daktanks/scannon39mm.mdl"
-			end
-			if self.DakCaliber >= 46 and self.DakCaliber < 53 then
-				self.DakModel = "models/daktanks/scannon46mm.mdl"
-			end
-			if self.DakCaliber >= 53 and self.DakCaliber < 60 then
-				self.DakModel = "models/daktanks/scannon53mm.mdl"
-			end
-			if self.DakCaliber >= 60 and self.DakCaliber < 67 then
-				self.DakModel = "models/daktanks/scannon60mm.mdl"
-			end
-			if self.DakCaliber >= 67 and self.DakCaliber < 74 then
-				self.DakModel = "models/daktanks/scannon67mm.mdl"
-			end
-			if self.DakCaliber >= 74 and self.DakCaliber < 81 then
-				self.DakModel = "models/daktanks/scannon74mm.mdl"
-			end
-			if self.DakCaliber >= 81 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/scannon81mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 95 then
-				self.DakModel = "models/daktanks/scannon88mm.mdl"
-			end
-			if self.DakCaliber >= 95 and self.DakCaliber < 102 then
-				self.DakModel = "models/daktanks/scannon95mm.mdl"
-			end
-			if self.DakCaliber >= 102 and self.DakCaliber < 109 then
-				self.DakModel = "models/daktanks/scannon102mm.mdl"
-			end
-			if self.DakCaliber >= 109 and self.DakCaliber < 116 then
-				self.DakModel = "models/daktanks/scannon109mm.mdl"
-			end
-			if self.DakCaliber >= 116 and self.DakCaliber < 123 then
-				self.DakModel = "models/daktanks/scannon116mm.mdl"
-			end
-			if self.DakCaliber >= 123 and self.DakCaliber < 130 then
-				self.DakModel = "models/daktanks/scannon123mm.mdl"
-			end
-			if self.DakCaliber >= 130 and self.DakCaliber < 137 then
-				self.DakModel = "models/daktanks/scannon130mm.mdl"
-			end
-			if self.DakCaliber >= 137 and self.DakCaliber < 144 then
-				self.DakModel = "models/daktanks/scannon137mm.mdl"
-			end
-			if self.DakCaliber >= 144 and self.DakCaliber < 151 then
-				self.DakModel = "models/daktanks/scannon144mm.mdl"
-			end
-			if self.DakCaliber >= 151 and self.DakCaliber < 158 then
-				self.DakModel = "models/daktanks/scannon151mm.mdl"
-			end
-			if self.DakCaliber >= 158 and self.DakCaliber < 165 then
-				self.DakModel = "models/daktanks/scannon158mm.mdl"
-			end
-			if self.DakCaliber >= 165 and self.DakCaliber < 172 then
-				self.DakModel = "models/daktanks/scannon165mm.mdl"
-			end
-			if self.DakCaliber >= 172 and self.DakCaliber < 179 then
-				self.DakModel = "models/daktanks/scannon172mm.mdl"
-			end
-			if self.DakCaliber >= 179 and self.DakCaliber < 186 then
-				self.DakModel = "models/daktanks/scannon179mm.mdl"
-			end
-			if self.DakCaliber >= 186 and self.DakCaliber < 193 then
-				self.DakModel = "models/daktanks/scannon186mm.mdl"
-			end
-			if self.DakCaliber >= 193 and self.DakCaliber < 200 then
-				self.DakModel = "models/daktanks/scannon193mm.mdl"
-			end
-			if self.DakCaliber >= 200 then
-				self.DakModel = "models/daktanks/scannon200mm.mdl"
-			end
+			self.DakModel = "models/daktanks/shortcannon100mm2.mdl"
 
 			if self.DakCaliber < 37 then
 				self.DakFireSound = "daktanks/c25.mp3"
@@ -1384,33 +922,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Autocannon"
-			if self.DakCaliber < 25 then
-				self.DakModel = "models/daktanks/ac20mm.mdl"
-			end
-			if self.DakCaliber >= 25 and self.DakCaliber < 30 then
-				self.DakModel = "models/daktanks/ac25mm.mdl"
-			end
-			if self.DakCaliber >= 30 and self.DakCaliber < 35 then
-				self.DakModel = "models/daktanks/ac30mm.mdl"
-			end
-			if self.DakCaliber >= 35 and self.DakCaliber < 40 then
-				self.DakModel = "models/daktanks/ac35mm.mdl"
-			end
-			if self.DakCaliber >= 40 and self.DakCaliber < 45 then
-				self.DakModel = "models/daktanks/ac40mm.mdl"
-			end
-			if self.DakCaliber >= 45 and self.DakCaliber < 50 then
-				self.DakModel = "models/daktanks/ac45mm.mdl"
-			end
-			if self.DakCaliber >= 50 and self.DakCaliber < 55 then
-				self.DakModel = "models/daktanks/ac50mm.mdl"
-			end
-			if self.DakCaliber >= 55 and self.DakCaliber < 60 then
-				self.DakModel = "models/daktanks/ac55mm.mdl"
-			end
-			if self.DakCaliber >= 60 then
-				self.DakModel = "models/daktanks/ac60mm.mdl"
-			end
+			self.DakModel = "models/daktanks/autocannon100mm2.mdl"
 			
 			if self.DakCaliber < 37 then
 				self.DakFireSound = "daktanks/ac25.mp3"
@@ -1927,6 +1439,10 @@ function TOOL:LeftClick( trace )
 		if self.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/smokelauncher100mm.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/machinegun100mm.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/cannon100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then self.ScalingGun = 1 end
 
 		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_tegearbox") and not(trace.Entity:GetClass() == "dak_tegearboxnew") and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
 			self.spawnedent:Spawn()
