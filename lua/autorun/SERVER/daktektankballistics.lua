@@ -3228,10 +3228,11 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 	end
 	local Filter = table.Copy( Shell.Filter )
 	if SpallDamage < 0.01 then traces = 0 end
-	if traces > 50 then
-		SpallDamage = SpallDamage * (traces/50)
-		traces = 50
-	end
+
+	--if traces > 50 then
+	--	SpallDamage = SpallDamage * (traces/50)
+	--	traces = 50
+	--end
 	local DEBUGSpallDamage = 0
 	for i=1, traces do
 		local Direction = ((Angle(math.Rand(-Ang,Ang),math.Rand(-Ang,Ang),math.Rand(-Ang,Ang))) + Dir:Angle()):Forward()

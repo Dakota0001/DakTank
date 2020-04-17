@@ -84,7 +84,8 @@ function ENT:Initialize()
  	self.muzzle:SetMoveType(MOVETYPE_NONE)
  	self.muzzle:PhysicsInit(SOLID_NONE)
  	self.muzzle:SetParent(self)
- 	self.muzzle:SetModel( self:GetModel() )
+ 	self.muzzle:SetModel( "models/daktanks/machinegun100mm.mdl" )
+ 	self.muzzle:DrawShadow(false)
  	self.muzzle:SetColor( Color(255, 255, 255, 0) )
  	self.muzzle:SetRenderMode( RENDERMODE_TRANSCOLOR )
  	self.muzzle:Spawn()
@@ -100,7 +101,7 @@ function ENT:Think()
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
 	end
-	if IsValid(self.DakTankCore) then
+	if self.DakCaliber~=nil then
 		if self.ScalingFinished == nil then
 			local ScalingGun = 0
 			if self.DakModel == "models/daktanks/mortar100mm2.mdl" then ScalingGun = 1 end
@@ -133,12 +134,12 @@ function ENT:Think()
 				Vector( x1, y1, z0 ),
 				Vector( x1, y1, z1 )
 				} )
-				self:SetMoveType(MOVETYPE_VPHYSICS)
+				--self:SetMoveType(MOVETYPE_VPHYSICS)
 				self:SetSolid(SOLID_VPHYSICS)
 				self:EnableCustomCollisions( true )
 				local mins2, maxs2 = self:GetHitBoxBounds( 0, 0 )
 				self:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
-				self:Activate()
+				--self:Activate()
 				self.ScalingFinished = true
 				local muzzlepos1
 				local muzzlepos2

@@ -14,9 +14,22 @@ function ENT:Think()
 	local Energy = self:GetNWFloat("Energy")
 
 	if Caliber > 0 and self.Scaled == 0 then
-		--self:PhysicsInit( SOLID_VPHYSICS )
+		self:PhysicsInit( SOLID_VPHYSICS )
+
+		local Mat = Matrix()
+		Mat:Scale(Vector(1,1,1))
+		self:EnableMatrix("RenderMultiply", Mat )
+
 		local mins, maxs = self:GetModelBounds()
 		self:PhysicsInitBox( mins, maxs )
+
+		self:EnableCustomCollisions(true)
+
+		if self:GetPhysicsObject():IsValid() then
+			self:GetPhysicsObject():EnableMotion(false)
+			self:GetPhysicsObject():Sleep()
+		end
+
 		self:SetSolidFlags( 0 )
 		self.Scaled = 1
 	end
