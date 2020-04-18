@@ -3229,6 +3229,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 	local Filter = table.Copy( Shell.Filter )
 	if SpallDamage < 0.01 then traces = 0 end
 
+	--print(traces)
 	--if traces > 50 then
 	--	SpallDamage = SpallDamage * (traces/50)
 	--	traces = 50

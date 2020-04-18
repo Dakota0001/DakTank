@@ -807,23 +807,24 @@ function ENT:Think()
 										end
 									end
 								end
-								Mass = Mass + CurrentRes:GetPhysicsObject():GetMass()
-								if IsValid(CurrentRes:GetParent()) then
-									ParentMass = ParentMass + CurrentRes:GetPhysicsObject():GetMass()
-								end
-								if CurrentRes:GetPhysicsObject():GetSurfaceArea() then
-									if CurrentRes:GetPhysicsObject():GetMass()>1 then
-										SA = SA + CurrentRes:GetPhysicsObject():GetSurfaceArea()
+								if CurrentRes:GetPhysicsObject():IsValid() then
+									Mass = Mass + CurrentRes:GetPhysicsObject():GetMass()
+									if IsValid(CurrentRes:GetParent()) then
+										ParentMass = ParentMass + CurrentRes:GetPhysicsObject():GetMass()
 									end
-								else
-									self.Tread[#self.Tread+1]=CurrentRes
+									if CurrentRes:GetPhysicsObject():GetSurfaceArea() then
+										if CurrentRes:GetPhysicsObject():GetMass()>1 then
+											SA = SA + CurrentRes:GetPhysicsObject():GetSurfaceArea()
+										end
+									else
+										self.Tread[#self.Tread+1]=CurrentRes
+									end
+									---TEST
+									if CurrentRes:GetClass()=="prop_physics" then
+										--CurrentRes:AddEFlags( EFL_SERVER_ONLY )
+										--CurrentRes:AddEFlags( EFL_DORMANT )
+									end
 								end
-								---TEST
-								if CurrentRes:GetClass()=="prop_physics" then
-									--CurrentRes:AddEFlags( EFL_SERVER_ONLY )
-									--CurrentRes:AddEFlags( EFL_DORMANT )
-								end
-
 								---END TEST
 							end
 						end
@@ -1427,6 +1428,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.DakMass = Ent.EntityMods.DakTek.DakMass
 		Ent.EntityMods.DakTek = nil
 	end
+	self.PreCostTimerFirst = CurTime()
 	self.DakOwner = Player
 	self.BaseClass.PostEntityPaste( self, Player, Ent, CreatedEntities )
 end
