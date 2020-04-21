@@ -305,8 +305,10 @@ function ENT:Think()
 					local RightArmor = Ave/AveCount
 					self.SideArmor = (RightArmor+LeftArmor)/2
 
+					self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
+
 					local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
-					armormult = Total/420
+					armormult = (Total/420)*self.ArmorSideMult
 					--local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
 					--print(self.FrontalArmor)
 					--print(self.SideArmor)

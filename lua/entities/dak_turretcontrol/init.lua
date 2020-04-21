@@ -435,8 +435,8 @@ function ENT:Think()
 											local V = GunEnt.DakShellVelocity * (GunEnt:GetPropellant()*0.01)
 											local ShellMass = GunEnt.DakShellMass
 											local Drag = (((V*0.0254)*(V*0.0254)) * (math.pi * ((Caliber/2000)*(Caliber/2000))))*0.0245
-											if ShellType=="HVAP" then Drag = (((V*0.0254)*(V*0.0254)) * (math.pi * ((Caliber/1000)*(Caliber/1000))))*0.0245 end
-											if ShellType=="APFSDS" then Drag = (((V*0.0254)*(V*0.0254)) * (math.pi * ((Caliber/1000)*(Caliber/1000))))*0.085 end
+											if ShellType=="HVAP" then Drag = (((V*0.0254)*(V*0.0254)) * (math.pi * (((Caliber*0.5)/1000)*((Caliber*0.5)/1000))))*0.0245 end
+											if ShellType=="APFSDS" then Drag = (((V*0.0254)*(V*0.0254)) * (math.pi * (((Caliber*0.25)/1000)*((Caliber*0.25)/1000))))*0.085 end
 											local VelLoss
 											if ShellType == "HEAT" or ShellType == "HVAP" or ShellType == "ATGM" or ShellType == "HEATFS" or ShellType == "APFSDS" or ShellType == "APDS" then
 											    VelLoss = ((Drag/(ShellMass*8/2))*39.37)
@@ -450,7 +450,7 @@ function ENT:Think()
 											else 
 												self.NoTarTicks = self.NoTarTicks + 1 
 											end
-											if self.NoTarTicks>66 then
+											if self.NoTarTicks>15 then
 												self.Tar = PreCamTrace.Entity
 												self.NoTarTicks = 0
 											end

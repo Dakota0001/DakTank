@@ -658,7 +658,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				if HitAng >= 70 and EffArmor>=5 and (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then Shattered = 1 end
 				if HitAng >= 80 and EffArmor>=5 and (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then Shattered = 1 Failed = 1 end
 				if EffArmor < (CurrentPen) and HitEnt.IsDakTekFutureTech == nil and Failed == 0 then
-					if HitEnt.SPPOwner and HitEnt.SPPOwner:IsPlayer() and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then		
+					if HitEnt.SPPOwner:IsValid() and HitEnt.SPPOwner:IsPlayer() and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then		
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
 							if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_temachinegun" or HitEnt:GetClass() == "dak_teautogun" then
 								DTDealDamage(HitEnt,math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
@@ -791,7 +791,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							end
 						end
 					end
-					if HitEnt.SPPOwner and HitEnt.SPPOwner:IsPlayer() and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt.Base ~= "base_nextbot" then			
+					if HitEnt.SPPOwner:IsValid() and HitEnt.SPPOwner:IsPlayer() and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt.Base ~= "base_nextbot" then			
 						if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
 							if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_temachinegun" or HitEnt:GetClass() == "dak_teautogun" then
 								DTDealDamage(HitEnt,Shell.DakDamage*0.25*0.001,Shell.DakGun)
@@ -1539,7 +1539,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					if HitAng >= 70 and EffArmor>=5 and (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then Shattered = 1 end
 					if HitAng >= 80 and EffArmor>=5 and (Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH") then Shattered = 1 Failed = 1 end
 					if EffArmor < (CurrentPen) and HitEnt.IsDakTekFutureTech == nil and Failed == 0 then
-						if HitEnt.SPPOwner and HitEnt.SPPOwner:IsPlayer() and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then			
+						if HitEnt.SPPOwner:IsValid() and HitEnt.SPPOwner:IsPlayer() and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) then			
 							if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
 								if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_temachinegun" or HitEnt:GetClass() == "dak_teautogun" then
 									DTDealDamage(HitEnt,math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
@@ -1675,7 +1675,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 								end
 							end
 						end
-						if HitEnt.SPPOwner and HitEnt.SPPOwner:IsPlayer() and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt.Base ~= "base_nextbot" then			
+						if HitEnt.SPPOwner:IsValid() and HitEnt.SPPOwner:IsPlayer() and not(HitEnt==nil) and not(HitEnt.SPPOwner:IsWorld()) and HitEnt.Base ~= "base_nextbot" then			
 							if HitEnt.SPPOwner:HasGodMode()==false and HitEnt.DakIsTread == nil then
 								if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_temachinegun" or HitEnt:GetClass() == "dak_teautogun" then
 									DTDealDamage(HitEnt,Shell.DakDamage*0.25*0.01,Shell.DakGun)
@@ -2231,7 +2231,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-					if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+					if ExpTrace.Entity.SPPOwner:IsValid() and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
@@ -2417,7 +2417,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-					if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+					if ExpTrace.Entity.SPPOwner:IsValid() and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
@@ -2601,7 +2601,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 				
 				ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-				if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+				if ExpTrace.Entity.SPPOwner:IsValid() and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 					if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
@@ -2821,7 +2821,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt)
 						
 						ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-						if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+						if ExpTrace.Entity.SPPOwner:IsValid() and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 							if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 								if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
@@ -3060,7 +3060,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt)
 		for i = 1, #Shell.DakDamageList do
 			local CurTarget = CurTarget
 			local HPPerc = 0
-			if CurTarget.SPPOwner and CurTarget.SPPOwner:IsPlayer() then
+			if CurTarget.SPPOwner:IsValid() and CurTarget.SPPOwner:IsPlayer() then
 				if CurTarget.SPPOwner:IsWorld() then
 					if CurTarget.DakIsTread==nil then
 						if CurTarget:GetPos():Distance(Pos) > Radius/2 then
@@ -3289,7 +3289,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 					end
 					
 					SpallTrace.Entity.DakLastDamagePos = SpallTrace.HitPos
-					if SpallTrace.Entity.SPPOwner and SpallTrace.Entity.SPPOwner:IsPlayer() and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
+					if SpallTrace.Entity.SPPOwner:IsValid() and SpallTrace.Entity.SPPOwner:IsPlayer() and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
 						if SpallTrace.Entity.SPPOwner:HasGodMode()==false and SpallTrace.Entity.DakIsTread == nil then	
 							if SpallTrace.Entity:GetClass() == "dak_tegun" or SpallTrace.Entity:GetClass() == "dak_temachinegun" or SpallTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(SpallTrace.Entity, math.Clamp(SpallDamage*(SpallPen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
@@ -3485,7 +3485,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 					end
 					
 					SpallTrace.Entity.DakLastDamagePos = SpallTrace.HitPos
-					if SpallTrace.Entity.SPPOwner and SpallTrace.Entity.SPPOwner:IsPlayer() and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
+					if SpallTrace.Entity.SPPOwner:IsValid() and SpallTrace.Entity.SPPOwner:IsPlayer() and not(SpallTrace.Entity.SPPOwner:IsWorld()) then			
 						if SpallTrace.Entity.SPPOwner:HasGodMode()==false and SpallTrace.Entity.DakIsTread == nil then	
 							if SpallTrace.Entity:GetClass() == "dak_tegun" or SpallTrace.Entity:GetClass() == "dak_temachinegun" or SpallTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
@@ -3698,7 +3698,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						HEATPen = HEATPen * math.sqrt(math.sqrt(StandoffCalibers))/1.185
 					end
 
-					if HEATTrace.Entity.SPPOwner and HEATTrace.Entity.SPPOwner:IsPlayer() and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
+					if HEATTrace.Entity.SPPOwner:IsValid() and HEATTrace.Entity.SPPOwner:IsPlayer() and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
 						if HEATTrace.Entity.SPPOwner:HasGodMode()==false and HEATTrace.Entity.DakIsTread == nil then	
 							if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(HEATTrace.Entity, math.Clamp(HEATDamage*(math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
@@ -3903,7 +3903,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						HEATPen = HEATPen * math.sqrt(math.sqrt(StandoffCalibers))/1.185
 					end
 
-					if HEATTrace.Entity.SPPOwner and HEATTrace.Entity.SPPOwner:IsPlayer() and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
+					if HEATTrace.Entity.SPPOwner:IsValid() and HEATTrace.Entity.SPPOwner:IsPlayer() and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
 						if HEATTrace.Entity.SPPOwner:HasGodMode()==false and HEATTrace.Entity.DakIsTread == nil then	
 							if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(HEATTrace.Entity, math.Clamp(HEATDamage*(math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
@@ -4119,7 +4119,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 							Pen = Pen * math.sqrt(math.sqrt(StandoffCalibers))/1.185
 						end
 					end
-					if HEATTrace.Entity.SPPOwner and HEATTrace.Entity.SPPOwner:IsPlayer() and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
+					if HEATTrace.Entity.SPPOwner:IsValid() and HEATTrace.Entity.SPPOwner:IsPlayer() and not(HEATTrace.Entity.SPPOwner:IsWorld()) then			
 						if HEATTrace.Entity.SPPOwner:HasGodMode()==false and HEATTrace.Entity.DakIsTread == nil then
 							if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
@@ -4342,14 +4342,19 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 					end
 					
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
-
-					if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
+					if ExpTrace.Entity.IsComposite == 1 then
+						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
+						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end 
+						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Filter )*ExpTrace.Entity.EntityMods.CompKEMult
+					end
+					if ExpTrace.Entity.SPPOwner:IsValid() and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then
 							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 							else
 								if ExpTrace.Entity.IsERA == 1 then
-									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/EffArmor),0,EffArmor*2),self,true)
 								else
 									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 								end
@@ -4360,17 +4365,11 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 						else
 							if ExpTrace.Entity.IsERA == 1 then
-								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/EffArmor),0,EffArmor*2),self,true)
 							else
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 							end	
 						end
-					end
-					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 then
-						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
-						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end 
-						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Filter )*ExpTrace.Entity.EntityMods.CompKEMult
 					end
 					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 						--util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), self)
@@ -4540,13 +4539,20 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 					
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
-					if ExpTrace.Entity.SPPOwner and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
+					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
+					if ExpTrace.Entity.IsComposite == 1 then
+						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
+						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
+						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Filter )*ExpTrace.Entity.EntityMods.CompKEMult
+					end
+
+					if ExpTrace.Entity.SPPOwner:IsValid() and ExpTrace.Entity.SPPOwner:IsPlayer() and not(ExpTrace.Entity.SPPOwner:IsWorld()) then			
 						if ExpTrace.Entity.SPPOwner:HasGodMode()==false and ExpTrace.Entity.DakIsTread == nil then	
 							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(ExpTrace.Entity,- math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 							else
 								if ExpTrace.Entity.IsERA == 1 then
-									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/EffArmor),0,EffArmor*2),self,true)
 								else
 									DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 								end
@@ -4557,18 +4563,13 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 						else
 							if ExpTrace.Entity.IsERA == 1 then
-								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/EffArmor),0,EffArmor*2),self,true)
 							else
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 							end
 						end
 					end
-					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 then
-						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
-						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
-						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Filter )*ExpTrace.Entity.EntityMods.CompKEMult
-					end
+					
 					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 						util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), self)
 						Filter[#Filter+1] = IgnoreEnt
