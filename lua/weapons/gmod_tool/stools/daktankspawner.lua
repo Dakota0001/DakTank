@@ -161,42 +161,42 @@ function TOOL:LeftClick( trace )
 			self.DakHealth = 5
 			self.DakMaxHealth = 5
 			self.DakModel = "models/daktanks/engine1.mdl"
-			self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
+			self.DakSound = "daktanks/engine/enginemicro.wav"
 		end
 		if Selection == "SmallEngine" then
 			self.DakName = "Small Engine"
 			self.DakHealth = 20
 			self.DakMaxHealth = 20
 			self.DakModel = "models/daktanks/engine2.mdl"
-			self.DakSound = "vehicles/apc/apc_cruise_loop3.wav"
+			self.DakSound = "daktanks/engine/enginesmall.wav"
 		end
 		if Selection == "StandardEngine" then
 			self.DakName = "Standard Engine"
 			self.DakHealth = 45
 			self.DakMaxHealth = 45
 			self.DakModel = "models/daktanks/engine3.mdl"
-			self.DakSound = "vehicles/airboat/fan_motor_idle_loop1.wav"
+			self.DakSound = "daktanks/engine/enginestandard.wav"
 		end
 		if Selection == "LargeEngine" then
 			self.DakName = "Large Engine"
 			self.DakHealth = 90
 			self.DakMaxHealth = 90
 			self.DakModel = "models/daktanks/engine4.mdl"
-			self.DakSound = "vehicles/crane/crane_idle_loop3.wav"
+			self.DakSound = "daktanks/engine/enginelarge.wav"
 		end
 		if Selection == "HugeEngine" then
 			self.DakName = "Huge Engine"
 			self.DakHealth = 150
 			self.DakMaxHealth = 150
 			self.DakModel = "models/daktanks/engine5.mdl"
-			self.DakSound = "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"
+			self.DakSound = "daktanks/engine/enginehuge.wav"
 		end
 		if Selection == "UltraEngine" then
 			self.DakName = "Ultra Engine"
 			self.DakHealth = 360
 			self.DakMaxHealth = 360
 			self.DakModel = "models/daktanks/engine6.mdl"
-			self.DakSound = "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"
+			self.DakSound = "daktanks/engine/engineultra.wav"
 		end
 		--GEARBOXES
 		if Selection == "MicroGearboxF" then
@@ -1890,13 +1890,13 @@ function TOOL:RightClick( trace )
 							end
 							ply:ChatPrint(Target.Cost.." point "..Era.." tank.")
 							--ply:ChatPrint("Base Costs")	
-							ply:ChatPrint("Armor Cost: "..math.Round(Target.ArmorMult*50,2).." points (main arc: "..math.Round((Target.ArmorMult*50)/Target.ArmorSideMult,2)..", side arc multiplier: "..math.Round(Target.ArmorSideMult,2)..").")
+							ply:ChatPrint("Armor Cost: "..math.Round((Target.ArmorMult*50),2).." points (main arc: "..math.Round((Target.ArmorMult*50)/Target.ArmorSideMult,2)..", side arc multiplier: "..math.Round(Target.ArmorSideMult,2)..").")
 							ply:ChatPrint("Firepower Cost: "..math.Round(Target.FirepowerMult*50,2).." points.")
 							--ply:ChatPrint("Multipliers")
 							ply:ChatPrint("Flanking Multiplier: "..Target.SpeedMult.."x.")
 							ply:ChatPrint("Gun Handling Multiplier: "..Target.GunHandlingMult.."x.")
 							--ply:ChatPrint("Misc")
-							ply:ChatPrint("Best Average Armor: "..(math.Round(Target.ArmorMult*420/Target.ArmorSideMult,2)).."mm, Best Round Pen: "..math.Round(Target.MaxPen,2).."mm, HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2)..".")
+							ply:ChatPrint("Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm, Best Round Pen: "..math.Round(Target.MaxPen,2).."mm, HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2)..".")
 							ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 						else
 							ply:ChatPrint("Calculating Tank Cost")

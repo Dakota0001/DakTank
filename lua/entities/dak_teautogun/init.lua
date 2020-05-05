@@ -1245,12 +1245,8 @@ function ENT:Think()
 
 			if self:GetParent():IsValid() and self:GetParent():GetParent():IsValid() and self.IsAutoLoader==1 and self.Controller~=nil then
 				local breechoffset
-				if self:GetHitBoxCount( 0 ) == 2 then
-					_, breechoffset = self:GetHitBoxBounds( 1, 0 )
-				else
-					_, breechoffset = self:GetHitBoxBounds( 0, 0 )
-				end
-				breechoffset = math.abs(breechoffset.x) * -1
+				breechoffset, _ = self:GetModelBounds()
+				breechoffset = math.abs(breechoffset.x*(self.DakCaliber/100)) * -1
 				local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetForward()*1000), self.DakCaliber, {self, self:GetParent(), self:GetParent():GetParent()}, self)
 				local ShellSize = (self.ShellLengthMult*10*self.DakCaliber*0.0393701)
 				if self.ReloadMult == nil then
@@ -2583,12 +2579,8 @@ function ENT:DakTEAutoAmmoCheck()
 		self.AmmoCount = 0 
 		self.SortedAmmo = {}
 		local breechoffset
-		if self:GetHitBoxCount( 0 ) == 2 then
-			_, breechoffset = self:GetHitBoxBounds( 1, 0 )
-		else
-			_, breechoffset = self:GetHitBoxBounds( 0, 0 )
-		end
-		breechoffset = math.abs(breechoffset.x) * -1
+		breechoffset, _ = self:GetModelBounds()
+		breechoffset = math.abs(breechoffset.x*(self.DakCaliber/100)) * -1
 		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -2748,6 +2740,11 @@ function ENT:DakTEAutoFire()
 				net.WriteFloat( self.DakCaliber )
 				net.WriteString( FiringSound[math.random(1,3)] )
 				net.Broadcast()
+
+				self:SetNWBool("Firing",true)
+				timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
+					self:SetNWBool("Firing",false)
+				end)
 
 				--if self.DakCaliber>=40 then
 				--	self:SetNWBool("Firing",true)
@@ -3242,5 +3239,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 				--self:Activate()
 			end)
 		end)
+	else
+		self.ScaleSet = true
 	end
 end

@@ -724,6 +724,8 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 				--self:Activate()
 			end)
 		end)
+	else
+		self.ScaleSet = true
 	end
 end
 

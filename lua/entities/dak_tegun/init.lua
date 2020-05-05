@@ -536,12 +536,8 @@ function ENT:Think()
 
 			if self:GetParent():IsValid() and self:GetParent():GetParent():IsValid() and self.Controller~=nil then
 				local breechoffset
-				if self:GetHitBoxCount( 0 ) == 2 then
-					_, breechoffset = self:GetHitBoxBounds( 1, 0 )
-				else
-					_, breechoffset = self:GetHitBoxBounds( 0, 0 )
-				end
-				breechoffset = math.abs(breechoffset.x) * -1
+				breechoffset, _ = self:GetModelBounds()
+				breechoffset = math.abs(breechoffset.x*(self.DakCaliber/100)) * -1
 				local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetForward()*1000), self.DakCaliber, {self, self:GetParent(), self:GetParent():GetParent()}, self)
 				local LeftDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetRight()*1000), self.DakCaliber, {self, self:GetParent(), self:GetParent():GetParent()}, self)
 				local RightDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)+(self:GetRight()*1000), self.DakCaliber, {self, self:GetParent(), self:GetParent():GetParent()}, self)
@@ -1176,12 +1172,8 @@ function ENT:DakTEAmmoCheck()
 		self.AmmoCount = 0
 		self.SortedAmmo = {}
 		local breechoffset
-		if self:GetHitBoxCount( 0 ) == 2 then
-			_, breechoffset = self:GetHitBoxBounds( 1, 0 )
-		else
-			_, breechoffset = self:GetHitBoxBounds( 0, 0 )
-		end
-		breechoffset = math.abs(breechoffset.x) * -1
+		breechoffset, _ = self:GetModelBounds()
+		breechoffset = math.abs(breechoffset.x*(self.DakCaliber/100)) * -1
 		if not(self.DakTankCore.Ammoboxes == nil) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -1748,5 +1740,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 				--self:Activate()
 			end)
 		end)
+	else
+		self.ScaleSet = true
 	end
 end

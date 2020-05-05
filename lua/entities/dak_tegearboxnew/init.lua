@@ -517,7 +517,7 @@ function ENT:Think()
 			       			end
 							if self.Speed < G1Speed then
 								--self.Gear = 1
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*5.3),0,8*math.abs(self.Perc))
+								GearBoost = 0.4
 								self.CurTopSpeed = G1Speed
 								self.LastTopSpeed = 0
 								self.MaxSpeedDif = G1Speed
@@ -527,7 +527,7 @@ function ENT:Think()
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*4),0,8*math.abs(self.Perc)) )
 							elseif self.Speed < G2Speed then
 								--self.Gear = 2
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*5.5),0,4*math.abs(self.Perc))
+								GearBoost = 0.15
 								self.CurTopSpeed = G2Speed
 								self.LastTopSpeed = G1Speed
 								self.MaxSpeedDif = G2Speed - self.TopSpeed*0.1
@@ -537,7 +537,7 @@ function ENT:Think()
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc)) )
 							elseif self.Speed < G3Speed then
 								--self.Gear = 3
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*1.5),0,2*math.abs(self.Perc))
+								GearBoost = 0.1
 								self.CurTopSpeed = G3Speed
 								self.LastTopSpeed = G2Speed
 								self.MaxSpeedDif = G3Speed - G2Speed
@@ -547,7 +547,7 @@ function ENT:Think()
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*2),0,2*math.abs(self.Perc)) )
 							else
 								--self.Gear = 4
-								GearBoost = math.Clamp(self.TopSpeed/(self.Speed*1.125),0,2*math.abs(self.Perc))
+								GearBoost = 0.05
 								self.CurTopSpeed = G4Speed
 								self.LastTopSpeed = G3Speed
 								self.MaxSpeedDif = G4Speed - G3Speed
@@ -557,72 +557,106 @@ function ENT:Think()
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc)) )
 							end
 
-							
-							local newspeed = self.phy:GetVelocity():Length()*(0.277778*0.254)
-
-							--print(newspeed-self.Speed)
-
 							if self.Speed > 0 and self.Speed < G1Speed and not(self.Gear == 1) then
 								self.Gear = 1 
-								if #self.DakTankCore.Motors>0 then
-									for i=1, #self.DakTankCore.Motors do
-										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.75 , 0 )
-											self.DakTankCore.Motors[i].Sound:ChangeVolume( 1 , 0.2 )
-											self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
-										end
-									end
-								end
 							end
 							if self.Speed > G1Speed and self.Speed < G2Speed and not(self.Gear == 2) then
 								self.Gear = 2 
-								if #self.DakTankCore.Motors>0 then
-									for i=1, #self.DakTankCore.Motors do
-										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.75 , 0 )
-											self.DakTankCore.Motors[i].Sound:ChangeVolume( 1 , 0.2 )
-											self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
-										end
-									end
-								end
 							end
 							if self.Speed > G2Speed and self.Speed < G3Speed and not(self.Gear == 3) then
 								self.Gear = 3
-								if #self.DakTankCore.Motors>0 then
-									for i=1, #self.DakTankCore.Motors do
-										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.75 , 0 )
-											self.DakTankCore.Motors[i].Sound:ChangeVolume( 1 , 0.2 )
-											self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
-										end
-									end
-								end
 							end
 							if self.Speed > G3Speed and self.Speed < G4Speed and not(self.Gear == 4) then
 								self.Gear = 4
+							end
+
+							if self.lastshift == nil then self.lastshift = 0 end
+							if self.LastGear == nil then self.LastGear = 1 end
+							if self.LastGear ~= self.Gear then
+								if self.Gear > self.LastGear then
+									if self.lastshift+2.5 < CurTime() then
+										--sound.Play("vehicles/v8/v8_stop1.wav",self:GetPos(),100,100,0.5)
+										if #self.DakTankCore.Motors>0 then
+											for i=1, #self.DakTankCore.Motors do
+												if IsValid(self.DakTankCore.Motors[i]) then
+													self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.5 , 0 )
+													self.DakTankCore.Motors[i].Sound:ChangeVolume( 1 , 0.15 )
+													self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
+												end
+											end
+										end
+										self.lastshift = CurTime()
+									end
+								end
+							end
+							self.LastGear = self.Gear
+							
+							if self.LastMoving == nil then self.LastMoving = 0 end
+							if self.MoveForward>0 or self.MoveReverse>0 or self.MoveLeft>0 or self.MoveRight>0 then
+								self.LastMoving = 1
+								if (self.MoveForward>0 or self.MoveReverse>0) and not(self.MoveLeft>0 or self.MoveRight>0) then
+									if #self.DakTankCore.Motors>0 then
+										for i=1, #self.DakTankCore.Motors do
+											if IsValid(self.DakTankCore.Motors[i]) then
+												self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif)*math.Min(throttle,1),0,1)*60+((self.Speed/self.TopSpeed)*90)+50 , 0.1 )
+											end
+										end
+									end
+								else
+									if self.CarTurning==0 then
+										if self.MoveLeft>0 or self.MoveRight>0 then
+											if #self.DakTankCore.Motors>0 then
+												for i=1, #self.DakTankCore.Motors do
+													if IsValid(self.DakTankCore.Motors[i]) then
+														self.DakTankCore.Motors[i].Sound:ChangePitch( 150 , 0.5 )
+													end
+												end
+											end
+										end
+									else
+										if self.lastdump == nil then self.lastdump = 0 end
+										if self.LastMoving == 1 then
+											if self.lastdump+2.5 < CurTime() then
+												if self.Gear > 2 and math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif),0,1) > 0.5 then
+													--sound.Play("acf_extra/vehiclefx/boost/gear_change_dump1.wav",self:GetPos(),100,100,1)
+													self.lastdump = CurTime()
+												end
+											end
+										end
+										if #self.DakTankCore.Motors>0 then
+											for i=1, #self.DakTankCore.Motors do
+												if IsValid(self.DakTankCore.Motors[i]) then
+													self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
+												end
+											end
+										end
+										self.LastMoving = 0
+									end
+								end
+							else
+								if self.lastdump == nil then self.lastdump = 0 end
+								if self.LastMoving == 1 then
+									if self.lastdump+2.5 < CurTime() then
+										if self.Gear > 2 and math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif),0,1) > 0.5 then
+											--sound.Play("acf_extra/vehiclefx/boost/gear_change_dump1.wav",self:GetPos(),100,100,1)
+											self.lastdump = CurTime()
+										end
+									end
+								end
 								if #self.DakTankCore.Motors>0 then
 									for i=1, #self.DakTankCore.Motors do
 										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.75 , 0 )
-											self.DakTankCore.Motors[i].Sound:ChangeVolume( 1 , 0.2 )
 											self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
 										end
 									end
 								end
-							end
-							if self.MoveForward>0 or self.MoveReverse>0 or self.MoveLeft>0 or self.MoveRight>0 then
-								if #self.DakTankCore.Motors>0 then
-									for i=1, #self.DakTankCore.Motors do
-										if IsValid(self.DakTankCore.Motors[i]) then
-											self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif)*math.Min(throttle,1),0.7,1)*200 , 0.2 )
-										end
-									end
-								end
+								self.LastMoving = 0
 							end
 						end
 						if self.Speed > self.TopSpeed then
 							self.LeftForce = 0
 							self.RightForce = 0
+							--[[
 							if self.MoveForward>0 or self.MoveReverse>0 or self.MoveLeft>0 or self.MoveRight>0 then
 								self.RPM = 2000 * self.Speed/self.TopSpeed
 								if #self.DakTankCore.Motors>0 then
@@ -633,8 +667,8 @@ function ENT:Think()
 									end
 								end
 							end
+							]]--
 						end
-
 
 						if self.CarTurning==0 then
 							local TorqueBoost = 0.15*self.HPperTon
@@ -719,6 +753,7 @@ function ENT:Think()
 									end
 								end
 							else
+								--[[
 					        	if self.MoveLeft>0 or self.MoveRight>0 then
 									self.RPM = 1000*math.Clamp( 0.5*(self.HPperTon/13) / math.abs(self.LastYaw-self.base:GetAngles().yaw)*10 ,0,2)
 									if #self.DakTankCore.Motors>0 then
@@ -729,6 +764,7 @@ function ENT:Think()
 										end
 									end
 								end
+								]]--
 								--OLD FORMULA
 								--LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.Turn*self:GetRight()*10*math.Clamp( (0.13*(1/self.GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) )
 								
@@ -960,7 +996,7 @@ function ENT:Think()
 	    end
 
 	    if self:IsOnFire() and self.DakDead ~= true then
-			self.DakHealth = self.DakHealth - self.DakMaxHealth*0.1*0.025
+			self.DakHealth = self.DakHealth - self.DakMaxHealth*0.025*engine.TickInterval()
 			if self.DakHealth <= 0 then
 				if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Destroyed!") end
 				self:SetMaterial("models/props_buildings/plasterwall021a")

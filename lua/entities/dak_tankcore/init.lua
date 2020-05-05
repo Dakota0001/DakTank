@@ -308,6 +308,7 @@ function ENT:Think()
 					self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
 
 					local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
+					self.BestAveArmor = Total
 					armormult = (Total/420)*self.ArmorSideMult
 					--local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
 					--print(self.FrontalArmor)
@@ -516,7 +517,6 @@ function ENT:Think()
 					--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
 					math.max(0.1,firepowermult)
 					firepowermult = (altfirepowermult+firepowermult)*0.5
-
 					local basepos = self:GetParent():GetParent():GetPos()
 					self.BestLength = 0
 					self.BestWidth = 0
@@ -539,41 +539,33 @@ function ENT:Think()
 								TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
 							end
 						end
-						local StabMults = 0
-						local FCSMults = 0
-						local RemoteWeaponMults = 0
 						local GunPercentage
-						local RotationSpeeds = 0
-						local HullMounts = 0
 						for i=1, #self.TurretControls do
 							if self.TurretControls[i].GunMass ~= nil then
-								GunPercentage = self.TurretControls[i].GunMass/TotalTurretMass
+								local RotationSpeed = self.TurretControls[i].RotationSpeed
+								local TurretCost = math.log(RotationSpeed*100,100)
 								if self.TurretControls[i].RemoteWeapon == true then
-									RemoteWeaponMults = RemoteWeaponMults + 1.5 * GunPercentage
+									TurretCost = TurretCost * 1.5
 								end
 								if self.TurretControls[i]:GetFCS() == true then
 									self.ColdWar = 1
-									FCSMults = FCSMults + 1.5 * GunPercentage
+									TurretCost = TurretCost * 1.5
 								end
 								if self.TurretControls[i]:GetStabilizer() == true then
 									self.ColdWar = 1
-									StabMults = StabMults + 1.25 * GunPercentage
+									TurretCost = TurretCost * 1.25
 								elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
-									StabMults = StabMults + 1 * GunPercentage
+									TurretCost = TurretCost * 1
 								else
-									StabMults = StabMults + 0.75 * GunPercentage
+									TurretCost = TurretCost * 0.75
 								end
-								RotationSpeeds = RotationSpeeds + self.TurretControls[i].RotationSpeed * GunPercentage
 								if self.TurretControls[i]:GetYawMin()<=45 and self.TurretControls[i]:GetYawMax()<=45 then
-									HullMounts = HullMounts + GunPercentage
+									TurretCost = TurretCost * 0.5
 								end
+								--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
+								GunHandlingMult = GunHandlingMult + math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)
 							end
 						end
-						GunHandlingMult = math.log(RotationSpeeds*100,100)
-						GunHandlingMult = GunHandlingMult * math.Max(RemoteWeaponMults,1)
-						GunHandlingMult = GunHandlingMult * math.Max(FCSMults,1)
-						GunHandlingMult = GunHandlingMult * StabMults
-						GunHandlingMult = GunHandlingMult * (1-(0.50*HullMounts))
 					end
 
 					--print("Highest Armor: "..(armormult*50))
@@ -582,11 +574,10 @@ function ENT:Think()
 					--print("Adjusted Armor: "..((armormult*50)*(self.SideArmor/100)))
 					self.FirepowerMult = math.Round(math.max((self.BoxVolume*0.01/250000),firepowermult),2)
 					self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
-					self.ArmorMult = math.Round(math.max(0.1,armormult),2)
+					self.ArmorMult = math.Round(math.max(0.01,armormult),3)
 					self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
 					self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.TextoliteWeight+self.ERAWeight
 					local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
-
 					self.ArmorMult = self.ArmorMult * ArmorTypeMult
 					self.PreCost = self.ArmorMult*50 + self.FirepowerMult*50
 					--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
@@ -917,6 +908,7 @@ function ENT:Think()
 					else
 						self.DakActive = 0
 					end
+					--local debugtime = SysTime()
 					--####################OPTIMIZE ZONE START###################--
 					if self.DakActive == 1 and table.Count(self.HitBox)~=0 and self.CurrentHealth then
 						if table.Count(self.HitBox) > 0 then
@@ -969,7 +961,7 @@ function ENT:Think()
 									end
 								end
 							end
-							
+							--print("ERA: "..(SysTime()-debugtime))
 							if self.Composites then
 								if table.Count(self.Composites) > 0 then
 									local weightvalcomp
@@ -1014,6 +1006,8 @@ function ENT:Think()
 									end
 								end
 							end
+							--print("Comps: "..(SysTime()-debugtime))
+							local debugtime = SysTime()
 							if self.ERA then
 								if table.Count(self.ERA) > 0 then
 									local weightval
@@ -1027,7 +1021,7 @@ function ENT:Think()
 													self.ERA[i].EntityMods.DakName = "ERA"
 													self.ERA[i].EntityMods.IsERA = 1
 												end
-												weightval = math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) 
+												local weightval = math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) 
 												if self.ERA[i]:GetPhysicsObject():GetMass() ~= weightval then self.ERA[i]:GetPhysicsObject():SetMass( weightval ) end
 												self.ERA[i].DakArmor = math.sqrt(math.sqrt(self.ERA[i]:GetPhysicsObject():GetVolume()))*2.5
 											end
@@ -1035,7 +1029,8 @@ function ENT:Think()
 									end
 								end
 							end
-
+							--print("Total: "..(SysTime()-debugtime))
+							--print("ERA2: "..(SysTime()-debugtime))
 							self.DamageCycle = 0
 							self.LastDamagedBy = NULL
 							if self.DakHealth < self.CurrentHealth then
@@ -1081,7 +1076,7 @@ function ENT:Think()
 									end
 								end
 							end
-
+							--print("Hitbox: "..(SysTime()-debugtime))
 							if not(self.CurMass>self.LastCurMass) then
 								if self.DamageCycle>0 then
 									if self.LastRemake+3 > CurTime() then
@@ -1099,16 +1094,6 @@ function ENT:Think()
 									self.HitBox[i].DakMaxHealth = self.BoxVolume*0.01
 								end
 								self.HitBox[i].DakHealth = self.CurrentHealth
-
-								if self.HitBox[i]:GetClass()=="prop_physics" then
-									--self.HitBox[i]:AddEFlags( EFL_SERVER_ONLY )
-									--self.HitBox[i]:AddEFlags( EFL_DORMANT )
-									--self.HitBox[i]:AddEFlags( EFL_NO_GAME_PHYSICS_SIMULATION )
-
-									--self.HitBox[i]:RemoveEFlags( EFL_SERVER_ONLY )
-									--self.HitBox[i]:RemoveEFlags( EFL_DORMANT )
-								end
-
 							end
 							self.DakHealth = self.CurrentHealth
 							
@@ -1146,7 +1131,7 @@ function ENT:Think()
 
 
 					--####################OPTIMIZE ZONE END###################--
-
+					--print("Total: "..(SysTime()-debugtime))
 							if self.DakHealth then
 								if (self.DakHealth <= 0 or #self.Crew <= 0 or self.LivingCrew <= 0 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
 									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
