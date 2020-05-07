@@ -516,7 +516,7 @@ function ENT:Think()
 							
 							if self.Speed < G1Speed then
 								--self.Gear = 1
-								GearBoost = 0.52
+								GearBoost = 0.52 + math.Clamp(self.TopSpeed*0.15/(self.Speed),0,10*math.abs(self.Perc))
 								self.CurTopSpeed = G1Speed
 								self.LastTopSpeed = 0
 								self.MaxSpeedDif = G1Speed
