@@ -39,6 +39,8 @@ ENT.BasicVelocity = 29527.6
 ENT.muzzle = NULL
 
 function ENT:Initialize()
+	self.ShellLoaded = 0
+	self.NoLoad = 0
 	--self:SetModel(self.DakModel)
 	self.DakHealth = self.DakMaxHealth
 	
@@ -1220,7 +1222,7 @@ function ENT:Think()
 					if #self.DakTankCore.Crew>0 then
 						for i=1, #self.DakTankCore.Crew do
 							if self.DakTankCore.Crew[i].DakEntity == self and self.DakTankCore.Crew[i].DakDead ~= true then
-								if IsValid(self.TurretController.TurretBase) and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
+								if IsValid(self.TurretController.TurretBase) and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
 									if self.DakTankCore.Crew[i]:GetParent():GetParent() == self.TurretController.TurretBase or self.DakTankCore.Crew[i]:GetParent():GetParent() == self:GetParent():GetParent() then
 										self.Loaders = self.Loaders + 1
 										self.DakTankCore.Crew[i].Job = 3
@@ -1256,10 +1258,12 @@ function ENT:Think()
 						self.DakOwner:ChatPrint("WARNING: "..self.DakName.." #"..self:EntIndex().." does not have ample room to load shell at default position, reload impossible. Required space behind breech: "..math.Round(ShellSize,2).." inches, given space: "..math.Round(BackDist,2).." inches.")
 					end
 				end
+				self.NoLoad = 0
 				if math.Round(BackDist,2) > math.Round(ShellSize*0.5,2) and math.Round(BackDist,2) <= math.Round(ShellSize,2) then
 					self.DakCooldown = self.DakCooldown * 2
 					self.ReloadMult = 2
 				elseif math.Round(BackDist,2) < math.Round(ShellSize,2) then
+					self.NoLoad = 1
 					self.DakCooldown = self.DakCooldown * math.huge
 					self.ReloadMult = math.huge
 				end
@@ -1287,8 +1291,20 @@ function ENT:Think()
 			WireLib.TriggerOutput(self, "MaxCooldown",self.DakCooldown)
 			WireLib.TriggerOutput(self, "ReloadTime",self.DakReloadTime)
 			if self.DakIsReloading == 0 then
-				WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
-				WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
+				if self.ShellLoaded == 1 then
+					WireLib.TriggerOutput(self, "Cooldown", 0)
+					WireLib.TriggerOutput(self, "CooldownPercent", 0)
+				else
+					if self.NoLoad == 1 then
+						self.timer = CurTime()
+						self.LastFireTime = CurTime()
+						WireLib.TriggerOutput(self, "Cooldown", math.huge)
+						WireLib.TriggerOutput(self, "CooldownPercent", 100)
+					else
+						WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
+						WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
+					end
+				end
 			else
 				WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.DakLastReload+self.DakReloadTime)-CurTime(),0,100))
 				WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.DakLastReload+self.DakReloadTime)-CurTime(),0,100)/self.DakReloadTime))
@@ -2390,6 +2406,11 @@ function ENT:Think()
 			self.SlowThinkTime = CurTime()
 		end
 	end
+
+	if CurTime() > (self.timer + self.DakCooldown) then
+		self.ShellLoaded = 1
+	end
+
 	self:NextThink( CurTime()+0.1 )
 	return true
 end
@@ -2584,7 +2605,7 @@ function ENT:DakTEAutoAmmoCheck()
 		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
-					if (self.HasMag == 0 and self.IsAutoLoader == 1) and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
+					if (self.HasMag == 0 and self.IsAutoLoader == 1) and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
 						if self.TurretController.TurretBase == self.DakTankCore.Ammoboxes[i]:GetParent():GetParent() or self:GetParent():GetParent() == self.DakTankCore.Ammoboxes[i]:GetParent():GetParent() then
 							if self.DakTankCore.Ammoboxes[i].DakAmmoType == self.DakAmmoType then
 								self.AmmoCount = self.AmmoCount + self.DakTankCore.Ammoboxes[i].DakAmmo
@@ -2631,7 +2652,7 @@ function ENT:DakTEAutoFire()
 			if not(self.SortedAmmo == nil) then
 				for i = 1, #self.SortedAmmo do
 					if IsValid(self.SortedAmmo[i][1]) then
-						if (self.HasMag == 0 and self.IsAutoLoader == 1) and self.TurretController and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
+						if (self.HasMag == 0 and self.IsAutoLoader == 1) and self.TurretController and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
 							if self.TurretController.TurretBase == self.SortedAmmo[i][1]:GetParent():GetParent() or self:GetParent():GetParent() == self.SortedAmmo[i][1]:GetParent():GetParent() then
 								if self.SortedAmmo[i][1].DakAmmoType == self.DakAmmoType then
 									self.AmmoCount = self.AmmoCount + self.SortedAmmo[i][1].DakAmmo
@@ -2647,7 +2668,7 @@ function ENT:DakTEAutoFire()
 			end
 		end
 		if self.AmmoCount > 0 then
-			if CurTime() > (self.timer + self.DakCooldown) then
+			if self.ShellLoaded == 1 then
 				--AMMO CHECK HERE
 				for i = 1, #self.SortedAmmo do
 					if IsValid(self.SortedAmmo[i][1]) then
@@ -2659,6 +2680,7 @@ function ENT:DakTEAutoFire()
 					end
 				end
 				--FIREBULLETHERE
+				self.ShellLoaded = 0
 				self.LastFireTime = CurTime()
 				local shootOrigin = self:GetPos() + (self:GetForward()*self:GetModelRadius())
 				local shootAngles = (self:GetVelocity()+self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
@@ -2818,7 +2840,7 @@ function ENT:DakTEAutoFire()
 		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
-					if (self.HasMag == 0 and self.IsAutoLoader == 1) and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
+					if (self.HasMag == 0 and self.IsAutoLoader == 1) and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
 						if self.TurretController.TurretBase == self.DakTankCore.Ammoboxes[i]:GetParent():GetParent() or self:GetParent():GetParent() == self.DakTankCore.Ammoboxes[i]:GetParent():GetParent() then
 							if self.DakTankCore.Ammoboxes[i].DakAmmoType == self.DakAmmoType then
 								self.AmmoCount = self.AmmoCount + self.DakTankCore.Ammoboxes[i].DakAmmo
@@ -3048,7 +3070,7 @@ function ENT:DakTEAutoGunAmmoSwap()
 		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) and IsValid(self.DakTankCore.Ammoboxes[i]:GetParent()) and IsValid(self.DakTankCore.Ammoboxes[i]:GetParent():GetParent()) then
-					if (self.HasMag == 0 and self.IsAutoLoader == 1) and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
+					if (self.HasMag == 0 and self.IsAutoLoader == 1) and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
 						if self.TurretController.TurretBase == self.DakTankCore.Ammoboxes[i]:GetParent():GetParent() or self:GetParent():GetParent() == self.DakTankCore.Ammoboxes[i]:GetParent():GetParent() then
 							if self.DakTankCore.Ammoboxes[i].DakAmmoType == self.DakAmmoType then
 								self.AmmoCount = self.AmmoCount + self.DakTankCore.Ammoboxes[i].DakAmmo
@@ -3206,6 +3228,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then ScalingGun = 1 end
 	if ScalingGun == 1 then
 		timer.Simple(10,function()
 			self:PhysicsDestroy()	

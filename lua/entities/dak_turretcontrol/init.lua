@@ -311,11 +311,11 @@ function ENT:Think()
 								self.RotationSpeed = 0
 							end
 							if not(self.Controller.ColdWar == 1 or self.Controller.Modern == 1) then
-								if IsValid(self.TurretBase) and self:GetYawMin()>45 and self:GetYawMax()>45 then
+								if IsValid(self.TurretBase) and (self:GetYawMin()+self:GetYawMax()>90) then
 									if self.DakCrew:IsValid() then
 										if self.DakCrew:GetParent():IsValid() then
 											if self.DakCrew:GetParent():GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase then
+												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
 													self.RotationSpeed = 0
 													if self.GunnerErrorMessageSent2 == nil then
 														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in turret, remote weapon systems are cold war and modern only.")
@@ -326,11 +326,11 @@ function ENT:Think()
 										end
 									end
 								end
-								if not(IsValid(self.TurretBase)) and self:GetYawMin()>45 and self:GetYawMax()>45 then
+								if not(IsValid(self.TurretBase)) and (self:GetYawMin()+self:GetYawMax()>90) then
 									if self.DakCrew:IsValid() then
 										if self.DakCrew:GetParent():IsValid() then
 											if self.DakCrew:GetParent():GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() then
+												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
 													self.RotationSpeed = 0
 													if self.GunnerErrorMessageSent3 == nil then
 														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in hull, remote weapon systems are cold war and modern only.")
@@ -342,11 +342,11 @@ function ENT:Think()
 									end
 								end
 							else
-								if IsValid(self.TurretBase) and self:GetYawMin()>45 and self:GetYawMax()>45 then
+								if IsValid(self.TurretBase) and (self:GetYawMin()+self:GetYawMax()>90) then
 									if self.DakCrew:IsValid() then
 										if self.DakCrew:GetParent():IsValid() then
 											if self.DakCrew:GetParent():GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase then
+												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
 													if self.GunnerErrorMessageSent2 == nil then
 														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
 														self.GunnerErrorMessageSent2 = true
@@ -357,11 +357,11 @@ function ENT:Think()
 										end
 									end
 								end
-								if not(IsValid(self.TurretBase)) and self:GetYawMin()>45 and self:GetYawMax()>45 then
+								if not(IsValid(self.TurretBase)) and (self:GetYawMin()+self:GetYawMax()>90) then
 									if self.DakCrew:IsValid() then
 										if self.DakCrew:GetParent():IsValid() then
 											if self.DakCrew:GetParent():GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() then
+												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
 													if self.GunnerErrorMessageSent3 == nil then
 														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
 														self.GunnerErrorMessageSent3 = true
@@ -457,17 +457,19 @@ function ENT:Think()
 
 											local TarPos0
 											local GunPos=GunEnt:GetPos()
+											self.TarVel = Vector(0,0,0)
 											if self.Tar and self.Tar:IsValid() then
 												TarPos0 = self.Tar:GetPos() + (self.CamTarPos-self.Tar:GetPos())
+												self.TarVel = self.Tar:GetVelocity()
 											else
 												TarPos0 = PreCamTrace.HitPos
 											end
 
-											local TarVel = self.Tar:GetVelocity()
+											
 											if self.Tar:GetParent() and self.Tar:GetParent():IsValid() then
-											    TarVel=self.Tar:GetParent():GetVelocity()
+											    self.TarVel=self.Tar:GetParent():GetVelocity()
 											    if self.Tar:GetParent():GetParent() and self.Tar:GetParent():GetParent():IsValid() then
-											        TarVel=self.Tar:GetParent():GetParent():GetVelocity()
+											        self.TarVel=self.Tar:GetParent():GetParent():GetVelocity()
 											    end
 											end
 											local SelfVel = self.Controller:GetParent():GetParent():GetVelocity()
@@ -482,7 +484,7 @@ function ENT:Think()
 											local TarPos
 											for i=1, 2 do
 											    VelValue = V - VelLossFull
-											    TarPos = TarPos0 + ((TarVel-SelfVel)*(TravelTime+0.1))
+											    TarPos = TarPos0 + ((self.TarVel-SelfVel)*(TravelTime+0.1))
 											    Diff = (TarPos-GunPos)
 											    X = Vector(Diff.x,Diff.y,0):Length()
 											    Y = Diff.z

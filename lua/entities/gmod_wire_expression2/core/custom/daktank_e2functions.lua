@@ -133,10 +133,14 @@ e2function number entity:daktankGetCooldownPerc()
 	if not IsValid(this) then return 0 end
 
 	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_temachinegun" then
-		if this.LastFireTime == nil or this.DakCooldown == nil then
-			return 1
+		if this.ShellLoaded == 1 then
+			return 0
 		else
-			return 100*(math.Clamp((this.LastFireTime+this.DakCooldown)-CurTime(),0,100)/this.DakCooldown)
+			if this.LastFireTime == nil or this.DakCooldown == nil then
+				return 1
+			else
+				return 100*(math.Clamp((this.LastFireTime+this.DakCooldown)-CurTime(),0,100)/this.DakCooldown)
+			end
 		end
 	end
 	if this:GetClass() == "dak_teautogun" then
@@ -144,7 +148,15 @@ e2function number entity:daktankGetCooldownPerc()
 			return 1
 		else
 			if this.DakIsReloading == 0 then
-				return 100*(math.Clamp((this.LastFireTime+this.DakCooldown)-CurTime(),0,100)/this.DakCooldown)
+				if this.ShellLoaded == 1 then
+					return 0
+				else
+					if this.NoLoad == 1 then
+						return 100
+					else
+						return 100*(math.Clamp((this.LastFireTime+this.DakCooldown)-CurTime(),0,100)/this.DakCooldown)
+					end
+				end
 			else
 				return 100*(math.Clamp((this.DakLastReload+this.DakReloadTime)-CurTime(),0,100)/this.DakReloadTime)
 			end

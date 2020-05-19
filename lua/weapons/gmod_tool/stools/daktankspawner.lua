@@ -466,84 +466,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Howitzer"
-			if self.DakCaliber < 58 then
-				self.DakModel = "models/daktanks/howitzer50mm.mdl"
-			end
-			if self.DakCaliber >= 58 and self.DakCaliber < 65 then
-				self.DakModel = "models/daktanks/howitzer58mm.mdl"
-			end
-			if self.DakCaliber >= 65 and self.DakCaliber < 73 then
-				self.DakModel = "models/daktanks/howitzer65mm.mdl"
-			end
-			if self.DakCaliber >= 73 and self.DakCaliber < 80 then
-				self.DakModel = "models/daktanks/howitzer73mm.mdl"
-			end
-			if self.DakCaliber >= 80 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/howitzer80mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 96 then
-				self.DakModel = "models/daktanks/howitzer88mm.mdl"
-			end
-			if self.DakCaliber >= 96 and self.DakCaliber < 103 then
-				self.DakModel = "models/daktanks/howitzer96mm.mdl"
-			end
-			if self.DakCaliber >= 103 and self.DakCaliber < 111 then
-				self.DakModel = "models/daktanks/howitzer103mm.mdl"
-			end
-			if self.DakCaliber >= 111 and self.DakCaliber < 118 then
-				self.DakModel = "models/daktanks/howitzer111mm.mdl"
-			end
-			if self.DakCaliber >= 118 and self.DakCaliber < 126 then
-				self.DakModel = "models/daktanks/howitzer118mm.mdl"
-			end
-			if self.DakCaliber >= 126 and self.DakCaliber < 134 then
-				self.DakModel = "models/daktanks/howitzer126mm.mdl"
-			end
-			if self.DakCaliber >= 134 and self.DakCaliber < 141 then
-				self.DakModel = "models/daktanks/howitzer134mm.mdl"
-			end
-			if self.DakCaliber >= 141 and self.DakCaliber < 149 then
-				self.DakModel = "models/daktanks/howitzer141mm.mdl"
-			end
-			if self.DakCaliber >= 149 and self.DakCaliber < 156 then
-				self.DakModel = "models/daktanks/howitzer149mm.mdl"
-			end
-			if self.DakCaliber >= 156 and self.DakCaliber < 164 then
-				self.DakModel = "models/daktanks/howitzer156mm.mdl"
-			end
-			if self.DakCaliber >= 164 and self.DakCaliber < 172 then
-				self.DakModel = "models/daktanks/howitzer164mm.mdl"
-			end
-			if self.DakCaliber >= 172 and self.DakCaliber < 179 then
-				self.DakModel = "models/daktanks/howitzer172mm.mdl"
-			end
-			if self.DakCaliber >= 179 and self.DakCaliber < 187 then
-				self.DakModel = "models/daktanks/howitzer179mm.mdl"
-			end
-			if self.DakCaliber >= 187 and self.DakCaliber < 194 then
-				self.DakModel = "models/daktanks/howitzer187mm.mdl"
-			end
-			if self.DakCaliber >= 194 and self.DakCaliber < 202 then
-				self.DakModel = "models/daktanks/howitzer194mm.mdl"
-			end
-			if self.DakCaliber >= 202 and self.DakCaliber < 210 then
-				self.DakModel = "models/daktanks/howitzer202mm.mdl"
-			end
-			if self.DakCaliber >= 210 and self.DakCaliber < 217 then
-				self.DakModel = "models/daktanks/howitzer210mm.mdl"
-			end
-			if self.DakCaliber >= 217 and self.DakCaliber < 225 then
-				self.DakModel = "models/daktanks/howitzer217mm.mdl"
-			end
-			if self.DakCaliber >= 225 and self.DakCaliber < 232 then
-				self.DakModel = "models/daktanks/howitzer225mm.mdl"
-			end
-			if self.DakCaliber >= 232 and self.DakCaliber < 240 then
-				self.DakModel = "models/daktanks/howitzer232mm.mdl"
-			end
-			if self.DakCaliber >= 240 then
-				self.DakModel = "models/daktanks/howitzer240mm.mdl"
-			end
+			self.DakModel = "models/daktanks/howitzer100mm2.mdl"
 
 			if self.DakCaliber < 75 then
 				self.DakFireSound = "daktanks/h50.mp3"
@@ -718,85 +641,7 @@ function TOOL:LeftClick( trace )
 			self.DakGunType = "Autoloading Howitzer"
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),50,240)
 			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm Autoloading Howitzer"
-			if self.DakCaliber < 58 then
-				self.DakModel = "models/daktanks/howitzer50mm.mdl"
-			end
-			if self.DakCaliber >= 58 and self.DakCaliber < 65 then
-				self.DakModel = "models/daktanks/howitzer58mm.mdl"
-			end
-			if self.DakCaliber >= 65 and self.DakCaliber < 73 then
-				self.DakModel = "models/daktanks/howitzer65mm.mdl"
-			end
-			if self.DakCaliber >= 73 and self.DakCaliber < 80 then
-				self.DakModel = "models/daktanks/howitzer73mm.mdl"
-			end
-			if self.DakCaliber >= 80 and self.DakCaliber < 88 then
-				self.DakModel = "models/daktanks/howitzer80mm.mdl"
-			end
-			if self.DakCaliber >= 88 and self.DakCaliber < 96 then
-				self.DakModel = "models/daktanks/howitzer88mm.mdl"
-			end
-			if self.DakCaliber >= 96 and self.DakCaliber < 103 then
-				self.DakModel = "models/daktanks/howitzer96mm.mdl"
-			end
-			if self.DakCaliber >= 103 and self.DakCaliber < 111 then
-				self.DakModel = "models/daktanks/howitzer103mm.mdl"
-			end
-			if self.DakCaliber >= 111 and self.DakCaliber < 118 then
-				self.DakModel = "models/daktanks/howitzer111mm.mdl"
-			end
-			if self.DakCaliber >= 118 and self.DakCaliber < 126 then
-				self.DakModel = "models/daktanks/howitzer118mm.mdl"
-			end
-			if self.DakCaliber >= 126 and self.DakCaliber < 134 then
-				self.DakModel = "models/daktanks/howitzer126mm.mdl"
-			end
-			if self.DakCaliber >= 134 and self.DakCaliber < 141 then
-				self.DakModel = "models/daktanks/howitzer134mm.mdl"
-			end
-			if self.DakCaliber >= 141 and self.DakCaliber < 149 then
-				self.DakModel = "models/daktanks/howitzer141mm.mdl"
-			end
-			if self.DakCaliber >= 149 and self.DakCaliber < 156 then
-				self.DakModel = "models/daktanks/howitzer149mm.mdl"
-			end
-			if self.DakCaliber >= 156 and self.DakCaliber < 164 then
-				self.DakModel = "models/daktanks/howitzer156mm.mdl"
-			end
-			if self.DakCaliber >= 164 and self.DakCaliber < 172 then
-				self.DakModel = "models/daktanks/howitzer164mm.mdl"
-			end
-			if self.DakCaliber >= 172 and self.DakCaliber < 179 then
-				self.DakModel = "models/daktanks/howitzer172mm.mdl"
-			end
-			if self.DakCaliber >= 179 and self.DakCaliber < 187 then
-				self.DakModel = "models/daktanks/howitzer179mm.mdl"
-			end
-			if self.DakCaliber >= 187 and self.DakCaliber < 194 then
-				self.DakModel = "models/daktanks/howitzer187mm.mdl"
-			end
-			if self.DakCaliber >= 194 and self.DakCaliber < 202 then
-				self.DakModel = "models/daktanks/howitzer194mm.mdl"
-			end
-			if self.DakCaliber >= 202 and self.DakCaliber < 210 then
-				self.DakModel = "models/daktanks/howitzer202mm.mdl"
-			end
-			if self.DakCaliber >= 210 and self.DakCaliber < 217 then
-				self.DakModel = "models/daktanks/howitzer210mm.mdl"
-			end
-			if self.DakCaliber >= 217 and self.DakCaliber < 225 then
-				self.DakModel = "models/daktanks/howitzer217mm.mdl"
-			end
-			if self.DakCaliber >= 225 and self.DakCaliber < 232 then
-				self.DakModel = "models/daktanks/howitzer225mm.mdl"
-			end
-			if self.DakCaliber >= 232 and self.DakCaliber < 240 then
-				self.DakModel = "models/daktanks/howitzer232mm.mdl"
-			end
-			if self.DakCaliber >= 240 then
-				self.DakModel = "models/daktanks/howitzer240mm.mdl"
-			end
+			self.DakModel = "models/daktanks/howitzer100mm2.mdl"
 
 			if self.DakCaliber < 75 then
 				self.DakFireSound = "daktanks/h50.mp3"
@@ -1443,6 +1288,7 @@ function TOOL:LeftClick( trace )
 		if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then self.ScalingGun = 1 end
 
 		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_tegearbox") and not(trace.Entity:GetClass() == "dak_tegearboxnew") and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
 			self.spawnedent:Spawn()

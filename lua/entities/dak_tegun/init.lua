@@ -34,6 +34,7 @@ ENT.BasicVelocity = 29527.6
 ENT.muzzle = NULL
 
 function ENT:Initialize()
+	self.ShellLoaded = 0
 	--self:SetModel(self.DakModel)
 	self.DakHealth = self.DakMaxHealth
 	
@@ -510,7 +511,7 @@ function ENT:Think()
 					if #self.DakTankCore.Crew>0 then
 						for i=1, #self.DakTankCore.Crew do
 							if self.DakTankCore.Crew[i].DakEntity == self and self.DakTankCore.Crew[i].DakDead ~= true then
-								if IsValid(self.TurretController.TurretBase) and self.TurretController:GetYawMin()>45 and self.TurretController:GetYawMax()>45 then
+								if IsValid(self.TurretController.TurretBase) and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
 									if self.DakTankCore.Crew[i]:IsValid() then
 										if self.DakTankCore.Crew[i]:GetParent():IsValid() then
 											if self.DakTankCore.Crew[i]:GetParent():GetParent():IsValid() then
@@ -575,9 +576,13 @@ function ENT:Think()
 		end
 		if CurTime()>=self.MidThinkTime+0.33 and self.BaseDakShellDamage ~= nil then
 			self:DakTEAmmoCheck()
-
-			WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
-			WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
+			if self.ShellLoaded == 1 then
+				WireLib.TriggerOutput(self, "Cooldown", 0)
+				WireLib.TriggerOutput(self, "CooldownPercent", 0)
+			else
+				WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
+				WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
+			end
 			WireLib.TriggerOutput(self, "MaxCooldown",self.DakCooldown)
 			self.MidThinkTime = CurTime()
 		end
@@ -972,6 +977,11 @@ function ENT:Think()
 			self.SlowThinkTime = CurTime()
 		end
 	end
+
+	if CurTime() > (self.timer + self.DakCooldown) then
+		self.ShellLoaded = 1
+	end
+
 	self:NextThink( CurTime()+0.1 )
 	return true
 end
@@ -1230,7 +1240,7 @@ function ENT:DakTEFire()
 			end
 		end
 		if self.AmmoCount > 0 then
-			if CurTime() > (self.timer + self.DakCooldown) then
+			if self.ShellLoaded == 1 then
 				--AMMO CHECK HERE
 				for i = 1, #self.SortedAmmo do
 					if IsValid(self.SortedAmmo[i][1]) then
@@ -1242,6 +1252,7 @@ function ENT:DakTEFire()
 					end
 				end
 				--FIREBULLETHERE
+				self.ShellLoaded = 0
 				self.LastFireTime = CurTime()
 				local shootOrigin = self:GetPos() + (self:GetForward()*self:GetModelRadius())
 				local shootAngles = (self:GetVelocity()+self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
@@ -1707,6 +1718,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then ScalingGun = 1 end
 	if ScalingGun == 1 then
 		timer.Simple(10,function()
 			self:PhysicsDestroy()	

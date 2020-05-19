@@ -874,6 +874,8 @@ function ENT:Think()
 						self.LeftChanges[i] = 0
 						self.RightPosChanges[i] = selfpos
 						self.LeftPosChanges[i] = selfpos
+						self.RightRidePosChanges[i] = 0
+						self.LeftRidePosChanges[i] = 0
 					end
 				end
 				local traceline = util.TraceLine
