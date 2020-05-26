@@ -81,7 +81,10 @@ function ENT:Initialize()
  	self.FireRateMod = self:GetRateOfFire()
 
  	self.muzzle = ents.Create("prop_physics")
- 	self.muzzle:SetAngles(self:GetAngles()+Angle(0,-90,0))
+
+
+
+ 	self.muzzle:SetAngles(self:GetForward():Angle()+Angle(0,-90,0))
  	self.muzzle:SetPos(self:GetPos())
  	self.muzzle:SetMoveType(MOVETYPE_NONE)
  	self.muzzle:PhysicsInit(SOLID_NONE)
@@ -3101,6 +3104,7 @@ function ENT:DakTEAutoGunAmmoSwap()
 		else
 			self.AutoSwapStacks = 0
 		end
+		self.ShellLoaded = 0
 		WireLib.TriggerOutput(self, "Ammo", self.AmmoCount)
 	end
 end
