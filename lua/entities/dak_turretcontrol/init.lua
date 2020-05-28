@@ -122,6 +122,30 @@ function ENT:ApplyForce(entity, angle)
 	end
 end
 
+function ENT:ApplyForceDirector(Director, entity, angle)
+	local phys = entity:GetPhysicsObject()
+
+	local up = Director:GetUp()
+	local left = Director:GetRight() * -1
+	local forward = Director:GetForward()
+	
+	local forcemult = 1
+	if angle.pitch ~= 0 then
+		local pitch = up      * (angle.pitch * 0.5)
+		phys:ApplyForceOffset( forward*forcemult, pitch )
+		phys:ApplyForceOffset( forward * -1*forcemult, pitch * -1 )
+	end
+	if angle.yaw ~= 0 then
+		local yaw   = forward * (angle.yaw * 0.5)
+		phys:ApplyForceOffset( left*forcemult, yaw )
+		phys:ApplyForceOffset( left * -1*forcemult, yaw * -1 )
+	end
+	if angle.roll ~= 0 then
+		local roll  = left    * (angle.roll * 0.5)
+		phys:ApplyForceOffset( up*forcemult, roll )
+		phys:ApplyForceOffset( up * -1*forcemult, roll * -1 )
+	end
+end
 
 function ENT:Initialize()
 	self:SetModel( "models/beer/wiremod/gate_e2_mini.mdl" )
@@ -295,7 +319,7 @@ function ENT:Think()
 							end
 						end
 					end
-					self.RotationSpeed = RotMult * (15000/self.GunMass) * (66/(1/engine.TickInterval())) * RotationMult
+					self.RotationSpeed = math.min(RotMult * (15000/self.GunMass) * (66/(1/engine.TickInterval())) * RotationMult,5)
 					if self.DakCrew == NULL then
 						self.RotationSpeed = 0
 						if self.GunnerErrorMessageSent1 == nil then
@@ -391,9 +415,6 @@ function ENT:Think()
 						if IsValid(DakTurret) then
 							if not(self.TurInertia) then
 								self.TurInertia = Angle(DakTurret:GetPhysicsObject():GetInertia().y,DakTurret:GetPhysicsObject():GetInertia().z,DakTurret:GetPhysicsObject():GetInertia().x)
-							end
-							if not(self.TurAng) then
-								self.TurAng = self:WorldToLocalAngles(DakTurret:GetAngles())-Angle(0,self.YawDiff,0)
 							end
 						end
 						
@@ -541,9 +562,7 @@ function ENT:Think()
 									end
 
 							    	GunDir = normalizedVector(self.CamTrace.HitPos - self.CamTrace.StartPos+(self.CamTrace.StartPos-self.DakGun:GetPos()))
-							    	self.GunAng = angnorm(angClamp(self.GunAng - angNumRotationSpeedClamp(heading(Vector(0,0,0), self.GunAng, self:toLocalAxis(GunDir)), -self.RotationSpeed, self.RotationSpeed, 1), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-								    self.GunAng = self.GunAng
-								    local Ang = -heading(Vector(0,0,0), self.DakGun:GetAngles(), self:LocalToWorldAngles(  angClamp(self.GunAng+self.Shake,Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1))  ):Forward())
+								    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+self.Shake), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
 								    Ang = Angle(Ang.pitch*1250,Ang.yaw*1250,Ang.roll*1250)
 								    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
 								    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
@@ -551,26 +570,28 @@ function ENT:Think()
 								    Ang = Angle((Ang.pitch*self.Inertia.pitch),(Ang.yaw*self.Inertia.yaw),(Ang.roll*self.Inertia.roll))
 									if IsValid(DakTurret) then
 										TurDir = normalizedVector(self.CamTrace.HitPos - self.CamTrace.StartPos+(self.CamTrace.StartPos-DakTurret:GetPos()))
-								    	self.TurAng = angnorm(angClamp(self.TurAng - angNumClamp(heading(Vector(0,0,0), self.TurAng, self:toLocalAxis(TurDir)), -self.RotationSpeed, self.RotationSpeed), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-									    local TurAng = -heading(Vector(0,0,0), DakTurret:GetAngles()-Angle(0,self.YawDiff,0), self:LocalToWorldAngles(self.TurAng):Forward())
-									    TurAng = Angle(TurAng.pitch*250,TurAng.yaw*250,TurAng.roll*250)
+										local TurAng = angNumClamp(angClamp(self:WorldToLocalAngles(TurDir:Angle()), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
+									    TurAng = Angle(TurAng.pitch*1250,TurAng.yaw*1250,TurAng.roll*1250)
 									    local TurAngVel = DakTurret:GetPhysicsObject():GetAngleVelocity()
-									    local TurAngVelAng = Angle( TurAngVel.y*30, TurAngVel.z*30, TurAngVel.x*30 )
-									    TurAng = Angle((TurAng.pitch - TurAngVelAng.pitch),(TurAng.yaw - TurAngVelAng.yaw),(TurAng.roll - TurAngVelAng.roll))
+									    local TurAngVelAng = Angle( TurAngVel.y*15, TurAngVel.z*15, TurAngVel.x*15 )
+									    TurAng = Angle(TurAng.pitch-TurAngVelAng.pitch,TurAng.yaw-TurAngVelAng.yaw,TurAng.roll-TurAngVelAng.roll)
 									    TurAng = Angle((TurAng.pitch*self.TurInertia.pitch),(TurAng.yaw*self.TurInertia.yaw),(TurAng.roll*self.TurInertia.roll))
 									    --find yaw axis
 									    if self.Off == true then
 									    	self.OffTicks = self.OffTicks + 1
 									    	if self.OffTicks > 70 then
 												self.Off = false
-												self.GunAng = Angle(0,0,0)
-												self.TurAng = Angle(0,0,0)
 											end
 										else
-										   	if (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll > 1 or (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll < -1 then
-												self:ApplyForce(DakTurret, Angle(TurAng.pitch,0,0))
+											self:ApplyForceDirector(self.DakGun, DakTurret, Angle(0,TurAng.yaw,0))
+											local TurCounterAngVel = DakTurret:GetPhysicsObject():GetAngleVelocity()
+										    local TurCounterAngVelAng = Angle( TurCounterAngVel.y*10, TurCounterAngVel.z*10, TurCounterAngVel.x*10 )
+										    TurCounterAng = Angle((-TurCounterAngVelAng.pitch*self.TurInertia.pitch),(-TurCounterAngVelAng.yaw*self.TurInertia.yaw),(-TurCounterAngVelAng.roll*self.TurInertia.roll))
+										    self:ApplyForceDirector(self.DakGun, DakTurret, Angle(TurCounterAng.pitch,TurAng.yaw+TurCounterAng.yaw,TurCounterAng.roll))
+										    if (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll > 1 or (DakTurret:GetAngles()-self.DakGun:GetAngles()).roll < -1 then
+												self:ApplyForce(DakTurret, Angle(TurCounterAng.pitch,0,0))
 											else
-												self:ApplyForce(DakTurret, Angle(0,TurAng.yaw,0))
+												self:ApplyForce(DakTurret, Angle(0,TurCounterAng.yaw,0))
 											end
 											local CounterAngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
 										    local CounterAngVelAng = Angle( CounterAngVel.y*30, CounterAngVel.z*30, CounterAngVel.x*30 )
@@ -582,7 +603,6 @@ function ENT:Think()
 											self.OffTicks = self.OffTicks + 1
 											if self.OffTicks > 70 / (66/(1/engine.TickInterval())) then
 												self.Off = false
-												self.GunAng = Angle(0,0,0)
 											end
 										else
 											self:ApplyForce(self.DakGun, Ang)
@@ -652,7 +672,7 @@ function ENT:PreEntityCopy()
 	info.CrewID = self.DakCrew:EntIndex()
 	info.DakName = self.DakName
 	info.DakHealth = self.DakHealth
-	info.DakMaxHealth = self.DakBaseMaxHealth
+	info.DakMaxHealth = self.DakMaxHealth
 	info.DakMass = self.DakMass
 	info.DakOwner = self.DakOwner
 	duplicator.StoreEntityModifier( self, "DakTek", info )
@@ -673,9 +693,13 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		if Crew and IsValid(Crew) then
 			self.DakCrew = Crew
 		end
+		self.DakArmor = 0
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
+		if Ent.EntityMods.DakTek.DakMaxHealth == nil then
+			self.DakMaxHealth = 10 
+		end
 		self.DakMass = Ent.EntityMods.DakTek.DakMass
 		self.DakOwner = Player
 		Ent.EntityMods.DakTek = nil

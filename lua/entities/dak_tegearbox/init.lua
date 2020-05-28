@@ -326,7 +326,7 @@ function ENT:Think()
 				if self.DakDead ~= true then
 					self.HPperTon = self.DakHP/(self.TotalMass/1000)
 				else
-					self.DakHealth = 0
+					if self.DakHealth < 0 then self.DakHealth = 0 end
 					self.HPperTon = 0
 				end
 		        if (self.Active>0) then

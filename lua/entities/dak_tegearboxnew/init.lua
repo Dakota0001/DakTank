@@ -51,6 +51,7 @@ function ENT:Initialize()
  	self.WheelsPerSide = self:GetWheelsPerSide()
  	self.RideHeight = self:GetRideHeight()
  	self.RideLimit = self:GetRideLimit()
+ 	self.SuspensionBias = self:GetSuspensionBias()
 	self.RightChanges = {}
 	self.RightPosChanges = {}
 	self.RightRidePosChanges = {}
@@ -84,6 +85,7 @@ function ENT:Think()
  	self.WheelsPerSide = self:GetWheelsPerSide()
  	self.RideHeight = self:GetRideHeight()
  	self.RideLimit = self:GetRideLimit()
+ 	self.SuspensionBias =self:GetSuspensionBias()
  	self.FrontWheelRaise = self:GetFrontWheelRaise()
  	self.RearWheelRaise = self:GetRearWheelRaise()
  	self.ForwardOffset = self:GetForwardOffset()
@@ -867,6 +869,8 @@ function ENT:Think()
 				local weightforce = self.PhysicalMass*-GravxTicks --note, raise tick interval if I increase interval
 				local wheelforce = weightforce/((WheelsPerSide-2)*2)
 
+				local SuspensionBias = self.SuspensionBias
+
 				local wheelweightforce = Vector(0,0,(self.AddonMass/(WheelsPerSide*2))*-9.8*engine.TickInterval())
 				if self.LastWheelsPerSide ~= WheelsPerSide then
 			        for i=1, WheelsPerSide do
@@ -893,7 +897,7 @@ function ENT:Think()
 				if self.DakDead == true or self.CrewAlive == 0 then
 					self.RightForce = 0
 					self.LeftForce = 0
-					self.DakHealth = 0
+					if self.DakHealth < 0 then self.DakHealth = 0 end
 				end
 
 				--Right side
@@ -927,8 +931,18 @@ function ENT:Think()
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
-					
-					SuspensionForce = ((500*(100/RideLimit))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce
+
+					local multval = i/WheelsPerSide
+					if multval == 0.5 then
+						multval = 1
+					elseif multval > 0.5 then
+						multval = multval*SuspensionBias
+					elseif multval < 0.5 then
+						multval = -multval*SuspensionBias
+					end
+
+					local limitmult = 1 + multval
+					SuspensionForce = ((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
@@ -971,7 +985,18 @@ function ENT:Think()
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
-					SuspensionForce = ((500*(100/RideLimit))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce
+
+					local multval = i/WheelsPerSide
+					if multval == 0.5 then
+						multval = 1
+					elseif multval > 0.5 then
+						multval = multval*SuspensionBias
+					elseif multval < 0.5 then
+						multval = -multval*SuspensionBias
+					end
+
+					local limitmult = 1 + multval
+					SuspensionForce = ((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce
 
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
