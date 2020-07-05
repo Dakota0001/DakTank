@@ -234,7 +234,7 @@ function ENT:Think()
 								end
 							end
 						end )
-						self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,300,self.DakOwner)
+						self:DTExplosion(self:GetPos(),50000*(self.DakAmmo/self.DakMaxAmmo),500,500,300,self.DakOwner)
 						--self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
 						sound.Play( "daktanks/ammoexplode.mp3", self:GetPos(), 100, 75, 1 )
 						timer.Create( "RemoveTimer"..self:EntIndex(), 0.5, 1, function()
@@ -259,7 +259,7 @@ function ENT:Think()
 										effectdata:SetNormal( Vector(0,0,-1) )
 										util.Effect("daktescalingexplosionold", effectdata, true, true)
 
-										self:DTExplosion(self:GetPos(),5000*(self.DakAmmo/self.DakMaxAmmo),500,500,200,self.DakOwner)
+										self:DTExplosion(self:GetPos(),50000*(self.DakAmmo/self.DakMaxAmmo),500,500,200,self.DakOwner)
 
 										--self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
 										sound.Play( "daktanks/ammoexplode.mp3", self:GetPos(), 100, 75, 1 )

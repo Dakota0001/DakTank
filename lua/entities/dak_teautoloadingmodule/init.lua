@@ -145,7 +145,7 @@ function ENT:Think()
 			effectdata:SetNormal( Vector(0,0,-1) )
 			util.Effect("daktescalingexplosion", effectdata, true, true)
 
-			self:DTExplosion(self:GetPos(),200,500,200,100,self.DakOwner)
+			self:DTExplosion(self:GetPos(),20000,500,200,100,self.DakOwner)
 
 			self:EmitSound( "daktanks/ammoexplode.mp3", 100, 75, 1)
 			if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Exploded!") end

@@ -558,10 +558,12 @@ function ENT:Think()
 											Shake = Angle(1*self.ShakeAmpX,0.1*self.ShakeAmpY,0) * (Speed * 0.0125)
 										end
 										self.Shake = Shake
-										self.LastAngles = self:GetAngles()
 									end
+									local HullAngleMovement = -self:WorldToLocalAngles(self.LastAngles)
+									self.LastAngles = self:GetAngles()
+									--get angle that self has changed in last tick, infact this is done above in last angles
 							    	GunDir = normalizedVector(self.CamTrace.HitPos - self.CamTrace.StartPos+(self.CamTrace.StartPos-self.DakGun:GetPos()))
-								    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+self.Shake), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
+								    local Ang = HullAngleMovement+angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+self.Shake), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
 								    Ang = Angle(Ang.pitch*1250,Ang.yaw*1250,Ang.roll*1250)
 								    local AngVel = self.DakGun:GetPhysicsObject():GetAngleVelocity()
 								    local AngVelAng = Angle( AngVel.y*30, AngVel.z*30, AngVel.x*30 )
@@ -569,7 +571,7 @@ function ENT:Think()
 								    Ang = Angle((Ang.pitch*self.Inertia.pitch),(Ang.yaw*self.Inertia.yaw),(Ang.roll*self.Inertia.roll))
 									if IsValid(DakTurret) then
 										TurDir = normalizedVector(self.CamTrace.HitPos - self.CamTrace.StartPos+(self.CamTrace.StartPos-DakTurret:GetPos()))
-										local TurAng = angNumClamp(self.DakGun:WorldToLocalAngles(self:LocalToWorldAngles(angClamp(self:WorldToLocalAngles(TurDir:Angle()), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))), -self.RotationSpeed, self.RotationSpeed)
+										local TurAng = HullAngleMovement+angNumClamp(self.DakGun:WorldToLocalAngles(self:LocalToWorldAngles(angClamp(self:WorldToLocalAngles(TurDir:Angle()), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))), -self.RotationSpeed, self.RotationSpeed)
 									    TurAng = Angle(TurAng.pitch*1250,TurAng.yaw*1250,TurAng.roll*1250)
 									    local TurAngVel = DakTurret:GetPhysicsObject():GetAngleVelocity()
 									    local TurAngVelAng = Angle( TurAngVel.y*15, TurAngVel.z*15, TurAngVel.x*15 )
