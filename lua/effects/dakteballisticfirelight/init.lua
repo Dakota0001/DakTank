@@ -22,7 +22,17 @@ function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
 	local Ent = data:GetEntity()
 	local size = data:GetScale()
-	
+	local EntVel = Ent:GetVelocity()
+	if Ent:GetParent():IsValid() then
+		EntVel = Ent:GetParent():GetVelocity()
+		if Ent:GetParent():GetParent():IsValid() then
+			EntVel = Ent:GetParent():GetParent():GetVelocity()
+			if Ent:GetParent():GetParent():GetParent():IsValid() then
+				EntVel = Ent:GetParent():GetParent():GetParent():GetVelocity()
+			end
+		end
+	end
+
 	local emitter = ParticleEmitter( Pos )
 	
 	if not(Ent==NULL) then
@@ -35,7 +45,7 @@ function EFFECT:Init( data )
 		local strength = math.Rand(1,10)
 
 			if (particle) then
-				particle:SetVelocity(Ent:GetForward()*500*strength+Vector(math.Rand(-1000,1000)))
+				particle:SetVelocity((Ent:GetForward()*500*strength+Vector(math.Rand(-1000,1000)))+EntVel)
 				particle:SetLifeTime(0) 
 				particle:SetDieTime((size/50)+math.Rand(0,0.5))
 				particle:SetStartAlpha(25)
@@ -62,7 +72,7 @@ function EFFECT:Init( data )
 			if particle == nil then particle = emitter:Add( "sprites/light_glow02_add.vmt", Pos + Ent:GetForward()*math.random( 0, 0 ))  end
 			
 			if (particle) then
-				particle:SetVelocity(Ent:GetForward()*math.Rand(250,3000+(size*600)) + Vector(math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20))))
+				particle:SetVelocity((Ent:GetForward()*math.Rand(250,3000+(size*600)) + Vector(math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20))))+EntVel)
 				particle:SetLifeTime(0) 
 				particle:SetDieTime(0.1+math.Rand(0,0.15)) 
 				particle:SetStartAlpha(200)

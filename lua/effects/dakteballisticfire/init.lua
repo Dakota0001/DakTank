@@ -22,6 +22,16 @@ function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
 	local Ent = data:GetEntity()
 	local size = data:GetScale()
+	local EntVel = Ent:GetVelocity()
+	if Ent:GetParent():IsValid() then
+		EntVel = Ent:GetParent():GetVelocity()
+		if Ent:GetParent():GetParent():IsValid() then
+			EntVel = Ent:GetParent():GetParent():GetVelocity()
+			if Ent:GetParent():GetParent():GetParent():IsValid() then
+				EntVel = Ent:GetParent():GetParent():GetParent():GetVelocity()
+			end
+		end
+	end
 
 	local emitter = ParticleEmitter( Pos )
 
@@ -73,7 +83,7 @@ function EFFECT:Init( data )
 			if particle == nil then particle = emitter:Add( "dak/smokey", Pos)  end
 
 			if (particle) then
-				particle:SetVelocity(-Ent:GetRight()*50*size*math.Rand(0.1,1) )
+				particle:SetVelocity((-Ent:GetRight()*50*size*math.Rand(0.1,1))+EntVel )
 				particle:SetLifeTime(0) 
 				particle:SetDieTime((size/50)+math.Rand(0,0.5))
 				particle:SetStartAlpha(25)
@@ -99,7 +109,7 @@ function EFFECT:Init( data )
 			if particle == nil then particle = emitter:Add( "dak/smokey", Pos)  end
 
 			if (particle) then
-				particle:SetVelocity(Vector(0,0,0))
+				particle:SetVelocity(Vector(0,0,0)+EntVel)
 				particle:SetLifeTime(0) 
 				particle:SetDieTime((size/50)+math.Rand(0,0.5))
 				particle:SetStartAlpha(25)
@@ -126,7 +136,7 @@ function EFFECT:Init( data )
 			if particle == nil then particle = emitter:Add( "effects/muzzleflash1.vtf", Pos + -Ent:GetRight()*math.random( 0, 0 ))  end
 			
 			if (particle) then
-				particle:SetVelocity(-Ent:GetRight()*math.Rand(250,3000+(size*600)) + Vector(math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20))))
+				particle:SetVelocity((-Ent:GetRight()*math.Rand(250,3000+(size*600)) + Vector(math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20)),math.random(-(50+size*20),50+(size*20))))+EntVel)
 				particle:SetLifeTime(0) 
 				particle:SetDieTime(0.1+math.Rand(0,0.15)) 
 				particle:SetStartAlpha(200)

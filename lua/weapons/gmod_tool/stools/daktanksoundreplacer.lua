@@ -57,7 +57,17 @@ function TOOL:RightClick( trace )
 		if Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun" or Target:GetClass() == "dak_temachinegun" then
 			if not(Target.DakFireSound == nil) or not(Target.DakFireSound == "") then
 				if (SERVER) or (game.SinglePlayer()) then
-					self:GetOwner():ChatPrint(Target.DakFireSound1..", "..Target.DakFireSound2..", "..Target.DakFireSound3)
+					local output = ""
+					if Target.DakFireSound1 ~= nil then
+						output = "Sound 1: "..Target.DakFireSound1
+						if Target.DakFireSound2 ~= nil then
+							output = "Sound 1: "..Target.DakFireSound1..",\nSound 2: "..Target.DakFireSound2
+							if Target.DakFireSound3 ~= nil then
+								output = "Sound 1: "..Target.DakFireSound1..",\nSound 2: "..Target.DakFireSound2..",\nSound 3: "..Target.DakFireSound3
+							end
+						end
+					end
+					self:GetOwner():ChatPrint(output)
 				end
 			end
 		end

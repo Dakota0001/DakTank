@@ -402,6 +402,9 @@ function ENT:Think()
 					self.DakFireSound1 = "daktanks/flamerfire.mp3"
 				end
 			end
+			if self:GetPhysicsObject():IsValid() then
+				if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
+			end
 			self.SlowThinkTime = CurTime()
 		end
 	end
@@ -692,6 +695,9 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/launcher100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/duallauncher100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/recoillessrifle100mm2.mdl" then ScalingGun = 1 end
 	if ScalingGun == 1 then
 		timer.Simple(10,function()
 			self:PhysicsDestroy()	

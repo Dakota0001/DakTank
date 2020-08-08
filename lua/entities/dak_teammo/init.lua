@@ -108,7 +108,7 @@ function ENT:Think()
 				end
 			else
 				-- steel density 0.132 kg/in3
-				--cannon
+				--cannon, launcher, and recoilless rifle
 				self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
 				self.ShellMass = self.ShellVolume*0.044
 				self.ShellSquareVolume = ((self.DakCaliber*0.0393701)^2)*(self.DakCaliber*0.0393701*13)

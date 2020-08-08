@@ -290,79 +290,6 @@ function TOOL:LeftClick( trace )
 			self.DakName = "Large Autoloader Magazine"
 			self.DakModel = "models/daktanks/alclip3.mdl"
 		end
-		--LAUNCHERS--
-		if Selection == "2G100" then
-			self.DakGunType = "2G100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 2xLauncher Ground Model"
-			self.DakModel = "models/daktanks/test/srm23.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
-		if Selection == "3G100" then
-			self.DakGunType = "3G100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 3xLauncher Ground Model"
-			self.DakModel = "models/daktanks/test/atm33.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
-		if Selection == "5G100" then
-			self.DakGunType = "5G100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 5xLauncher Ground Model"
-			self.DakModel = "models/daktanks/test/lrm53.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
-		if Selection == "6G100" then
-			self.DakGunType = "6G100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 6xLauncher Ground Model"
-			self.DakModel = "models/daktanks/test/atm63.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
-		if Selection == "10G100" then
-			self.DakGunType = "10G100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 10xLauncher Ground Model"
-			self.DakModel = "models/daktanks/test/mrm103.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
-		if Selection == "3A100" then
-			self.DakGunType = "3A100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 3xLauncher Air Model"
-			self.DakModel = "models/daktanks/test/atm32.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
-		if Selection == "5A100" then
-			self.DakGunType = "5A100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 5xLauncher Air Model"
-			self.DakModel = "models/daktanks/test/lrm52.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
-		if Selection == "6A100" then
-			self.DakGunType = "6A100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 6xLauncher Air Model"
-			self.DakModel = "models/daktanks/test/atm62.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
-		if Selection == "10A100" then
-			self.DakGunType = "10A100"
-			self.DakCaliber = 100
-			self.DakMaxHealth = self.DakCaliber
-			self.DakName = self.DakCaliber.."mm 10xLauncher Air Model"
-			self.DakModel = "models/daktanks/test/mrm102.mdl"
-			self.DakFireSound = "daktanks/extra/120mmMainGun02.mp3"
-		end
 		--GUNS--
 		if Selection == "Cannon" then
 			self.DakGunType = "Cannon"
@@ -779,6 +706,88 @@ function TOOL:LeftClick( trace )
 				self.DakFireSound = "daktanks/ac50.mp3"
 			end
 		end
+		if Selection == "ATGM Launcher" then
+			self.DakGunType = "ATGM Launcher"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,180)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakName = self.DakCaliber.."mm ATGM Launcher"
+			self.DakModel = "models/daktanks/launcher100mm2.mdl"
+			
+			self.DakFireSound = "daktanks/new/cannons/misc/tank_rocket_shot_1.mp3"
+		end
+		if Selection == "Dual ATGM Launcher" then
+			self.DakGunType = "Dual ATGM Launcher"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,180)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakName = self.DakCaliber.."mm Dual ATGM Launcher"
+			self.DakModel = "models/daktanks/duallauncher100mm2.mdl"
+			
+			self.DakFireSound = "daktanks/new/cannons/misc/tank_rocket_shot_1.mp3"
+		end
+		if Selection == "Autoloading ATGM Launcher" then
+			self.DakGunType = "Autoloading ATGM Launcher"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,180)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakName = self.DakCaliber.."mm Autoloading ATGM Launcher"
+			self.DakModel = "models/daktanks/launcher100mm2.mdl"
+			
+			self.DakFireSound = "daktanks/new/cannons/misc/tank_rocket_shot_1.mp3"
+		end
+		if Selection == "Autoloading Dual ATGM Launcher" then
+			self.DakGunType = "Autoloading Dual ATGM Launcher"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,180)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakName = self.DakCaliber.."mm Autoloading Dual ATGM Launcher"
+			self.DakModel = "models/daktanks/duallauncher100mm2.mdl"
+			
+			self.DakFireSound = "daktanks/new/cannons/misc/tank_rocket_shot_1.mp3"
+		end
+		if Selection == "Recoilless Rifle" then
+			self.DakGunType = "Recoilless Rifle"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),30,120)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakName = self.DakCaliber.."mm Recoilless Rifle"
+			self.DakModel = "models/daktanks/recoillessrifle100mm2.mdl"
+
+			if self.DakCaliber < 50 then
+				self.DakFireSound = "daktanks/new/cannons/37mm/cannon_37mm_kwk36_shot_01.mp3"
+			end
+			if self.DakCaliber >= 50 and self.DakCaliber < 70 then
+				self.DakFireSound = "daktanks/new/cannons/57mm/cannon_57mm_zis4_shot_01.mp3"
+			end
+			if self.DakCaliber >= 70 and self.DakCaliber < 90 then
+				self.DakFireSound = "daktanks/new/cannons/85mm/cannon_85mm_zis_c53_shot_01.mp3"
+			end
+			if self.DakCaliber >= 90 and self.DakCaliber < 110 then
+				self.DakFireSound = "daktanks/new/cannons/105mm/cannon_105mm_m4_shot_01.mp3"
+			end
+			if self.DakCaliber >= 110 and self.DakCaliber <= 120 then
+				self.DakFireSound = "daktanks/new/cannons/120mm/cannon_120mm_rh120_shot_01.mp3"
+			end
+		end
+		if Selection == "Autoloading Recoilless Rifle" then
+			self.DakGunType = "Autoloading Recoilless Rifle"
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),30,120)
+			self.DakMaxHealth = self.DakCaliber
+			self.DakName = self.DakCaliber.."mm Autoloading Recoilless Rifle"
+			self.DakModel = "models/daktanks/recoillessrifle100mm2.mdl"
+			
+			if self.DakCaliber < 50 then
+				self.DakFireSound = "daktanks/new/cannons/37mm/cannon_37mm_kwk36_shot_01.mp3"
+			end
+			if self.DakCaliber >= 50 and self.DakCaliber < 70 then
+				self.DakFireSound = "daktanks/new/cannons/57mm/cannon_57mm_zis4_shot_01.mp3"
+			end
+			if self.DakCaliber >= 70 and self.DakCaliber < 90 then
+				self.DakFireSound = "daktanks/new/cannons/85mm/cannon_85mm_zis_c53_shot_01.mp3"
+			end
+			if self.DakCaliber >= 90 and self.DakCaliber < 110 then
+				self.DakFireSound = "daktanks/new/cannons/105mm/cannon_105mm_m4_shot_01.mp3"
+			end
+			if self.DakCaliber >= 110 and self.DakCaliber <= 120 then
+				self.DakFireSound = "daktanks/new/cannons/120mm/cannon_120mm_rh120_shot_01.mp3"
+			end
+		end
 		--AMMO--
 		--Define variables--
 		local boxname = (string.Split( Selection, "" ))
@@ -897,6 +906,30 @@ function TOOL:LeftClick( trace )
 			if self:GetClientInfo("DTTE_AmmoType") == "HMG" then
 				self.GunType = "HMG"
 				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "ATGM Launcher" then
+				self.GunType = "L"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,180)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Dual ATGM Launcher" then
+				self.GunType = "L"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,180)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autoloading ATGM Launcher" then
+				self.GunType = "L"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,180)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autoloading Dual ATGM Launcher" then
+				self.GunType = "L"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),40,180)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Recoilless Rifle" then
+				self.GunType = "RR"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),30,120)
+			end
+			if self:GetClientInfo("DTTE_AmmoType") == "Autoloading Recoilless Rifle" then
+				self.GunType = "RR"
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),30,120)
 			end
 		    --huge if statement that checks to see if its an ammo crate of any type
 			self.DakIsExplosive = true
@@ -1289,6 +1322,9 @@ function TOOL:LeftClick( trace )
 		if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/launcher100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/duallauncher100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/recoillessrifle100mm2.mdl" then self.ScalingGun = 1 end
 
 		if not(trace.Entity:GetClass() == self:GetClientInfo("SpawnEnt")) and not(trace.Entity:GetClass() == "dak_tegearbox") and not(trace.Entity:GetClass() == "dak_tegearboxnew") and not(trace.Entity:GetClass() == "dak_gun") and not(trace.Entity:GetClass() == "dak_tegun") and not(trace.Entity:GetClass() == "dak_temachinegun") and not(trace.Entity:GetClass() == "dak_teautogun") and not(trace.Entity:GetClass() == "dak_laser") and not(trace.Entity:GetClass() == "dak_xpulselaser") and not(trace.Entity:GetClass() == "dak_launcher") and not(trace.Entity:GetClass() == "dak_lams") then
 			self.spawnedent:Spawn()
@@ -2014,8 +2050,23 @@ function TOOL.BuildCPanel( panel )
 	
 	--Table containing the description of the available weapons
 	local gunList = {}
-	gunList["Launcher"] = function()
-		DLabel:SetText( Caliber.."mm Launcher\n\nLaunches missile" )
+	gunList["ATGM Launcher"] = function()
+		DLabel:SetText( Caliber.."mm ATGM Launcher\n\nLightweight and simple ATGM launcher.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(0.0125*((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nReloads: \n\nATGM: "..math.Round( 0.75*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550)/25 ) , 1).. "\n\n" )
+	end
+	gunList["Dual ATGM Launcher"] = function()
+		DLabel:SetText( Caliber.."mm Dual ATGM Launcher\n\nTwo tube ATGM launcher, capable of reloading while still keeping a missile ready.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(0.02*((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nReloads: \n\nATGM: "..math.Round( 0.75*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550)/25 ) , 1).. "\n\n" )
+	end
+	gunList["Autoloading ATGM Launcher"] = function()
+		DLabel:SetText( Caliber.."mm Autoloading ATGM Launcher\n\nSimple autoloaded ATGM tube.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(0.0125*((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nRefire Time (Mag):         "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300,2).." seconds\nRefire Time (Carousel):  "..math.Round((0.225*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)+1.1,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
+	end
+	gunList["Autoloading Dual ATGM Launcher"] = function()
+		DLabel:SetText( Caliber.."mm Autoloading Dual Launcher\n\nDouble barrel autoloaded ATGM launcher.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(0.02*((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nRefire Time (Mag):         "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300,2).." seconds\nRefire Time (Carousel):  "..math.Round((0.225*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)+1.1,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
+	end
+	gunList["Recoilless Rifle"] = function()
+		DLabel:SetText( Caliber.."mm Recoilless Rifle\n\nVery light weight, low recoil gun, great on light vehicles but limited to explosive ammunition only.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(0.2*((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*25))-(math.pi*((Caliber/2)^2)*(Caliber*25)))*0.001*7.8125)/1000).." kg\nReloads: \n\nHE: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*5350) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*5350)/25 ) , 1).. "\nHEAT: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550)/25 ) , 1).. "\nHESH: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3450) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3450)/25 ) , 1).. "\nHEATFS: "..math.Round( 1.279318 + 0.2484886*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550) ,2).." seconds, Loaders: "..math.Max(math.Round( (math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5)*3550)/25 ) , 1).."\n\n" )
+	end
+	gunList["Autoloading Recoilless Rifle"] = function()
+		DLabel:SetText( Caliber.."mm Autoloading Recoilless Rifle\n\nAutoloaded, light weight, low recoil gun, great on light vehicles but limited to explosive ammunition only.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..math.Round(0.2*((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*25))-(math.pi*((Caliber/2)^2)*(Caliber*25)))*0.001*7.8125)/1000).." kg\nRefire Time (Mag):         "..math.Round(0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300,2).." seconds\nRefire Time (Carousel):  "..math.Round((0.225*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)+1.1,2).." seconds\n\nSmall Mag Stats:\nMag Size:      "..math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*24068.224609375/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nMedium Mag Stats:\nMag Size:      "..math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*81230.265625/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\nLarge Mag Stats:\nMag Size:      "..math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))).." rounds\nReload Time: "..math.Round((0.15*(math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*4300)*math.floor(0.27*192545.796875/(((Caliber*0.0393701)^2)*(Caliber*0.0393701*13*ShellLength))),2).." seconds\n\n" )
 	end
 	gunList["Autocannon"] = function()
 		DLabel:SetText( Caliber.."mm Autocannon\n\nFully automatic cannon limited to lower calibers for ease of loading. Cold war and modern versions are belt fed directly from ammo boxes while WWII versions reload based off a set magazine size. A loader can help speed up the reloading time. Ammo for this gun must be in the turret if it is in the turret or hull if it is hull mounted.\n\nWeapon Stats:\nArmor:          "..(Caliber*5).."mm\nWeight:        "..3.1*math.Round(((((Caliber*6.5)*(Caliber*3)*(Caliber*3))+(math.pi*(Caliber^2)*(Caliber*50))-(math.pi*((Caliber/2)^2)*(Caliber*50)))*0.001*7.8125)/1000).." kg\nRate of Fire: "..math.Round(60/(0.2*math.sqrt((math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*7700)),2).." rpm, "..math.Round(60/(0.14*math.sqrt((math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*7700)),2).." modern\nReload Time: "..math.Round(math.sqrt((math.pi*((Caliber*0.001*0.5)^2)*(Caliber*0.001*6.5))*7700)*0.5*math.Round(600/Caliber),2).." seconds\nMag Size:      "..math.Round(600/Caliber).." rounds, size of crate modern and cold war\n\n" )
@@ -2082,12 +2133,47 @@ function TOOL.BuildCPanel( panel )
 
 	--Table containing information and settings for weapons, this is called by the Gun Type combobox
 	local gunData = {}
-	gunData["Launcher"] = function()
+	gunData["ATGM Launcher"] = function()
 		EntType   = "dak_tegun"
 		ShellLength = 50/50
 		ShellLengthExact = 6.5
 		AmmoTypes = { "Anti Tank Guided Missile" }
-		DermaNumSlider:SetMinMax( 100, 100 )
+		DermaNumSlider:SetMinMax( 40, 180 )
+	end
+	gunData["Dual ATGM Launcher"] = function()
+		EntType   = "dak_tegun"
+		ShellLength = 50/50
+		ShellLengthExact = 6.5
+		AmmoTypes = { "Anti Tank Guided Missile" }
+		DermaNumSlider:SetMinMax( 40, 180 )
+	end
+	gunData["Autoloading ATGM Launcher"] = function()
+		EntType   = "dak_teautogun"
+		ShellLength = 50/50
+		ShellLengthExact = 6.5
+		AmmoTypes = { "Anti Tank Guided Missile" }
+		DermaNumSlider:SetMinMax( 40, 180 )
+	end
+	gunData["Autoloading Dual ATGM Launcher"] = function()
+		EntType   = "dak_teautogun"
+		ShellLength = 50/50
+		ShellLengthExact = 6.5
+		AmmoTypes = { "Anti Tank Guided Missile" }
+		DermaNumSlider:SetMinMax( 40, 180 )
+	end
+	gunData["Recoilless Rifle"] = function()
+		EntType   = "dak_tegun"
+		ShellLength = 25/50
+		ShellLengthExact = 6.5
+		AmmoTypes = { "High Explosive","High Explosive Anti Tank","High Explosive Anti Tank Fin Stabilized","High Explosive Squash Head","Smoke" }
+		DermaNumSlider:SetMinMax( 30, 120 )
+	end
+	gunData["Autoloading Recoilless Rifle"] = function()
+		EntType   = "dak_teautogun"
+		ShellLength = 50/50
+		ShellLengthExact = 6.5
+		AmmoTypes = { "High Explosive","High Explosive Anti Tank","High Explosive Anti Tank Fin Stabilized","High Explosive Squash Head","Smoke" }
+		DermaNumSlider:SetMinMax( 30, 120 )
 	end
 	gunData["Autocannon"] = function()
 		EntType   = "dak_teautogun"
@@ -2436,63 +2522,6 @@ function TOOL.BuildCPanel( panel )
 		end
 	end
 	------------- Weaponry -------------
-	--launchers--
-	selection["Ground 100mm x2"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "2G100" )
-		DLabel:SetText( "2xLauncher Ground Model" )
-		DLabel:SetVisible( true )
-	end
-	selection["Ground 100mm x3"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "3G100" )
-		DLabel:SetText( "3xLauncher Ground Model" )
-		DLabel:SetVisible( true )
-	end
-	selection["Ground 100mm x5"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "5G100" )
-		DLabel:SetText( "5xLauncher Ground Model" )
-		DLabel:SetVisible( true )
-	end
-	selection["Ground 100mm x6"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "6G100" )
-		DLabel:SetText( "6xLauncher Ground Model" )
-		DLabel:SetVisible( true )
-	end
-	selection["Ground 100mm x10"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "10G100" )
-		DLabel:SetText( "10xLauncher Ground Model" )
-		DLabel:SetVisible( true )
-	end
-	selection["Air 100mm x3"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "3A100" )
-		DLabel:SetText( "3xLauncher Air Model" )
-		DLabel:SetVisible( true )
-	end
-	selection["Air 100mm x5"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "5A100" )
-		DLabel:SetText( "5xLauncher Air Model" )
-		DLabel:SetVisible( true )
-	end
-	selection["Air 100mm x6"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "6A100" )
-		DLabel:SetText( "6xLauncher Air Model" )
-		DLabel:SetVisible( true )
-	end
-	selection["Air 100mm x10"] = function()
-		RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teautogun" )
-		RunConsoleCommand( "daktankspawner_SpawnSettings", "10A100" )
-		DLabel:SetText( "10xLauncher Air Model" )
-		DLabel:SetVisible( true )
-	end
-
-
 	selection["Weaponry"] = function()
 		DLabel:SetText( "Weaponry\n\nEquipment used to make things deader." )
 		DLabel:SetVisible(true)
@@ -2687,7 +2716,12 @@ function TOOL.BuildCPanel( panel )
 	AmmoBoxSelect:AddChoice( "Autoloading Mortar" )
 	AmmoBoxSelect:AddChoice( "Short Cannon" )
 	AmmoBoxSelect:AddChoice( "Cannon" )
-	AmmoBoxSelect:AddChoice( "Launcher" )
+	AmmoBoxSelect:AddChoice( "ATGM Launcher" )
+	AmmoBoxSelect:AddChoice( "Dual ATGM Launcher" )
+	AmmoBoxSelect:AddChoice( "Autoloading ATGM Launcher" )
+	AmmoBoxSelect:AddChoice( "Autoloading Dual ATGM Launcher" )
+	AmmoBoxSelect:AddChoice( "Recoilless Rifle" )
+	AmmoBoxSelect:AddChoice( "Autoloading Recoilless Rifle" )
 	AmmoBoxSelect:AddChoice( "Long Cannon" )
 	AmmoBoxSelect:AddChoice( "Flamethrower" )
 	AmmoBoxSelect:AddChoice( "Heavy Machine Gun" )
@@ -2890,16 +2924,6 @@ function TOOL.BuildCPanel( panel )
 		DTTE_NodeList["Auto Tread Gearbox"] = DTTE_NodeList["Mobility"]:AddNode( "Auto Tread Gearboxes", "icon16/cog.png" )
 
 	DTTE_NodeList["Weapons"] 	 	= ctrl:AddNode( "Weaponry", "icon16/folder_wrench.png" )
-		DTTE_NodeList["Launcher"]	= ctrl:AddNode( "Missile Launchers", "icon16/folder_wrench.png" )
-			DTTE_NodeList["2G100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Ground 100mm x2", "icon16/cog.png" )
-			DTTE_NodeList["3G100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Ground 100mm x3", "icon16/cog.png" )
-			DTTE_NodeList["5G100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Ground 100mm x5", "icon16/cog.png" )
-			DTTE_NodeList["6G100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Ground 100mm x6", "icon16/cog.png" )
-			DTTE_NodeList["10G100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Ground 100mm x10", "icon16/cog.png" )
-			DTTE_NodeList["3A100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Air 100mm x3", "icon16/cog.png" )
-			DTTE_NodeList["5A100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Air 100mm x5", "icon16/cog.png" )
-			DTTE_NodeList["6A100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Air 100mm x6", "icon16/cog.png" )
-			DTTE_NodeList["10A100"] 	= DTTE_NodeList["Launcher"]:AddNode( "Air 100mm x10", "icon16/cog.png" )
 		DTTE_NodeList["Weapon"] 	= DTTE_NodeList["Weapons"]:AddNode( "Weapons", "icon16/cog.png" )
 		DTTE_NodeList["ALMagazine"] = DTTE_NodeList["Weapons"]:AddNode( "Autoloader Magazines", "icon16/cog.png" )
 		DTTE_NodeList["Ammo"] 		= DTTE_NodeList["Weapons"]:AddNode( "Ammunition", "icon16/cog.png" )
