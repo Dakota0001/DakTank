@@ -744,7 +744,7 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "Recoilless Rifle" then
 			self.DakGunType = "Recoilless Rifle"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),30,120)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,150)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Recoilless Rifle"
 			self.DakModel = "models/daktanks/recoillessrifle100mm2.mdl"
@@ -767,7 +767,7 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "Autoloading Recoilless Rifle" then
 			self.DakGunType = "Autoloading Recoilless Rifle"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),30,120)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,150)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Autoloading Recoilless Rifle"
 			self.DakModel = "models/daktanks/recoillessrifle100mm2.mdl"
@@ -925,11 +925,11 @@ function TOOL:LeftClick( trace )
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Recoilless Rifle" then
 				self.GunType = "RR"
-				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),30,120)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,150)
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autoloading Recoilless Rifle" then
 				self.GunType = "RR"
-				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),30,120)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,150)
 			end
 		    --huge if statement that checks to see if its an ammo crate of any type
 			self.DakIsExplosive = true
@@ -2166,14 +2166,14 @@ function TOOL.BuildCPanel( panel )
 		ShellLength = 25/50
 		ShellLengthExact = 6.5
 		AmmoTypes = { "High Explosive","High Explosive Anti Tank","High Explosive Anti Tank Fin Stabilized","High Explosive Squash Head","Smoke" }
-		DermaNumSlider:SetMinMax( 30, 120 )
+		DermaNumSlider:SetMinMax( 20, 150 )
 	end
 	gunData["Autoloading Recoilless Rifle"] = function()
 		EntType   = "dak_teautogun"
 		ShellLength = 50/50
 		ShellLengthExact = 6.5
 		AmmoTypes = { "High Explosive","High Explosive Anti Tank","High Explosive Anti Tank Fin Stabilized","High Explosive Squash Head","Smoke" }
-		DermaNumSlider:SetMinMax( 30, 120 )
+		DermaNumSlider:SetMinMax( 20, 150 )
 	end
 	gunData["Autocannon"] = function()
 		EntType   = "dak_teautogun"

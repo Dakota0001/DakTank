@@ -499,15 +499,24 @@ function ENT:Think()
 							--print(1/((self.Guns[g].DakCooldown)+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime)))
 							--print(ShotsPerSecond)
 							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+							if self.Guns[g].ReadyRounds == 2 then 
+								DPS = DPS*2 
+							end
 						end
 						if self.Guns[g]:GetClass() == "dak_tegun" then
 							ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
 							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+							if self.Guns[g].ReadyRounds == 2 then 
+								DPS = DPS*2 
+							end
 						end
 						if self.Guns[g]:GetClass() == "dak_temachinegun" then
 							self.Guns[g].ShellLengthExact = 6.5
 							ShotsPerSecond = 1/(self.Guns[g].DakCooldown*(1/self.Guns[g].FireRateMod))
 							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+							if self.Guns[g].ReadyRounds == 2 then 
+								DPS = DPS*2 
+							end
 						end
 						TotalDPS = TotalDPS + DPS
 					end
