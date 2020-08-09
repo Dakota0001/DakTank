@@ -917,7 +917,7 @@ function ENT:Think()
 					}
 					CurTrace = traceline( trace )
 					CurTraceHitPos = CurTrace.HitPos
-					CurTraceDist = (CurTrace.StartPos-(CurTraceHitPos)):Length()
+					CurTraceDist = math.max((CurTrace.StartPos-(CurTraceHitPos)):Length(),80)
 					lastchange = (CurTraceDist-self.RightChanges[i])/TickInt
 					self.RightChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.RightPosChanges[i]
@@ -970,7 +970,7 @@ function ENT:Think()
 					}
 					CurTrace = traceline( trace )
 					CurTraceHitPos = CurTrace.HitPos
-					CurTraceDist = (CurTrace.StartPos-(CurTraceHitPos)):Length()
+					CurTraceDist = math.max((CurTrace.StartPos-(CurTraceHitPos)):Length(),80)
 					lastchange = (CurTraceDist-self.LeftChanges[i])/TickInt
 					self.LeftChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.LeftPosChanges[i]
