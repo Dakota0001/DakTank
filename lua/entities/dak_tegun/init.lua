@@ -1331,7 +1331,6 @@ function ENT:Think()
 					self.DakShellPenSounds = {"daktanks/dakhevpen1.mp3","daktanks/dakhevpen2.mp3","daktanks/dakhevpen3.mp3","daktanks/dakhevpen4.mp3","daktanks/dakhevpen5.mp3"}
 					self.ReloadSound = "daktanks/dakreloadheavy.mp3"
 				end
-				print(self.DakFireSound1)
 				if self.DakFireSound1 == nil then
 					if self.DakCaliber < 50 then
 						self.DakFireSound1 = "daktanks/new/cannons/37mm/cannon_37mm_kwk36_shot_01.mp3"
