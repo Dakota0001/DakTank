@@ -12,8 +12,8 @@ function ENT:SetupDataTables()
 	if self:GetGearRatio()==0 then self:SetGearRatio( 100 ) end
 	self:NetworkVar( "Float", 	4, "RideLimit", 	{ KeyName = "ridelimit", 	Edit = {category = "Mobility",title = "Suspension Give", type = "Float", order = 2, min = 50, max = 1000 } } )
 	if self:GetRideLimit()==0 then self:SetRideLimit( 250 ) end
-	self:NetworkVar( "Float", 	14, "SuspensionBias", 	{ KeyName = "suspensionbias", 	Edit = {category = "Mobility",title = "Suspension Bias", type = "Float", order = 3, min = -1, max = 1 } } )
-	if self:GetSuspensionBias()==0 then self:SetRideLimit( 0 ) end
+	self:NetworkVar( "Float", 	14, "SuspensionBias", 	{ KeyName = "suspensionbias", 	Edit = {category = "Mobility",title = "Suspension Bias", type = "Float", order = 3, min = -0.99, max = 0.99 } } )
+	if self:GetSuspensionBias()==0 then self:SetSuspensionBias( 0 ) end
 	--self:NetworkVar( "Float", 	14, "ForwardBias", 	{ KeyName = "forwardbias", 	Edit = {category = "Mobility",title = "Suspension Forward Bias", type = "Float", order = 6, min = -1, max = 1 } } )
 	--if self:GetForwardBias()==0 then self:SetForwardBias( 0 ) end
 	--Dimensions

@@ -900,9 +900,13 @@ function ENT:Think()
 					if self.DakHealth < 0 then self.DakHealth = 0 end
 				end
 
+				
+				local basesize = {self.base:OBBMaxs().x,self.base:OBBMaxs().y,self.base:OBBMaxs().z}
+				table.sort( basesize, function(a, b) return a>b end )
+
 				--Right side
 				for i=1, WheelsPerSide do
-					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*self.SideDist)
+					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*basesize[2]*0.95)
 					if i==WheelsPerSide then 
 						CurRideHeight = RideHeight - FrontWheelRaise
 					elseif i==1 then
@@ -942,7 +946,7 @@ function ENT:Think()
 					end
 
 					local limitmult = 1 + multval
-					SuspensionForce = ((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce
+					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce)
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
@@ -954,7 +958,7 @@ function ENT:Think()
 
 				--Left side
 				for i=1, WheelsPerSide do
-					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*self.SideDist)
+					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*basesize[2]*0.95)
 					if i==WheelsPerSide then 
 						CurRideHeight = RideHeight - FrontWheelRaise
 					elseif i==1 then
@@ -996,7 +1000,7 @@ function ENT:Think()
 					end
 
 					local limitmult = 1 + multval
-					SuspensionForce = ((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce
+					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce)
 
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
