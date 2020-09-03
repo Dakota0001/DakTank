@@ -145,10 +145,15 @@ if SERVER then
 							local difference = ShellList[i].DakVelocity:GetNormalized() - (indicator.HitPos-ShellList[i].SimPos):GetNormalized()
 							
 							local _, LocalAng = WorldToLocal( indicator.HitPos, (indicator.HitPos-ShellList[i].SimPos):GetNormalized():Angle(), ShellList[i].SimPos, ShellList[i].DakVelocity:GetNormalized():Angle() )
-							local pitch = math.Clamp(LocalAng.pitch,-10,10)
-							local yaw = math.Clamp(LocalAng.yaw,-10,10)
-							if math.abs(LocalAng.yaw)>90 then yaw = -math.Clamp(LocalAng.yaw,-10,10) end
-							local roll = 0--math.Clamp(LocalAng.roll,-10,10)
+							local pitch = 0
+							local yaw = 0
+							local roll = 0
+							if ShellList[i].LifeTime>0.2 then
+								pitch = math.Clamp(LocalAng.pitch,-10,10)
+								yaw = math.Clamp(LocalAng.yaw,-10,10)
+								if math.abs(LocalAng.yaw)>90 then yaw = -math.Clamp(LocalAng.yaw,-10,10) end
+								roll = 0--math.Clamp(LocalAng.roll,-10,10)
+							end
 
 
 							ShellList[i].DakVelocity = (ShellList[i].DakVelocity:GetNormalized():Angle() + Angle(pitch,yaw,roll)):Forward() * math.Clamp((12600/2*ShellList[i].LifeTime) - (7875/20*ShellList[i].LifeTime), 4725, 12600)
@@ -196,7 +201,11 @@ if SERVER then
 									end
 								end
 								if ShellList[i].RemoveNow ~= 1 then
-									trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+DakTankBulletThinkDelay)) - (-physenv.GetGravity()*((ShellList[i].LifeTime+DakTankBulletThinkDelay)^2)/2)
+									if ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
+										trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+(ShellList[i].FuzeDelay-ShellList[i].LifeTime))) - (-physenv.GetGravity()*((ShellList[i].LifeTime+(ShellList[i].FuzeDelay-ShellList[i].LifeTime))^2)/2)
+									else
+										trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+DakTankBulletThinkDelay)) - (-physenv.GetGravity()*((ShellList[i].LifeTime+DakTankBulletThinkDelay)^2)/2)
+									end
 								end
 							end
 						end
@@ -217,11 +226,19 @@ if SERVER then
 								end
 							end
 
+
 							if ShellTrace.Hit then
 								if ShellList[i].IsGuided then
 									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 								else
 									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+								end
+							else
+								if ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
+									if ShellList[i].DakShellType == "HE" or ShellList[i].DakShellType == "SM" then
+										ShellList[i].ExplodeNow = true
+										DTShellAirBurst(trace.endpos,ShellList[i],trace.endpos-trace.start)
+									end
 								end
 							end
 						end

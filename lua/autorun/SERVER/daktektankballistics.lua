@@ -471,6 +471,127 @@ function CheckClip(Ent, HitPos)
 	return HitClip
 end
 
+function DTShellAirBurst(HitPos,Shell,Normal)
+	if Shell.ExplodeNow==true then
+		Shell.ExplodeNow=false
+		if Shell.DakExplosive then
+			local effectdata3 = EffectData()
+			effectdata3:SetOrigin(HitPos)
+			effectdata3:SetEntity(Shell.DakGun)
+			effectdata3:SetAttachment(1)
+			effectdata3:SetMagnitude(.5)
+			effectdata3:SetScale(Shell.DakBlastRadius)
+			effectdata3:SetNormal( Normal )
+			if Shell.DakShellType == "SM" then
+				util.Effect("daktescalingsmoke", effectdata3, true, true)
+			else
+				util.Effect("daktescalingexplosion", effectdata3, true, true)
+			end
+
+			Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
+			if Shell.DakCaliber>=75 then
+				Shell.DakGun:SetNWBool("Exploding",true)
+				timer.Create( "ExplodeTimer"..Shell.DakGun:EntIndex(), 0.1, 1, function()
+					Shell.DakGun:SetNWBool("Exploding",false)
+				end)
+			else
+				local ExpSounds = {}
+				if Shell.DakCaliber < 20 then
+					ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
+				else
+					ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
+				end
+				sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 100, 1 )	
+			end
+			if Shell.Exploded ~= true or Shell.Exploded == nil then
+				if Shell.DakShellType == "HESH" then
+					DTShockwave(HitPos,Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell,nil,true)
+				else
+					DTShockwave(HitPos,Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell,nil,true)
+					--DTExplosion(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+				end
+			end
+			Shell.Exploded = true
+		else
+			local effectdata = EffectData()
+			if Shell.DakIsFlame == 1 then
+				effectdata:SetOrigin(HitPos)
+				effectdata:SetEntity(Shell.DakGun)
+				effectdata:SetAttachment(1)
+				effectdata:SetMagnitude(.5)
+				effectdata:SetScale(1)
+				util.Effect("dakteflameimpact", effectdata, true, true)
+				local Targets = ents.FindInSphere( HitPos, 150 )
+				if table.Count(Targets) > 0 then
+					if table.Count(Targets) > 0 then
+						for i = 1, #Targets do
+							if Targets[i]:GetClass() == "dak_temotor" then
+								if not(Targets[i]:IsOnFire()) then 
+									Targets[i]:Ignite(5,1)
+								end
+							end
+							if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
+								if not(Targets[i]:IsOnFire()) then 
+									Targets[i]:Ignite(5,1)
+								end
+								Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
+							end
+							if Targets[i]:IsPlayer() then
+								if not Targets[i]:InVehicle() then
+									if not(Targets[i]:IsOnFire()) then 
+										Targets[i]:Ignite(5,1)
+									end
+								end
+							end
+							if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
+								if not(Targets[i]:IsOnFire()) then 
+									Targets[i]:Ignite(5,1)
+								end
+							end
+						end
+					end
+				end
+				sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+			else
+				effectdata:SetOrigin(HitPos)
+				effectdata:SetEntity(Shell.DakGun)
+				effectdata:SetAttachment(1)
+				effectdata:SetMagnitude(.5)
+				if Shell.DakDamage == 0 then
+					effectdata:SetScale(0.5)
+				else
+					effectdata:SetScale(Shell.DakCaliber*0.25)
+				end
+				if Shell.IsFrag then
+				else
+					util.Effect("dakteshellimpact", effectdata, true, true)
+				end
+				util.Decal( "Impact.Concrete", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*5), Shell.DakGun)
+				local ExpSounds = {}
+				if Shell.DakCaliber < 20 then
+					ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
+				else
+					ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
+				end
+
+				if Shell.DakIsPellet then
+					sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 150, 0.25 )	
+				else
+					sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 100, 1 )	
+				end
+			end
+		end
+		Shell.RemoveNow = 1
+		if Shell.DakExplosive then
+			Shell.ExplodeNow = true
+		end
+		Shell.LifeTime = 0
+		Shell.DakVelocity = Vector(0,0,0)
+		Shell.DakDamage = 0
+	else
+	end	
+end
+
 function DTShellHit(Start,End,HitEnt,Shell,Normal)
 	if Shell.Hits~=nil and Shell.Hits>50 then 
 		Shell.RemoveNow = 1
@@ -2679,15 +2800,18 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 end
 
 util.AddNetworkString( "daktankexplosion" )
-function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt)
-	local newtrace = {}
-		newtrace.start = Pos - (Shell.DakVelocity:GetNormalized()*1000)
-		newtrace.endpos = Pos + (Shell.DakVelocity:GetNormalized()*1000)
-		newtrace.filter = Shell.Filter
-		newtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
-		newtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
-	local HitCheckShellTrace = util.TraceHull( newtrace )
-	Pos = HitCheckShellTrace.HitPos
+function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
+	if nocheck == true then
+	else
+		local newtrace = {}
+			newtrace.start = Pos - (Shell.DakVelocity:GetNormalized()*1000)
+			newtrace.endpos = Pos + (Shell.DakVelocity:GetNormalized()*1000)
+			newtrace.filter = Shell.Filter
+			newtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+			newtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+		local HitCheckShellTrace = util.TraceHull( newtrace )
+		Pos = HitCheckShellTrace.HitPos
+	end
 	--if Shell.DakCaliber >= 75 then
 		net.Start( "daktankexplosion" )
 		net.WriteVector( Pos )

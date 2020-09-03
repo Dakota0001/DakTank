@@ -691,7 +691,7 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "Autocannon" then
 			self.DakGunType = "Autocannon"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,90)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Autocannon"
 			self.DakModel = "models/daktanks/autocannon100mm2.mdl"
@@ -897,7 +897,7 @@ function TOOL:LeftClick( trace )
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "Autocannon" then
 				self.GunType = "AC"
-				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,90)
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "MG" then
 				self.GunType = "MG"
@@ -2180,7 +2180,7 @@ function TOOL.BuildCPanel( panel )
 		ShellLength = 50/50
 		ShellLengthExact = 6.5
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "Armor Piercing Fin Stabilized Discarding Sabot" }
-		DermaNumSlider:SetMinMax( 20, 60 )
+		DermaNumSlider:SetMinMax( 20, 90 )
 	end
 	gunData["Autoloader"] = function()
 		EntType   = "dak_teautogun"

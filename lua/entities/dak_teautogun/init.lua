@@ -53,7 +53,7 @@ function ENT:Initialize()
 	self.timer = CurTime()
 	self.timer2 = CurTime()
 	
-	self.Inputs = Wire_CreateInputs(self, { "Fire", "SwapAmmo","Reload", "Indicator [ENTITY]" })
+	self.Inputs = Wire_CreateInputs(self, { "Fire", "SwapAmmo","Reload", "Indicator [ENTITY]", "FuzeDelay" })
 	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "MaxCooldown", "ReloadTime", "Ammo", "MagazineRounds", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
  	self.Soundtime = CurTime()
@@ -102,6 +102,7 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
+	self.FuzeDelay = self.Inputs.FuzeDelay.Value
 	if self.ScaleSet == true then 
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
@@ -2346,7 +2347,7 @@ function ENT:DakTEAutoFire()
 				if self.DakName == "Flamethrower" then
 					Shell.DakIsFlame = 1
 				end
-
+				Shell.FuzeDelay = self.FuzeDelay
 				if self.DakAmmoType == self.DakATGM then
 					Shell.IsGuided = true
 					Shell.DakTrail = "daktemissiletracer"

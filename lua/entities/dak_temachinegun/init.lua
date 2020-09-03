@@ -44,7 +44,7 @@ function ENT:Initialize()
 	--local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
 	
-	self.Inputs = Wire_CreateInputs(self, { "Fire" })
+	self.Inputs = Wire_CreateInputs(self, { "Fire", "FuzeDelay" })
 	self.Outputs = WireLib.CreateOutputs( self, { "Cooldown" , "CooldownPercent", "MaxCooldown", "Ammo", "AmmoType [STRING]", "MuzzleVel", "ShellMass", "Penetration" } )
  	self.Held = false
  	self.Soundtime = CurTime()
@@ -81,6 +81,7 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
+	self.FuzeDelay = self.Inputs.FuzeDelay.Value
 	if self.ScaleSet == true then 
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
@@ -543,6 +544,7 @@ function ENT:DakTEFire()
 				if self.DakName == "Flamethrower" then
 					Shell.DakIsFlame = 1
 				end
+				Shell.FuzeDelay = self.FuzeDelay
 				DakTankShellList[#DakTankShellList+1] = Shell
 
 				local FiringSound = {self.DakFireSound1,self.DakFireSound2,self.DakFireSound3}
