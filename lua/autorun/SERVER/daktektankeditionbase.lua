@@ -201,7 +201,7 @@ if SERVER then
 									end
 								end
 								if ShellList[i].RemoveNow ~= 1 then
-									if ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
+									if ShellList[i].FuzeDelay~=nil and ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
 										trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+(ShellList[i].FuzeDelay-ShellList[i].LifeTime))) - (-physenv.GetGravity()*((ShellList[i].LifeTime+(ShellList[i].FuzeDelay-ShellList[i].LifeTime))^2)/2)
 									else
 										trace.endpos = ShellList[i].Pos + (ShellList[i].DakVelocity * (ShellList[i].LifeTime+DakTankBulletThinkDelay)) - (-physenv.GetGravity()*((ShellList[i].LifeTime+DakTankBulletThinkDelay)^2)/2)
@@ -234,7 +234,7 @@ if SERVER then
 									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 								end
 							else
-								if ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
+								if ShellList[i].FuzeDelay~=nil and ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
 									if ShellList[i].DakShellType == "HE" or ShellList[i].DakShellType == "SM" then
 										ShellList[i].ExplodeNow = true
 										DTShellAirBurst(trace.endpos,ShellList[i],trace.endpos-trace.start)
