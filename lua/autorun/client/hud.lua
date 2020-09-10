@@ -46,12 +46,12 @@ surface.CreateFont( "DakTankHudFont2", {
 	outline = true,
 })
 
-hook.Add( "AddToolMenuCategories", "CustomCategory", function()
-	spawnmenu.AddToolCategory( "Utilities", "DakTank", "#Daktank" )
+hook.Add( "AddToolMenuCategories", "DakTankInfoScannerAddToolMenuCategories", function()
+	spawnmenu.AddToolCategory( "Utilities", "DakTank", "#DakTank" )
 end )
 
-hook.Add( "PopulateToolMenu", "CustomMenuSettings", function()
-	spawnmenu.AddToolMenuOption( "Utilities", "DakTank", "Custom_Menu", "#DakTank Info Scanner", "", "", function( panel )
+hook.Add( "PopulateToolMenu", "DakTankInfoScannerPopulateToolMenu", function()
+	spawnmenu.AddToolMenuOption( "Utilities", "DakTank", "DakTankInfoScannerMenu", "#DakTank Info Scanner", "", "", function( panel )
 		panel:ClearControls()
 		panel:CheckBox( "Enable DakTank Info Scanner", "EnableDakTankInfoScanner" )
 		-- Add stuff here
