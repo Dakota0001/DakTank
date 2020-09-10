@@ -117,7 +117,7 @@ function ENT:Think()
 					local ReplacementFound = false
 					local CrewNum = 1
 					while ReplacementFound == false and CrewNum <= #self.Controller.Crew do
-						if self.Controller.Crew[CrewNum]:IsValid() and (self.Controller.Crew[CrewNum].Job == nil or (self.Controller.Crew[CrewNum].Job ~= nil and self.Controller.Crew[CrewNum].Job > self.Job)) and self.Controller.Crew[CrewNum].DakDead ~= true and (self.Controller.Crew[CrewNum].DakHealth ~= nil and self.Controller.Crew[CrewNum].DakHealth > 0) then
+						if self.Controller.Crew[CrewNum]:IsValid() and not(self.Controller.Crew[CrewNum].Job == 2) and (self.Controller.Crew[CrewNum].Job == nil or (self.Controller.Crew[CrewNum].Job ~= nil and (self.Controller.Crew[CrewNum].Job > self.Job or self.Job == 2) )) and self.Controller.Crew[CrewNum].DakDead ~= true and (self.Controller.Crew[CrewNum].DakHealth ~= nil and self.Controller.Crew[CrewNum].DakHealth > 0) then
 							if self.Job == 1 then -- gunner
 								if self.Controller.Crew[CrewNum].Job == 2 then
 									self.Controller.Crew[CrewNum].DakDead = true

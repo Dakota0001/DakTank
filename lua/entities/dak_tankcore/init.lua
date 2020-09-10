@@ -568,7 +568,7 @@ function ENT:Think()
 								else
 									TurretCost = TurretCost * 0.75
 								end
-								if self.TurretControls[i]:GetYawMin()<=45 and self.TurretControls[i]:GetYawMax()<=45 then
+								if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
 									TurretCost = TurretCost * 0.5
 								end
 								--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
@@ -1142,7 +1142,7 @@ function ENT:Think()
 					--####################OPTIMIZE ZONE END###################--
 					--print("Total: "..(SysTime()-debugtime))
 							if self.DakHealth then
-								if (self.DakHealth <= 0 or #self.Crew <= 0 or self.LivingCrew <= 0 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
+								if (self.DakHealth <= 0 or #self.Crew < 2 or self.LivingCrew < 2 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
 									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
 
 									self.RemoveTurretList = {}

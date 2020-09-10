@@ -904,6 +904,33 @@ function ENT:Think()
 				local basesize = {self.base:OBBMaxs().x,self.base:OBBMaxs().y,self.base:OBBMaxs().z}
 				table.sort( basesize, function(a, b) return a>b end )
 
+
+
+				fronttrace = {
+					start = selfpos + Vector(0,0,100)+Angle(0,self:GetAngles().yaw,0):Forward()*(TrackLength*0.5),
+					endpos = selfpos + Vector(0,0,-1000)+Angle(0,self:GetAngles().yaw,0):Forward()*(TrackLength*0.5),
+					mask = MASK_SOLID_BRUSHONLY
+				}
+				FrontTrace = traceline( fronttrace )
+				backtrace = {
+					start = selfpos + Vector(0,0,100)+Angle(0,self:GetAngles().yaw,0):Forward()*-(TrackLength*0.5),
+					endpos = selfpos + Vector(0,0,-1000)+Angle(0,self:GetAngles().yaw,0):Forward()*-(TrackLength*0.5),
+					mask = MASK_SOLID_BRUSHONLY
+				}
+				BackTrace = traceline( backtrace )
+
+				local FrontHit = FrontTrace.HitPos
+				local BackHit = BackTrace.HitPos
+				local HeightDiff = FrontHit.z-BackHit.z
+				local ResistAng = math.atan(HeightDiff/TrackLength)*57.2958
+				if self.MoveReverse>0 then ResistAng = ResistAng*-1 end
+				local TerrainMultiplier = math.Clamp(((90-ResistAng)/90),0,1.5)
+
+				local TerrainBraking = 0
+				if TerrainMultiplier < 1 then
+					TerrainBraking = (1-TerrainMultiplier)*0.5
+				end
+
 				--Right side
 				for i=1, WheelsPerSide do
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*basesize[2]*0.95)
@@ -925,7 +952,7 @@ function ENT:Think()
 					lastchange = (CurTraceDist-self.RightChanges[i])/TickInt
 					self.RightChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.RightPosChanges[i]
-					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.RightBrake,0.0),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
+					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.RightBrake,TerrainBraking),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
 					self.RightPosChanges[i] = CurTraceHitPos
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
@@ -953,7 +980,7 @@ function ENT:Think()
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.RightRidePosChanges[i] = RidePos
 					--print(FrictionForceFinal) ----------FIX ISSUE WHERE THIS SPERGS OUT AND GETS BIG FOR NO RAISIN
-					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*self.RightForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
+					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*(TerrainMultiplier*self.RightForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
 
 				--Left side
@@ -978,7 +1005,7 @@ function ENT:Think()
 					lastchange = (CurTraceDist-self.LeftChanges[i])/TickInt
 					self.LeftChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.LeftPosChanges[i]
-					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.LeftBrake,0.0),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
+					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.LeftBrake,TerrainBraking),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
 					self.LeftPosChanges[i] = CurTraceHitPos
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 
@@ -1006,7 +1033,8 @@ function ENT:Think()
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.LeftRidePosChanges[i] = RidePos
-					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*self.LeftForce/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
+
+					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*(TerrainMultiplier*self.LeftForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
 				
 				self.LastWheelsPerSide = WheelsPerSide
