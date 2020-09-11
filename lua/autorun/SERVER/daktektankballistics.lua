@@ -16,6 +16,58 @@ end
 --this function seemingly only works with that one broken visclip twisted suggested I use once
 ]]--
 
+function PersistFire(Pos, owner, gun)
+	timer.Create( "DTPersistFire"..(Pos.x)..CurTime(), 0.25, 40, function() FireBurn(Pos, owner, gun) end )
+end
+
+function FireBurn(Pos, owner, gun)
+	local Radius = 250
+	sound.Play( "daktanks/flamerimpact.mp3", Pos, 100, 100*math.Rand(0.6,0.8), 1 )	
+	local Targets = ents.FindInSphere( Pos, Radius )
+	if table.Count(Targets) > 0 then
+		if table.Count(Targets) > 0 then
+			for i = 1, #Targets do
+				if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
+					if Targets[i].Controller.ColdWar ~= 1 and Targets[i].Controller.Modern ~= 1 then
+						if not(Targets[i]:IsOnFire()) then 
+							Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
+						end
+						Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+0.1
+					end
+				end
+				if Targets[i]:IsPlayer() then
+					if not Targets[i]:InVehicle() then
+						
+						local Pain = DamageInfo()
+						Pain:SetDamageForce( Vector(0,0,0) )
+						Pain:SetDamage( 1 )
+						if owner and Shell and Shell.DakGun then
+							Pain:SetAttacker( owner )
+							Pain:SetInflictor( gun )
+						else
+							Pain:SetAttacker( game.GetWorld() )
+							Pain:SetInflictor( game.GetWorld() )
+						end
+						Pain:SetReportedPosition( Pos )
+						Pain:SetDamagePosition( Targets[i]:GetPos() )
+						Pain:SetDamageType(DMG_BURN)
+						Targets[i]:TakeDamageInfo( Pain )
+
+						if not(Targets[i]:IsOnFire()) then 
+							Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
+						end
+					end
+				end
+				if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
+					if not(Targets[i]:IsOnFire()) then 
+						Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
+					end
+				end
+			end
+		end
+	end
+end
+
 function CanDamage(Ent)
 	if IsValid(Ent.SPPOwner) then
 		if Ent.SPPOwner:IsPlayer() then		
@@ -85,7 +137,7 @@ function DTSimpleTrace(Start, End, Caliber, Filter, Gun)
 		trace.mins = Vector(-Caliber*0.02,-Caliber*0.02,-Caliber*0.02)
 		trace.maxs = Vector(Caliber*0.02,Caliber*0.02,Caliber*0.02)
 		trace.ignoreworld = true
-	local SimpleTrace = util.TraceLine( trace )
+	local SimpleTrace = util.TraceHull( trace )
 	local Stop = 1
 	local Ent = SimpleTrace.Entity
 	local Pos = SimpleTrace.HitPos
@@ -521,36 +573,7 @@ function DTShellAirBurst(HitPos,Shell,Normal)
 				effectdata:SetMagnitude(.5)
 				effectdata:SetScale(1)
 				util.Effect("dakteflameimpact", effectdata, true, true)
-				local Targets = ents.FindInSphere( HitPos, 150 )
-				if table.Count(Targets) > 0 then
-					if table.Count(Targets) > 0 then
-						for i = 1, #Targets do
-							if Targets[i]:GetClass() == "dak_temotor" then
-								if not(Targets[i]:IsOnFire()) then 
-									Targets[i]:Ignite(5,1)
-								end
-							end
-							if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-								if not(Targets[i]:IsOnFire()) then 
-									Targets[i]:Ignite(5,1)
-								end
-								Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-							end
-							if Targets[i]:IsPlayer() then
-								if not Targets[i]:InVehicle() then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-								end
-							end
-							if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-								if not(Targets[i]:IsOnFire()) then 
-									Targets[i]:Ignite(5,1)
-								end
-							end
-						end
-					end
-				end
+				PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 				sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 			else
 				effectdata:SetOrigin(HitPos)
@@ -558,9 +581,9 @@ function DTShellAirBurst(HitPos,Shell,Normal)
 				effectdata:SetAttachment(1)
 				effectdata:SetMagnitude(.5)
 				if Shell.DakDamage == 0 then
-					effectdata:SetScale(0.5)
+					effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 				else
-					effectdata:SetScale(Shell.DakCaliber*0.25)
+					effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 				end
 				if Shell.IsFrag then
 				else
@@ -826,7 +849,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					end
 					local effectdata = EffectData()
 					effectdata:SetOrigin(HitPos)
-					effectdata:SetEntity(Shell.DakGun)
+					effectdata:SetEntity(HitEnt)
 					effectdata:SetAttachment(1)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakCaliber*0.25)
@@ -963,34 +986,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(1)
 						util.Effect("dakteflameimpact", effectdata, true, true)
-						local Targets = ents.FindInSphere( HitPos, 150 )
-						if table.Count(Targets) > 0 then
-							for i = 1, #Targets do
-								if Targets[i]:GetClass() == "dak_temotor" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-								end
-								if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-									Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-								end
-								if Targets[i]:IsPlayer() then
-									if not Targets[i]:InVehicle() then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-								end
-								if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-								end
-							end
-						end
+						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 						sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 					else
 						Shell.Filter[#Shell.Filter+1] = HitEnt
@@ -1052,7 +1048,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 								effectdata:SetEntity(Shell.DakGun)
 								effectdata:SetAttachment(1)
 								effectdata:SetMagnitude(.5)
-								effectdata:SetScale(Shell.DakCaliber*0.25)
+								effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 								if Shell.IsFrag then
 								else
 									util.Effect("dakteshellimpact", effectdata, true, true)
@@ -1184,7 +1180,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				if HitEnt:Health() <= 0 and not(Shell.DakIsFlame == 1) then
 					local effectdata = EffectData()
 					effectdata:SetOrigin(HitPos)
-					effectdata:SetEntity(Shell.DakGun)
+					effectdata:SetEntity(HitEnt)
 					effectdata:SetAttachment(1)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakCaliber*0.25)
@@ -1215,41 +1211,14 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(1)
 						util.Effect("dakteflameimpact", effectdata, true, true)
-						local Targets = ents.FindInSphere( HitPos, 150 )
-						if table.Count(Targets) > 0 then
-							for i = 1, #Targets do
-								if Targets[i]:GetClass() == "dak_temotor" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-								end
-								if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-									Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-								end
-								if Targets[i]:IsPlayer() then
-									if not Targets[i]:InVehicle() then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-								end
-								if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-								end
-							end
-						end
+						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 						sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 					else
 						effectdata:SetOrigin(HitPos)
 						effectdata:SetEntity(Shell.DakGun)
 						effectdata:SetAttachment(1)
 						effectdata:SetMagnitude(.5)
-						effectdata:SetScale(Shell.DakCaliber*0.25)
+						effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 						if Shell.IsFrag then
 						else
 							util.Effect("dakteshellimpact", effectdata, true, true)
@@ -1330,36 +1299,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(1)
 					util.Effect("dakteflameimpact", effectdata, true, true)
-					local Targets = ents.FindInSphere( HitPos, 150 )
-					if table.Count(Targets) > 0 then
-						if table.Count(Targets) > 0 then
-							for i = 1, #Targets do
-								if Targets[i]:GetClass() == "dak_temotor" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-								end
-								if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-									Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-								end
-								if Targets[i]:IsPlayer() then
-									if not Targets[i]:InVehicle() then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-								end
-								if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-									if not(Targets[i]:IsOnFire()) then 
-										Targets[i]:Ignite(5,1)
-									end
-								end
-							end
-						end
-					end
+					PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 					sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 				else
 					effectdata:SetOrigin(HitPos)
@@ -1369,7 +1309,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if Shell.DakDamage == 0 then
 						effectdata:SetScale(0.5)
 					else
-						effectdata:SetScale(Shell.DakCaliber*0.25)
+						effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 					end
 					if Shell.IsFrag then
 					else
@@ -1692,7 +1632,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 
 						local effectdata = EffectData()
 						effectdata:SetOrigin(ContShellTrace.HitPos)
-						effectdata:SetEntity(Shell.DakGun)
+						effectdata:SetEntity(HitEnt)
 						effectdata:SetAttachment(1)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(Shell.DakCaliber*0.25)
@@ -1829,34 +1769,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							effectdata:SetMagnitude(.5)
 							effectdata:SetScale(1)
 							util.Effect("dakteflameimpact", effectdata, true, true)
-							local Targets = ents.FindInSphere( ContShellTrace.HitPos, 150 )
-							if table.Count(Targets) > 0 then
-								for i = 1, #Targets do
-									if Targets[i]:GetClass() == "dak_temotor" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-									if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-									end
-									if Targets[i]:IsPlayer() then
-										if not Targets[i]:InVehicle() then
-											if not(Targets[i]:IsOnFire()) then 
-												Targets[i]:Ignite(5,1)
-											end
-										end
-									end
-									if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-								end
-							end
+							PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 							sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 						else
 							Shell.Filter[#Shell.Filter+1] = HitEnt
@@ -1918,7 +1831,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 									effectdata:SetEntity(Shell.DakGun)
 									effectdata:SetAttachment(1)
 									effectdata:SetMagnitude(.5)
-									effectdata:SetScale(Shell.DakCaliber*0.25)
+									effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 									if Shell.IsFrag then
 									else
 										util.Effect("dakteshellimpact", effectdata, true, true)
@@ -2042,7 +1955,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					if HitEnt:Health() <= 0 and not(Shell.DakIsFlame == 1) then
 						local effectdata = EffectData()
 						effectdata:SetOrigin(ContShellTrace.HitPos)
-						effectdata:SetEntity(Shell.DakGun)
+						effectdata:SetEntity(HitEnt)
 						effectdata:SetAttachment(1)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(Shell.DakCaliber*0.25)
@@ -2073,41 +1986,14 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							effectdata:SetMagnitude(.5)
 							effectdata:SetScale(1)
 							util.Effect("dakteflameimpact", effectdata, true, true)
-							local Targets = ents.FindInSphere( ContShellTrace.HitPos, 150 )
-							if table.Count(Targets) > 0 then
-								for i = 1, #Targets do
-									if Targets[i]:GetClass() == "dak_temotor" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-									if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-									end
-									if Targets[i]:IsPlayer() then
-										if not Targets[i]:InVehicle() then
-											if not(Targets[i]:IsOnFire()) then 
-												Targets[i]:Ignite(5,1)
-											end
-										end
-									end
-									if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-								end
-							end
+							PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 							sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 						else
 							effectdata:SetOrigin(ContShellTrace.HitPos)
 							effectdata:SetEntity(Shell.DakGun)
 							effectdata:SetAttachment(1)
 							effectdata:SetMagnitude(.5)
-							effectdata:SetScale(Shell.DakCaliber*0.25)
+							effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 							if Shell.IsFrag then
 							else
 								util.Effect("dakteshellimpact", effectdata, true, true)
@@ -2189,35 +2075,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						effectdata:SetScale(1)
 						util.Effect("dakteflameimpact", effectdata, true, true)
 						local Targets = ents.FindInSphere( ContShellTrace.HitPos, 150 )
-						if table.Count(Targets) > 0 then
-							if table.Count(Targets) > 0 then
-								for i = 1, #Targets do
-									if Targets[i]:GetClass() == "dak_temotor" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-									if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-										Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+1
-									end
-									if Targets[i]:IsPlayer() then
-										if not Targets[i]:InVehicle() then
-											if not(Targets[i]:IsOnFire()) then 
-												Targets[i]:Ignite(5,1)
-											end
-										end
-									end
-									if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-										if not(Targets[i]:IsOnFire()) then 
-											Targets[i]:Ignite(5,1)
-										end
-									end
-								end
-							end
-						end
+						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 						sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 					else
 						effectdata:SetOrigin(ContShellTrace.HitPos)
@@ -2227,7 +2085,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						if Shell.DakDamage == 0 then
 							effectdata:SetScale(0.5)
 						else
-							effectdata:SetScale(Shell.DakCaliber*0.25)
+							effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 						end
 						if Shell.IsFrag then
 						else
@@ -2846,7 +2704,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 				effectdata:SetEntity(Shell.DakGun)
 				effectdata:SetAttachment(1)
 				effectdata:SetMagnitude(.5)
-				effectdata:SetScale(12.7*0.25)
+				effectdata:SetScale(12.7)
 				util.Effect("dakteshellimpact", effectdata, true, true)
 			end
 

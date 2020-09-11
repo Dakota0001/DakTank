@@ -288,7 +288,32 @@ function EFFECT:Init( data )
 			Debris:SetColor( 50,50,50 )
 		end
 	end
-	for i = 1,size*3.125 do
+	for i = 1,size*3.125*0.5 do
+		local ang = math.Rand(0,360) * math.pi/180
+		local particle = emitter:Add( "effects/muzzleflash1.vtf", Pos + size*0.4*Vector(math.Rand(0,20)*math.cos(ang),math.Rand(0,20)*math.sin(ang),-math.random(-20,20)) ) 
+		 
+		if particle == nil then particle = emitter:Add( "effects/muzzleflash1.vtf", Pos + size*Vector(   math.random(0,0),math.random(0,0),math.random(0,0) ) ) end
+		
+		if (particle) then
+			particle:SetVelocity(size*Vector(math.random(-50,50),math.random(-50,50),math.random(-75,75)))
+			particle:SetLifeTime(0.0) 
+			particle:SetDieTime(0.3) 
+			particle:SetStartAlpha(200)
+			particle:SetEndAlpha(0)
+			local expsize = size*30*math.Rand(0.9,1.1)
+			particle:SetStartSize(expsize) 
+			particle:SetEndSize(expsize*0.5)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(255,150,75,math.random(150,255))
+			particle:SetGravity( Vector(0,0,0) ) 
+			particle:SetAirResistance(75)  
+			particle:SetCollide(false)
+			particle:SetBounce(1000)
+		end
+	end
+	for i = 1,size*3.125*0.5 do
 		local ang = math.Rand(0,360) * math.pi/180
 		local particle = emitter:Add( "effects/muzzleflash1.vtf", Pos + size*0.4*Vector(math.Rand(0,20)*math.cos(ang),math.Rand(0,20)*math.sin(ang),-math.random(-20,20)) ) 
 		 

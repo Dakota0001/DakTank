@@ -9,7 +9,6 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 				if HitEnt.Controller then
 					local Target = HitEnt.Controller
 					if Target.Cost then
-						net.Start( "daktankhud" )
 						local InfoTable1 = {}
 						local InfoTable2 = {}
 						local InfoTable3 = {}
@@ -25,7 +24,12 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						InfoTable1[2] = Target.Cost.." point "..Era.." "..math.Round(Target.TotalMass*0.001,2).." ton tank."
 						InfoTable1[3] = "-Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
 						InfoTable1[4] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
-						InfoTable1[5] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
+						if Target.Gearbox.DakHP ~= nil then
+							InfoTable1[5] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
+						else
+							InfoTable1[5] = "-HP/T: 0."
+						end
+						
 						InfoTable1[6] = "-Crew Count: "..(#Target.Crew)
 
 						
@@ -125,7 +129,7 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 							info3count = info3count + 1
 							InfoTable3[info3count] = "-All Clear"
 						end
-
+						net.Start( "daktankhud" )
 						net.WriteString( util.TableToJSON( InfoTable1 ) )
 						net.WriteString( util.TableToJSON( InfoTable2 ) )
 						net.WriteString( util.TableToJSON( InfoTable3 ) )

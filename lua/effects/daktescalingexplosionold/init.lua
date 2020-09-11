@@ -83,11 +83,11 @@ function EFFECT:Init( data )
 		end
 	end
 
-	for i = 1,size*25 do
+	for i = 1,size*12.5 do
 
-		local particle = emitter:Add( "effects/muzzleflash1.vtf", Pos + size*Vector( math.random(-20,20),math.random(-20,20),math.random(-20,20) ) ) 
+		local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos + size*Vector( math.random(-20,20),math.random(-20,20),math.random(-20,20) ) ) 
 		 
-		if particle == nil then particle = emitter:Add( "effects/muzzleflash1.vtf", Pos + size*Vector(   math.random(0,0),math.random(0,0),math.random(0,0) ) ) end
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos + size*Vector(   math.random(0,0),math.random(0,0),math.random(0,0) ) ) end
 		
 		if (particle) then
 			particle:SetVelocity(size*Vector(math.random(-200,200),math.random(-200,200),math.random(-200,200)))
@@ -100,7 +100,31 @@ function EFFECT:Init( data )
 			particle:SetAngles( Angle(0,0,0) )
 			particle:SetAngleVelocity( Angle(0,0,0) ) 
 			particle:SetRoll(math.Rand( 0, 360 ))
-			particle:SetColor(255,150,75,math.random(150,255))
+			particle:SetColor(255,255,255,math.random(150,255))
+			particle:SetGravity( Vector(0,0,0) ) 
+			particle:SetAirResistance(1500)  
+			particle:SetCollide(false)
+			particle:SetBounce(1000)
+		end
+	end
+	for i = 1,size*12.5 do
+
+		local particle = emitter:Add( "effects/fire_cloud2.vtf", Pos + size*Vector( math.random(-20,20),math.random(-20,20),math.random(-20,20) ) ) 
+		 
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", Pos + size*Vector(   math.random(0,0),math.random(0,0),math.random(0,0) ) ) end
+		
+		if (particle) then
+			particle:SetVelocity(size*Vector(math.random(-200,200),math.random(-200,200),math.random(-200,200)))
+			particle:SetLifeTime(0.0) 
+			particle:SetDieTime(0.01+math.Rand(0,0.5)) 
+			particle:SetStartAlpha(200)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(size*100*math.Rand(0.9,1.1)) 
+			particle:SetEndSize(0)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(255,255,255,math.random(150,255))
 			particle:SetGravity( Vector(0,0,0) ) 
 			particle:SetAirResistance(1500)  
 			particle:SetCollide(false)

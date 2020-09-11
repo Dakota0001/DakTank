@@ -23,7 +23,7 @@ function EFFECT:Init( data )
 	
 	local emitter = ParticleEmitter( Pos )
 	
-	for i = 1,5 do
+	for i = 1,10 do
 
 		local particle = emitter:Add( "dak/smokey", Pos)  
 		 
@@ -31,9 +31,9 @@ function EFFECT:Init( data )
 		
 		if (particle) then
 			local ang = math.Rand(0,360) * math.pi/180
-			particle:SetVelocity(Vector(750*math.Rand(0,1)*math.cos(ang),750*math.Rand(0,1)*math.sin(ang),math.Rand(150,250)))
+			particle:SetVelocity(Vector(150*math.Rand(0,1)*math.cos(ang),150*math.Rand(0,1)*math.sin(ang),math.Rand(50,150)))
 			particle:SetLifeTime(0) 
-			particle:SetDieTime(5) 
+			particle:SetDieTime(10) 
 			particle:SetStartAlpha(150)
 			particle:SetEndAlpha(0)
 			particle:SetStartSize(50) 
@@ -43,23 +43,144 @@ function EFFECT:Init( data )
 			particle:SetRoll(math.Rand( 0, 360 ))
 			local CVal = math.random(50,100)
 			particle:SetColor(CVal,CVal,CVal,math.random(50,50))
-			particle:SetGravity( Vector(0,0,math.random(500,500)) ) 
-			particle:SetAirResistance(150)  
+			particle:SetGravity( Vector(0,0,math.random(10,10)) ) 
+			particle:SetAirResistance(40)  
 			particle:SetCollide(false)
 			particle:SetBounce(0)
 		end
 	end
 	local ScaleSize = 2
-	for i = 1,50 do
+	for i = 1,20 do
 		local ang = math.Rand(0,360) * math.pi/180
-		local particle = emitter:Add( "dak/flamelet5", Pos)
-		if particle == nil then particle = emitter:Add( "dak/flamelet5", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-25,100)))  end
+		local particle = emitter:Add( "effects/fire_cloud2.vtf", Pos)
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-50,100)))  end
+		
+		if (particle) then
+			local ang = math.Rand(0,360) * math.pi/180
+			particle:SetVelocity(ScaleSize*Vector(150*math.Rand(0,1)*math.cos(ang),150*math.Rand(0,1)*math.sin(ang),math.Rand(0,100)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(10) 
+			particle:SetStartAlpha(255)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(ScaleSize*40) 
+			particle:SetEndSize(ScaleSize*50)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
+			particle:SetGravity( ScaleSize*Vector(0,0,math.Rand(0,30) ) ) 
+			particle:SetAirResistance(ScaleSize*75)  
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+			particle:SetNextThink( CurTime() )
+			particle.rollspeed = math.Rand(0.001,0.01)
+			particle:SetThinkFunction( function( pa )
+				pa:SetRoll( pa:GetRoll()+pa.rollspeed )
+				pa:SetNextThink( CurTime() )
+			end )
+		end
+	end
+	for i = 1,20 do
+		local ang = math.Rand(0,360) * math.pi/180
+		local particle = emitter:Add( "effects/fire_cloud2.vtf", Pos)
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-50,100)))  end
+		
+		if (particle) then
+			local ang = math.Rand(0,360) * math.pi/180
+			particle:SetVelocity(ScaleSize*Vector(250*math.Rand(0,1)*math.cos(ang),250*math.Rand(0,1)*math.sin(ang),math.Rand(0,10)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(10) 
+			particle:SetStartAlpha(255)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(ScaleSize*40) 
+			particle:SetEndSize(ScaleSize*50)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
+			particle:SetGravity( ScaleSize*Vector(0,0,-10) ) 
+			particle:SetAirResistance(ScaleSize*75)  
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+			particle:SetNextThink( CurTime() )
+			particle.rollspeed = math.Rand(0.001,0.01)
+			particle:SetThinkFunction( function( pa )
+				pa:SetRoll( pa:GetRoll()+pa.rollspeed )
+				pa:SetNextThink( CurTime() )
+			end )
+		end
+	end
+	for i = 1,10 do
+		local ang = math.Rand(0,360) * math.pi/180
+		local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-50,100)))  end
+		
+		if (particle) then
+			local ang = math.Rand(0,360) * math.pi/180
+			particle:SetVelocity(ScaleSize*Vector(150*math.Rand(0,1)*math.cos(ang),150*math.Rand(0,1)*math.sin(ang),math.Rand(0,100)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(10) 
+			particle:SetStartAlpha(255)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(ScaleSize*40) 
+			particle:SetEndSize(ScaleSize*50)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
+			particle:SetGravity( ScaleSize*Vector(0,0,math.Rand(0,30) ) ) 
+			particle:SetAirResistance(ScaleSize*75)  
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+			particle:SetNextThink( CurTime() )
+			particle.rollspeed = math.Rand(0.001,0.01)
+			particle:SetThinkFunction( function( pa )
+				pa:SetRoll( pa:GetRoll()+pa.rollspeed )
+				pa:SetNextThink( CurTime() )
+			end )
+		end
+	end
+	for i = 1,10 do
+		local ang = math.Rand(0,360) * math.pi/180
+		local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-50,100)))  end
+		
+		if (particle) then
+			local ang = math.Rand(0,360) * math.pi/180
+			particle:SetVelocity(ScaleSize*Vector(250*math.Rand(0,1)*math.cos(ang),250*math.Rand(0,1)*math.sin(ang),math.Rand(0,10)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(10) 
+			particle:SetStartAlpha(255)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(ScaleSize*40) 
+			particle:SetEndSize(ScaleSize*50)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
+			particle:SetGravity( ScaleSize*Vector(0,0,-10) ) 
+			particle:SetAirResistance(ScaleSize*75)  
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+			particle:SetNextThink( CurTime() )
+			particle.rollspeed = math.Rand(0.001,0.01)
+			particle:SetThinkFunction( function( pa )
+				pa:SetRoll( pa:GetRoll()+pa.rollspeed )
+				pa:SetNextThink( CurTime() )
+			end )
+		end
+	end
+	--[[
+	for i = 1,25 do
+		local ang = math.Rand(0,360) * math.pi/180
+		local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(0,100)))  end
 		
 		if (particle) then
 			local ang = math.Rand(0,360) * math.pi/180
 			particle:SetVelocity(ScaleSize*Vector(500*math.Rand(0,1)*math.cos(ang),500*math.Rand(0,1)*math.sin(ang),math.Rand(-100,100)))
 			particle:SetLifeTime(0) 
-			particle:SetDieTime(1) 
+			particle:SetDieTime(5) 
 			particle:SetStartAlpha(255)
 			particle:SetEndAlpha(0)
 			particle:SetStartSize(ScaleSize*15) 
@@ -74,16 +195,16 @@ function EFFECT:Init( data )
 			particle:SetBounce(0)
 		end
 	end
-	for i = 1,50 do
+	for i = 1,25 do
 		local ang = math.Rand(0,360) * math.pi/180
-		local particle = emitter:Add( "dak/flamelet5", Pos)
-		if particle == nil then particle = emitter:Add( "dak/flamelet5", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-25,100)))  end
+		local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(0,100)))  end
 		
 		if (particle) then
 			local ang = math.Rand(0,360) * math.pi/180
 			particle:SetVelocity(ScaleSize*Vector(200*math.Rand(0,1)*math.cos(ang),200*math.Rand(0,1)*math.sin(ang),math.Rand(-100,300)))
 			particle:SetLifeTime(0) 
-			particle:SetDieTime(1) 
+			particle:SetDieTime(5) 
 			particle:SetStartAlpha(255)
 			particle:SetEndAlpha(0)
 			particle:SetStartSize(ScaleSize*15) 
@@ -98,6 +219,7 @@ function EFFECT:Init( data )
 			particle:SetBounce(0)
 		end
 	end
+	]]--
 	emitter:Finish()
 		
 end

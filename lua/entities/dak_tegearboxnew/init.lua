@@ -1057,7 +1057,7 @@ function ENT:Think()
 	    if self:IsOnFire() and self.DakDead ~= true then
 			self.DakHealth = self.DakHealth - self.DakMaxHealth*0.025*engine.TickInterval()
 			if self.DakHealth <= 0 then
-				if self.DakOwner:IsPlayer() then self.DakOwner:ChatPrint(self.DakName.." Destroyed!") end
+				if self.DakOwner:IsPlayer() and self.DakOwner~=NULL then self.DakOwner:ChatPrint(self.DakName.." Destroyed!") end
 				self:SetMaterial("models/props_buildings/plasterwall021a")
 				self:SetColor(Color(100,100,100,255))
 				self.DakDead = true

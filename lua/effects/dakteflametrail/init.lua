@@ -32,17 +32,17 @@ function EFFECT:Init( data )
 	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
 
 	local emitter = ParticleEmitter( self.StartPos )
-	for i = 1, 10 do
+	for i = 1, 25 do
 
-		local particle = emitter:Add( "dak/flamelet5", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
+		local particle = emitter:Add( "effects/fire_cloud2.vtf", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
-		if particle == nil then particle = emitter:Add( "dak/flamelet5", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
 		
 		if (particle) then
-			particle:SetVelocity(Vector(math.Rand(-250,250),math.Rand(-250,250),math.Rand(-250,250)))
+			particle:SetVelocity(self.Dir*2500+Vector(math.Rand(-50,50),math.Rand(-50,50),math.Rand(-50,50)))
 			particle:SetLifeTime(0) 
 			particle:SetDieTime(0.5) 
-			particle:SetStartAlpha(150)
+			particle:SetStartAlpha(250)
 			particle:SetEndAlpha(0)
 			particle:SetStartSize(15)
 			particle:SetEndSize(0)
@@ -50,23 +50,47 @@ function EFFECT:Init( data )
 			particle:SetAngleVelocity( Angle(0,0,0) ) 
 			particle:SetRoll(math.Rand( 0, 360 ))
 			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
-			particle:SetGravity( Vector(0,0,math.random(-5,-25)) )  
-			particle:SetAirResistance(750)  
+			particle:SetGravity( Vector(0,0,math.random(5,2500)) )  
+			particle:SetAirResistance(500)  
+			particle:SetCollide(true)
+			particle:SetBounce(0)
+		end
+	end
+	for i = 1, 15 do
+
+		local particle = emitter:Add( "effects/fire_cloud1.vtf", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
+		 
+		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
+		
+		if (particle) then
+			particle:SetVelocity(self.Dir*2500+Vector(math.Rand(-200,200),math.Rand(-200,200),math.Rand(-200,200)))
+			particle:SetLifeTime(0) 
+			particle:SetDieTime(0.5) 
+			particle:SetStartAlpha(250)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(15)
+			particle:SetEndSize(0)
+			particle:SetAngles( Angle(0,0,0) )
+			particle:SetAngleVelocity( Angle(0,0,0) ) 
+			particle:SetRoll(math.Rand( 0, 360 ))
+			particle:SetColor(math.random(255,255),math.random(255,255),math.random(255,255),math.random(255,255))
+			particle:SetGravity( Vector(0,0,math.random(5,2500)) ) 
+			particle:SetAirResistance(500)  
 			particle:SetCollide(true)
 			particle:SetBounce(0)
 		end
 	end
 
-	for i = 1, 3 do
+	for i = 1, 15 do
 
 		local particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
 		if particle == nil then particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
 		
 		if (particle) then
-			particle:SetVelocity(Vector(math.Rand(-25,25),math.Rand(-25,25),math.Rand(-25,25)))
+			particle:SetVelocity(self.Dir*2500+Vector(math.Rand(-200,200),math.Rand(-200,200),math.Rand(-200,200)))
 			particle:SetLifeTime(0) 
-			particle:SetDieTime(2.0) 
+			particle:SetDieTime(1.0) 
 			particle:SetStartAlpha(75)
 			particle:SetEndAlpha(0)
 			particle:SetStartSize(0)
@@ -76,8 +100,8 @@ function EFFECT:Init( data )
 			particle:SetRoll(math.Rand( 0, 360 ))
 			local CVal = math.random(50,100)
 			particle:SetColor(CVal,CVal,CVal,math.random(50,50))
-			particle:SetGravity( Vector(0,0,math.random(5,25)) ) 
-			particle:SetAirResistance(20) 
+			particle:SetGravity( Vector(0,0,math.random(5,1500)) ) 
+			particle:SetAirResistance(500) 
 			particle:SetCollide(true)
 			particle:SetBounce(0)
 		end

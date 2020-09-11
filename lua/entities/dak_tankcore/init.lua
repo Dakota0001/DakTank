@@ -620,6 +620,7 @@ function ENT:Think()
 					end
 
 					if self.rebuildtable == 0 then
+						--[[
 						self.Contraption = {}
 						table.Add(self.Contraption,GetParents(self))
 
@@ -646,6 +647,150 @@ function ENT:Think()
 						end
 
 						table.Add( self.Contraption, Children )
+
+						local preturretcontrollers = {}
+						for i=1, #self.Contraption do
+							if self.Contraption[i]:GetClass()=="dak_turretcontrol" then
+								preturretcontrollers[#preturretcontrollers+1]=self.Contraption[i]
+							end
+						end
+						for i=1, #preturretcontrollers do
+							--print(preturretcontrollers[i])
+							self.Contraption[#self.Contraption+1] = preturretcontrollers[i].WiredGun
+							self.Contraption[#self.Contraption+1] = preturretcontrollers[i].WiredTurret
+						end
+
+						self.Contraption = ents.FindInSphere(self:GetPos(),1000)
+						--]]
+						local Mass = 0
+						local ParentMass = 0
+						local SA = 0
+						
+						self.Contraption = {self:GetParent():GetParent()}
+						local turrets = {}
+
+						for k, v in pairs(self:GetParent():GetParent():GetChildren()) do
+							self.Contraption[#self.Contraption+1] = v
+							for k2, v2 in pairs(v:GetChildren()) do
+								self.Contraption[#self.Contraption+1] = v2
+								if v2:GetClass() == "dak_turretcontrol" then
+									turrets[#turrets+1] = v2
+								end
+							end
+						end
+
+						local turrets2 = {}
+						for i=1, #turrets do
+							local TurEnts = {}
+							if turrets[i].WiredTurret ~= NULL then
+								self.Contraption[#self.Contraption+1] = turrets[i].WiredTurret
+								TurEnts[#TurEnts+1] = turrets[i].WiredTurret
+								for k, v in pairs(turrets[i].WiredTurret:GetChildren()) do
+									self.Contraption[#self.Contraption+1] = v
+									TurEnts[#TurEnts+1] = v
+									for k2, v2 in pairs(v:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v2
+										TurEnts[#TurEnts+1] = v2
+										if v2:GetClass() == "dak_turretcontrol" then
+											turrets2[#turrets2+1] = v2
+										end
+									end
+								end
+							end
+							if turrets[i].WiredGun ~= NULL then
+								self.Contraption[#self.Contraption+1] = turrets[i].WiredGun:GetParent():GetParent()
+								TurEnts[#TurEnts+1] = turrets[i].WiredGun:GetParent():GetParent()
+								for k, v in pairs(turrets[i].WiredGun:GetParent():GetParent():GetChildren()) do
+									self.Contraption[#self.Contraption+1] = v
+									TurEnts[#TurEnts+1] = v
+									for k2, v2 in pairs(v:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v2
+										TurEnts[#TurEnts+1] = v2
+										if v2:GetClass() == "dak_turretcontrol" then
+											turrets2[#turrets2+1] = v2
+										end
+									end
+								end
+							end
+							turrets[i].Extra = TurEnts
+						end
+
+						local turrets3 = {}
+						for i=1, #turrets2 do
+							local TurEnts = {}
+							if turrets2[i].WiredTurret ~= NULL then
+								self.Contraption[#self.Contraption+1] = turrets2[i].WiredTurret
+								TurEnts[#TurEnts+1] = turrets2[i].WiredTurret
+								for k, v in pairs(turrets2[i].WiredTurret:GetChildren()) do
+									self.Contraption[#self.Contraption+1] = v
+									TurEnts[#TurEnts+1] = v
+									for k2, v2 in pairs(v:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v2
+										TurEnts[#TurEnts+1] = v2
+										if v2:GetClass() == "dak_turretcontrol" then
+											turrets3[#turrets3+1] = v2
+										end
+									end
+								end
+							end
+							if turrets2[i].WiredGun ~= NULL then
+								self.Contraption[#self.Contraption+1] = turrets2[i].WiredGun:GetParent():GetParent()
+								TurEnts[#TurEnts+1] = turrets2[i].WiredGun:GetParent():GetParent()
+								for k, v in pairs(turrets2[i].WiredGun:GetParent():GetParent():GetChildren()) do
+									self.Contraption[#self.Contraption+1] = v
+									TurEnts[#TurEnts+1] = v
+									for k2, v2 in pairs(v:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v2
+										TurEnts[#TurEnts+1] = v2
+										if v2:GetClass() == "dak_turretcontrol" then
+											turrets3[#turrets3+1] = v2
+										end
+									end
+								end
+							end
+							turrets2[i].Extra = TurEnts
+						end
+
+						--just gonna stop it right here, if people have turrets on their turrets on their turrets that's fine, but I'm not going a step further
+
+						--local turrets4 = {}
+						for i=1, #turrets3 do
+							local TurEnts = {}
+							if turrets3[i].WiredTurret ~= NULL then
+								self.Contraption[#self.Contraption+1] = turrets3[i].WiredTurret
+								TurEnts[#TurEnts+1] = turrets3[i].WiredTurret
+								for k, v in pairs(turrets3[i].WiredTurret:GetChildren()) do
+									self.Contraption[#self.Contraption+1] = v
+									TurEnts[#TurEnts+1] = v
+									for k2, v2 in pairs(v:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v2
+										TurEnts[#TurEnts+1] = v2
+										--if v2:GetClass() == "dak_turretcontrol" then
+										--	turrets4[#turrets4+1] = v2
+										--end
+									end
+								end
+							end
+							if turrets3[i].WiredGun ~= NULL then
+								self.Contraption[#self.Contraption+1] = turrets3[i].WiredGun:GetParent():GetParent()
+								TurEnts[#TurEnts+1] = turrets3[i].WiredGun:GetParent():GetParent()
+								for k, v in pairs(turrets3[i].WiredGun:GetParent():GetParent():GetChildren()) do
+									self.Contraption[#self.Contraption+1] = v
+									TurEnts[#TurEnts+1] = v
+									for k2, v2 in pairs(v:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v2
+										TurEnts[#TurEnts+1] = v2
+										--if v2:GetClass() == "dak_turretcontrol" then
+										--	turrets4[#turrets4+1] = v2
+										--end
+									end
+								end
+							end
+							turrets3[i].Extra = TurEnts
+						end
+
+						
+						--PrintTable(self.Contraption)
 
 						local hash = {}
 						local res = {}
