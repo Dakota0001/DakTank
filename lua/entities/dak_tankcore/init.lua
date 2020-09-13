@@ -13,6 +13,8 @@ ENT.DakFuel = nil
 --cause self to delete self if not properly unfrozen
 
 --FIX turret not unparenting on pop off causing it to delete
+--fix wheels not deleting with tankcore
+--have tank just keep rolling with gearbox on death (they aren't being added to contraption, find all axised to baseplate)
 
 function ENT:Initialize()
 	self:SetModel( "models/bull/gates/logic.mdl" )
@@ -366,6 +368,14 @@ function ENT:Think()
 									end
 								elseif self.Guns[i].DakGunType == "Autocannon" then
 									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "A" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "Recoilless Rifle" or self.Guns[i].DakGunType == "Autoloading Recoilless Rifle" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "R" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "R" then
+										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+									end
+								elseif self.Guns[i].DakGunType == "ATGM Launcher" or self.Guns[i].DakGunType == "Dual ATGM Launcher" or self.Guns[i].DakGunType == "Autoloading ATGM Launcher" or self.Guns[i].DakGunType == "Autoloading Dual ATGM Launcher" then
+									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "L" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "C" then
 										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
 									end
 								else
