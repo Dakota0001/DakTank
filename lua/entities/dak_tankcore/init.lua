@@ -12,6 +12,8 @@ ENT.DakFuel = nil
 
 --cause self to delete self if not properly unfrozen
 
+--FIX turret not unparenting on pop off causing it to delete
+
 function ENT:Initialize()
 	self:SetModel( "models/bull/gates/logic.mdl" )
 	self:PhysicsInit(SOLID_VPHYSICS)

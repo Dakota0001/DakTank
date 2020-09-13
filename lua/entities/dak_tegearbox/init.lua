@@ -516,11 +516,11 @@ function ENT:Think()
 			       				throttle = self.MoveReverse
 			       			end
 
-			       			
+			       			local Tweak = 2
 							if self.Speed < G1Speed then
 								--self.Gear = 1
 								--GearBoost = 0.52 + math.Clamp(self.TopSpeed*0.15/(self.Speed),0,10*math.abs(self.Perc))
-								GearBoost = math.Clamp((self.TopSpeed/self.Speed)*0.1*0.5,0,5)
+								GearBoost = math.Clamp((self.TopSpeed/self.Speed)*0.1*0.3,0,5)
 								--print(GearBoost)
 								self.CurTopSpeed = G1Speed
 								self.LastTopSpeed = 0
@@ -529,8 +529,8 @@ function ENT:Think()
 
 								--print(GearBoost)
 								if self.CrewAlive == 1 then
-									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*GearBoost * math.Min(throttle,1) )
-									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*GearBoost * math.Min(throttle,1) )
+									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
+									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
 								end
 							elseif self.Speed < G2Speed then
 								--self.Gear = 2
@@ -540,10 +540,10 @@ function ENT:Think()
 								self.MaxSpeedDif = G2Speed - self.TopSpeed*0.1
 								--GearBoost = 0.1 + math.Clamp(self.CurTopSpeed/(self.Speed*5.25),0.05,0.15*math.abs(self.Perc))
 								--print(GearBoost)
-								GearBoost = (self.TopSpeed/self.Speed)*0.1*0.35
+								GearBoost = (self.TopSpeed/self.Speed)*0.15*0.3
 								if self.CrewAlive == 1 then
-									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*GearBoost * math.Min(throttle,1) )
-									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*GearBoost * math.Min(throttle,1) )
+									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
+									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
 								end
 							elseif self.Speed < G3Speed then
 								--self.Gear = 3
@@ -553,10 +553,10 @@ function ENT:Think()
 								self.MaxSpeedDif = G3Speed - G2Speed
 								--GearBoost = 0.1 + math.Clamp(self.CurTopSpeed/(self.Speed*5.5),0.05,0.15*math.abs(self.Perc))
 								--print(GearBoost)
-								GearBoost = (self.TopSpeed/self.Speed)*0.2*0.4
+								GearBoost = (self.TopSpeed/self.Speed)*0.2*0.495
 								if self.CrewAlive == 1 then
-									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*GearBoost * math.Min(throttle,1) )
-									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*GearBoost * math.Min(throttle,1) )
+									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
+									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
 								end
 							else
 								--self.Gear = 4
@@ -566,10 +566,10 @@ function ENT:Think()
 								self.MaxSpeedDif = G4Speed - G3Speed
 								--GearBoost = 0.1 + math.Clamp(self.CurTopSpeed/(self.Speed*10),0.05,0.15*math.abs(self.Perc))
 								--print(GearBoost)
-								GearBoost = (self.TopSpeed/self.Speed)*0.3*0.4
+								GearBoost = (self.TopSpeed/self.Speed)*0.3*0.395
 								if self.CrewAlive == 1 then
-									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*GearBoost * math.Min(throttle,1) )
-									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*GearBoost * math.Min(throttle,1) )
+									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
+									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
 								end
 							end
 							--print(GearBoost)
