@@ -230,7 +230,6 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 							if ShellList[i].IsGuided then
 								DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 							else
-								print("Ent Hit on Base: "..tostring(ShellTrace.Entity))
 								DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 							end
 						else

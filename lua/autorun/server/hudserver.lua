@@ -89,31 +89,33 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						local info3count = 1
 
 						--turret gunner detection
-						for i=1, #TurretsSorted do
-							if TurretsSorted[i].DakCrew == NULL then
-								info3count = info3count + 1
-								InfoTable3[info3count] = "-"..TurretsSorted[i].DakName.." #"..TurretsSorted[i]:EntIndex().." gunner not detected"
-							else
-								if not(Target.ColdWar == 1 or Target.Modern == 1) then
-									if IsValid(TurretsSorted[i].TurretBase) and (TurretsSorted[i]:GetYawMin()+TurretsSorted[i]:GetYawMax()>90) then
-										if TurretsSorted[i].DakCrew:IsValid() then
-											if TurretsSorted[i].DakCrew:GetParent():IsValid() then
-												if TurretsSorted[i].DakCrew:GetParent():GetParent():IsValid() then
-													if TurretsSorted[i].DakCrew:GetParent():GetParent() ~= TurretsSorted[i].TurretBase and TurretsSorted[i].DakCrew:GetParent():GetParent() ~= TurretsSorted[i].DakGun then
-														info3count = info3count + 1
-														InfoTable3[info3count] = "-"..TurretsSorted[i].DakName.." #"..TurretsSorted[i]:EntIndex().." gunner not in turret"
+						if TurretsSorted[1] ~= NULL then
+							for i=1, #TurretsSorted do
+								if TurretsSorted[i].DakCrew == NULL then
+									info3count = info3count + 1
+									InfoTable3[info3count] = "-"..TurretsSorted[i].DakName.." #"..TurretsSorted[i]:EntIndex().." gunner not detected"
+								else
+									if not(Target.ColdWar == 1 or Target.Modern == 1) then
+										if IsValid(TurretsSorted[i].TurretBase) and (TurretsSorted[i]:GetYawMin()+TurretsSorted[i]:GetYawMax()>90) then
+											if TurretsSorted[i].DakCrew:IsValid() then
+												if TurretsSorted[i].DakCrew:GetParent():IsValid() then
+													if TurretsSorted[i].DakCrew:GetParent():GetParent():IsValid() then
+														if TurretsSorted[i].DakCrew:GetParent():GetParent() ~= TurretsSorted[i].TurretBase and TurretsSorted[i].DakCrew:GetParent():GetParent() ~= TurretsSorted[i].DakGun then
+															info3count = info3count + 1
+															InfoTable3[info3count] = "-"..TurretsSorted[i].DakName.." #"..TurretsSorted[i]:EntIndex().." gunner not in turret"
+														end
 													end
 												end
 											end
 										end
-									end
-									if not(IsValid(TurretsSorted[i].TurretBase)) and (TurretsSorted[i]:GetYawMin()+TurretsSorted[i]:GetYawMax()>90) then
-										if TurretsSorted[i].DakCrew:IsValid() then
-											if TurretsSorted[i].DakCrew:GetParent():IsValid() then
-												if TurretsSorted[i].DakCrew:GetParent():GetParent():IsValid() then
-													if TurretsSorted[i].DakCrew:GetParent():GetParent() == TurretsSorted[i]:GetParent():GetParent() or TurretsSorted[i].DakCrew:GetParent():GetParent() == TurretsSorted[i].DakGun then
-														info3count = info3count + 1
-														InfoTable3[info3count] = "-"..TurretsSorted[i].DakName.." #"..TurretsSorted[i]:EntIndex().." gunner not in hull"
+										if not(IsValid(TurretsSorted[i].TurretBase)) and (TurretsSorted[i]:GetYawMin()+TurretsSorted[i]:GetYawMax()>90) then
+											if TurretsSorted[i].DakCrew:IsValid() then
+												if TurretsSorted[i].DakCrew:GetParent():IsValid() then
+													if TurretsSorted[i].DakCrew:GetParent():GetParent():IsValid() then
+														if TurretsSorted[i].DakCrew:GetParent():GetParent() == TurretsSorted[i]:GetParent():GetParent() or TurretsSorted[i].DakCrew:GetParent():GetParent() == TurretsSorted[i].DakGun then
+															info3count = info3count + 1
+															InfoTable3[info3count] = "-"..TurretsSorted[i].DakName.." #"..TurretsSorted[i]:EntIndex().." gunner not in hull"
+														end
 													end
 												end
 											end
