@@ -1889,6 +1889,19 @@ function TOOL:Reload( trace )
 	end
 end
 
+function DTSpawnerEngineLabel(name,desc,health,armor,weight,speed,power,fuel)
+	local s1 = name.."\n\n"
+	local s2 = desc.."\n\n"
+	local s3 = "Engine Stats:\n"
+	local s4 = "Health:                  "..health.."\n"
+	local s5 = "Armor:                  "..armor.."mm\n"
+	local s6 = "Weight:                "..weight.."kg\n"
+	local s7 = "Speed:            "..speed.."km/h with 10t contraption\n"
+	local s8 = "Power:                  "..power.." HP\n"
+	local s9 = "Fuel Required:      "..fuel.."L (for full performance)"
+	return s1..s2..s3..s4..s5..s6..s7..s8..s9
+end
+
 function TOOL.BuildCPanel( panel )
 	panel:SetMouseInputEnabled( true )
 	
@@ -1928,22 +1941,22 @@ function TOOL.BuildCPanel( panel )
 	--Table containing the information of the available engines
 	local engineList = {}
 	engineList["Micro Engine"] = function()
-		DLabel:SetText( "Micro Engine\n\nTiny engine for tiny tanks.\n\nEngine Stats:\nHealth:                  5\nArmor:                  5mm\nWeight:                80kg\nCrewed Speed:     13km/h with 10t contraption\nUncrewed Speed: 8km/h with 10t contraption\nPower:                  40 HP\nFuel Required:      24L (for full performance)" )
+		DLabel:SetText(DTSpawnerEngineLabel("Micro Engine","Tiny engine for tiny tanks.","5","5","80","13","40","24"))
 	end
 	engineList["Small Engine"] = function()
-		DLabel:SetText( "Small Engine\n\nSmall engine for light tanks and slow mediums.\n\nEngine Stats:\nHealth:                  20\nArmor:                  20mm\nWeight:                265kg\nCrewed Speed:     42km/h with 10t contraption\nUncrewed Speed: 25km/h with 10t contraption\nPower:                  125 HP\nFuel Required:      75L (for full performance)" )
+		DLabel:SetText(DTSpawnerEngineLabel("Small Engine","Small engine for light tanks and slow mediums.","20","20","265","42","125","75"))
 	end
 	engineList["Standard Engine"] = function()
-		DLabel:SetText( "Standard Engine\n\nStandard sized engine for medium tanks or slow heavies.\n\nEngine Stats:\nHealth:                  45\nArmor:                  45mm\nWeight:                630kg\nCrewed Speed:     100km/h with 10t contraption\nUncrewed Speed: 60km/h with 10t contraption\nPower:                  300 HP\nFuel Required:      180L (for full performance)" )
+		DLabel:SetText(DTSpawnerEngineLabel("Standard Engine","Standard sized engine for medium tanks or slow heavies.","45","45","630","100","300","180"))
 	end
 	engineList["Large Engine"] = function()
-		DLabel:SetText( "Large Engine\n\nLarge engine for heavy tanks.\n\nEngine Stats:\nHealth:                  90\nArmor:                  90mm\nWeight:                1225kg\nCrewed Speed:     200km/h with 10t contraption\nUncrewed Speed: 120km/h with 10t contraption\nPower:                  600 HP\nFuel Required:      360L (for full performance)" )
+		DLabel:SetText(DTSpawnerEngineLabel("Large Engine","Large engine for heavy tanks.","90","90","1225","200","600","360"))
 	end
 	engineList["Huge Engine"] = function()
-		DLabel:SetText( "Huge Engine\n\nHuge engine for heavy tanks that want to move fast.\n\nEngine Stats:\nHealth:                  150\nArmor:                  150mm\nWeight:                2120kg\nCrewed Speed:     333km/h with 10t contraption\nUncrewed Speed: 200km/h with 10t contraption\nPower:                  1000 HP\nFuel Required:      600L (for full performance)" )
+		DLabel:SetText(DTSpawnerEngineLabel("Huge Engine","Huge engine for heavy tanks that want to move fast.","150","150","2120","333","1000","600"))
 	end
 	engineList["Ultra Engine"] = function()
-		DLabel:SetText( "Ultra Engine\n\nUltra engine for use in super heavy tanks.\n\nEngine Stats:\nHealth:                  360\nArmor:                  360mm\nWeight:                5020kg\nCrewed Speed:     800km/h with 10t contraption\nUncrewed Speed: 480km/h with 10t contraption\nPower:                  2400 HP\nFuel Required:      1440L (for full performance)" )
+		DLabel:SetText(DTSpawnerEngineLabel("Ultra Engine","Ultra engine for use in super heavy tanks.","360","360","5020","800","2400","1440"))
 	end
 	
 	--Table containing the description of the available gearboxes

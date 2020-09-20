@@ -22,13 +22,16 @@ function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
 	local Ent = data:GetEntity()
 	local size = data:GetScale()
-	local EntVel = Ent:GetVelocity()
-	if Ent:GetParent():IsValid() then
-		EntVel = Ent:GetParent():GetVelocity()
-		if Ent:GetParent():GetParent():IsValid() then
-			EntVel = Ent:GetParent():GetParent():GetVelocity()
-			if Ent:GetParent():GetParent():GetParent():IsValid() then
-				EntVel = Ent:GetParent():GetParent():GetParent():GetVelocity()
+	local EntVel = 0
+	if Ent:IsValid() then
+		EntVel = Ent:GetVelocity()
+		if Ent:GetParent():IsValid() then
+			EntVel = Ent:GetParent():GetVelocity()
+			if Ent:GetParent():GetParent():IsValid() then
+				EntVel = Ent:GetParent():GetParent():GetVelocity()
+				if Ent:GetParent():GetParent():GetParent():IsValid() then
+					EntVel = Ent:GetParent():GetParent():GetParent():GetVelocity()
+				end
 			end
 		end
 	end

@@ -1159,7 +1159,8 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						checkhitboxtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
 					local HitboxTrace = util.TraceHull( checkhitboxtrace )
 					local Pain = DamageInfo()
-					Pain:SetDamageForce( Shell.DakVelocity:GetNormalized()*Shell.DakDamage*Shell.DakMass*(Shell.DakVelocity:Distance( Vector(0,0,0) )) )
+					--Pain:SetDamageForce( Shell.DakVelocity:GetNormalized()*Shell.DakDamage*Shell.DakMass*(Shell.DakVelocity:Distance( Vector(0,0,0) )) )
+					Pain:SetDamageForce( Shell.DakVelocity:GetNormalized()*(2500*Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6)) )
 					Pain:SetDamage( Shell.DakDamage*500 )
 					if Shell.DakGun.DakOwner and Shell and Shell.DakGun then
 						Pain:SetAttacker( Shell.DakGun.DakOwner )
@@ -1934,7 +1935,8 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 					else
 						local Pain = DamageInfo()
-						Pain:SetDamageForce( Shell.DakVelocity:GetNormalized()*Shell.DakDamage*Shell.DakMass*(Shell.DakVelocity:Distance( Vector(0,0,0) )) )
+						--Pain:SetDamageForce( Shell.DakVelocity:GetNormalized()*Shell.DakDamage*Shell.DakMass*(Shell.DakVelocity:Distance( Vector(0,0,0) )) )
+						Pain:SetDamageForce( Shell.DakVelocity:GetNormalized()*(2500*Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6)) )
 						Pain:SetDamage( Shell.DakDamage*500 )
 						if Shell.DakGun.DakOwner and Shell and Shell.DakGun then
 							Pain:SetAttacker( Shell.DakGun.DakOwner )
@@ -3158,7 +3160,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 		SpallDamage = math.Round(SpallDamage * HitEnt.EntityMods.Ductility,2)
 		SpallPen = math.Round(SpallPen * HitEnt.EntityMods.Ductility,2)
 	end
-	local Filter = table.Copy( Shell.Filter )
+	
 	if SpallDamage < 0.01 then traces = 0 end
 
 	--print(traces)
@@ -3168,14 +3170,16 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 	--end
 	local DEBUGSpallDamage = 0
 	for i=1, traces do
+		local Filter = table.Copy( Shell.Filter )
 		local Direction = ((Angle(math.Rand(-Ang,Ang),math.Rand(-Ang,Ang),math.Rand(-Ang,Ang))) + Dir:Angle()):Forward()
 		local trace = {}
-			trace.start = Pos - Direction*2
+			trace.start = Pos - Dir*2
 			trace.endpos = Pos + Direction*1000
 			trace.filter = Filter
-			trace.mins = Vector(-Caliber*0.002,-Caliber*0.002,-Caliber*0.002)
-			trace.maxs = Vector(Caliber*0.002,Caliber*0.002,Caliber*0.002)
-		local SpallTrace = util.TraceLine( trace )
+
+			--trace.mins = Vector(-Caliber*0.002,-Caliber*0.002,-Caliber*0.002)
+			--trace.maxs = Vector(Caliber*0.002,Caliber*0.002,Caliber*0.002)
+		local SpallTrace = util.TraceHull( trace )
 		if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
 			if SpallTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
@@ -3219,7 +3223,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 							end
 						end
 					end
-					
+
 					SpallTrace.Entity.DakLastDamagePos = SpallTrace.HitPos
 					if CanDamage(SpallTrace.Entity) then
 						if SpallTrace.Entity:GetClass() == "dak_tegun" or SpallTrace.Entity:GetClass() == "dak_temachinegun" or SpallTrace.Entity:GetClass() == "dak_teautogun" then
@@ -3366,7 +3370,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 			trace.filter = Filter
 			trace.mins = Vector(-Shell.DakCaliber*0.002,-Shell.DakCaliber*0.002,-Shell.DakCaliber*0.002)
 			trace.maxs = Vector(Shell.DakCaliber*0.002,Shell.DakCaliber*0.002,Shell.DakCaliber*0.002)
-		local SpallTrace = util.TraceLine( trace )
+		local SpallTrace = util.TraceHull( trace )
 		if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
 			if (SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and not(SpallTrace.Entity.DakHealth == 0)) then
 				if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then

@@ -36,25 +36,53 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						local info2count = 1
 						InfoTable2[info2count] = "Guns"
 						local GunsSorted = table.Copy( Target.Guns )
-						table.sort( GunsSorted, function(a, b) return a.DakMass > b.DakMass end )
+						table.sort( GunsSorted, function(a, b)
+							if a.DakMass ~= nil and b.DakMass ~= nil then
+								return a.DakMass > b.DakMass 
+							else
+								return false
+							end
+						end )
 						for i = 1, #GunsSorted do
 							info2count = info2count + 1
-							InfoTable2[info2count] = "-"..GunsSorted[i].DakName
+							if GunsSorted[i].DakName ~= nil then
+								InfoTable2[info2count] = "-"..GunsSorted[i].DakName
+							else
+								InfoTable2[info2count] = "-N/A"
+							end
 						end
 						info2count = info2count + 1
 						local TurretsSorted = table.Copy( Target.TurretControls )
-						table.sort( TurretsSorted, function(a, b) return a.GunMass > b.GunMass end )
+						table.sort( TurretsSorted, function(a, b)
+							if a.DakMass ~= nil and b.DakMass ~= nil then
+								return a.DakMass > b.DakMass 
+							else
+								return false
+							end
+						end )
 
 						InfoTable2[info2count] = "Turrets: "..(#TurretsSorted)
 						for i=1, #TurretsSorted do
 							info2count = info2count + 1
 							InfoTable2[info2count] = "-Turret "..i
 							info2count = info2count + 1
-							InfoTable2[info2count] = "--Motors: "..(#TurretsSorted[i].DakTurretMotors)
+							if TurretsSorted[i].DakTurretMotors ~= nil then
+								InfoTable2[info2count] = "--Motors: "..(#TurretsSorted[i].DakTurretMotors)
+							else
+								InfoTable2[info2count] = "--Motors: N/A"
+							end
 							info2count = info2count + 1
-							InfoTable2[info2count] = "--Weight: "..TurretsSorted[i].GunMass.."kg"
+							if TurretsSorted[i].GunMass ~= nil then
+								InfoTable2[info2count] = "--Weight: "..TurretsSorted[i].GunMass.."kg"
+							else
+								InfoTable2[info2count] = "--Weight: N/A kg"
+							end
 							info2count = info2count + 1
-							InfoTable2[info2count] = "--Speed: "..math.Round((TurretsSorted[i].RotationSpeed*1/engine.TickInterval()),2).." degrees/s"
+							if TurretsSorted[i].RotationSpeed ~= nil then
+								InfoTable2[info2count] = "--Speed: "..math.Round((TurretsSorted[i].RotationSpeed*1/engine.TickInterval()),2).." degrees/s"
+							else
+								InfoTable2[info2count] = "--Speed: N/A degrees/s"
+							end
 						end
 
 						InfoTable3[1] = "Debugging"
@@ -96,29 +124,37 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						end
 
 						--crew count check
-						if (#Target.Crew) < 2 then
-							info3count = info3count + 1
-							InfoTable3[info3count] = "-Not enough crew"
+						if Target.Crew ~= nil then
+							if (#Target.Crew) < 2 then
+								info3count = info3count + 1
+								InfoTable3[info3count] = "-Not enough crew"
+							end
 						end
 
 						--driver check
-						if Target.Gearbox.CrewAlive == 0 then
-							info3count = info3count + 1
-							InfoTable3[info3count] = "-No Driver"
+						if Target.Gearbox.CrewAlive ~= nil then
+							if Target.Gearbox.CrewAlive == 0 then
+								info3count = info3count + 1
+								InfoTable3[info3count] = "-No Driver"
+							end
 						end
 
 						--fuel check
-						if Target.Gearbox.DakFuel < Target.Gearbox.DakFuelReq then
-							info3count = info3count + 1
-							InfoTable3[info3count] = "-"..Target.Gearbox.DakFuel.." out of "..Target.Gearbox.DakFuelReq.." Fuel available"
+						if Target.Gearbox.DakFuel ~= nil and Target.Gearbox.DakFuelReq ~= nil then
+							if Target.Gearbox.DakFuel < Target.Gearbox.DakFuelReq then
+								info3count = info3count + 1
+								InfoTable3[info3count] = "-"..Target.Gearbox.DakFuel.." out of "..Target.Gearbox.DakFuelReq.." Fuel available"
+							end
 						end
 
 						--autoloader check
 						for i = 1, #GunsSorted do
-							if GunsSorted[i].IsAutoLoader == 1 then
-								if not(GunsSorted[i].Loaded == 1) then
-									info3count = info3count + 1
-									InfoTable3[info3count] = "-"..GunsSorted[i].DakName.." needs mag"
+							if GunsSorted[i].IsAutoLoader ~= nil then
+								if GunsSorted[i].IsAutoLoader == 1 then
+									if not(GunsSorted[i].Loaded == 1) then
+										info3count = info3count + 1
+										InfoTable3[info3count] = "-"..GunsSorted[i].DakName.." needs mag"
+									end
 								end
 							end
 						end
