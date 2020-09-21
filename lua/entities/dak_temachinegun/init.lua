@@ -696,6 +696,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/shortautocannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/launcher100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/duallauncher100mm2.mdl" then ScalingGun = 1 end

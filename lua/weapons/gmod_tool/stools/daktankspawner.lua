@@ -660,24 +660,7 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
-			if self.DakCaliber < 24 then
-				self.DakModel = "models/daktanks/hmg20mm.mdl"
-			end
-			if self.DakCaliber >= 24 and self.DakCaliber < 28 then
-				self.DakModel = "models/daktanks/hmg24mm.mdl"
-			end
-			if self.DakCaliber >= 28 and self.DakCaliber < 32 then
-				self.DakModel = "models/daktanks/hmg28mm.mdl"
-			end
-			if self.DakCaliber >= 32 and self.DakCaliber < 36 then
-				self.DakModel = "models/daktanks/hmg32mm.mdl"
-			end
-			if self.DakCaliber >= 36 and self.DakCaliber < 40 then
-				self.DakModel = "models/daktanks/hmg36mm.mdl"
-			end
-			if self.DakCaliber >= 40 then
-				self.DakModel = "models/daktanks/hmg40mm.mdl"
-			end
+			self.DakModel = "models/daktanks/shortautocannon100mm2.mdl"
 
 			if self.DakCaliber < 30 then
 				self.DakFireSound = "daktanks/hmg20.mp3"
@@ -1321,6 +1304,7 @@ function TOOL:LeftClick( trace )
 		if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/shortautocannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/launcher100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/duallauncher100mm2.mdl" then self.ScalingGun = 1 end
