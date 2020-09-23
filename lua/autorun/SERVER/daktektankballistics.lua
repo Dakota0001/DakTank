@@ -1013,7 +1013,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							else
 								Bounce = 0
 							end
-							--Bounce = 0
+							Bounce = 0
 							if Shell.DakShellType == "HESH" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then Bounce = 0 end
 							if Bounce == 1 then
 								effectdata:SetOrigin(HitPos)
@@ -1798,7 +1798,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 								else
 									Bounce = 0
 								end
-								--Bounce = 0
+								Bounce = 0
 								if Shell.DakShellType == "HESH" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then Bounce = 0 end
 								if Bounce == 1 then
 									effectdata:SetOrigin(ContShellTrace.HitPos)

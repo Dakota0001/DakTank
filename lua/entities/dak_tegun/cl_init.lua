@@ -45,7 +45,7 @@ function ENT:Think()
 		end
 	end
 	local Fired = false
-	if self:GetModel() == "models/daktanks/mortar100mm2.mdl" or self:GetModel() == "models/daktanks/cannon100mm2.mdl" or self:GetModel() == "models/daktanks/shortcannon100mm2.mdl" or self:GetModel() == "models/daktanks/longcannon100mm2.mdl" or self:GetModel() == "models/daktanks/howitzer100mm2.mdl" then
+	if self:GetModel() == "models/daktanks/mortar100mm2.mdl" or self:GetModel() == "models/daktanks/cannon100mm2.mdl" or self:GetModel() == "models/daktanks/shortcannon100mm2.mdl" or self:GetModel() == "models/daktanks/longcannon100mm2.mdl" or self:GetModel() == "models/daktanks/howitzer100mm2.mdl" or self:GetModel() == "models/daktanks/hmg100mm2.mdl" then
 		if self:GetNWBool("Firing") == true and self:GetNWBool("Firing")~=self.LastFire2 then
 			self:SetSequence( self:LookupSequence( "recoil" ) )
 			self.CycleVal = 0.0

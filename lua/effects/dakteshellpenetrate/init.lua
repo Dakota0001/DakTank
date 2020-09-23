@@ -68,7 +68,9 @@ function EFFECT:Init( data )
 			particle:SetNextThink( CurTime() )
 			particle:SetThinkFunction( function( pa )
 				if HitEnt~=NULL and Attach~=nil then
-					pa:SetPos( HitEnt:LocalToWorld(Attach) )
+					if HitEnt~=NULL and Attach~=nil then
+						pa:SetPos( HitEnt:LocalToWorld(Attach) )
+					end
 					pa:SetNextThink( CurTime() )
 				end
 			end )
@@ -97,7 +99,9 @@ function EFFECT:Init( data )
 			particle:SetNextThink( CurTime() )
 			particle:SetThinkFunction( function( pa )
 				if HitEnt~=NULL and Attach~=nil then
-					pa:SetPos( HitEnt:LocalToWorld(Attach) )
+					if HitEnt~=NULL and Attach~=nil then
+						pa:SetPos( HitEnt:LocalToWorld(Attach) )
+					end
 					pa:SetNextThink( CurTime() )
 				end
 			end )
@@ -126,7 +130,9 @@ function EFFECT:Init( data )
 			particle:SetNextThink( CurTime() )
 			particle:SetThinkFunction( function( pa )
 				if HitEnt~=NULL and Attach~=nil then
-					pa:SetPos( HitEnt:LocalToWorld(Attach) )
+					if HitEnt~=NULL and Attach~=nil then
+						pa:SetPos( HitEnt:LocalToWorld(Attach) )
+					end
 					pa:SetNextThink( CurTime() )
 				end
 			end )

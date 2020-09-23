@@ -70,7 +70,7 @@ function ENT:Initialize()
  	self.muzzle:SetMoveType(MOVETYPE_NONE)
  	self.muzzle:PhysicsInit(SOLID_NONE)
  	self.muzzle:SetParent(self)
- 	self.muzzle:SetModel( "models/daktanks/smokelauncher100mm.mdl" )
+ 	self.muzzle:SetModel( "models/daktanks/machinegun100mm.mdl" )
  	self.muzzle:DrawShadow(false)
  	self.muzzle:SetColor( Color(255, 255, 255, 0) )
  	self.muzzle:SetRenderMode( RENDERMODE_TRANSCOLOR )
@@ -696,7 +696,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then ScalingGun = 1 end
-	if self.DakModel == "models/daktanks/shortautocannon100mm2.mdl" then ScalingGun = 1 end
+	if self.DakModel == "models/daktanks/hmg100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/launcher100mm2.mdl" then ScalingGun = 1 end
 	if self.DakModel == "models/daktanks/duallauncher100mm2.mdl" then ScalingGun = 1 end

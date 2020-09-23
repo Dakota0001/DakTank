@@ -657,10 +657,10 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "HMG" then
 			self.DakGunType = "HMG"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
-			self.DakModel = "models/daktanks/shortautocannon100mm2.mdl"
+			self.DakModel = "models/daktanks/hmg100mm2.mdl"
 
 			if self.DakCaliber < 30 then
 				self.DakFireSound = "daktanks/hmg20.mp3"
@@ -1304,7 +1304,7 @@ function TOOL:LeftClick( trace )
 		if self.DakModel == "models/daktanks/shortcannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/longcannon100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/autocannon100mm2.mdl" then self.ScalingGun = 1 end
-		if self.DakModel == "models/daktanks/shortautocannon100mm2.mdl" then self.ScalingGun = 1 end
+		if self.DakModel == "models/daktanks/hmg100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/howitzer100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/launcher100mm2.mdl" then self.ScalingGun = 1 end
 		if self.DakModel == "models/daktanks/duallauncher100mm2.mdl" then self.ScalingGun = 1 end
@@ -2259,7 +2259,7 @@ function TOOL.BuildCPanel( panel )
 		ShellLength = 40/50
 		ShellLengthExact = 5
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "Armor Piercing Fin Stabilized Discarding Sabot" }
-		DermaNumSlider:SetMinMax( 20, 40 )
+		DermaNumSlider:SetMinMax( 20, 60 )
 	end
 	gunData["Howitzer"] = function()
 		EntType   = "dak_tegun"
