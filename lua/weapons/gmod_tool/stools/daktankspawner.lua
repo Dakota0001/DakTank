@@ -888,7 +888,7 @@ function TOOL:LeftClick( trace )
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "HMG" then
 				self.GunType = "HMG"
-				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,40)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "ATGM Launcher" then
 				self.GunType = "L"
