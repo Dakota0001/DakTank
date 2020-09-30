@@ -167,6 +167,12 @@ function ENT:Think()
 				end
 				self.PreCostTimer = CurTime() - self.PreCostTimerFirst
 				if self.PreCostTimer > 5 and self.CanSpawn ~= true and IsValid(self.Gearbox) then
+					if self:GetForceColdWar() == true then
+						self.ColdWar = 1
+					end
+					if self:GetForceModern() == true then
+						self.Modern = 1
+					end
 					self.CanSpawn = true
 					self.BestHeight = 0
 					self.BestWidth = 0
@@ -833,7 +839,6 @@ function ENT:Think()
 						self.NERAWeight = 0
 						self.TextoliteWeight = 0
 						self.ERAWeight = 0
-
 
 						local CurrentRes
 						for i=1, #res do
