@@ -1160,6 +1160,25 @@ function TOOL:LeftClick( trace )
 					self.spawnedent:PhysicsInit(SOLID_VPHYSICS)
 					self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
 					self.spawnedent:SetSolid(SOLID_VPHYSICS)
+					local color = math.random(1,8)
+					if color == 1 then
+						self.spawnedent:SetColor(Color(255,255,255))
+					elseif color == 2 then
+						self.spawnedent:SetColor(Color(246,217,185))
+					elseif color == 3 then
+						self.spawnedent:SetColor(Color(225,206,154))
+					elseif color == 4 then
+						self.spawnedent:SetColor(Color(227,183,135))
+					elseif color == 5 then
+						self.spawnedent:SetColor(Color(175,148,72))
+					elseif color == 6 then
+						self.spawnedent:SetColor(Color(140,112,35))
+					elseif color == 7 then
+						self.spawnedent:SetColor(Color(66,55,26))
+					elseif color == 8 then
+						self.spawnedent:SetColor(Color(0,0,0))
+					end
+					
 				end
 			end
 			if not(trace.Entity:IsValid()) then

@@ -1304,7 +1304,8 @@ function ENT:Think()
 
 									self.RemoveTurretList = {}
 
-									if math.random(1,3) == 1 then
+									
+									if math.random(1,100) <= self:GetTurretPop() then
 										for j=1, #self.TurretControls do
 											if IsValid(self.TurretControls[j]) then
 												table.RemoveByValue( self.Contraption, self.TurretControls[j].TurretBase )
@@ -1357,8 +1358,9 @@ function ENT:Think()
 														end
 													end
 													self.TurretControls[j].TurretBase:SetParent(nil)
-													self.TurretControls[j].TurretBase:SetAngles(self.TurretControls[j].TurretBase:GetAngles() + Angle(math.Rand(-45,45),math.Rand(-45,45),math.Rand(-45,45)))
-													self.TurretControls[j].TurretBase:GetPhysicsObject():ApplyForceCenter(self.TurretControls[j].TurretBase:GetUp()*2500*self.TurretControls[j].TurretBase:GetPhysicsObject():GetMass())
+													self.TurretControls[j].TurretBase:SetAngles(self.TurretControls[j].TurretBase:GetAngles() + Angle(math.Rand(-15,15),math.Rand(-15,15),math.Rand(-15,15)))
+													self.TurretControls[j].TurretBase:GetPhysicsObject():SetMass(self.TurretControls[j].GunMass)
+													self.TurretControls[j].TurretBase:GetPhysicsObject():ApplyForceCenter(self.TurretControls[j].TurretBase:GetUp()*2500*self:GetTurretPopForceMult()*self.TurretControls[j].TurretBase:GetPhysicsObject():GetMass())
 													self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].TurretBase
 												end
 											end
