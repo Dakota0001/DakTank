@@ -1645,14 +1645,15 @@ function ENT:DakTEFire()
 				end
 				self.LastFireTime = CurTime()
 				local shootOrigin = self:GetPos() + (self:GetForward()*self:GetModelRadius())
-				local shootAngles = (self:GetVelocity()+self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
-				local initvel = self:GetVelocity()
-				if self:GetParent():IsValid() then
-					initvel = self:GetParent():GetVelocity()
-					if self:GetParent():GetParent():IsValid() then
-						initvel = self:GetParent():GetParent():GetVelocity()
+				local shootAngles = (self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
+				local initvel = self.DakTankCore:GetVelocity()
+				if self.DakTankCore:GetParent():IsValid() then
+					initvel = self.DakTankCore:GetParent():GetVelocity()
+					if self.DakTankCore:GetParent():GetParent():IsValid() then
+						initvel = self.DakTankCore:GetParent():GetParent():GetVelocity()
 					end
 				end
+
 				local shootDir = shootAngles:Forward()
 
 				local Propellant = self:GetPropellant()*0.01

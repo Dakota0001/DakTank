@@ -530,6 +530,8 @@ function ENT:Think()
 												    TravelTime = X/(VelValue*math.cos(Ang*0.017453293))
 												    VelLossFull = VelLoss * TravelTime 
 												end
+												--print(SelfVel)
+												--print(TravelTime)
 												local traceFCS2 = {}
 													traceFCS2.start = GunPos
 													traceFCS2.endpos = GunPos + Angle(Ang,Diff:Angle().yaw,0):Forward()*100000000
