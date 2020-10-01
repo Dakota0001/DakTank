@@ -305,6 +305,7 @@ function ENT:PreEntityCopy()
 	info.DakName = self.DakName
 	info.DakMass = self.DakMass
 	info.DakModel = self.DakModel
+	info.DakColor = self:GetColor()
 	info.DakMaxHealth = self.DakMaxHealth
 	info.DakHealth = self.DakHealth
 
