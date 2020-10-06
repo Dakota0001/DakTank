@@ -58,7 +58,7 @@ local function GetPhysCons( ent, Results )
 		Results[ ent ] = ent
 		local Constraints = constraint.GetTable( ent )
 		for k, v in ipairs( Constraints ) do
-			if not (v.Type == "NoCollide") then
+			if not (v.Type == "NoCollide") and not (v.Type == "Rope") and not ((v.Type == "AdvBallsocket") and v.onlyrotation == 1) then
 				for i, Ent in pairs( v.Entity ) do
 					GetPhysCons( Ent.Entity, Results )
 				end
