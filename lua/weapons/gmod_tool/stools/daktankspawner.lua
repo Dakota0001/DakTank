@@ -1700,117 +1700,119 @@ function TOOL:RightClick( trace )
 			end
 			local Target = trace.Entity
 			local ply = self:GetOwner()
-			local TarName = Target.DakName
-			local HP = math.Round(Target.DakHealth, 1 )
-			local MHP = math.Round(Target.DakMaxHealth, 1 )
-			local PHP = math.Round((HP/MHP)*100, 1 )
-			if trace.Entity.IsComposite == 1 then
-				if Target.EntityMods.DakName then
-					ply:ChatPrint(Target.EntityMods.DakName..", ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompKEMult),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompCEMult),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
-				else
-					ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompKEMult),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompCEMult),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
-				end
-			else
-				if Target:GetClass() ~= "dak_tankcore" then
-					if Target.EntityMods and Target.EntityMods.ArmorType then
-						ply:ChatPrint(Target.EntityMods.ArmorType.." Plate, ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+			if Target.DakHealth and Target.DakMaxHealth then
+				local TarName = Target.DakName
+				local HP = math.Round(Target.DakHealth, 1 )
+				local MHP = math.Round(Target.DakMaxHealth, 1 )
+				local PHP = math.Round((HP/MHP)*100, 1 )
+				if trace.Entity.IsComposite == 1 then
+					if Target.EntityMods.DakName then
+						ply:ChatPrint(Target.EntityMods.DakName..", ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompKEMult),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompCEMult),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
 					else
-						if TarName == "Armor" then
-							ply:ChatPrint("RHA Plate, ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+						ply:ChatPrint("Composite, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompKEMult),2).." Armor(mm) vs KE, ".. math.Round((DTCompositesTrace( Target, trace.HitPos, trace.Normal, {ply} )*trace.Entity.EntityMods.CompCEMult),2).." Armor(mm) vs HEAT, ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+					end
+				else
+					if Target:GetClass() ~= "dak_tankcore" then
+						if Target.EntityMods and Target.EntityMods.ArmorType then
+							ply:ChatPrint(Target.EntityMods.ArmorType.." Plate, ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
 						else
-							ply:ChatPrint(TarName..", ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+							if TarName == "Armor" then
+								ply:ChatPrint("RHA Plate, ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+							else
+								ply:ChatPrint(TarName..", ".. math.Round(Target.DakArmor,2).." Armor (mm), ".. HP.."/"..MHP.." Health, "..PHP.."% Health")
+							end
 						end
 					end
 				end
-			end
-			if Target:GetClass() == "dak_teammo" then
-				if Target.DakAmmo and Target.DakMaxAmmo then
-					ply:ChatPrint("Ammo: "..Target.DakAmmo.."/"..Target.DakMaxAmmo.." Rounds")
-				end
-			end
-			if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" then
-				if Target.DakHP and Target.TotalMass then
-					if Target.DakCrew == NULL then
-						ply:ChatPrint("HP/T: "..math.Round(math.Clamp(Target.DakHP,0,Target.MaxHP)/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Uncrewed")
-						ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
-					else
-						ply:ChatPrint("HP/T: "..math.Round(math.Clamp(Target.DakHP,0,Target.MaxHP)/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Crewed")
-						ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
+				if Target:GetClass() == "dak_teammo" then
+					if Target.DakAmmo and Target.DakMaxAmmo then
+						ply:ChatPrint("Ammo: "..Target.DakAmmo.."/"..Target.DakMaxAmmo.." Rounds")
 					end
 				end
-			end
-			if Target:GetClass() == "dak_tankcore" then
-				if Target.Modern and Target.ColdWar then
-					ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
-					--[[
-					if Target.Modern == 1 then
-						ply:ChatPrint("Modern Tank, no limits, autocannon/HMG reload and mag size improved, carousel autoloader functionality gained")
-					elseif Target.ColdWar == 1 then
-						ply:ChatPrint("Cold War Tank, limited to no modern composites and no APFSDS, HEATFS/ATGM pen reduced, autocannon/HMG mag size improved, carousel autoloader functionality gained")
-					else
-						ply:ChatPrint("Historical Tank, limited to no composites, APFSDS, HEATFS, or ATGMs")
-					end
-					]]--
-					if Target.Cost~=nil then
-						if Target.CanSpawn == true then
-							--ply:ChatPrint("Tank Cost: "..Target.Cost..", breakdown below:")
-							--ply:ChatPrint("Component Cost: "..Target.ComponentCost..", Ammo Cost: "..Target.AmmoCost)
-							--ply:ChatPrint("Cost multiplier for Armor: "..Target.ArmorMult)
-							--ply:ChatPrint("Cost multiplier for Speed: "..Target.SpeedMult)
-							--ply:ChatPrint("Cost multiplier for Firepower: "..Target.FirepowerMult)
-							--ply:ChatPrint("Cost multiplier for Gun Handling: "..Target.GunHandlingMult)
-							local Era = "WWII"
-							if Target.ColdWar == 1 then
-								Era = "Cold War"
-							end
-							if Target.Modern == 1 then
-								Era = "Modern"
-							end
-							ply:ChatPrint(Target.Cost.." point "..Era.." tank.")
-							--ply:ChatPrint("Base Costs")	
-							ply:ChatPrint("Armor Cost: "..math.Round((Target.ArmorMult*50),2).." points (main arc: "..math.Round((Target.ArmorMult*50)/Target.ArmorSideMult,2)..", side arc multiplier: "..math.Round(Target.ArmorSideMult,2)..").")
-							ply:ChatPrint("Firepower Cost: "..math.Round(Target.FirepowerMult*50,2).." points.")
-							--ply:ChatPrint("Multipliers")
-							ply:ChatPrint("Flanking Multiplier: "..Target.SpeedMult.."x.")
-							ply:ChatPrint("Gun Handling Multiplier: "..Target.GunHandlingMult.."x.")
-							--ply:ChatPrint("Misc")
-							ply:ChatPrint("Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm, Best Round Pen: "..math.Round(Target.MaxPen,2).."mm, HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2)..".")
-							ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+				if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" then
+					if Target.DakHP and Target.TotalMass then
+						if Target.DakCrew == NULL then
+							ply:ChatPrint("HP/T: "..math.Round(math.Clamp(Target.DakHP,0,Target.MaxHP)/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Uncrewed")
+							ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
 						else
-							ply:ChatPrint("Calculating Tank Cost")
-							ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+							ply:ChatPrint("HP/T: "..math.Round(math.Clamp(Target.DakHP,0,Target.MaxHP)/(Target.TotalMass/1000),2)..", Speed: "..math.Round(Target.TopSpeed,2).." kph, Crewed")
+							ply:ChatPrint("Total Mass: "..math.Round(Target.DakTankCore.TotalMass,2).." kg, Physical Mass: "..math.Round(Target.DakTankCore.PhysMass,2).." kg, Parented Mass: "..math.Round(Target.DakTankCore.ParMass,2).." kg")
 						end
 					end
 				end
-			end
-			if Target:GetClass() == "dak_temotor" then
-				if Target.DakHP then
-					ply:ChatPrint("HP: "..Target.DakHP)
+				if Target:GetClass() == "dak_tankcore" then
+					if Target.Modern and Target.ColdWar then
+						ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+						--[[
+						if Target.Modern == 1 then
+							ply:ChatPrint("Modern Tank, no limits, autocannon/HMG reload and mag size improved, carousel autoloader functionality gained")
+						elseif Target.ColdWar == 1 then
+							ply:ChatPrint("Cold War Tank, limited to no modern composites and no APFSDS, HEATFS/ATGM pen reduced, autocannon/HMG mag size improved, carousel autoloader functionality gained")
+						else
+							ply:ChatPrint("Historical Tank, limited to no composites, APFSDS, HEATFS, or ATGMs")
+						end
+						]]--
+						if Target.Cost~=nil then
+							if Target.CanSpawn == true then
+								--ply:ChatPrint("Tank Cost: "..Target.Cost..", breakdown below:")
+								--ply:ChatPrint("Component Cost: "..Target.ComponentCost..", Ammo Cost: "..Target.AmmoCost)
+								--ply:ChatPrint("Cost multiplier for Armor: "..Target.ArmorMult)
+								--ply:ChatPrint("Cost multiplier for Speed: "..Target.SpeedMult)
+								--ply:ChatPrint("Cost multiplier for Firepower: "..Target.FirepowerMult)
+								--ply:ChatPrint("Cost multiplier for Gun Handling: "..Target.GunHandlingMult)
+								local Era = "WWII"
+								if Target.ColdWar == 1 then
+									Era = "Cold War"
+								end
+								if Target.Modern == 1 then
+									Era = "Modern"
+								end
+								ply:ChatPrint(Target.Cost.." point "..Era.." tank.")
+								--ply:ChatPrint("Base Costs")	
+								ply:ChatPrint("Armor Cost: "..math.Round((Target.ArmorMult*50),2).." points (main arc: "..math.Round((Target.ArmorMult*50)/Target.ArmorSideMult,2)..", side arc multiplier: "..math.Round(Target.ArmorSideMult,2)..").")
+								ply:ChatPrint("Spall Liner Coverage: Frontal: "..math.Round((Target.FrontalSpallLinerCoverage*100),0).."%, "..math.Round(1+(Target.FrontalSpallLinerCoverage*0.25),2).." Multiplier, Side: "..math.Round((Target.SideSpallLinerCoverage*100),0).."%, "..math.Round(1+(Target.SideSpallLinerCoverage*0.25),2).." Multiplier")
+								ply:ChatPrint("Firepower Cost: "..math.Round(Target.FirepowerMult*50,2).." points (Penetration: "..math.Round(Target.PenMult,2)..", DPS: "..math.Round(Target.DPSMult,2)..").")
+								--ply:ChatPrint("Multipliers")
+								ply:ChatPrint("Flanking Multiplier: "..Target.SpeedMult.."x, Gun Handling Multiplier: "..Target.GunHandlingMult.."x.")
+								--ply:ChatPrint("Misc")
+								ply:ChatPrint("Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm, Best Round Pen: "..math.Round(Target.MaxPen,2).."mm, HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2)..".")
+								ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+							else
+								ply:ChatPrint("Calculating Tank Cost")
+								ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
+							end
+						end
+					end
 				end
-			end
-			if Target:GetClass() == "dak_tefuel" then
-				if Target.DakFuel then
-					ply:ChatPrint("Fuel: "..Target.DakFuel.." L")
+				if Target:GetClass() == "dak_temotor" then
+					if Target.DakHP then
+						ply:ChatPrint("HP: "..Target.DakHP)
+					end
 				end
-			end
-			if Target:GetClass() == "dak_tegun" then
-				if Target.Loaders then
-					ply:ChatPrint("Loaders: "..Target.Loaders.."/"..math.Max(math.Round( Target.BaseDakShellMass/25 ) , 1))
-					ply:ChatPrint("Reload Time: "..math.Round(Target.DakCooldown,2))
+				if Target:GetClass() == "dak_tefuel" then
+					if Target.DakFuel then
+						ply:ChatPrint("Fuel: "..Target.DakFuel.." L")
+					end
 				end
-			end
-			if Target:GetClass() == "dak_teautogun" then
-				if Target.Loaders then
-					ply:ChatPrint("Loaders: "..Target.Loaders)
-					ply:ChatPrint("Reload Time: "..math.Round(Target.DakCooldown,2))
-					ply:ChatPrint("Reload Time (magazine): "..math.Round(Target.DakReloadTime,2))
+				if Target:GetClass() == "dak_tegun" then
+					if Target.Loaders then
+						ply:ChatPrint("Loaders: "..Target.Loaders.."/"..math.Max(math.Round( Target.BaseDakShellMass/25 ) , 1))
+						ply:ChatPrint("Reload Time: "..math.Round(Target.DakCooldown,2))
+					end
 				end
-			end
-			if Target:GetClass() == "dak_crew" then
-				if Target.DakEntity.DakName ~= nil then
-					ply:ChatPrint("Crew for "..Target.DakEntity.DakName.." #"..Target.DakEntity:EntIndex())
-				else
-					ply:ChatPrint("Crew idle")
+				if Target:GetClass() == "dak_teautogun" then
+					if Target.Loaders then
+						ply:ChatPrint("Loaders: "..Target.Loaders)
+						ply:ChatPrint("Reload Time: "..math.Round(Target.DakCooldown,2))
+						ply:ChatPrint("Reload Time (magazine): "..math.Round(Target.DakReloadTime,2))
+					end
+				end
+				if Target:GetClass() == "dak_crew" then
+					if Target.DakEntity.DakName ~= nil then
+						ply:ChatPrint("Crew for "..Target.DakEntity.DakName.." #"..Target.DakEntity:EntIndex())
+					else
+						ply:ChatPrint("Crew idle")
+					end
 				end
 			end
 		end

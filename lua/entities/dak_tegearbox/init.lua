@@ -44,7 +44,6 @@ function ENT:Initialize()
  	self.SparkTime = CurTime()
  	self.MoveRightOld = 0
 	self.MoveLeftOld = 0
-	self.InertiaSet = 0
 	self.LeftBrakesEnabled = 0
 	self.RightBrakesEnabled = 0
 	self.Gear = 0
@@ -300,12 +299,17 @@ function ENT:Think()
 			 			self.LastYaw = self:GetParent():GetParent():GetAngles().yaw
 
 			 			--self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/self:GetParent():GetParent():GetPhysicsObject():GetMass())*0.25 )
-			 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/10000) )
+			 			--self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/10000) )
 			 			self.setup = 1
 			 		end
 			 	end
 	 		end
-
+	 		if self.InertiaSet == nil then
+		 		if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
+		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/10000) )
+			 		self.InertiaSet = 1
+			 	end
+		 	end
 	    	local LPhys = self.LeftDriveWheel:GetPhysicsObject()
 	    	local RPhys = self.RightDriveWheel:GetPhysicsObject()
 	    	local LPos = self:GetUp()*math.Clamp(self.LeftDriveWheel:OBBMaxs().z*2,1,60)

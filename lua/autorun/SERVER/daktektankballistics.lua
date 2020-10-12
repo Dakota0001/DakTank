@@ -195,7 +195,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 		DakTekTankEditionSetupNewEnt(HitEnt)
 	end
 	if (HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth~=nil and not(HitEnt.DakHealth <= 0))) then
-		if not((CheckClip(HitEnt,ShellSimTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" or HitEnt.DakDead==true) then
+		if not((CheckClip(HitEnt,ShellSimTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
 			if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
 				DakTekTankEditionSetupNewEnt(HitEnt)
 			end
@@ -293,7 +293,11 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 	else
 		EndPos = End
 	end
-	return EffArmor, HitEnt, EndPos, Shatter, Failed, HitGun, HitGear
+	if HitEnt.DakDead==true then
+		return 0, HitEnt, EndPos, 0, 0, 0, 0
+	else
+		return EffArmor, HitEnt, EndPos, Shatter, Failed, HitGun, HitGear
+	end
 end
 
 function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
@@ -309,7 +313,11 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	local Shatters = HeatShattered
 	local Fails = HeatFailed
 	local Rico = 0
-	
+	local Thickest = Armor
+	local SpallLiner = 0 
+	local SpallLinerOnCrit = 0
+	local LinerThickness = 0
+
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)
 		if newHitGun == 1 then HitGun = 1 end
@@ -321,14 +329,36 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 				FirstPenPos = LastPenPos
 			end
 		end
+		if newArmor >= Thickest then 
+			Thickest = newArmor
+			SpallLiner = 0
+			LinerThickness = 0
+		else
+			if newEnt:IsValid() then
+				if newEnt:GetClass() == "prop_physics" then
+					LinerThickness = LinerThickness + newArmor
+				end
+			end
+			if LinerThickness >= Thickest*0.1 and Thickest > 0 then
+				SpallLiner = 1
+			end
+		end
 		Shatters = Shatters + Shattered
 		Fails = Fails + Failed
 		if newEnt:IsValid() then
 			if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
 				if newEnt:GetClass() == "dak_teammo" then
-					if newEnt.DakAmmo > 0 then Go = 0 end
+					if newEnt.DakAmmo > 0 then 
+						Go = 0 
+						if SpallLiner == 1 then
+							SpallLinerOnCrit = 1
+						end
+					end
 				else
 					Go = 0
+					if SpallLiner == 1 then
+						SpallLinerOnCrit = 1
+					end
 				end
 			end
 		else
@@ -367,7 +397,10 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter)
 	local Fails = HeatFailed
 	local Rico = 0
 	local HitCrit = 0
-	
+	local Thickest = Armor
+	local SpallLiner = 0 
+	local SpallLinerOnCrit = 0
+	local LinerThickness = 0
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)
 		if newHitGun == 1 then HitGun = 1 end
@@ -379,14 +412,36 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter)
 				FirstPenPos = LastPenPos
 			end
 		end
+		if newArmor >= Thickest then 
+			Thickest = newArmor
+			SpallLiner = 0
+			LinerThickness = 0
+		else
+			if newEnt:IsValid() then
+				if newEnt:GetClass() == "prop_physics" then
+					LinerThickness = LinerThickness + newArmor
+				end
+			end
+			if LinerThickness >= Thickest*0.1 and Thickest > 0 then
+				SpallLiner = 1
+			end
+		end
 		Shatters = Shatters + Shattered
 		Fails = Fails + Failed
 		if newEnt:IsValid() then
 			if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
 				if newEnt:GetClass() == "dak_teammo" then
-					if newEnt.DakAmmo > 0 then HitCrit = 1 end
+					if newEnt.DakAmmo > 0 then 
+						HitCrit = 1 
+						if SpallLiner == 1 then
+							SpallLinerOnCrit = 1
+						end
+					end
 				else
 					HitCrit = 1
+					if SpallLiner == 1 then
+						SpallLinerOnCrit = 1
+					end
 				end
 			end
 		else
@@ -403,7 +458,7 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter)
 			if ShellType == "APDS" or ShellType == "APFSDS" then
 				if Fails > 0 then Rico = 1 end
 			end
-			return Armor, Ent, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos
+			return Armor, Ent, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
 		end
 		NewFilter[#NewFilter+1] = newEnt
 		Armor = Armor + newArmor
@@ -646,8 +701,12 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 		if HitEnt.DakHealth == nil then
 			DakTekTankEditionSetupNewEnt(HitEnt)
 		end
-		if (HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth~=nil and not(HitEnt.DakHealth <= 0))) or (HitEnt.DakName=="Damaged Component") or (HitEnt.DakDead==true) then
-			if (CheckClip(HitEnt,HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" or HitEnt.DakDead==true then
+		if (HitEnt.DakDead==true) then
+			Shell.Filter[#Shell.Filter+1] = HitEnt
+			DTShellContinue(Start,End,Shell,Normal,true)
+		end
+		if (HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth~=nil and not(HitEnt.DakHealth <= 0))) or (HitEnt.DakName=="Damaged Component") then
+			if (CheckClip(HitEnt,HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" then
 				if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
 					DakTekTankEditionSetupNewEnt(HitEnt)
 				end
@@ -1427,8 +1486,12 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			if HitEnt.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(HitEnt)
 			end
-			if (HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth~=nil and not(HitEnt.DakHealth <= 0))) or (HitEnt.DakName=="Damaged Component") or (HitEnt.DakDead==true)  then
-				if (CheckClip(HitEnt,ContShellTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" or HitEnt.DakDead==true then
+			if (HitEnt.DakDead==true) then
+				Shell.Filter[#Shell.Filter+1] = HitEnt
+				DTShellContinue(Start,End,Shell,Normal,true)
+			end
+			if (HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth~=nil and not(HitEnt.DakHealth <= 0))) or (HitEnt.DakName=="Damaged Component")  then
+				if (CheckClip(HitEnt,ContShellTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" then
 				--if (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component" or HitEnt.DakDead==true then
 					if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(HitEnt)
@@ -2151,7 +2214,11 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 			if ExpTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 			end
-			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true) then
+			if (ExpTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = ExpTrace.Entity
+				ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
+			end
+			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
 				if ExpTrace.Entity:GetClass()=="dak_crew" then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 				end
@@ -2328,7 +2395,11 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 			if ExpTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 			end
-			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true) then
+			if (ExpTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = ExpTrace.Entity
+				ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
+			end
+			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
 				if ExpTrace.Entity:GetClass()=="dak_crew" then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 				end
@@ -2502,7 +2573,11 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 		if ExpTrace.Entity.DakHealth == nil then
 			DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 		end
-		if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true) then
+		if (ExpTrace.Entity.DakDead==true) then
+			Filter[#Filter+1] = ExpTrace.Entity
+			ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
+		end
+		if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
 			if ExpTrace.Entity:GetClass()=="dak_crew" then
 				util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), IgnoreEnt)
 			end
@@ -2717,7 +2792,11 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 				if ExpTrace.Entity.DakHealth == nil then
 					DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 				end
-				if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true) then
+				if (ExpTrace.Entity.DakDead==true) then
+					Filter[#Filter+1] = ExpTrace.Entity
+					ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
+				end
+				if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
 					if ExpTrace.Entity:GetClass()=="dak_crew" then
 						util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 					end
@@ -3185,7 +3264,11 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 			if SpallTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
 			end
-			if (SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and (SpallTrace.Entity.DakHealth~=nil and not(SpallTrace.Entity.DakHealth <= 0))) or (SpallTrace.Entity.DakName=="Damaged Component") or (SpallTrace.Entity.DakDead==true) then
+			if (SpallTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = SpallTrace.Entity
+				ContSpall(Filter,SpallTrace.Entity,Pos,SpallDamage,SpallPen,Owner,Direction,Shell,1)
+			end
+			if (SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and (SpallTrace.Entity.DakHealth~=nil and not(SpallTrace.Entity.DakHealth <= 0))) or (SpallTrace.Entity.DakName=="Damaged Component") then
 				if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
 					if SpallTrace.Entity.DakArmor == nil or SpallTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
@@ -3373,7 +3456,11 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 			trace.maxs = Vector(Shell.DakCaliber*0.002,Shell.DakCaliber*0.002,Shell.DakCaliber*0.002)
 		local SpallTrace = util.TraceHull( trace )
 		if hook.Run("DakTankDamageCheck", SpallTrace.Entity, Owner, Shell.DakGun) ~= false and SpallTrace.HitPos:Distance(Pos)<=1000 then
-			if (SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and not(SpallTrace.Entity.DakHealth == 0)) then
+			if (SpallTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = SpallTrace.Entity
+				ContSpall(Filter,SpallTrace.Entity,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
+			end
+			if (SpallTrace.Entity:IsValid() and not(SpallTrace.Entity:IsPlayer()) and not(SpallTrace.Entity:IsNPC()) and not(SpallTrace.Entity.Base == "base_nextbot") and (SpallTrace.Entity.DakHealth~=nil and not(SpallTrace.Entity.DakHealth <= 0))) or (SpallTrace.Entity.DakName=="Damaged Component") then
 				if (CheckClip(SpallTrace.Entity,SpallTrace.HitPos)) or (SpallTrace.Entity:GetPhysicsObject():GetMass()<=1 or (SpallTrace.Entity.DakIsTread==1) and not(SpallTrace.Entity:IsVehicle()) and not(SpallTrace.Entity.IsDakTekFutureTech==1)) then
 					if SpallTrace.Entity.DakArmor == nil or SpallTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(SpallTrace.Entity)
@@ -3569,7 +3656,11 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 			if HEATTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
 			end
-			if (HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth~=nil and not(HEATTrace.Entity.DakHealth <= 0))) or (HEATTrace.Entity.DakName=="Damaged Component") or (HEATTrace.Entity.DakDead==true) then
+			if (HEATTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = HEATTrace.Entity
+				ContHEAT(Filter,HEATTrace.Entity,Pos,HEATDamage,HEATPen,Owner,Direction,Shell,false)
+			end
+			if (HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth~=nil and not(HEATTrace.Entity.DakHealth <= 0))) or (HEATTrace.Entity.DakName=="Damaged Component") then
 				if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 					if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
@@ -3765,7 +3856,11 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 			if HEATTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
 			end
-			if (HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth~=nil and not(HEATTrace.Entity.DakHealth <= 0))) or (HEATTrace.Entity.DakName=="Damaged Component") or (HEATTrace.Entity.DakDead==true) then
+			if (HEATTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = HEATTrace.Entity
+				ContHEAT(Filter,HEATTrace.Entity,Pos,HEATDamage,HEATPen,Owner,Direction,Shell,false)
+			end
+			if (HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth~=nil and not(HEATTrace.Entity.DakHealth <= 0))) or (HEATTrace.Entity.DakName=="Damaged Component") then
 				if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 					if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
@@ -3964,7 +4059,11 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 			if HEATTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
 			end
-			if (HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth~=nil and not(HEATTrace.Entity.DakHealth <= 0))) or (HEATTrace.Entity.DakName=="Damaged Component") or (HEATTrace.Entity.DakDead==true) then
+			if (HEATTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = HEATTrace.Entity
+				ContHEAT(Filter,HEATTrace.Entity,Pos,Damage,Pen,Owner,Direction,Shell,false,Recurse)
+			end
+			if (HEATTrace.Entity:IsValid() and not(HEATTrace.Entity:IsPlayer()) and not(HEATTrace.Entity:IsNPC()) and not(HEATTrace.Entity.Base == "base_nextbot") and (HEATTrace.Entity.DakHealth~=nil and not(HEATTrace.Entity.DakHealth <= 0))) or (HEATTrace.Entity.DakName=="Damaged Component") then
 				if (CheckClip(HEATTrace.Entity,HEATTrace.HitPos)) or (HEATTrace.Entity:GetPhysicsObject():GetMass()<=1 or (HEATTrace.Entity.DakIsTread==1) and not(HEATTrace.Entity:IsVehicle()) and not(HEATTrace.Entity.IsDakTekFutureTech==1)) then
 					if HEATTrace.Entity.DakArmor == nil or HEATTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(HEATTrace.Entity)
@@ -4194,7 +4293,11 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 			if ExpTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 			end
-			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true) then
+			if (ExpTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = ExpTrace.Entity
+				self:ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
+			end
+			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
 				if ExpTrace.Entity:GetClass()=="dak_crew" then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), self)
 				end
@@ -4380,7 +4483,11 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 			if ExpTrace.Entity.DakHealth == nil then
 				DakTekTankEditionSetupNewEnt(ExpTrace.Entity)
 			end
-			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") or (ExpTrace.Entity.DakDead==true) then
+			if (ExpTrace.Entity.DakDead==true) then
+				Filter[#Filter+1] = ExpTrace.Entity
+				self:ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Recurses)
+			end
+			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
 				if (CheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
 					if ExpTrace.Entity.DakArmor == nil or ExpTrace.Entity.DakBurnStacks == nil then
 						DakTekTankEditionSetupNewEnt(ExpTrace.Entity)

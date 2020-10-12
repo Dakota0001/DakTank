@@ -237,27 +237,34 @@ function ENT:Think()
 							self.DakGun = GunEnt:GetParent():GetParent()
 						end
 						self.Turret = {}
-						table.Add(self.Turret,GetTurretParents(GunEnt))
-						for k, v in pairs(GetTurretParents(GunEnt)) do
-							table.Add(self.Turret,GetTurretPhysCons(v))
-						end
 						if IsValid(DakTurret) then
-							table.Add(self.Turret,GetTurretParents(DakTurret))
-							for k, v in pairs(GetTurretParents(DakTurret)) do
+							table.Add(self.Turret,GetTurretParents(GunEnt))
+							for k, v in pairs(GetTurretParents(GunEnt)) do
 								table.Add(self.Turret,GetTurretPhysCons(v))
 							end
-						end
-						for i=1, #self.Turret do
-							table.Add( self.Turret, self.Turret[i]:GetChildren() )
-							table.Add( self.Turret, self.Turret[i]:GetParent() )
-						end
-						local Children = {}
-						for i2=1, #self.Turret do
-							if table.Count(self.Turret[i2]:GetChildren()) > 0 then
-							table.Add( Children, self.Turret[i2]:GetChildren() )
+							if IsValid(DakTurret) then
+								table.Add(self.Turret,GetTurretParents(DakTurret))
+								for k, v in pairs(GetTurretParents(DakTurret)) do
+									table.Add(self.Turret,GetTurretPhysCons(v))
+								end
+							end
+							for i=1, #self.Turret do
+								table.Add( self.Turret, self.Turret[i]:GetChildren() )
+								table.Add( self.Turret, self.Turret[i]:GetParent() )
+							end
+							local Children = {}
+							for i2=1, #self.Turret do
+								if table.Count(self.Turret[i2]:GetChildren()) > 0 then
+								table.Add( Children, self.Turret[i2]:GetChildren() )
+								end
+							end
+							table.Add( self.Turret, Children )
+						else
+							table.Add(self.Turret,self.DakGun:GetChildren())
+							for k, v in pairs(self.DakGun:GetChildren()) do
+								table.Add(self.Turret,v:GetChildren())
 							end
 						end
-						table.Add( self.Turret, Children )
 						local hash = {}
 						local res = {}
 						for _,v in ipairs(self.Turret) do

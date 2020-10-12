@@ -12,8 +12,6 @@ ENT.DakFuel = nil
 
 --cause self to delete self if not properly unfrozen
 
---FIX turret not unparenting on pop off causing it to delete
---fix wheels not deleting with tankcore
 --have tank just keep rolling with gearbox on death (they aren't being added to contraption, find all axised to baseplate)
 
 function ENT:Initialize()
@@ -48,6 +46,8 @@ function ENT:Initialize()
 	self.Modern = 0
 	self.ColdWar = 0
 	self.BoxVolume = 100000000
+	self.PenMult = 0
+	self.DPSMult = 0
 end
 
 
@@ -166,7 +166,7 @@ function ENT:Think()
 					self.PreCostTimer = 0	
 				end
 				self.PreCostTimer = CurTime() - self.PreCostTimerFirst
-				if self.PreCostTimer > 5 and self.CanSpawn ~= true and IsValid(self.Gearbox) then
+				if self.PreCostTimer > 5 and self.CanSpawn ~= true and (IsValid(self.Gearbox) or (self.TurretControls~=nil and IsValid(self.TurretControls[1]))) then
 					if self:GetForceColdWar() == true then
 						self.ColdWar = 1
 					end
@@ -174,6 +174,49 @@ function ENT:Think()
 						self.Modern = 1
 					end
 					self.CanSpawn = true
+
+					local GunHandlingMult = 0
+					if self.TurretControls[1] then
+
+						local TotalTurretMass = 0 
+						for i=1, #self.TurretControls do
+							if self.TurretControls[i].GunMass ~= nil then
+								TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
+							end
+						end
+						self.MainTurret = self.TurretControls[1]
+						local GunPercentage
+						for i=1, #self.TurretControls do
+							if self.TurretControls[i].GunMass ~= nil and self.MainTurret.GunMass ~= nil then
+								if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
+									self.MainTurret = self.TurretControls[i].GunMass
+								end
+								local RotationSpeed = self.TurretControls[i].RotationSpeed
+								local TurretCost = math.log(RotationSpeed*100,100)
+								if self.TurretControls[i].RemoteWeapon == true then
+									TurretCost = TurretCost * 1.5
+								end
+								if self.TurretControls[i]:GetFCS() == true then
+									self.ColdWar = 1
+									TurretCost = TurretCost * 1.5
+								end
+								if self.TurretControls[i]:GetStabilizer() == true then
+									self.ColdWar = 1
+									TurretCost = TurretCost * 1.25
+								elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
+									TurretCost = TurretCost * 1
+								else
+									TurretCost = TurretCost * 0.75
+								end
+								if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
+									TurretCost = TurretCost * 0.5
+								end
+								--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
+								GunHandlingMult = GunHandlingMult + math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)
+							end
+						end
+					end
+
 					self.BestHeight = 0
 					self.BestWidth = 0
 					self.BestLength = 0
@@ -185,22 +228,40 @@ function ENT:Think()
 					local gunhit = 0
 					local gearhit = 0
 					local HitCrit = 0
-					local forward = Angle(0,self.Gearbox:GetAngles().yaw,0):Forward()
-					local right = Angle(0,self.Gearbox:GetAngles().yaw,0):Right()
-					local up = Angle(0,self.Gearbox:GetAngles().yaw,0):Up()
+					local SpallLiner = 0
+					local forward
+					local right
+					local up
+					if IsValid(self.Gearbox) then
+						forward = Angle(0,self.Gearbox:GetAngles().yaw,0):Forward()
+						right = Angle(0,self.Gearbox:GetAngles().yaw,0):Right()
+						up = Angle(0,self.Gearbox:GetAngles().yaw,0):Up()
+					elseif IsValid(self.MainTurret) then
+						forward = Angle(0,self.MainTurret:GetAngles().yaw,0):Forward()
+						right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
+						up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
+					end
+
+					--setup system to check layers of armor between first impact and crew and determine if a spall liner exists 
+
 					--FRONT
 					local startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
 					local basesize = self:GetParent():GetParent():OBBMaxs()
 					local distance = math.Max((math.Max(basesize.x, basesize.y, basesize.z)*5),250)
 					local ArmorValTable = {}
+					local SpallLinerCount = 0
 					local hitpos
 					for i=1, 25 do
 						for j=1, 25 do
 							addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll())
+							SpallLiner = 0
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll())
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+									if SpallLiner == 1 then
+										SpallLinerCount = SpallLinerCount + 1
+									end
 								end
 								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
@@ -220,19 +281,26 @@ function ENT:Think()
 						end
 					end
 					self.FrontalArmor = Ave/AveCount
+					self.FrontalSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
+					--has to be done per side
 					--REAR
 					count = 0
 					blocks = 0
 					HitCrit = 0
 					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
 					ArmorValTable = {}
+					SpallLinerCount = 0
 					for i=1, 50 do
 						for j=1, 50 do
 							addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos, "AP", 75, player.GetAll())
+							SpallLiner = 0
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos, "AP", 75, player.GetAll())
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+									if SpallLiner == 1 then
+										SpallLinerCount = SpallLinerCount + 1
+									end
 								end
 								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
@@ -251,19 +319,25 @@ function ENT:Think()
 						end
 					end
 					self.RearArmor = Ave/AveCount
+					self.RearSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
 					--LEFT
 					count = 0
 					blocks = 0
 					HitCrit = 0
 					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
 					ArmorValTable = {}
+					SpallLinerCount = 0
 					for i=1, 25 do
 						for j=1, 25 do
 							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos, "AP", 75, player.GetAll())
+							SpallLiner = 0
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos, "AP", 75, player.GetAll())
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+									if SpallLiner == 1 then
+										SpallLinerCount = SpallLinerCount + 1
+									end
 								end
 								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
@@ -282,19 +356,25 @@ function ENT:Think()
 						end
 					end
 					local LeftArmor = Ave/AveCount
+					self.LeftSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
 					--RIGHT
 					count = 0
 					blocks = 0
 					HitCrit = 0
 					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
 					ArmorValTable = {}
+					SpallLinerCount = 0
 					for i=1, 25 do
 						for j=1, 25 do
 							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos, "AP", 75, player.GetAll())
+							SpallLiner = 0
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos, "AP", 75, player.GetAll())
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
+									if SpallLiner == 1 then
+										SpallLinerCount = SpallLinerCount + 1
+									end
 								end
 								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
@@ -313,13 +393,16 @@ function ENT:Think()
 						end
 					end
 					local RightArmor = Ave/AveCount
+					self.RightSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
 					self.SideArmor = (RightArmor+LeftArmor)/2
+					self.SideSpallLinerCoverage = 0.5*(self.RightSpallLinerCoverage + self.LeftSpallLinerCoverage)
 
 					self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
 
 					local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
+
 					self.BestAveArmor = Total
-					armormult = (Total/420)*self.ArmorSideMult
+					armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(self.ArmorSideMult*(1+(0.25*self.SideSpallLinerCoverage)))
 					--local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
 					--print(self.FrontalArmor)
 					--print(self.SideArmor)
@@ -491,7 +574,7 @@ function ENT:Think()
 						ammocosts = ammocosts + cost
 					end
 					local speedmult = 1
-					if self.Gearbox:IsValid() then
+					if IsValid(self.Gearbox) then
 						if self.Gearbox.DakHP ~= nil and self.Gearbox.MaxHP ~= nil and self.Gearbox.TotalMass ~= nil and self.Gearbox.HPperTon ~= nil then
 							if self.Gearbox:GetClass() == "dak_tegearboxnew" then
 								speedmult = math.Clamp((1+(math.Round(math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/((self.Gearbox.TotalMass*1.1)/1000),2)*0.05))*0.5,0,1.5)
@@ -502,7 +585,9 @@ function ENT:Think()
 							self.DakOwner:ChatPrint("Please finish setting up the gearbox to get a correct cost for your tank.")
 						end
 					else
-						self.DakOwner:ChatPrint("Please give your tank a gearbox so that it may calculate its cost properly.")
+						speedmult = 0.5
+						self.DakOwner:ChatPrint("No gearbox detected, towed gun assumed.")
+						--self.DakOwner:ChatPrint("Please give your tank a gearbox so that it may calculate its cost properly.")
 					end
 					--local speedmult = math.Clamp((((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05)),0,2)
 					--armormult = armormult+0.1
@@ -543,6 +628,8 @@ function ENT:Think()
 					local altfirepowermult = 0.005*TotalDPS^1
 					--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
 					math.max(0.1,firepowermult)
+					self.PenMult = firepowermult*0.5
+					self.DPSMult = altfirepowermult*0.5
 					firepowermult = (altfirepowermult+firepowermult)*0.5
 					local basepos = self:GetParent():GetParent():GetPos()
 					self.BestLength = 0
@@ -557,43 +644,6 @@ function ENT:Think()
 					self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
 
 					firepowermult = math.max((self.BoxVolume*0.01/250000),firepowermult)
-
-					local GunHandlingMult = 0
-					if self.TurretControls[1] then
-						local TotalTurretMass = 0 
-						for i=1, #self.TurretControls do
-							if self.TurretControls[i].GunMass ~= nil then
-								TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
-							end
-						end
-						local GunPercentage
-						for i=1, #self.TurretControls do
-							if self.TurretControls[i].GunMass ~= nil then
-								local RotationSpeed = self.TurretControls[i].RotationSpeed
-								local TurretCost = math.log(RotationSpeed*100,100)
-								if self.TurretControls[i].RemoteWeapon == true then
-									TurretCost = TurretCost * 1.5
-								end
-								if self.TurretControls[i]:GetFCS() == true then
-									self.ColdWar = 1
-									TurretCost = TurretCost * 1.5
-								end
-								if self.TurretControls[i]:GetStabilizer() == true then
-									self.ColdWar = 1
-									TurretCost = TurretCost * 1.25
-								elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
-									TurretCost = TurretCost * 1
-								else
-									TurretCost = TurretCost * 0.75
-								end
-								if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
-									TurretCost = TurretCost * 0.5
-								end
-								--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
-								GunHandlingMult = GunHandlingMult + math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)
-							end
-						end
-					end
 
 					--print("Highest Armor: "..(armormult*50))
 					--print("Side Armor "..self.SideArmor)
@@ -1022,7 +1072,7 @@ function ENT:Think()
 						WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
 					end
 					--SETUP HEALTHPOOL
-					if table.Count(self.HitBox) == 0 and self.Contraption and IsValid(self.Gearbox) then
+					if table.Count(self.HitBox) == 0 and self.Contraption and (IsValid(self.Gearbox) or (self.TurretControls~=nil and IsValid(self.TurretControls[1]))) then
 						if #self.Contraption>=1 then
 							self.Remake = 0
 							self.DakPooled = 1

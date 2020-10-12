@@ -24,7 +24,7 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						InfoTable1[2] = Target.Cost.." point "..Era.." "..math.Round(Target.TotalMass*0.001,2).." ton tank."
 						InfoTable1[3] = "-Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
 						InfoTable1[4] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
-						if Target.Gearbox.DakHP ~= nil then
+						if Target.Gearbox ~= nil and Target.Gearbox.DakHP ~= nil then
 							InfoTable1[5] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
 						else
 							InfoTable1[5] = "-HP/T: 0."
@@ -73,9 +73,9 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 							end
 							info2count = info2count + 1
 							if TurretsSorted[i].GunMass ~= nil then
-								InfoTable2[info2count] = "--Weight: "..TurretsSorted[i].GunMass.."kg"
+								InfoTable2[info2count] = "--Weight: "..math.Round(TurretsSorted[i].GunMass/1000,2).." tons"
 							else
-								InfoTable2[info2count] = "--Weight: N/A kg"
+								InfoTable2[info2count] = "--Weight: N/A tons"
 							end
 							info2count = info2count + 1
 							if TurretsSorted[i].RotationSpeed ~= nil then
@@ -134,7 +134,7 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						end
 
 						--driver check
-						if Target.Gearbox.CrewAlive ~= nil then
+						if Target.Gearbox ~= nil and Target.Gearbox.CrewAlive ~= nil then
 							if Target.Gearbox.CrewAlive == 0 then
 								info3count = info3count + 1
 								InfoTable3[info3count] = "-No Driver"
@@ -142,7 +142,7 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						end
 
 						--fuel check
-						if Target.Gearbox.DakFuel ~= nil and Target.Gearbox.DakFuelReq ~= nil then
+						if Target.Gearbox ~= nil and Target.Gearbox.DakFuel ~= nil and Target.Gearbox.DakFuelReq ~= nil then
 							if Target.Gearbox.DakFuel < Target.Gearbox.DakFuelReq then
 								info3count = info3count + 1
 								InfoTable3[info3count] = "-"..Target.Gearbox.DakFuel.." out of "..Target.Gearbox.DakFuelReq.." Fuel available"
