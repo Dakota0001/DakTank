@@ -653,8 +653,8 @@ function ENT:Think()
 					self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
 					self.ArmorMult = math.Round(math.max(0.01,armormult),3)
 					self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
-					self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.TextoliteWeight+self.ERAWeight
-					local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
+					self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ERAWeight
+					local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
 					self.ArmorMult = self.ArmorMult * ArmorTypeMult
 					self.PreCost = self.ArmorMult*50 + self.FirepowerMult*50
 					--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
@@ -887,6 +887,7 @@ function ENT:Think()
 						self.CHAWeight = 0
 						self.HHAWeight = 0
 						self.NERAWeight = 0
+						self.StillbrewWeight = 0
 						self.TextoliteWeight = 0
 						self.ERAWeight = 0
 
@@ -1008,6 +1009,10 @@ function ENT:Think()
 											if CurrentRes.EntityMods.CompositeType == "NERA" then
 												self.Modern = 1
 												self.NERAWeight = self.NERAWeight + CurrentRes:GetPhysicsObject():GetMass()
+											end
+											if CurrentRes.EntityMods.CompositeType == "Stillbrew" then
+												self.Modern = 1
+												self.StillbrewWeight = self.StillbrewWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1
@@ -1201,6 +1206,14 @@ function ENT:Think()
 												KE = 9.2
 												Density = 2000
 												self.Composites[i].EntityMods.DakName = "NERA"
+											end
+											if self.Composites[i].EntityMods.CompositeType == "Stillbrew" then
+												self.Modern = 1
+												self.Composites[i].EntityMods.CompKEMult = 23
+												self.Composites[i].EntityMods.CompCEMult = 27.6
+												KE = 23
+												Density = 5750
+												self.Composites[i].EntityMods.DakName = "Stillbrew"
 											end
 											if self.Composites[i].EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1

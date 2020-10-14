@@ -241,6 +241,11 @@ function TOOL:RightClick( trace )
 										self.EntList[self.Key].EntityMods.CompCEMult = 18.4
 										self.EntList[self.Key].EntityMods.DakName = "NERA"
 									end
+									if self:GetClientInfo("ArmorType") == "Stillbrew" then
+										self.EntList[self.Key].EntityMods.CompKEMult = 23
+										self.EntList[self.Key].EntityMods.CompCEMult = 27.6
+										self.EntList[self.Key].EntityMods.DakName = "Stillbrew"
+									end
 									if self:GetClientInfo("ArmorType") == "Textolite" then
 										self.EntList[self.Key].EntityMods.CompKEMult = 10.4
 										self.EntList[self.Key].EntityMods.CompCEMult = 14
@@ -372,20 +377,25 @@ function TOOL.BuildCPanel( panel )
 	ArmorTypeSelect:SetValue( "--Select Composite Type--" )
 	ArmorTypeSelect:SetVisible( true )
 	ArmorTypeSelect:AddChoice( "NERA" )
+	ArmorTypeSelect:AddChoice( "Stillbrew" )
 	ArmorTypeSelect:AddChoice( "Textolite" )
 	ArmorTypeSelect:AddChoice( "ERA" )
 	ArmorTypeSelect.OnSelect = function( self, index, value )
 		local ArmorDesc = self:GetParent():Find( "ArmorDesc" )
 		if value == "NERA" then
-			ArmorDesc:SetText( "Non-Explosive Reactive Armor\n\nComposite of ceramic plates in a steel and rubber lattice designed to shatter incoming projectiles, it is especially effective at breaking up HEAT jets.\n\nDensity: 2.0g/cm3\nKE Protection: 9.2mm/in\nCE Protection: 18.4mm/in\nCost: 1.75xKG" )
+			ArmorDesc:SetText( "Non-Explosive Reactive Armor\n\nComposite of ceramic plates in a steel and rubber lattice designed to shatter incoming projectiles, it is especially effective at breaking up HEAT jets.\n\nDensity: 2.0g/cm3\nKE Protection: 9.2mm/in\nCE Protection: 18.4mm/in\nCost: 1.75xKG\nEra: Modern" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "NERA" )
 		end
+		if value == "Stillbrew" then
+			ArmorDesc:SetText( "Stillbrew\n\nHeavy composite of CHA, RHA, rubber, and air designed to provide good protection against both KE and CE.\n\nDensity: 5.75g/cm3\nKE Protection: 23mm/in\nCE Protection: 27.6mm/in\nCost: 1.0xKG\nEra: Modern" )
+			RunConsoleCommand( "daktanklinker_ArmorType", "Stillbrew" )
+		end
 		if value == "Textolite" then
-			ArmorDesc:SetText( "Glass-Textolite\n\nFiber glass and resin mix, it is lighter than RHA for a given protection value but takes up more space.\n\nDensity: 1.85kg/m3\nKE Protection: 10.4mm/in\nCE Protection: 14mm/in\nCost: 1.5xKG" )
+			ArmorDesc:SetText( "Glass-Textolite\n\nFiber glass and resin mix, it is lighter than RHA for a given protection value but takes up more space.\n\nDensity: 1.85g/cm3\nKE Protection: 10.4mm/in\nCE Protection: 14mm/in\nCost: 1.5xKG\nEra: Cold War" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "Textolite" )
 		end
 		if value == "ERA" then
-			ArmorDesc:SetText( "Explosive Reactive Armor\n\nExplosives sandwiched between two steel plates, detonates on impact, disrupting and shattering incoming HEAT jets.\n\nDensity: 1.732g/cm3\nKE Protection: 2.5mm/in\nCE Protection: 88.9mm/in\nCost: 1.25xKG" )
+			ArmorDesc:SetText( "Explosive Reactive Armor\n\nExplosives sandwiched between two steel plates, detonates on impact, disrupting and shattering incoming HEAT jets.\n\nDensity: 1.732g/cm3\nKE Protection: 2.5mm/in\nCE Protection: 88.9mm/in\nCost: 1.25xKG\nEra: Cold War" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "ERA" )
 		end
 	end

@@ -82,6 +82,7 @@ function SWEP:Initialize()
 	self.PrimaryCooldown = 1
 	self.FireSound = "daktanks/extra/76mmUSA2.mp3"
 	self.IsPistol = false
+	self.heavyweapon = true
 
  	--shell info
  	self.DakTrail = "daktemissiletracer"

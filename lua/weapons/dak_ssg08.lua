@@ -83,6 +83,7 @@ function SWEP:Initialize()
 	self.FireSound = "weapons/scout/scout_fire-1.wav"
 	self.IsPistol = false
 	self.IsRifle = true
+	self.heavyweapon = true
 
  	--shell info
  	self.DakTrail = "dakteballistictracer"

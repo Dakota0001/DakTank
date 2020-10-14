@@ -80,6 +80,7 @@ function SWEP:Initialize()
 	self.FireSound = "weapons/ak47/ak47-1.wav"
 	self.IsPistol = false
 	self.IsRifle = true
+	self.heavyweapon = false
 
  	--shell info
  	self.DakTrail = "dakteballistictracer"
@@ -120,122 +121,124 @@ end
 function SWEP:PrimaryAttack()
 	if not IsFirstTimePredicted() then return end
 	if self.PrimaryLastFire+self.PrimaryCooldown<CurTime() then
-		if self.Weapon:Clip1() > 0 then
-			if SERVER then
+		if (self.heavyweapon == true and self.Owner:Crouching() and self.Owner:OnGround()) or self.heavyweapon == false or self.heavyweapon == nil then 
+			if self.Weapon:Clip1() > 0 then
+				if SERVER then
+					if ( self.Owner:IsPlayer() ) then
+						self.Owner:LagCompensation( true )
+					end
+					local shootOrigin = self.Owner:EyePos()
+					local shootDir = self.Owner:GetAimVector()
+					for i=1, self.ShotCount do
+						local shell = {}
+						shell.Pos = self.Owner:GetShootPos()
+						local initvel = self.Owner:GetVelocity()
+						shell.DakVelocity = ((self.DakVelocity * math.Rand( 0.95, 1.05 )) * (self.Owner:GetAimVector():Angle() + Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))):Forward()) + initvel
+						if self.Owner:Crouching() then
+							shell.DakVelocity = ((self.DakVelocity * math.Rand( 0.95, 1.05 )) * (self.Owner:GetAimVector():Angle() + 0.5*Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))):Forward()) + initvel
+						end
+
+						shell.DakTrail = self.DakTrail
+						shell.DakCaliber = self.DakCaliber
+						shell.DakShellType = self.DakShellType
+						shell.DakPenLossPerMeter = self.DakPenLossPerMeter
+						shell.DakExplosive = self.DakExplosive
+
+						shell.DakBaseVelocity = self.DakVelocity
+
+						shell.DakMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
+						shell.DakDamage = shell.DakMass*((self.DakVelocity*0.0254)*(self.DakVelocity*0.0254))*0.01*0.002
+						shell.IsMissile = self.IsMissile
+						shell.IsTandem = self.IsTandem
+
+						shell.DakIsPellet = false
+						shell.DakSplashDamage = self.DakCaliber*5
+						if self.IsMissile then
+							shell.DakPenetration = self.PenOverride
+							shell.DakBasePenetration = self.PenOverride
+						else
+							shell.DakPenetration = (self.DakCaliber*2)*self.ShellLengthMult
+							shell.DakBasePenetration = (self.DakCaliber*2)*self.ShellLengthMult
+						end
+
+						if self.DakShellType == "HEAT" or self.DakShellType == "HEATFS" or self.DakShellType == "ATGM" then
+							shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)*0.5
+						elseif self.DakShellType == "APHE" then
+							shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)*0.25
+						else
+							shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)
+						end
+						
+
+
+						shell.DakPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
+						
+						shell.DakGun = self
+						shell.DakGun.DakOwner = self.Owner
+						shell.Filter = {self.Owner, self}
+						shell.LifeTime = 0
+						shell.Gravity = 0
+						shell.DakFragPen = (self.DakCaliber/2.5)
+
+						shell.IsGuided = self.DakIsGuided
+
+						shell.Indicator = self.Owner
+						shell.IndicatorStart = self.Owner:GetShootPos()
+						shell.IndicatorEnd = self.Owner:GetShootPos()+self.Owner:GetAimVector()*1000000
+
+						DakTankShellList[#DakTankShellList+1] = shell
+					end
+				end
 				if ( self.Owner:IsPlayer() ) then
-					self.Owner:LagCompensation( true )
+					self.Owner:LagCompensation( false )
 				end
-				local shootOrigin = self.Owner:EyePos()
-				local shootDir = self.Owner:GetAimVector()
-				for i=1, self.ShotCount do
-					local shell = {}
-					shell.Pos = self.Owner:GetShootPos()
-					local initvel = self.Owner:GetVelocity()
-					shell.DakVelocity = ((self.DakVelocity * math.Rand( 0.95, 1.05 )) * (self.Owner:GetAimVector():Angle() + Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))):Forward()) + initvel
-					if self.Owner:Crouching() then
-						shell.DakVelocity = ((self.DakVelocity * math.Rand( 0.95, 1.05 )) * (self.Owner:GetAimVector():Angle() + 0.5*Angle(math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread),math.Rand(-self.Spread,self.Spread))):Forward()) + initvel
-					end
-
-					shell.DakTrail = self.DakTrail
-					shell.DakCaliber = self.DakCaliber
-					shell.DakShellType = self.DakShellType
-					shell.DakPenLossPerMeter = self.DakPenLossPerMeter
-					shell.DakExplosive = self.DakExplosive
-
-					shell.DakBaseVelocity = self.DakVelocity
-
-					shell.DakMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700
-					shell.DakDamage = shell.DakMass*((self.DakVelocity*0.0254)*(self.DakVelocity*0.0254))*0.01*0.002
-					shell.IsMissile = self.IsMissile
-					shell.IsTandem = self.IsTandem
-
-					shell.DakIsPellet = false
-					shell.DakSplashDamage = self.DakCaliber*5
-					if self.IsMissile then
-						shell.DakPenetration = self.PenOverride
-						shell.DakBasePenetration = self.PenOverride
-					else
-						shell.DakPenetration = (self.DakCaliber*2)*self.ShellLengthMult
-						shell.DakBasePenetration = (self.DakCaliber*2)*self.ShellLengthMult
-					end
-
-					if self.DakShellType == "HEAT" or self.DakShellType == "HEATFS" or self.DakShellType == "ATGM" then
-						shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)*0.5
-					elseif self.DakShellType == "APHE" then
-						shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)*0.25
-					else
-						shell.DakBlastRadius = (((self.DakCaliber/155)*50)*39)
-					end
-					
-
-
-					shell.DakPenSounds = {"daktanks/daksmallpen1.mp3","daktanks/daksmallpen2.mp3","daktanks/daksmallpen3.mp3","daktanks/daksmallpen4.mp3"}
-					
-					shell.DakGun = self
-					shell.DakGun.DakOwner = self.Owner
-					shell.Filter = {self.Owner, self}
-					shell.LifeTime = 0
-					shell.Gravity = 0
-					shell.DakFragPen = (self.DakCaliber/2.5)
-
-					shell.IsGuided = self.DakIsGuided
-
-					shell.Indicator = self.Owner
-					shell.IndicatorStart = self.Owner:GetShootPos()
-					shell.IndicatorEnd = self.Owner:GetShootPos()+self.Owner:GetAimVector()*1000000
-
-					DakTankShellList[#DakTankShellList+1] = shell
+				local ActualSpeed = self.Owner:GetVelocity():Length()
+				local MaxSpeed = self.Owner:GetRunSpeed()
+				local IsMoving = math.max(0.5, ActualSpeed/MaxSpeed)
+				local IsCrouch = self.Owner:Crouching() and 0.5 or 1
+				local ShotForce = ((self.DakVelocity*0.0254)*(self.DakVelocity*0.0254)*(math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700)
+				if self.DakShellType == "HEAT" or self.DakShellType == "APHE" or self.DakShellType == "HEATFS" or self.DakShellType == "ATGM" then
+					ShotForce = ShotForce * 0.05
 				end
-			end
-			if ( self.Owner:IsPlayer() ) then
-				self.Owner:LagCompensation( false )
-			end
-			local ActualSpeed = self.Owner:GetVelocity():Length()
-			local MaxSpeed = self.Owner:GetRunSpeed()
-			local IsMoving = math.max(0.5, ActualSpeed/MaxSpeed)
-			local IsCrouch = self.Owner:Crouching() and 0.5 or 1
-			local ShotForce = ((self.DakVelocity*0.0254)*(self.DakVelocity*0.0254)*(math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*7700)
-			if self.DakShellType == "HEAT" or self.DakShellType == "APHE" or self.DakShellType == "HEATFS" or self.DakShellType == "ATGM" then
-				ShotForce = ShotForce * 0.05
-			end
-			local BaseRecoil = Angle(-math.Rand(0.0004, 0.0006), math.Rand(0.0002,-0.0002), 0)
-			local FinalRecoil = BaseRecoil * self.ShotCount * ShotForce * IsMoving * IsCrouch * (self.SpreadStacks/1) --have spread stacks so first few shots are sorta accurate
-			if self.IsPistol == true then
-				FinalRecoil = FinalRecoil * 3
-			end
-			if self.IsRifle == true then
-				FinalRecoil = FinalRecoil * 0.5
-			end
-			if self.Owner.PerkType == 5 then FinalRecoil = FinalRecoil * 0.5 end
-			if self.SpreadStacks<5 then
-				self.SpreadStacks = self.SpreadStacks + (ShotForce/10000)
-			end
-			if CLIENT or game.SinglePlayer() then
-				self.Owner:SetEyeAngles( self.Owner:EyeAngles() + FinalRecoil )
-				self.Owner:ViewPunch( FinalRecoil / 4 )
-			end
-			if self.Primary.ClipSize > 5 and self.Weapon:Clip1() <= 5 then
-				self:EmitSound( self.FireSound, 140, 95*math.Rand(0.99,1.01), 1, 2)
+				local BaseRecoil = Angle(-math.Rand(0.0004, 0.0006), math.Rand(0.0002,-0.0002), 0)
+				local FinalRecoil = BaseRecoil * self.ShotCount * ShotForce * IsMoving * IsCrouch * (self.SpreadStacks/1) --have spread stacks so first few shots are sorta accurate
+				if self.IsPistol == true then
+					FinalRecoil = FinalRecoil * 3
+				end
+				if self.IsRifle == true then
+					FinalRecoil = FinalRecoil * 0.5
+				end
+				if self.Owner.PerkType == 5 then FinalRecoil = FinalRecoil * 0.5 end
+				if self.SpreadStacks<5 then
+					self.SpreadStacks = self.SpreadStacks + (ShotForce/10000)
+				end
+				if CLIENT or game.SinglePlayer() then
+					self.Owner:SetEyeAngles( self.Owner:EyeAngles() + FinalRecoil )
+					self.Owner:ViewPunch( FinalRecoil / 4 )
+				end
+				if self.Primary.ClipSize > 5 and self.Weapon:Clip1() <= 5 then
+					self:EmitSound( self.FireSound, 140, 95*math.Rand(0.99,1.01), 1, 2)
+				else
+					self:EmitSound( self.FireSound, 140, 95*math.Rand(0.99,1.01), 1, 2)
+				end
+				--[[
+				if SERVER then
+					net.Start( "daktankshotfired" )
+					net.WriteVector( self:GetPos() )
+					net.WriteFloat( self.DakCaliber )
+					net.WriteString( self.FireSound )
+					net.Broadcast()
+				end
+				--]]
+				
+
+				self.PrimaryLastFire = CurTime()
+				self:TakePrimaryAmmo(1)
+				self.Fired = 1
 			else
-				self:EmitSound( self.FireSound, 140, 95*math.Rand(0.99,1.01), 1, 2)
-			end
-			--[[
-			if SERVER then
-				net.Start( "daktankshotfired" )
-				net.WriteVector( self:GetPos() )
-				net.WriteFloat( self.DakCaliber )
-				net.WriteString( self.FireSound )
-				net.Broadcast()
-			end
-			--]]
-			
-
-			self.PrimaryLastFire = CurTime()
-			self:TakePrimaryAmmo(1)
-			self.Fired = 1
-		else
-			if SERVER then
-				self:Reload()
+				if SERVER then
+					self:Reload()
+				end
 			end
 		end
 	end
