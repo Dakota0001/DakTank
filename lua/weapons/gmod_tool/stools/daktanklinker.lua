@@ -251,6 +251,11 @@ function TOOL:RightClick( trace )
 										self.EntList[self.Key].EntityMods.CompCEMult = 14
 										self.EntList[self.Key].EntityMods.DakName = "Textolite"
 									end
+									if self:GetClientInfo("ArmorType") == "Concrete" then
+										self.EntList[self.Key].EntityMods.CompKEMult = 2.8
+										self.EntList[self.Key].EntityMods.CompCEMult = 2.8
+										self.EntList[self.Key].EntityMods.DakName = "Concrete"
+									end
 									if self:GetClientInfo("ArmorType") == "ERA" then
 										self.EntList[self.Key].EntityMods.CompKEMult = 2.5
 										self.EntList[self.Key].EntityMods.CompCEMult = 88.9
@@ -380,6 +385,7 @@ function TOOL.BuildCPanel( panel )
 	ArmorTypeSelect:AddChoice( "Stillbrew" )
 	ArmorTypeSelect:AddChoice( "Textolite" )
 	ArmorTypeSelect:AddChoice( "ERA" )
+	ArmorTypeSelect:AddChoice( "Concrete" )
 	ArmorTypeSelect.OnSelect = function( self, index, value )
 		local ArmorDesc = self:GetParent():Find( "ArmorDesc" )
 		if value == "NERA" then
@@ -387,7 +393,7 @@ function TOOL.BuildCPanel( panel )
 			RunConsoleCommand( "daktanklinker_ArmorType", "NERA" )
 		end
 		if value == "Stillbrew" then
-			ArmorDesc:SetText( "Stillbrew\n\nHeavy composite of CHA, RHA, rubber, and air designed to provide good protection against both KE and CE.\n\nDensity: 5.75g/cm3\nKE Protection: 23mm/in\nCE Protection: 27.6mm/in\nCost: 1.0xKG\nEra: Modern" )
+			ArmorDesc:SetText( "Stillbrew Crew Protection Package\n\nHeavy composite of CHA, RHA, rubber, and air designed to provide good protection against both KE and CE.\n\nDensity: 5.75g/cm3\nKE Protection: 23mm/in\nCE Protection: 27.6mm/in\nCost: 1.0xKG\nEra: Modern" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "Stillbrew" )
 		end
 		if value == "Textolite" then
@@ -397,6 +403,10 @@ function TOOL.BuildCPanel( panel )
 		if value == "ERA" then
 			ArmorDesc:SetText( "Explosive Reactive Armor\n\nExplosives sandwiched between two steel plates, detonates on impact, disrupting and shattering incoming HEAT jets.\n\nDensity: 1.732g/cm3\nKE Protection: 2.5mm/in\nCE Protection: 88.9mm/in\nCost: 1.25xKG\nEra: Cold War" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "ERA" )
+		end
+		if value == "Concrete" then
+			ArmorDesc:SetText( "Concrete 1:3:5\n\nCement, sand, and gravel: a cheap option to add some extra protection for those with tonnage to spare.\n\nDensity: 2.4g/cm3\nKE Protection: 2.6mm/in\nCE Protection: 2.6mm/in\nCost: 0.05xKG\nEra: WWII" )
+			RunConsoleCommand( "daktanklinker_ArmorType", "Concrete" )
 		end
 	end
 

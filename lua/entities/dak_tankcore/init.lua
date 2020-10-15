@@ -653,8 +653,8 @@ function ENT:Think()
 					self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
 					self.ArmorMult = math.Round(math.max(0.01,armormult),3)
 					self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
-					self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ERAWeight
-					local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
+					self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
+					local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(0.05*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
 					self.ArmorMult = self.ArmorMult * ArmorTypeMult
 					self.PreCost = self.ArmorMult*50 + self.FirepowerMult*50
 					--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
@@ -858,6 +858,17 @@ function ENT:Think()
 						end
 
 						table.Add( self.Contraption, GetPhysCons( self:GetParent():GetParent() ) )
+
+						if table.Count(GetPhysCons( self:GetParent():GetParent() )) > 0 then
+							for k, v in pairs(GetPhysCons( self:GetParent():GetParent() )) do
+								for k2, v2 in pairs(v:GetChildren()) do
+									self.Contraption[#self.Contraption+1] = v2
+									for k3, v3 in pairs(v2:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v3
+									end
+								end
+							end
+						end
 						--PrintTable(self.Contraption)
 
 						local hash = {}
@@ -889,6 +900,7 @@ function ENT:Think()
 						self.NERAWeight = 0
 						self.StillbrewWeight = 0
 						self.TextoliteWeight = 0
+						self.ConcreteWeight = 0
 						self.ERAWeight = 0
 
 						local CurrentRes
@@ -1017,6 +1029,9 @@ function ENT:Think()
 											if CurrentRes.EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1
 												self.TextoliteWeight = self.TextoliteWeight + CurrentRes:GetPhysicsObject():GetMass()
+											end
+											if CurrentRes.EntityMods.CompositeType == "Concrete" then
+												self.ConcreteWeight = self.ConcreteWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "ERA" then
 												self.ColdWar = 1
@@ -1222,6 +1237,13 @@ function ENT:Think()
 												KE = 10.4
 												Density = 1850
 												self.Composites[i].EntityMods.DakName = "Textolite"
+											end
+											if self.Composites[i].EntityMods.CompositeType == "Concrete" then
+												self.Composites[i].EntityMods.CompKEMult = 2.8
+												self.Composites[i].EntityMods.CompCEMult = 2.8
+												KE = 2.8
+												Density = 2400
+												self.Composites[i].EntityMods.DakName = "Concrete"
 											end
 											if self.Composites[i].EntityMods.CompositeType == "ERA" then
 												self.ColdWar = 1
