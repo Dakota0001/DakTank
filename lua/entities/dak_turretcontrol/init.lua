@@ -508,14 +508,18 @@ function ENT:Think()
 												else
 													TarPos0 = PreCamTrace.HitPos
 												end
-
-												
-												if self.Tar:GetParent() and self.Tar:GetParent():IsValid() then
-												    self.TarVel=self.Tar:GetParent():GetVelocity()
-												    if self.Tar:GetParent():GetParent() and self.Tar:GetParent():GetParent():IsValid() then
-												        self.TarVel=self.Tar:GetParent():GetParent():GetVelocity()
-												    end
+												local basefound = false
+												local base = self.Tar
+												if IsValid(self.Tar) then
+													while basefound == false do
+														if IsValid(base:GetParent()) then
+															base = base:GetParent()
+														else
+															basefound = true
+														end
+													end
 												end
+												self.TarVel = base:GetVelocity()
 												local SelfVel = self.Controller:GetParent():GetParent():GetVelocity()
 												local VelValue = V
 												local VelLossFull = VelLoss
