@@ -1466,7 +1466,7 @@ function TOOL:LeftClick( trace )
 						constraint.Slider( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.material )
 					end
 					if v.Type == "Weld" then
-						constraint.Weld( v.ent1, v.ent2, v.bone1, v.bone2, v.forcelimit, v.nocollide, v.deleteent1onbreak )
+						constraint.Weld( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.forcelimit, v.nocollide, v.deleteonbreak )
 					end
 					if v.Type == "Winch" then
 						constraint.Winch( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.key, v.key, v.fwd_speed, v.bwd_speed, v.material, v.toggle )

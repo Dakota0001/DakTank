@@ -122,7 +122,7 @@ function DTArmorSanityCheck(Ent)
 	if Ent.EntityMods == nil or Ent.EntityMods.Hardness == nil then Ent.ArmorMod = 7.8125 else Ent.ArmorMod = 7.8125 * Ent.EntityMods.Hardness end
 	
 	--Ent.DakArmor > (7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA))*0.5
-
+	if Ent.DakBurnStacks == nil then Ent.DakBurnStacks = 0 end
 	if not(Ent.DakArmor == 7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - Ent.DakBurnStacks*0.25) then
 		Ent.DakArmor = 7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - Ent.DakBurnStacks*0.25
 	end
@@ -570,6 +570,7 @@ function CheckClip(Ent, HitPos)
 	local normal
 	local origin
 	for i=1, #Ent.ClipData do
+		if Ent.ClipData[i].physics == true then return false end
 		normal = Ent:LocalToWorldAngles(Ent.ClipData[i]["n"]):Forward()
 		origin = Ent:LocalToWorld(Ent.ClipData[i]["n"]:Forward()*Ent.ClipData[i]["d"])
 		HitClip = HitClip or normal:Dot((origin - HitPos):GetNormalized()) > 0

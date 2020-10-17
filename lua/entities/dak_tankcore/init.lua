@@ -14,6 +14,182 @@ ENT.DakFuel = nil
 
 --have tank just keep rolling with gearbox on death (they aren't being added to contraption, find all axised to baseplate)
 
+local PhysObj = FindMetaTable("PhysObj")
+local O_Mass = PhysObj.SetMass
+function PhysObj:SetMass(Mass)
+    O_Mass(self, Mass)
+   	if IsValid(self:GetEntity().Controller) then
+   		self:GetEntity().Controller.MassUpdate = 1
+   	end
+end
+
+--Thanks to ProperClipping as much of this code is copy pasted with the exception of the constraint copying fixed, will swap to theirs once they fix.
+local function abovePlane(point, plane, plane_dir)
+	return plane_dir:Dot(point - plane) > 0
+end
+local function intersection3D(line_start, line_end, plane, plane_dir)
+	local line = line_end - line_start
+	local dot = plane_dir:Dot(line)
+	
+	if math.abs(dot) < 1e-6 then return end
+	
+	return line_start + line * (-plane_dir:Dot(line_start - plane) / dot)
+end
+local function clipPlane3D(poly, plane, plane_dir)
+	local n = {}
+	
+	local last = poly[#poly]
+	for _, cur in ipairs(poly) do
+		local a = abovePlane(last, plane, plane_dir)
+		local b = abovePlane(cur, plane, plane_dir)
+		
+		if a and b then
+			table.insert(n, cur)
+		elseif a or b then
+			local point = intersection3D(last, cur, plane, plane_dir)
+			-- Check since if the point lies on the plane it will return nil
+			if point then
+				table.insert(n, point)
+			end
+			
+			if b then
+				table.insert(n, cur)
+			end
+		end
+		
+		last = cur
+	end
+	
+	return n
+end
+
+function BasicClippingGetPhysObjData(physobj)
+	return {
+		vol = physobj:GetVolume(),
+		mass = physobj:GetMass(),
+		mat = physobj:GetMaterial(),
+		contents = physobj:GetContents(),
+		motion = physobj:IsMotionEnabled(),
+		
+		Constraints = constraint.GetTable( physobj:GetEntity() )
+	}
+end
+
+function BasicClippingApplyPhysObjData(physobj, data)
+	physobj:SetMass(math.max(1, physobj:GetVolume() / data.vol * data.mass))
+	physobj:SetMaterial(data.mat)
+	physobj:SetContents(data.contents)
+	
+	if SERVER then
+		physobj:EnableMotion(data.motion)
+		if data.motion then
+			physobj:Wake()
+		end
+		timer.Simple(0, function()
+			for k, v in pairs(data.Constraints) do
+				if v.Type == "AdvBallsocket" then
+					constraint.AdvBallsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.xmin, v.ymin, v.zmin, v.xmax, v.ymax, v.zmax, v.xfric, v.yfric, v.zfric, v.onlyrotation, v.nocollide )
+				end
+				if v.Type == "Axis" then
+					constraint.Axis( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.forcelimit, v.torquelimit, v.friction, v.nocollide, v.LocalAxis, v.DontAddTable )
+				end
+				if v.Type == "Ballsocket" then
+					constraint.Ballsocket( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LocalPos, v.forcelimit, v.torquelimit, v.nocollide )
+				end
+				if v.Type == "Elastic" then
+					constraint.Elastic( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.constant, v.damping, v.rdamping, v.material, v.width, v.stretchonly )
+				end
+				if v.Type == "Hydraulic" then
+					constraint.Hydraulic( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.speed, v.material )
+				end
+				if v.Type == "Motor" then
+					constraint.Motor( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.friction, v.torque, v.forcetime, v.nocollide, v.toggle, v.pl, v.forcelimit, v.numpadkey_fwd, v.numpadkey_bwd, v.direction, v.LocalAxis )
+				end
+				if v.Type == "Muscle" then
+					constraint.Muscle( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.Length1, v.Length2, v.width, v.key, v.fixed, v.period, v.amplitude, v.starton, v.material )
+				end
+				if v.Type == "NoCollide" then
+					constraint.NoCollide( v.Ent1, v.Ent2, v.Bone1, v.Bone2 )
+				end
+				if v.Type == "Pulley" then
+					constraint.Pulley( v.Ent1, v.Ent4, v.Bone1, v.Bone4, v.LPos1, v.LPos4, v.WPos2, v.WPos3, v.forcelimit, v.rigid, v.width, v.material )
+				end
+				if v.Type == "Rope" then
+					constraint.Rope( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.length, v.addlength, v.forcelimit, v.width, v.material, v.rigid )
+				end
+				if v.Type == "Slider" then
+					constraint.Slider( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.material )
+				end
+				if v.Type == "Weld" then
+					constraint.Weld( v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.forcelimit, v.nocollide, v.deleteonbreak )
+				end
+				if v.Type == "Winch" then
+					constraint.Winch( v.pl, v.Ent1, v.Ent2, v.Bone1, v.Bone2, v.LPos1, v.LPos2, v.width, v.key, v.key, v.fwd_speed, v.bwd_speed, v.material, v.toggle )
+				end
+			end
+		end)
+	else
+		physobj:EnableMotion(false)
+		physobj:Sleep()
+	end
+end
+function BasicPhysClip(ent, norm, dist)
+	local physobj = ent:GetPhysicsObject()
+	
+	if not IsValid(physobj) then return end
+	
+	local meshes = physobj:GetMeshConvexes()
+	if not meshes then return end
+	
+	ent.PhysicsClipped = true
+	ent.OBBCenterOrg = ent.OBBCenterOrg or ent:OBBCenter()
+	
+	-- Store properties to copy over to the new physobj
+	local data = BasicClippingGetPhysObjData(physobj)
+	
+	-- Cull stuff
+	local pos = norm * dist
+	
+	local new = {}
+	for _, convex in ipairs(meshes) do
+		local vertices = {}
+		for _, vertex in ipairs(convex) do
+			table.insert(vertices, vertex.pos)
+		end
+		
+		vertices = clipPlane3D(vertices, pos, norm)
+		if next(vertices) then
+			table.insert(new, vertices)
+		end
+	end
+	
+	-- Make new one
+	if not ent:PhysicsInitMultiConvex(new) then return end
+	ent:SetMoveType(MOVETYPE_VPHYSICS)
+	ent:SetSolid(SOLID_VPHYSICS)
+	ent:EnableCustomCollisions(true)
+	
+	physobj = ent:GetPhysicsObject()
+	physobj:EnableMotion(false)
+
+	-- Apply stored properties to the new physobj
+	BasicClippingApplyPhysObjData(physobj, data)
+end
+--clipping functions end
+
+
+local function SetMass( Player, Entity, Data )
+	if not SERVER then return end
+
+	if Data.Mass then
+		local physobj = Entity:GetPhysicsObject()
+		if physobj:IsValid() then physobj:SetMass(Data.Mass) end
+	end
+
+	duplicator.StoreEntityModifier( Entity, "mass", Data )
+end
+duplicator.RegisterEntityModifier( "mass", SetMass )
+
 function ENT:Initialize()
 	self:SetModel( "models/bull/gates/logic.mdl" )
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -683,11 +859,9 @@ function ENT:Think()
 						self:SetSolid(SOLID_VPHYSICS)
 					end
 					
-					if self.rebuildtable == nil or self.rebuildtable == 5 then --rebuild contraption table every 5 seconds instead of every second to notice weight changes.
-						self.rebuildtable = 0
-					end
+					
 
-					if self.rebuildtable == 0 then
+					if self.recheckmass == nil then
 						--[[
 						self.Contraption = {}
 						table.Add(self.Contraption,GetParents(self))
@@ -904,6 +1078,7 @@ function ENT:Think()
 						self.ERAWeight = 0
 
 						local CurrentRes
+						self.Clips = {}
 						for i=1, #res do
 							CurrentRes = res[i]
 							if CurrentRes:IsSolid() then
@@ -973,6 +1148,27 @@ function ENT:Think()
 									CurrentRes.Controller = self
 								end
 								if CurrentRes:GetClass()=="prop_physics" then
+									--clip conversion
+									if CurrentRes.ClipData and #CurrentRes.ClipData > 0 then
+										if CurrentRes.ClipData[1].physics ~= true then
+											local Clips = {}
+											local curEnt = CurrentRes
+											DTArmorSanityCheck(CurrentRes)
+											local CurArmor = CurrentRes.DakArmor
+											for j=1, #CurrentRes.ClipData do
+												local num = #self.Clips+1
+												self.Clips[num] = {}
+												self.Clips[num].ent = CurrentRes
+												self.Clips[num].armor = CurArmor
+												self.Clips[num].n = CurrentRes.ClipData[j].n
+												self.Clips[num].d = CurrentRes.ClipData[j].d
+												self.Clips[num].inside = CurrentRes.ClipData[j].inside
+											end
+											ProperClipping.RemoveClips(CurrentRes)
+											CurrentRes.ClipData = {}
+										end
+									end
+
 									if CurrentRes.IsComposite == 1 then
 										if CurrentRes.EntityMods==nil then
 											CurrentRes.EntityMods = {}
@@ -1062,6 +1258,41 @@ function ENT:Think()
 								---END TEST
 							end
 						end
+
+						if self.Clips and #self.Clips > 0 then
+							self.DakOwner:ChatPrint((#self.Clips).." visclips detected, they are now physical clips, please save your vehicle.")
+							for i=1,#self.Clips do
+								timer.Simple( i*0.0, function()
+									if self.Clips ~= nil and self.Clips[i] ~= nil then
+										--print("Entity Clipped: "..tostring(self.Clips[i].ent))
+										local cursystime = SysTime()
+										--ProperClipping.AddClip(self.Clips[i].ent, self.Clips[i].n:Forward(), self.Clips[i].d, self.Clips[i].inside, true)
+										self.Clips[i].ent.Clipped = true
+										self.Clips[i].ent.ClipData = self.Clips[i].ent.ClipData or {}
+										table.insert(self.Clips[i].ent.ClipData, {
+											norm = self.Clips[i].n:Forward(),
+											n = self.Clips[i].n:Forward():Angle(),
+											d = self.Clips[i].d,
+											inside = self.Clips[i].inside,
+											physics = true, -- this is used to network and call on client automaticly
+											new = true -- whats this used for? no clue but lets add it anyways
+										})
+										BasicPhysClip(self.Clips[i].ent, self.Clips[i].n:Forward(), self.Clips[i].d)
+										ProperClipping.StoreClips(self.Clips[i].ent)
+										ProperClipping.NetworkClips(self.Clips[i].ent)
+										--print("Time to Clip: "..(SysTime()-cursystime))
+										if self.Clips[i].armor ~= nil then
+											local SA = self.Clips[i].ent:GetPhysicsObject():GetSurfaceArea()
+											local mass = math.ceil(((self.Clips[i].armor/1/(288/SA))/7.8125)*4.6311781,0)
+											if mass > 0 then
+												SetMass( self.DakOwner, self.Clips[i].ent, { Mass = mass } )
+											end
+										end
+									end
+								end  )
+							end
+						end
+
 						--PrintTable(self.Contraption)
 						self.CrewCount = #self.Crew
 						WireLib.TriggerOutput(self, "Crew", self.CrewCount)
@@ -1085,7 +1316,37 @@ function ENT:Think()
 						self.SizeMult = (SA/Mass)*0.18
 					end
 
-					self.rebuildtable = self.rebuildtable+1
+					--local debugtime = SysTime()
+					if self.recheckmass == nil or (self.recheckmass >= 5 and self.MassUpdate == 1) then --rebuild contraption table every 5 seconds instead of every second to notice weight changes.
+						--print("secondary run")
+						local CurrentRes
+						local Mass = 0
+						local ParentMass = 0 
+						local SA = 0
+						for i=1, #self.Contraption do
+							CurrentRes = self.Contraption[i]
+							local physobj = CurrentRes:GetPhysicsObject()
+							if physobj:IsValid() then
+								local physmass = physobj:GetMass()
+								Mass = Mass + physmass
+								if IsValid(CurrentRes:GetParent()) then
+									ParentMass = ParentMass + physmass
+								end
+							end
+						end
+						if IsValid(self.Gearbox) then
+							self.Gearbox.TotalMass = Mass
+							self.Gearbox.ParentMass = ParentMass
+							self.Gearbox.PhysicalMass = Mass-ParentMass
+						end
+						self.TotalMass = Mass
+						self.ParMass = ParentMass
+						self.PhysMass = Mass-ParentMass
+						self.recheckmass = 0
+						self.MassUpdate = 0
+					end
+					--print("Total: "..(SysTime()-debugtime))
+					self.recheckmass = self.recheckmass+1
 
 					if table.Count(self.HitBox) == 0 then
 						WireLib.TriggerOutput(self, "Health", self.DakHealth)
@@ -1570,12 +1831,12 @@ function ENT:Think()
 					end
 				end
 			else
-				if self.SpawnTime+10 < CurTime() then
+				if self.SpawnTime+30 < CurTime() then
 					self.DakOwner:PrintMessage( HUD_PRINTTALK, "Tank Core Error: Gate that tank core is parented to is not parented, please parent it to the baseplate." )
 				end
 			end
 		else
-			if self.SpawnTime+10 < CurTime() then
+			if self.SpawnTime+30 < CurTime() then
 				self.DakOwner:PrintMessage( HUD_PRINTTALK, "Tank Core Error: Tank core is not parented to anything, please parent it to a gate." )
 			end
 		end
