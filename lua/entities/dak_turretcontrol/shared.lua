@@ -16,5 +16,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Bool", 	0, "ShortStopStabilizer", 	{ KeyName = "shortstopstabilizer", 	Edit = { type = "Boolean", 		order = 6} } )
 	self:NetworkVar( "Bool", 	1, "Stabilizer", 	{ KeyName = "stabilizer", 	Edit = { type = "Boolean", 		order = 7} } )
 	self:NetworkVar( "Bool", 	2, "FCS", 	{ KeyName = "fcs", 	Edit = { type = "Boolean", 		order = 8} } )
+	self:NetworkVar( "Bool", 	3, "SetPitchOnLoading", 	{ KeyName = "setpitchonloading", 	Edit = { type = "Boolean", 		order = 9} } )
+	self:NetworkVar( "Float", 	5, "LoadingAngle", 	{ KeyName = "loadingangle", 	Edit = { type = "Float", 		order = 10, min = -self:GetDepression(), max = self:GetElevation() } } )
 
 end

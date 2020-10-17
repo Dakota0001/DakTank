@@ -1325,12 +1325,14 @@ function ENT:Think()
 						local SA = 0
 						for i=1, #self.Contraption do
 							CurrentRes = self.Contraption[i]
-							local physobj = CurrentRes:GetPhysicsObject()
-							if physobj:IsValid() then
-								local physmass = physobj:GetMass()
-								Mass = Mass + physmass
-								if IsValid(CurrentRes:GetParent()) then
-									ParentMass = ParentMass + physmass
+							if CurrentRes ~= NULL and CurrentRes ~= nil then
+								local physobj = CurrentRes:GetPhysicsObject()
+								if physobj:IsValid() then
+									local physmass = physobj:GetMass()
+									Mass = Mass + physmass
+									if IsValid(CurrentRes:GetParent()) then
+										ParentMass = ParentMass + physmass
+									end
 								end
 							end
 						end

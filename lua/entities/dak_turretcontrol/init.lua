@@ -589,6 +589,14 @@ function ENT:Think()
 										--get angle that self has changed in last tick, infact this is done above in last angles
 										
 								    	local GunDir = normalizedVector(self.CamTrace.HitPos - self.CamTrace.StartPos+(self.CamTrace.StartPos-self.DakGun:GetPos()))
+								    	
+								    	if self:GetSetPitchOnLoading() and not(GunEnt.ShellLoaded == 1 or GunEnt.ShellLoaded2 == 1) then
+								    		if IsValid(DakTurret) then
+								    			GunDir = (self.turretaimer:GetAngles()+Angle(-self:GetLoadingAngle(),0,0)):Forward()
+								    		else
+								    			GunDir = (self:GetAngles()+Angle(-self:GetLoadingAngle(),0,0)):Forward()
+								    		end
+								    	end
 									    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+self.Shake), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
 										if IsValid(DakTurret) then
 											--turn both turret and gun
