@@ -126,7 +126,7 @@ function DTArmorSanityCheck(Ent)
 	if not(Ent.DakArmor == 7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - Ent.DakBurnStacks*0.25) then
 		Ent.DakArmor = 7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - Ent.DakBurnStacks*0.25
 	end
-	if Ent.DakArmor <= 0 then Ent.DakArmor = 0.001 end 
+	if Ent.DakArmor <= 0 then Ent.DakArmor = 0.001 end
 end
 
 function DTSimpleTrace(Start, End, Caliber, Filter, Gun)

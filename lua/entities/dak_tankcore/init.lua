@@ -994,6 +994,17 @@ function ENT:Think()
 								end
 								if CurrentRes:GetClass()=="prop_physics" then
 									--clip conversion
+
+									--if CurrentRes.EntityMods.DakClippedArmor then
+									--	local SA = CurrentRes:GetPhysicsObject():GetSurfaceArea()
+									--	local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
+									--	if mass > 0 then
+									--		SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
+									--		CurrentRes:GetPhysicsObject():SetMass(mass)
+									--	end
+									--end
+
+									--[[
 									if CurrentRes.ClipData and #CurrentRes.ClipData > 0 then
 										if CurrentRes.ClipData[1].physics ~= true then
 											local Clips = {}
@@ -1013,6 +1024,7 @@ function ENT:Think()
 											CurrentRes.ClipData = {}
 										end
 									end
+									]]--
 
 									if CurrentRes.IsComposite == 1 then
 										if CurrentRes.EntityMods==nil then
@@ -1104,6 +1116,7 @@ function ENT:Think()
 							end
 						end
 
+						--[[
 						if self.Clips and #self.Clips > 0 then
 							self.DakOwner:ChatPrint((#self.Clips).." visclips detected, they are now physical clips, please save your vehicle.")
 							for i=1,#self.Clips do
@@ -1113,14 +1126,17 @@ function ENT:Think()
 										if self.Clips[i].armor ~= nil then
 											local SA = self.Clips[i].ent:GetPhysicsObject():GetSurfaceArea()
 											local mass = math.ceil(((self.Clips[i].armor/1/(288/SA))/7.8125)*4.6311781,0)
+											self.Clips[i].ent.EntityMods.DakClippedArmor = self.Clips[i].armor
 											if mass > 0 then
 												SetMass( self.DakOwner, self.Clips[i].ent, { Mass = mass } )
+												self.Clips[i].ent:GetPhysicsObject():SetMass(mass)
 											end
 										end
 									end
 								end  )
 							end
 						end
+						]]--
 
 						--PrintTable(self.Contraption)
 						self.CrewCount = #self.Crew
@@ -1156,6 +1172,17 @@ function ENT:Think()
 							CurrentRes = self.Contraption[i]
 							if CurrentRes ~= NULL and CurrentRes ~= nil then
 								local physobj = CurrentRes:GetPhysicsObject()
+								--[[
+								if CurrentRes.DakMassSet ~= true and CurrentRes.ClipData and CurrentRes.ClipData[1].physics == true then
+									local SA = physobj:GetSurfaceArea()
+									local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
+									if mass > 0 then
+										SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
+										physobj:SetMass(mass)
+									end
+									CurrentRes.DakMassSet = true
+								end
+								]]--
 								if physobj:IsValid() then
 									local physmass = physobj:GetMass()
 									Mass = Mass + physmass
