@@ -88,9 +88,10 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						InfoTable3[1] = "Debugging"
 						local info3count = 1
 
-						--turret gunner detection
+						--turret gunner detection and gun detection
 						if TurretsSorted[1] ~= NULL then
 							for i=1, #TurretsSorted do
+								--Gunner detection
 								if TurretsSorted[i].DakCrew == NULL then
 									info3count = info3count + 1
 									InfoTable3[info3count] = "-"..TurretsSorted[i].DakName.." #"..TurretsSorted[i]:EntIndex().." gunner not detected"
@@ -120,6 +121,14 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 												end
 											end
 										end
+									end
+								end
+								--Gun detection
+								if TurretsSorted[i].WiredGun ~= NULL and TurretsSorted[i].WiredGun ~= nil then
+									local gunclass = TurretsSorted[i].WiredGun:GetClass()
+									if not(gunclass == "dak_tegun" or gunclass == "dak_teautogun" or gunclass == "dak_temachinegun") then
+										info3count = info3count + 1
+										InfoTable3[info3count] = "-Turret #"..TurretsSorted[i]:EntIndex()..": Gun input must be weapon"
 									end
 								end
 							end

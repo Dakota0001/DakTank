@@ -668,7 +668,7 @@ function TOOL:LeftClick( trace )
 		end
 		if Selection == "HMG" then
 			self.DakGunType = "HMG"
-			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+			self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,75)
 			self.DakMaxHealth = self.DakCaliber
 			self.DakName = self.DakCaliber.."mm Heavy Machine Gun"
 			self.DakModel = "models/daktanks/hmg100mm2.mdl"
@@ -899,7 +899,7 @@ function TOOL:LeftClick( trace )
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "HMG" then
 				self.GunType = "HMG"
-				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,60)
+				self.DakCaliber = math.Clamp(math.Round(tonumber(self:GetClientInfo("DTTE_GunCaliber")),2),20,75)
 			end
 			if self:GetClientInfo("DTTE_AmmoType") == "ATGM Launcher" then
 				self.GunType = "L"
@@ -2273,7 +2273,7 @@ function TOOL.BuildCPanel( panel )
 		ShellLength = 40/50
 		ShellLengthExact = 5
 		AmmoTypes = { "Armor Piercing", "High Explosive", "Armor Piercing High Explosive", "High Explosive Anti Tank", "High Explosive Anti Tank Fin Stabilized", "High Velocity Armor Piercing", "Armor Piercing Discarding Sabot", "Armor Piercing Fin Stabilized Discarding Sabot" }
-		DermaNumSlider:SetMinMax( 20, 60 )
+		DermaNumSlider:SetMinMax( 20, 75 )
 	end
 	gunData["Howitzer"] = function()
 		EntType   = "dak_tegun"

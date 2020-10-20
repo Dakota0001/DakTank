@@ -10,6 +10,18 @@ ENT.HitBox = {}
 ENT.DakActive = 0
 ENT.DakFuel = nil
 
+hook.Add("AdvDupe_FinishPasting", "daktank_tankcore_check", function(dupe)
+	local ents = dupe[1].CreatedEntities
+	for id, data in pairs(dupe[1].EntityList) do
+		local ent = ents[id]
+		if ent:GetClass() == "dak_tankcore" then
+			timer.Simple(engine.TickInterval(),function()
+				ent.DakFinishedPasting = 1
+			end)
+		end
+	end
+end)
+
 --cause self to delete self if not properly unfrozen
 
 --have tank just keep rolling with gearbox on death (they aren't being added to contraption, find all axised to baseplate)
@@ -64,8 +76,8 @@ function ENT:Initialize()
 	self.FrontalArmor = 0
 	self.SideArmor = 0
 	self.RearArmor = 0
-	self.Modern = 0
-	self.ColdWar = 0
+	self.Modern = nil
+	self.ColdWar = nil
 	self.BoxVolume = 100000000
 	self.PenMult = 0
 	self.DPSMult = 0
@@ -187,7 +199,7 @@ function ENT:Think()
 					self.PreCostTimer = 0	
 				end
 				self.PreCostTimer = CurTime() - self.PreCostTimerFirst
-				if self.PreCostTimer > 5 and self.CanSpawn ~= true and (IsValid(self.Gearbox) or (self.TurretControls~=nil and IsValid(self.TurretControls[1]))) then
+				if self.DakFinishedPasting == 1 and self.CanSpawn ~= true and (IsValid(self.Gearbox) or (self.TurretControls~=nil and IsValid(self.TurretControls[1]))) then
 					if self:GetForceColdWar() == true then
 						self.ColdWar = 1
 					end
@@ -276,7 +288,7 @@ function ENT:Think()
 						for j=1, 25 do
 							addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
 							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll())
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
@@ -315,7 +327,7 @@ function ENT:Think()
 						for j=1, 50 do
 							addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
 							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos, "AP", 75, player.GetAll())
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
@@ -352,7 +364,7 @@ function ENT:Think()
 						for j=1, 25 do
 							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
 							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos, "AP", 75, player.GetAll())
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
@@ -389,7 +401,7 @@ function ENT:Think()
 						for j=1, 25 do
 							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
 							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos, "AP", 75, player.GetAll())
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
 							if IsValid(ent) then
 								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
 									ArmorValTable[#ArmorValTable+1] = ArmorVal1
@@ -688,7 +700,7 @@ function ENT:Think()
 					self.DakOwner:ChatPrint("Tank Analysis Complete: "..self.Cost.." point "..curera.." tank. Right click tank core with spawner for detailed readout.")
 				end
 
-				if not(self.Dead) then
+				if not(self.Dead) and self.DakFinishedPasting == 1 then
 					if not(self.DakMaxHealth) then
 						self.DakMaxHealth = 10
 					end
@@ -707,48 +719,6 @@ function ENT:Think()
 					
 
 					if self.recheckmass == nil then
-						--[[
-						self.Contraption = {}
-						table.Add(self.Contraption,GetParents(self))
-
-						for k, v in pairs(GetParents(self)) do
-							table.Add(self.Contraption,GetPhysCons(v))
-						end
-
-						local Mass = 0
-						local ParentMass = 0
-						local SA = 0
-						local ContraptionI
-						for i=1, #self.Contraption do
-							ContraptionI = self.Contraption[i]
-							table.Add( self.Contraption, ContraptionI:GetChildren() )
-							table.Add( self.Contraption, ContraptionI:GetParent() )
-						end
-						local Children = {}
-						local ContraptionI2
-						for i2=1, #self.Contraption do
-							ContraptionI2 = self.Contraption[i2]
-							if table.Count(ContraptionI2:GetChildren()) > 0 then
-							table.Add( Children, ContraptionI2:GetChildren() )
-							end
-						end
-
-						table.Add( self.Contraption, Children )
-
-						local preturretcontrollers = {}
-						for i=1, #self.Contraption do
-							if self.Contraption[i]:GetClass()=="dak_turretcontrol" then
-								preturretcontrollers[#preturretcontrollers+1]=self.Contraption[i]
-							end
-						end
-						for i=1, #preturretcontrollers do
-							--print(preturretcontrollers[i])
-							self.Contraption[#self.Contraption+1] = preturretcontrollers[i].WiredGun
-							self.Contraption[#self.Contraption+1] = preturretcontrollers[i].WiredTurret
-						end
-
-						self.Contraption = ents.FindInSphere(self:GetPos(),1000)
-						--]]
 						local Mass = 0
 						local ParentMass = 0
 						local SA = 0
@@ -785,18 +755,22 @@ function ENT:Think()
 								end
 							end
 							if turrets[i].WiredGun ~= NULL then
-								self.Contraption[#self.Contraption+1] = turrets[i].WiredGun:GetParent():GetParent()
-								TurEnts[#TurEnts+1] = turrets[i].WiredGun:GetParent():GetParent()
-								for k, v in pairs(turrets[i].WiredGun:GetParent():GetParent():GetChildren()) do
-									self.Contraption[#self.Contraption+1] = v
-									TurEnts[#TurEnts+1] = v
-									for k2, v2 in pairs(v:GetChildren()) do
-										self.Contraption[#self.Contraption+1] = v2
-										TurEnts[#TurEnts+1] = v2
-										if v2:GetClass() == "dak_turretcontrol" then
-											turrets2[#turrets2+1] = v2
+								if turrets[i].WiredGun:GetClass() == "dak_tegun" or turrets[i].WiredGun:GetClass() == "dak_teautogun" or turrets[i].WiredGun:GetClass() == "dak_temachinegun" then
+									self.Contraption[#self.Contraption+1] = turrets[i].WiredGun:GetParent():GetParent()
+									TurEnts[#TurEnts+1] = turrets[i].WiredGun:GetParent():GetParent()
+									for k, v in pairs(turrets[i].WiredGun:GetParent():GetParent():GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v
+										TurEnts[#TurEnts+1] = v
+										for k2, v2 in pairs(v:GetChildren()) do
+											self.Contraption[#self.Contraption+1] = v2
+											TurEnts[#TurEnts+1] = v2
+											if v2:GetClass() == "dak_turretcontrol" then
+												turrets2[#turrets2+1] = v2
+											end
 										end
 									end
+								else
+									self.DakOwner:ChatPrint(turrets[i].DakName.." #"..turrets[i]:EntIndex().." must have gun wired to a daktank gun.")
 								end
 							end
 							turrets[i].Extra = TurEnts
@@ -993,18 +967,8 @@ function ENT:Think()
 									CurrentRes.Controller = self
 								end
 								if CurrentRes:GetClass()=="prop_physics" then
+									CurrentRes.Controller = self
 									--clip conversion
-
-									--if CurrentRes.EntityMods.DakClippedArmor then
-									--	local SA = CurrentRes:GetPhysicsObject():GetSurfaceArea()
-									--	local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
-									--	if mass > 0 then
-									--		SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
-									--		CurrentRes:GetPhysicsObject():SetMass(mass)
-									--	end
-									--end
-
-									--[[
 									if CurrentRes.ClipData and #CurrentRes.ClipData > 0 then
 										if CurrentRes.ClipData[1].physics ~= true then
 											local Clips = {}
@@ -1024,7 +988,6 @@ function ENT:Think()
 											CurrentRes.ClipData = {}
 										end
 									end
-									]]--
 
 									if CurrentRes.IsComposite == 1 then
 										if CurrentRes.EntityMods==nil then
@@ -1106,37 +1069,27 @@ function ENT:Think()
 									else
 										self.Tread[#self.Tread+1]=CurrentRes
 									end
-									---TEST
-									if CurrentRes:GetClass()=="prop_physics" then
-										--CurrentRes:AddEFlags( EFL_SERVER_ONLY )
-										--CurrentRes:AddEFlags( EFL_DORMANT )
-									end
 								end
-								---END TEST
 							end
 						end
 
-						--[[
 						if self.Clips and #self.Clips > 0 then
-							self.DakOwner:ChatPrint((#self.Clips).." visclips detected, they are now physical clips, please save your vehicle.")
+							self.DakOwner:ChatPrint((#self.Clips).." visclips detected, they are now physical clips, please save your vehicle and respawn to finalize.")
 							for i=1,#self.Clips do
-								timer.Simple( i*0.0, function()
-									if self.Clips ~= nil and self.Clips[i] ~= nil then
-										ProperClipping.AddClip(self.Clips[i].ent, self.Clips[i].n:Forward(), self.Clips[i].d, self.Clips[i].inside, true)
-										if self.Clips[i].armor ~= nil then
-											local SA = self.Clips[i].ent:GetPhysicsObject():GetSurfaceArea()
-											local mass = math.ceil(((self.Clips[i].armor/1/(288/SA))/7.8125)*4.6311781,0)
-											self.Clips[i].ent.EntityMods.DakClippedArmor = self.Clips[i].armor
-											if mass > 0 then
-												SetMass( self.DakOwner, self.Clips[i].ent, { Mass = mass } )
-												self.Clips[i].ent:GetPhysicsObject():SetMass(mass)
-											end
+								if self.Clips ~= nil and self.Clips[i] ~= nil then
+									ProperClipping.AddClip(self.Clips[i].ent, self.Clips[i].n:Forward(), self.Clips[i].d, self.Clips[i].inside, true)
+									if self.Clips[i].armor ~= nil then
+										local SA = self.Clips[i].ent:GetPhysicsObject():GetSurfaceArea()
+										local mass = math.ceil(((self.Clips[i].armor/1/(288/SA))/7.8125)*4.6311781,0)
+										self.Clips[i].ent.EntityMods.DakClippedArmor = self.Clips[i].armor
+										if mass > 0 then
+											SetMass( self.DakOwner, self.Clips[i].ent, { Mass = mass } )
+											self.Clips[i].ent:GetPhysicsObject():SetMass(mass)
 										end
 									end
-								end  )
+								end
 							end
 						end
-						]]--
 
 						--PrintTable(self.Contraption)
 						self.CrewCount = #self.Crew
@@ -1162,7 +1115,7 @@ function ENT:Think()
 					end
 
 					--local debugtime = SysTime()
-					if self.recheckmass == nil or (self.recheckmass >= 5 and self.MassUpdate == 1) then --rebuild contraption table every 5 seconds instead of every second to notice weight changes.
+					if self.recheckmass == nil or (self.recheckmass >= 0 and self.MassUpdate == 1) then
 						--print("secondary run")
 						local CurrentRes
 						local Mass = 0
@@ -1172,17 +1125,19 @@ function ENT:Think()
 							CurrentRes = self.Contraption[i]
 							if CurrentRes ~= NULL and CurrentRes ~= nil then
 								local physobj = CurrentRes:GetPhysicsObject()
-								--[[
-								if CurrentRes.DakMassSet ~= true and CurrentRes.ClipData and CurrentRes.ClipData[1].physics == true then
-									local SA = physobj:GetSurfaceArea()
-									local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
-									if mass > 0 then
-										SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
-										physobj:SetMass(mass)
+								if CurrentRes.PhysicsClipped == true then
+									if CurrentRes.DakMassSet ~= true then
+										local SA = physobj:GetSurfaceArea()
+										local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
+										if mass > 0 then
+											SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
+											physobj:SetMass(mass)
+										end
+										CurrentRes.DakMassSet = true
 									end
-									CurrentRes.DakMassSet = true
 								end
-								]]--
+								
+
 								if physobj:IsValid() then
 									local physmass = physobj:GetMass()
 									Mass = Mass + physmass

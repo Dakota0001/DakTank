@@ -344,62 +344,64 @@ function ENT:Think()
 							if self.DakCrew.DakDead == true then
 								self.RotationSpeed = 0
 							end
-							if not(self.Controller.ColdWar == 1 or self.Controller.Modern == 1) then
-								if IsValid(self.TurretBase) and (self:GetYawMin()+self:GetYawMax()>90) then
-									if self.DakCrew:IsValid() then
-										if self.DakCrew:GetParent():IsValid() then
-											if self.DakCrew:GetParent():GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
-													self.RotationSpeed = 0
-													if self.GunnerErrorMessageSent2 == nil then
-														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in turret, remote weapon systems are cold war and modern only.")
-														self.GunnerErrorMessageSent2 = true
+							if not(self.Controller.ColdWar == nil and self.Controller.Modern == nil) then
+								if not(self.Controller.ColdWar == 1 or self.Controller.Modern == 1) then
+									if IsValid(self.TurretBase) and (self:GetYawMin()+self:GetYawMax()>90) then
+										if self.DakCrew:IsValid() then
+											if self.DakCrew:GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent():IsValid() then
+													if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
+														self.RotationSpeed = 0
+														if self.GunnerErrorMessageSent2 == nil then
+															self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in turret, remote weapon systems are cold war and modern only.")
+															self.GunnerErrorMessageSent2 = true
+														end
 													end
 												end
 											end
 										end
 									end
-								end
-								if not(IsValid(self.TurretBase)) and (self:GetYawMin()+self:GetYawMax()>90) then
-									if self.DakCrew:IsValid() then
-										if self.DakCrew:GetParent():IsValid() then
-											if self.DakCrew:GetParent():GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
-													self.RotationSpeed = 0
-													if self.GunnerErrorMessageSent3 == nil then
-														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in hull, remote weapon systems are cold war and modern only.")
-														self.GunnerErrorMessageSent3 = true
+									if not(IsValid(self.TurretBase)) and (self:GetYawMin()+self:GetYawMax()>90) then
+										if self.DakCrew:IsValid() then
+											if self.DakCrew:GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent():IsValid() then
+													if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
+														self.RotationSpeed = 0
+														if self.GunnerErrorMessageSent3 == nil then
+															self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in hull, remote weapon systems are cold war and modern only.")
+															self.GunnerErrorMessageSent3 = true
+														end
 													end
 												end
 											end
 										end
 									end
-								end
-							else
-								if IsValid(self.TurretBase) and (self:GetYawMin()+self:GetYawMax()>90) then
-									if self.DakCrew:IsValid() then
-										if self.DakCrew:GetParent():IsValid() then
-											if self.DakCrew:GetParent():GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
-													if self.GunnerErrorMessageSent2 == nil then
-														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
-														self.GunnerErrorMessageSent2 = true
-														self.RemoteWeapon = true
+								else
+									if IsValid(self.TurretBase) and (self:GetYawMin()+self:GetYawMax()>90) then
+										if self.DakCrew:IsValid() then
+											if self.DakCrew:GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent():IsValid() then
+													if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
+														if self.GunnerErrorMessageSent2 == nil then
+															self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
+															self.GunnerErrorMessageSent2 = true
+															self.RemoteWeapon = true
+														end
 													end
 												end
 											end
 										end
 									end
-								end
-								if not(IsValid(self.TurretBase)) and (self:GetYawMin()+self:GetYawMax()>90) then
-									if self.DakCrew:IsValid() then
-										if self.DakCrew:GetParent():IsValid() then
-											if self.DakCrew:GetParent():GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
-													if self.GunnerErrorMessageSent3 == nil then
-														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
-														self.GunnerErrorMessageSent3 = true
-														self.RemoteWeapon = true
+									if not(IsValid(self.TurretBase)) and (self:GetYawMin()+self:GetYawMax()>90) then
+										if self.DakCrew:IsValid() then
+											if self.DakCrew:GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent():IsValid() then
+													if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
+														if self.GunnerErrorMessageSent3 == nil then
+															self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
+															self.GunnerErrorMessageSent3 = true
+															self.RemoteWeapon = true
+														end
 													end
 												end
 											end
@@ -417,35 +419,37 @@ function ENT:Think()
 					end
 					if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
 						if not(self.Parented) then
-							constraint.RemoveAll( self.DakGun )
-							if IsValid(DakTurret) then
-								self.turretaimer = ents.Create("prop_physics")
-							 	self.turretaimer:SetAngles(self:GetAngles())
-							 	self.turretaimer:SetPos(DakTurret:GetPos())
-							 	self.turretaimer:SetMoveType(MOVETYPE_NONE)
-							 	self.turretaimer:PhysicsInit(SOLID_NONE)
-							 	self.turretaimer:SetParent(self)
-							 	self.turretaimer:SetModel( "models/daktanks/smokelauncher100mm.mdl" )
-							 	self.turretaimer:DrawShadow(false)
-							 	self.turretaimer:SetColor( Color(255, 255, 255, 0) )
-							 	self.turretaimer:SetRenderMode( RENDERMODE_TRANSCOLOR )
-							 	self.turretaimer:Spawn()
-							 	self.turretaimer:Activate()
-							 	self.turretaimer:SetMoveType(MOVETYPE_NONE)
-							 	self.turretaimer:PhysicsInit(SOLID_NONE)
-								DakTurret:SetParent()
-								self.DakGun:SetParent()
-								constraint.RemoveAll( DakTurret )
-								constraint.AdvBallsocket( DakTurret, self.Controller:GetParent():GetParent(), 0, 0, Vector(0,0,0), Vector(0,0,0), 0, 0, -180, -180, -180, 180, 180, 180, 0, 0, 0, 1, 0 )
-								constraint.AdvBallsocket( self.DakGun, DakTurret, 0, 0, Vector(0,0,0), Vector(0,0,0), 0, 0, -180, -180, -180, 180, 180, 180, 0, 0, 0, 1, 0 )	
-								constraint.AdvBallsocket( self.turretaimer, self.Controller:GetParent():GetParent(), 0, 0, Vector(0,0,0), Vector(0,0,0), 0, 0, -180, -180, -180, 180, 180, 180, 0, 0, 0, 1, 0 )							
-								DakTurret:SetParent( self.turretaimer )
-								self.DakGun:SetParent( self.turretaimer )
-							else
-								self.DakGun:SetParent()
-								constraint.AdvBallsocket( self.DakGun, self.Controller:GetParent():GetParent(), 0, 0, Vector(0,0,0), Vector(0,0,0), 0, 0, -180, -180, -180, 180, 180, 180, 0, 0, 0, 1, 0 )
-								self.DakGun:SetParent( self:GetParent() )
-							end
+							timer.Simple( engine.TickInterval()*1, function()
+								constraint.RemoveAll( self.DakGun )
+								if IsValid(DakTurret) then
+									self.turretaimer = ents.Create("prop_physics")
+								 	self.turretaimer:SetAngles(self:GetAngles())
+								 	self.turretaimer:SetPos(DakTurret:GetPos())
+								 	self.turretaimer:SetMoveType(MOVETYPE_NONE)
+								 	self.turretaimer:PhysicsInit(SOLID_NONE)
+								 	self.turretaimer:SetParent(self)
+								 	self.turretaimer:SetModel( "models/daktanks/smokelauncher100mm.mdl" )
+								 	self.turretaimer:DrawShadow(false)
+								 	self.turretaimer:SetColor( Color(255, 255, 255, 0) )
+								 	self.turretaimer:SetRenderMode( RENDERMODE_TRANSCOLOR )
+								 	self.turretaimer:Spawn()
+								 	self.turretaimer:Activate()
+								 	self.turretaimer:SetMoveType(MOVETYPE_NONE)
+								 	self.turretaimer:PhysicsInit(SOLID_NONE)
+									DakTurret:SetParent()
+									self.DakGun:SetParent()
+									constraint.RemoveAll( DakTurret )
+									constraint.AdvBallsocket( DakTurret, self.Controller:GetParent():GetParent(), 0, 0, Vector(0,0,0), Vector(0,0,0), 0, 0, -180, -180, -180, 180, 180, 180, 0, 0, 0, 1, 0 )
+									constraint.AdvBallsocket( self.DakGun, DakTurret, 0, 0, Vector(0,0,0), Vector(0,0,0), 0, 0, -180, -180, -180, 180, 180, 180, 0, 0, 0, 1, 0 )	
+									constraint.AdvBallsocket( self.turretaimer, self.Controller:GetParent():GetParent(), 0, 0, Vector(0,0,0), Vector(0,0,0), 0, 0, -180, -180, -180, 180, 180, 180, 0, 0, 0, 1, 0 )							
+									DakTurret:SetParent( self.turretaimer )
+									self.DakGun:SetParent( self.turretaimer )
+								else
+									self.DakGun:SetParent()
+									constraint.AdvBallsocket( self.DakGun, self.Controller:GetParent():GetParent(), 0, 0, Vector(0,0,0), Vector(0,0,0), 0, 0, -180, -180, -180, 180, 180, 180, 0, 0, 0, 1, 0 )
+									self.DakGun:SetParent( self:GetParent() )
+								end
+							end)
 							self.Parented = 1
 						end
 						if self.Parented == 1 then
@@ -519,7 +523,11 @@ function ENT:Think()
 														end
 													end
 												end
-												self.TarVel = base:GetVelocity()
+												if base ~= NULL then
+													self.TarVel = base:GetVelocity()
+												else
+													self.TarVel = Vector(0,0,0)
+												end
 												local SelfVel = self.Controller:GetParent():GetParent():GetVelocity()
 												local VelValue = V
 												local VelLossFull = VelLoss

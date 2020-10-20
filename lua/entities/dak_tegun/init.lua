@@ -103,11 +103,13 @@ function ENT:Think()
 				muzzlepos1, muzzlepos2 = self:GetModelBounds()
 				local length = math.Max(math.abs(muzzlepos1.x),math.abs(muzzlepos1.y),math.abs(muzzlepos1.z),math.abs(muzzlepos2.x),math.abs(muzzlepos2.y),math.abs(muzzlepos2.z))*(self.DakCaliber/100)
 				self.muzzle:SetPos(self:GetPos()+self:GetForward()*length)
-				if self:GetParent():IsValid() == false then
-					self.DakOwner:ChatPrint("Parenting Error on "..self.DakName..". Please reparent, make sure the gate is parented to the aimer prop and the gun is parented to the gate.")
-				else
-					if self:GetParent():GetParent():IsValid() == false then
+				if IsValid(self.Controller) and self.Controller.DakFinishedPasting == 1 then
+					if self:GetParent():IsValid() == false then
 						self.DakOwner:ChatPrint("Parenting Error on "..self.DakName..". Please reparent, make sure the gate is parented to the aimer prop and the gun is parented to the gate.")
+					else
+						if self:GetParent():GetParent():IsValid() == false then
+							self.DakOwner:ChatPrint("Parenting Error on "..self.DakName..". Please reparent, make sure the gate is parented to the aimer prop and the gun is parented to the gate.")
+						end
 					end
 				end
 			end
@@ -2117,36 +2119,40 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if self.DakModel == "models/daktanks/recoillessrifle100mm2.mdl" then ScalingGun = 1 end
 	if ScalingGun == 1 then
 		timer.Simple(10,function()
-			self:PhysicsDestroy()	
-			timer.Simple(2,function()
-				local mins, maxs = self:GetModelBounds()
-				local CalMult = (self.DakCaliber/100)
-				mins = mins*CalMult
-				maxs = maxs*CalMult
-				local x0 = mins[1] -- Define the min corner of the box
-				local y0 = mins[2]
-				local z0 = mins[3]
-				local x1 = maxs[1] -- Define the max corner of the box
-				local y1 = maxs[2]
-				local z1 = maxs[3]
-				self:PhysicsInitConvex( {
-				Vector( x0, y0, z0 ),
-				Vector( x0, y0, z1 ),
-				Vector( x0, y1, z0 ),
-				Vector( x0, y1, z1 ),
-				Vector( x1, y0, z0 ),
-				Vector( x1, y0, z1 ),
-				Vector( x1, y1, z0 ),
-				Vector( x1, y1, z1 )
-				} )
-				self.ScaleSet = true
-				self:SetMoveType(MOVETYPE_VPHYSICS)
-				self:SetSolid(SOLID_VPHYSICS)
-				self:EnableCustomCollisions( true )
-				local mins2, maxs2 = self:GetHitBoxBounds( 0, 0 )
-				self:SetCollisionBounds( mins2*CalMult, maxs2*CalMult )
-				--self:Activate()
-			end)
+			if IsValid(self) then
+				self:PhysicsDestroy()	
+				timer.Simple(2,function()
+					if IsValid(self) then
+						local mins, maxs = self:GetModelBounds()
+						local CalMult = (self.DakCaliber/100)
+						mins = mins*CalMult
+						maxs = maxs*CalMult
+						local x0 = mins[1] -- Define the min corner of the box
+						local y0 = mins[2]
+						local z0 = mins[3]
+						local x1 = maxs[1] -- Define the max corner of the box
+						local y1 = maxs[2]
+						local z1 = maxs[3]
+						self:PhysicsInitConvex( {
+						Vector( x0, y0, z0 ),
+						Vector( x0, y0, z1 ),
+						Vector( x0, y1, z0 ),
+						Vector( x0, y1, z1 ),
+						Vector( x1, y0, z0 ),
+						Vector( x1, y0, z1 ),
+						Vector( x1, y1, z0 ),
+						Vector( x1, y1, z1 )
+						} )
+						self.ScaleSet = true
+						self:SetMoveType(MOVETYPE_VPHYSICS)
+						self:SetSolid(SOLID_VPHYSICS)
+						self:EnableCustomCollisions( true )
+						local mins2, maxs2 = self:GetHitBoxBounds( 0, 0 )
+						self:SetCollisionBounds( mins2*CalMult, maxs2*CalMult )
+						--self:Activate()
+					end
+				end)
+			end
 		end)
 	else
 		self.ScaleSet = true

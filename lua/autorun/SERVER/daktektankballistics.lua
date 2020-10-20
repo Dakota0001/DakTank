@@ -123,10 +123,13 @@ function DTArmorSanityCheck(Ent)
 	
 	--Ent.DakArmor > (7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA))*0.5
 	if Ent.DakBurnStacks == nil then Ent.DakBurnStacks = 0 end
-	if not(Ent.DakArmor == 7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - Ent.DakBurnStacks*0.25) then
-		Ent.DakArmor = 7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - Ent.DakBurnStacks*0.25
+	if SA ~= nil then
+		if not(Ent.DakArmor == 7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - Ent.DakBurnStacks*0.25) then
+			Ent.DakArmor = 7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA) - Ent.DakBurnStacks*0.25
+		end
+		if Ent.DakArmor <= 0 then Ent.DakArmor = 0.001 end
 	end
-	if Ent.DakArmor <= 0 then Ent.DakArmor = 0.001 end
+	
 end
 
 function DTSimpleTrace(Start, End, Caliber, Filter, Gun)
@@ -175,7 +178,7 @@ function DTSimpleRecurseTrace(Start, End, Caliber, Filter, Gun)
 	end
 end
 
-function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
+function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 	if tonumber(Caliber) == nil then return 0, NULL, Vector(0,0,0), 0, 0, 0 end
 	local trace = {}
 		trace.start = Start
@@ -183,7 +186,13 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
 		trace.filter = Filter
 		trace.ignoreworld = true
 	local ShellSimTrace = util.TraceLine( trace )
-
+	if core ~= nil and core ~= NULL then
+		if ShellSimTrace.Entity.Controller ~= nil then
+			if ShellSimTrace.Entity.Controller ~= core then
+				return 0, ShellSimTrace.Entity, Vector(0,0,0), 0, 0, 0 
+			end
+		end
+	end
 	local HitEnt = ShellSimTrace.Entity
 	local EffArmor = 0
 	local Shatter = 0
@@ -383,9 +392,9 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	end
 end
 
-function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter)
+function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 	if tonumber(Caliber) == nil then return 0, NULL, 0, 0, 0, 0, 0, Vector(0,0,0) end
-	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
+	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
@@ -401,51 +410,63 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter)
 	local SpallLiner = 0 
 	local SpallLinerOnCrit = 0
 	local LinerThickness = 0
+	local CritEnt = NULL
+
 	while Go == 1 and Recurse<25 do
-		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)
-		if newHitGun == 1 then HitGun = 1 end
-		if newHitGear == 1 then HitGear = 1 end		
-		if Armor == 0 or newArmor == 0 then
-			if Armor == 0 then
-				HeatShattered = Shattered
-				HeatFailed = Failed
-				FirstPenPos = LastPenPos
-			end
-		end
-		if newArmor >= Thickest then 
-			Thickest = newArmor
-			SpallLiner = 0
-			LinerThickness = 0
-		else
-			if newEnt:IsValid() then
-				if newEnt:GetClass() == "prop_physics" then
-					LinerThickness = LinerThickness + newArmor
+		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
+		if newEnt.Controller == core then
+			if newHitGun == 1 then HitGun = 1 end
+			if newHitGear == 1 then HitGear = 1 end		
+			if Armor == 0 or newArmor == 0 then
+				if Armor == 0 then
+					HeatShattered = Shattered
+					HeatFailed = Failed
+					FirstPenPos = LastPenPos
 				end
 			end
-			if LinerThickness >= Thickest*0.1 and Thickest > 0 then
-				SpallLiner = 1
+			if newArmor >= Thickest then 
+				Thickest = newArmor
+				SpallLiner = 0
+				LinerThickness = 0
+			else
+				if newEnt:IsValid() then
+					if newEnt:GetClass() == "prop_physics" then
+						LinerThickness = LinerThickness + newArmor
+					end
+				end
+				if LinerThickness >= Thickest*0.1 and Thickest > 0 then
+					SpallLiner = 1
+				end
 			end
+			Shatters = Shatters + Shattered
+			Fails = Fails + Failed
+			Armor = Armor + newArmor
 		end
-		Shatters = Shatters + Shattered
-		Fails = Fails + Failed
 		if newEnt:IsValid() then
-			if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
-				if newEnt:GetClass() == "dak_teammo" then
-					if newEnt.DakAmmo > 0 then 
-						HitCrit = 1 
+			if newEnt.Controller == core then
+				if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
+					if newEnt:GetClass() == "dak_teammo" then
+						if newEnt.DakAmmo > 0 then 
+							HitCrit = 1
+							CritEnt = newEnt
+							if SpallLiner == 1 then
+								SpallLinerOnCrit = 1
+							end
+						end
+					else
+						HitCrit = 1
+						CritEnt = newEnt
 						if SpallLiner == 1 then
 							SpallLinerOnCrit = 1
 						end
-					end
-				else
-					HitCrit = 1
-					if SpallLiner == 1 then
-						SpallLinerOnCrit = 1
 					end
 				end
 			end
 		else
 			Go = 0
+		end
+		if Recurse >= 25 then
+			return math.huge, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
 		end
 		if Go == 0 then
 			if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
@@ -458,10 +479,11 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter)
 			if ShellType == "APDS" or ShellType == "APFSDS" then
 				if Fails > 0 then Rico = 1 end
 			end
-			return Armor, Ent, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
+			return Armor, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
 		end
+		
 		NewFilter[#NewFilter+1] = newEnt
-		Armor = Armor + newArmor
+		
 		Recurse = Recurse + 1
 	end
 end
@@ -2777,7 +2799,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 			local ExpTrace = util.TraceHull( trace )
 			local ExpTraceLine = util.TraceLine( trace )
 
-			if ExpTrace.Hit and i <= 50 then
+			if ExpTrace.Hit and i <= 10 then
 				local effectdata = EffectData()
 				effectdata:SetOrigin(ExpTrace.HitPos)
 				effectdata:SetEntity(Shell.DakGun)

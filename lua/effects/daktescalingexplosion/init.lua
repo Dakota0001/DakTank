@@ -190,7 +190,7 @@ function EFFECT:Init( data )
 				if particle == nil then particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(math.Rand(-dustsize*10,dustsize*10),math.Rand(-dustsize*10,dustsize*10),-25))  end
 				
 				if (particle) then
-					particle:SetVelocity(Vector(0,0,math.Rand(dustsize*25,dustsize*50)))
+					particle:SetVelocity(Vector(0,0,math.Rand(dustsize*5,dustsize*25)))
 					particle:SetLifeTime(0) 
 					--particle:SetDieTime((dustsize/5)+math.Rand(0,5))
 					particle:SetDieTime(dusttime)
@@ -202,7 +202,7 @@ function EFFECT:Init( data )
 					particle:SetAngleVelocity( Angle(math.Rand(-0.5,0.5),0,0) ) 
 					particle:SetRoll(math.Rand( 0, 360 ))
 					particle:SetColor(math.random(227,227),math.random(211,211),math.random(161,161),math.random(50,50))
-					particle:SetGravity( Vector(0,0,dustsize*15*1*math.Rand(0.75,1.25)) ) 
+					particle:SetGravity( Vector(0,0,dustsize*15*1*math.Rand(0.25,1.25)) ) 
 					particle:SetAirResistance(100*25*math.Rand(0.5,1.5)) 
 					particle:SetCollide(false)
 					particle:SetBounce(0)
