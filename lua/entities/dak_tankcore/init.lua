@@ -21,7 +21,6 @@ hook.Add("AdvDupe_FinishPasting", "daktank_tankcore_check", function(dupe)
 		end
 	end
 end)
-
 --cause self to delete self if not properly unfrozen
 
 --have tank just keep rolling with gearbox on death (they aren't being added to contraption, find all axised to baseplate)

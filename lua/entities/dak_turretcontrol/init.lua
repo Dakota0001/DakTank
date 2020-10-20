@@ -646,7 +646,7 @@ function ENT:Think()
 					        	--reposition to forward facing
 					        	local GunDir = self:GetForward()
 							    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
-								if IsValid(DakTurret) then
+								if IsValid(DakTurret) and IsValid(self.turretaimer) then
 									local TurDir = self:GetForward()
 									local TurAng = angNumClamp(angClamp(self:WorldToLocalAngles(TurDir:Angle()), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.turretaimer:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
 									self.turretaimer:SetAngles(self:LocalToWorldAngles(Angle(0,self:WorldToLocalAngles(self.turretaimer:GetAngles()).yaw,0)) + Angle(0,TurAng.yaw,0) )
