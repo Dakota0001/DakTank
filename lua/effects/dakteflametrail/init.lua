@@ -32,7 +32,7 @@ function EFFECT:Init( data )
 	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
 
 	local emitter = ParticleEmitter( self.StartPos )
-	for i = 1, 25 do
+	for i = 1, 4 do
 
 		local particle = emitter:Add( "effects/fire_cloud2.vtf", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
@@ -56,7 +56,7 @@ function EFFECT:Init( data )
 			particle:SetBounce(0)
 		end
 	end
-	for i = 1, 15 do
+	for i = 1, 2 do
 
 		local particle = emitter:Add( "effects/fire_cloud1.vtf", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
@@ -81,7 +81,7 @@ function EFFECT:Init( data )
 		end
 	end
 
-	for i = 1, 15 do
+	for i = 1, 2 do
 
 		local particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
@@ -181,6 +181,6 @@ function EFFECT:Think()
 end
 
 function EFFECT:Render()
-	--render.SetMaterial( self.Mat )
-	--render.DrawBeam( self.StartPos, self.EndPos, self.Caliber, 1, 0, Color( 255,175,50, 255 ) )
+	--render.SetMaterial( Material( "trails/plasma" ) )
+	--render.DrawBeam( self.StartPos, self.EndPos, 5, 1, 0, Color( 75,50,50, 100 ) )
 end

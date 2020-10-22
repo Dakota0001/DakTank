@@ -99,7 +99,7 @@ function ENT:Think()
 		if not(self.DakName == "Base Ammo") then
 			self.DakCaliber = tonumber(string.Split( self.DakName, "m" )[1])
 			if self.DakAmmoType == "Flamethrower Fuel" then
-				self.DakMaxAmmo = 150
+				self.DakMaxAmmo = 1000
 				if not(self.DakAmmo) then
 					self.DakAmmo = self.DakMaxAmmo
 				end
@@ -408,7 +408,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 
 	self.DakCaliber = tonumber(string.Split( self.DakName, "m" )[1])
 	if self.DakAmmoType == "Flamethrower Fuel" then
-		self.DakMaxAmmo = 150
+		self.DakMaxAmmo = 1000
 		if not(self.DakAmmo) then
 			self.DakAmmo = self.DakMaxAmmo
 		end

@@ -217,7 +217,7 @@ function ENT:Think()
 			--Flamethrower
 			if self.DakGunType == "Flamethrower" then
 				self.DakName = "Flamethrower"
-				self.DakCooldown = 0.1
+				self.DakCooldown = 1/66
 				self.DakMaxHealth = 10
 				self.DakArmor = 50
 				self.DakMass = 50
@@ -555,12 +555,22 @@ function ENT:DakTEFire()
 				self:SetNWInt("FirePitch",self.DakFirePitch)
 				self:SetNWFloat("Caliber",self.DakCaliber)
 
+				if self.DakName == "Flamethrower" then
+					if self.FlameFiring == nil then self.FlameFiring = 0 end
+					if self.FlameFiring == 0 then
+						self:EmitSound( "daktanks/flamethrower_start.wav", 100, 95, 1, 6)
+						self:EmitSound( "daktanks/flamethrower_loop.wav", 100, 95, 1, 6)
+
+						--weapons/flame_thrower_fire_hit.wav
+						self.FlameFiring = 1
+					end
+				else
 				net.Start( "daktankshotfired" )
 				net.WriteVector( self:GetPos() )
 				net.WriteFloat( self.DakCaliber )
 				net.WriteString( FiringSound[math.random(1,3)] )
 				net.Broadcast()
-
+				end
 				--if self.DakCaliber>=40 then
 				--	self:SetNWBool("Firing",true)
 				--	timer.Create( "ResoundTimer"..self:EntIndex(), 0.1, 1, function()
@@ -595,6 +605,13 @@ function ENT:DakTEFire()
 					end
 				end
 			end
+		else
+			if self.FlameFiring == 1 then
+				self.FlameFiring = 0
+				self:StopSound( "daktanks/flamethrower_start.wav" )
+				self:StopSound( "daktanks/flamethrower_loop.wav" )
+				self:EmitSound( "daktanks/flamethrower_end.wav", 100, 95, 1, 6 )
+			end
 		end
 	end
 	if IsValid(self.DakTankCore) then
@@ -626,6 +643,13 @@ function ENT:TriggerInput(iname, value)
 				end)
 			else
 				timer.Remove( "RefireTimer"..self:EntIndex() )
+
+				if self.FlameFiring == 1 then
+					self.FlameFiring = 0
+					self:StopSound( "daktanks/flamethrower_start.wav" )
+					self:StopSound( "daktanks/flamethrower_loop.wav" )
+					self:EmitSound( "daktanks/flamethrower_end.wav", 100, 95, 1, 6 )
+				end
 			end
 		end
 	end

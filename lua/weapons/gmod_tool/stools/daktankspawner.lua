@@ -935,8 +935,8 @@ function TOOL:LeftClick( trace )
 			self.DakCaliber = 10
 			self.DakName = "Flamethrower Fuel Tank"
 			self.DakIsExplosive = true
-			self.DakAmmo = 150
-			self.DakMaxAmmo = 150
+			self.DakAmmo = 1000
+			self.DakMaxAmmo = 1000
 			self.DakAmmoType = "Flamethrower Fuel"
 			self.spawnedent:SetModel( "models/props_c17/canister_propane01a.mdl" )
 		end
@@ -2108,7 +2108,7 @@ function TOOL.BuildCPanel( panel )
 	end
 	gunList["Flamethrower"] = function()
 		DLabel:SetPos( 15, 380 )
-		DLabel:SetText( "Flamethrower\n\nFlamethrower capable of igniting infantry, softening armor and stalling engines.\n\nWeapon Stats:\nArmor:          50mm\nWeight:        50kg\nHealth:          10\nDamage:        5\nRate of Fire: 600 streams/minute\n" )
+		DLabel:SetText( "Flamethrower\n\nFlamethrower capable of igniting infantry, softening armor and stalling engines.\n\nWeapon Stats:\nArmor:          50mm\nWeight:        50kg\nHealth:          10\nDamage:        5\nRate of Fire: 3960 streams/minute\n" )
 		DermaNumSlider:SetVisible( false )
 	end
 	gunList["HMG"] = function()
@@ -2571,7 +2571,7 @@ function TOOL.BuildCPanel( panel )
 			
 		if AmmoBoxSelect:GetSelected() == "Flamethrower" then
 			DLabel:SetPos( 15, 380 )
-			DLabel:SetText( "Flamethrower Fuel\n\nFlamethrower fuel tank, more armored than normal ammo boxes but more likely to be crit, use with caution.\n\nCrate Stats:\nArmor:  12.5mm\nWeight: 500kg\nHealth:  30\n\nFuel Stats:\nCapacity:      15 seconds\nDamage:        5\nRate of Fire: 600 streams/minute" )
+			DLabel:SetText( "Flamethrower Fuel\n\nFlamethrower fuel tank, more armored than normal ammo boxes but more likely to be crit, use with caution.\n\nCrate Stats:\nArmor:  12.5mm\nWeight: 500kg\nHealth:  30\n\nFuel Stats:\nCapacity:      15 seconds\nDamage:        5\nRate of Fire: 3960 streams/minute" )
 			RunConsoleCommand( "daktankspawner_SpawnSettings", "Flamethrower Fuel" )
 			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teammo" )
 		else

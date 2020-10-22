@@ -23,7 +23,7 @@ function EFFECT:Init( data )
 	
 	local emitter = ParticleEmitter( Pos )
 	
-	for i = 1,10 do
+	for i = 1,1 do
 
 		local particle = emitter:Add( "dak/smokey", Pos)  
 		 
@@ -50,7 +50,7 @@ function EFFECT:Init( data )
 		end
 	end
 	local ScaleSize = 2
-	for i = 1,20 do
+	for i = 1,3 do
 		local ang = math.Rand(0,360) * math.pi/180
 		local particle = emitter:Add( "effects/fire_cloud2.vtf", Pos)
 		if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-50,100)))  end
@@ -80,7 +80,7 @@ function EFFECT:Init( data )
 			end )
 		end
 	end
-	for i = 1,20 do
+	for i = 1,3 do
 		local ang = math.Rand(0,360) * math.pi/180
 		local particle = emitter:Add( "effects/fire_cloud2.vtf", Pos)
 		if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-50,100)))  end
@@ -110,7 +110,7 @@ function EFFECT:Init( data )
 			end )
 		end
 	end
-	for i = 1,10 do
+	for i = 1,1 do
 		local ang = math.Rand(0,360) * math.pi/180
 		local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
 		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-50,100)))  end
@@ -140,7 +140,7 @@ function EFFECT:Init( data )
 			end )
 		end
 	end
-	for i = 1,10 do
+	for i = 1,1 do
 		local ang = math.Rand(0,360) * math.pi/180
 		local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
 		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos+Vector(25*math.Rand(0,1)*math.cos(ang),25*math.Rand(0,1)*math.sin(ang),math.random(-50,100)))  end

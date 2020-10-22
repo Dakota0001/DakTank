@@ -17,7 +17,7 @@ end
 ]]--
 
 function PersistFire(Pos, owner, gun)
-	timer.Create( "DTPersistFire"..(Pos.x)..CurTime(), 0.25, 40, function() FireBurn(Pos, owner, gun) end )
+	timer.Create( "DTPersistFire"..(Pos.x)..CurTime(), 0.5, 20, function() FireBurn(Pos, owner, gun) end )
 end
 
 function FireBurn(Pos, owner, gun)

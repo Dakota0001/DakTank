@@ -25,7 +25,7 @@ function EFFECT:Init( data )
 	local emitter = ParticleEmitter( Pos )
 	
 	if not(Ent==NULL) then
-	for i = 1,5 do
+	for i = 1,0 do
 
 		local particle = emitter:Add( "dak/smokey", Pos + Ent:GetForward()*math.random( -0, 0 )) 
 		 
