@@ -609,6 +609,27 @@ function ENT:Think()
 								    			GunDir = (self:GetAngles()+Angle(-self:GetLoadingAngle(),0,0)):Forward()
 								    		end
 								    	end
+
+								    	if self:GetQuadrantElevation() then
+									    	local GunYaw = self:WorldToLocalAngles(self.DakGun:GetAngles()).yaw
+									    	if GunYaw >=-45 and GunYaw <= 45 then
+									    		--print("Forward")
+									    		Elevation = self:GetFrontElevation()
+									    		Depression = self:GetFrontDepression()
+									    	elseif GunYaw < -45 and GunYaw > -135 then
+									    		--print("Right")
+									    		Elevation = self:GetRightElevation()
+									    		Depression = self:GetRightDepression()
+									    	elseif GunYaw > 45 and GunYaw < 135 then
+									    		--print("Left")
+									    		Elevation = self:GetLeftElevation()
+									    		Depression = self:GetLeftDepression()
+									    	else
+									    		--print("Rear")
+									    		Elevation = self:GetRearElevation()
+									    		Depression = self:GetRearDepression()
+									    	end
+									    end
 									    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+self.Shake), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
 										if IsValid(DakTurret) then
 											--turn both turret and gun
