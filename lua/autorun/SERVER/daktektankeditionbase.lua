@@ -227,10 +227,12 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 
 
 						if ShellTrace.Hit then
-							if ShellList[i].IsGuided then
-								DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
-							else
-								DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+							if not(ShellTrace.HitSky) then
+								if ShellList[i].IsGuided then
+									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+								else
+									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+								end
 							end
 						else
 							if ShellList[i].FuzeDelay~=nil and ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
@@ -258,7 +260,6 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 		if #RemoveList > 0 then
 			for i = 1, #RemoveList do
 				table.remove( ShellList, RemoveList[i] )
-				--DTCreatePath(Vector(702.671875, 1826.617432, -6953.648438))
 			end
 		end
 	--end

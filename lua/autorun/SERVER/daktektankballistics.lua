@@ -1334,8 +1334,39 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 			end
 		end
 		if HitEnt:IsWorld() or Shell.ExplodeNow==true then
+			if not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1) then
+				local worldtrace = {}
+				worldtrace.filter = Shell.Filter
+				worldtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+				worldtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+				worldtrace.mask = MASK_SOLID_BRUSHONLY
+				worldtrace.start = HitPos + (Shell.DakVelocity:GetNormalized())*Shell.DakCaliber*0.05
+				worldtrace.endpos = HitPos + (Shell.DakVelocity:GetNormalized())*Shell.DakPenetration --dirt/sand/gravel mix is about 1mm of RHA per source unit (inch), so if you can pen 100mm of RHA you can pen 100 inches of dirt. 
+				local worldShellTrace = util.TraceHull( worldtrace )
+				local PenMult = (1-worldShellTrace.FractionLeftSolid)
+				if PenMult == 0 or worldShellTrace.FractionLeftSolid == 0 then
+					Shell.Grounded = 1
+				else
+					Shell.Pos = HitPos + ((Shell.DakVelocity:GetNormalized())*Shell.DakPenetration*PenMult) + Shell.DakVelocity:GetNormalized()
+					Shell.DakPenetration = Shell.DakPenetration * PenMult
+					local effectdata = EffectData()
+					effectdata:SetOrigin(HitPos)
+					effectdata:SetEntity(HitEnt)
+					effectdata:SetAttachment(1)
+					effectdata:SetMagnitude(.5)
+					effectdata:SetScale(Shell.DakCaliber*0.25)
+					util.Effect("dakteshellpenetrate", effectdata, true, true)
+					if Shell.DakShellType == "HE" or Shell.DakShellType == "SM" then
+						DTShellContinue(Shell.Pos,End,Shell,Normal)
+					else
+						DTShellContinue(Shell.Pos,End,Shell,Normal,true)
+					end
+					Shell.PenetratedGround = 1
+				end
+			end
+
 			Shell.ExplodeNow=false
-			if Shell.DakExplosive then
+			if Shell.DakExplosive and Shell.PenetratedGround~=1 then
 				local effectdata3 = EffectData()
 				effectdata3:SetOrigin(HitPos)
 				effectdata3:SetEntity(Shell.DakGun)
@@ -1413,13 +1444,16 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					end
 				end
 			end
-			Shell.RemoveNow = 1
-			if Shell.DakExplosive then
-				Shell.ExplodeNow = true
+			if Shell.Grounded == 1 or Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then
+				Shell.RemoveNow = 1
+				if Shell.DakExplosive then
+					Shell.ExplodeNow = true
+				end
+				Shell.LifeTime = 0
+				Shell.DakVelocity = Vector(0,0,0)
+				Shell.DakDamage = 0
 			end
-			Shell.LifeTime = 0
-			Shell.DakVelocity = Vector(0,0,0)
-			Shell.DakDamage = 0
+			Shell.PenetratedGround = nil
 		else
 		end	
 
@@ -2115,8 +2149,39 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 				end
 			end
 			if HitEnt:IsWorld() or Shell.ExplodeNow==true then
+				if not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1) then
+				local worldtrace = {}
+					worldtrace.filter = Shell.Filter
+					worldtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+					worldtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+					worldtrace.mask = MASK_SOLID_BRUSHONLY
+					worldtrace.start = ContShellTrace.HitPos + (Shell.DakVelocity:GetNormalized())*Shell.DakCaliber*0.05
+					worldtrace.endpos = ContShellTrace.HitPos + (Shell.DakVelocity:GetNormalized())*Shell.DakPenetration --dirt/sand/gravel mix is about 1mm of RHA per source unit (inch), so if you can pen 100mm of RHA you can pen 100 inches of dirt. 
+					local worldShellTrace = util.TraceHull( worldtrace )
+					local PenMult = (1-worldShellTrace.FractionLeftSolid)
+					if PenMult == 0 or worldShellTrace.FractionLeftSolid == 0 then
+						Shell.Grounded = 1
+					else
+						Shell.Pos = ContShellTrace.HitPos + ((Shell.DakVelocity:GetNormalized())*Shell.DakPenetration*PenMult) + Shell.DakVelocity:GetNormalized()
+						Shell.DakPenetration = Shell.DakPenetration * PenMult
+						local effectdata = EffectData()
+						effectdata:SetOrigin(ContShellTrace.HitPos)
+						effectdata:SetEntity(HitEnt)
+						effectdata:SetAttachment(1)
+						effectdata:SetMagnitude(.5)
+						effectdata:SetScale(Shell.DakCaliber*0.25)
+						util.Effect("dakteshellpenetrate", effectdata, true, true)
+						if Shell.DakShellType == "HE" or Shell.DakShellType == "SM" then
+							DTShellContinue(Shell.Pos,End,Shell,Normal)
+						else
+							DTShellContinue(Shell.Pos,End,Shell,Normal,true)
+						end
+						Shell.PenetratedGround = 1
+					end
+				end
+
 				Shell.ExplodeNow=false
-				if Shell.DakExplosive then
+				if Shell.DakExplosive and Shell.PenetratedGround~=1 then
 					local effectdata3 = EffectData()
 					effectdata3:SetOrigin(ContShellTrace.HitPos)
 					effectdata3:SetEntity(Shell.DakGun)
@@ -2198,13 +2263,16 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 					end
 				end
-				Shell.RemoveNow = 1
-				if Shell.DakExplosive then
-					Shell.ExplodeNow = true
+				if Shell.Grounded == 1 or Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then
+					Shell.RemoveNow = 1
+					if Shell.DakExplosive then
+						Shell.ExplodeNow = true
+					end
+					Shell.LifeTime = 0
+					Shell.DakVelocity = Vector(0,0,0)
+					Shell.DakDamage = 0
 				end
-				Shell.LifeTime = 0
-				Shell.DakVelocity = Vector(0,0,0)
-				Shell.DakDamage = 0
+				Shell.PenetratedGround = nil
 			end	
 
 			if Shell.DakPenetration <= 0 then
