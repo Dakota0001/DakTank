@@ -1741,7 +1741,8 @@ function TOOL:RightClick( trace )
 					end
 				end
 				if Target:GetClass() == "dak_tankcore" then
-					if Target.Modern and Target.ColdWar then
+					--print(Target.Modern)
+					--if Target.Modern and Target.ColdWar then
 						ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 						--[[
 						if Target.Modern == 1 then
@@ -1782,7 +1783,7 @@ function TOOL:RightClick( trace )
 								ply:ChatPrint("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 							end
 						end
-					end
+					--end
 				end
 				if Target:GetClass() == "dak_temotor" then
 					if Target.DakHP then

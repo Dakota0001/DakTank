@@ -212,33 +212,40 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 						trace.filter = ShellList[i].Filter
 						trace.mins = Vector(-ShellList[i].DakCaliber*0.02,-ShellList[i].DakCaliber*0.02,-ShellList[i].DakCaliber*0.02)
 						trace.maxs = Vector(ShellList[i].DakCaliber*0.02,ShellList[i].DakCaliber*0.02,ShellList[i].DakCaliber*0.02)
+
+						--if util.IsInWorld( trace.endpos ) or util.IsInWorld( trace.start ) then
+						--	ShellList[i].RemoveNow = 1
+						--else
 						local ShellTrace = util.TraceHull( trace )
-						if ShellList[i].Crushed ~= 1 then
-							local effectdata = EffectData()
-							effectdata:SetStart(ShellTrace.StartPos)
-							effectdata:SetOrigin(ShellTrace.HitPos)
-							effectdata:SetScale((ShellList[i].DakCaliber*0.0393701))
-							if ShellTrace.Hit then
-								util.Effect(ShellList[i].DakTrail, effectdata, true, true)
-							else
-								util.Effect(ShellList[i].DakTrail, effectdata, true, true)
-							end
-						end
-
-
-						if ShellTrace.Hit then
-							if not(ShellTrace.HitSky) then
-								if ShellList[i].IsGuided then
-									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+						--end
+						if ShellTrace ~= nil then
+							if ShellList[i].Crushed ~= 1 then
+								local effectdata = EffectData()
+								effectdata:SetStart(ShellTrace.StartPos)
+								effectdata:SetOrigin(ShellTrace.HitPos)
+								effectdata:SetScale((ShellList[i].DakCaliber*0.0393701))
+								if ShellTrace.Hit then
+									util.Effect(ShellList[i].DakTrail, effectdata, true, true)
 								else
-									DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+									util.Effect(ShellList[i].DakTrail, effectdata, true, true)
 								end
 							end
-						else
-							if ShellList[i].FuzeDelay~=nil and ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
-								if ShellList[i].DakShellType == "HE" or ShellList[i].DakShellType == "SM" then
-									ShellList[i].ExplodeNow = true
-									DTShellAirBurst(trace.endpos,ShellList[i],trace.endpos-trace.start)
+
+
+							if ShellTrace.Hit then
+								if not(ShellTrace.HitSky) then
+									if ShellList[i].IsGuided then
+										DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+									else
+										DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+									end
+								end
+							else
+								if ShellList[i].FuzeDelay~=nil and ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then
+									if ShellList[i].DakShellType == "HE" or ShellList[i].DakShellType == "SM" then
+										ShellList[i].ExplodeNow = true
+										DTShellAirBurst(trace.endpos,ShellList[i],trace.endpos-trace.start)
+									end
 								end
 							end
 						end

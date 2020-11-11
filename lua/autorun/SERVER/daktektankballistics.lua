@@ -15,14 +15,25 @@ local function CheckClip(Ent, HitPos)
 end
 --this function seemingly only works with that one broken visclip twisted suggested I use once
 ]]--
-
+DakTank = {}
+DakTank.PersistFireLast = 0
+DakTank.PersistFireLastDelay = math.random(0.25,0.5)
 function PersistFire(Pos, owner, gun)
 	timer.Create( "DTPersistFire"..(Pos.x)..CurTime(), 0.5, 20, function() FireBurn(Pos, owner, gun) end )
+	if CurTime() - DakTank.PersistFireLast > DakTank.PersistFireLastDelay then
+		DakTank.PersistFireLast = CurTime()
+		DakTank.PersistFireLastDelay = math.random(0.25,0.5)
+		sound.Play( "daktanks/flamerimpact.mp3", Pos, 100, 100*math.Rand(0.6,0.8), 1 )
+	end
 end
 
 function FireBurn(Pos, owner, gun)
 	local Radius = 250
-	sound.Play( "daktanks/flamerimpact.mp3", Pos, 100, 100*math.Rand(0.6,0.8), 1 )	
+	if CurTime() - DakTank.PersistFireLast > DakTank.PersistFireLastDelay then
+		DakTank.PersistFireLast = CurTime()
+		DakTank.PersistFireLastDelay = math.random(0.25,0.5)
+		sound.Play( "daktanks/flamerimpact.mp3", Pos, 100, 100*math.Rand(0.6,0.8), 1 )
+	end	
 	local Targets = ents.FindInSphere( Pos, Radius )
 	if table.Count(Targets) > 0 then
 		if table.Count(Targets) > 0 then
@@ -239,8 +250,9 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 			if ShellType == "APDS" then
 				TDRatio = HitEnt.DakArmor/(Caliber*1.75)
 			end
-			if HitEnt.IsComposite == 1 then
+			if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
 				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal, Filter )
+				if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 				if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end 
 				if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end 
 				if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
@@ -652,7 +664,7 @@ function DTShellAirBurst(HitPos,Shell,Normal)
 				effectdata:SetScale(1)
 				util.Effect("dakteflameimpact", effectdata, true, true)
 				PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-				sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+				--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 			else
 				effectdata:SetOrigin(HitPos)
 				effectdata:SetEntity(Shell.DakGun)
@@ -783,8 +795,9 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				local TDRatio = 0
 				local PenRatio = 0
 				local CompArmor
-				if HitEnt.IsComposite == 1 then
+				if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
 					CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.DakVelocity:GetNormalized(), Shell.Filter )
+					if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 					if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end 
 					if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end 
 					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" then
@@ -868,7 +881,8 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				if HitAng >= 70 and HitEnt.DakArmor>=Shell.DakCaliber*0.85 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Shattered = 1 end
 				if HitAng >= 80 and HitEnt.DakArmor>=Shell.DakCaliber*0.85 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Shattered = 1 Failed = 1 end
-				if HitEnt.IsComposite == 1 then
+				if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+					if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 					if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end 
 					if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end 
 					EffArmor = CompArmor
@@ -974,7 +988,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					end
 				else
 					if Shell.DakShellType == "HESH" then
-						if HitEnt.IsComposite == 1 then
+						if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
 							if Shell.DakCaliber*1.25 > CompArmor and HitAng < 80 then
 								Shell.Filter[#Shell.Filter+1] = HitEnt
 								Shell.HeatPen = true
@@ -999,7 +1013,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 					if Shell.DakShellType == "HE" then
-						if HitEnt.IsComposite == 1 then
+						if HitEnt.IsComposite == 1 or(HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
 							if Shell.DakFragPen*10 > CompArmor and HitAng < 70 then
 								Shell.Filter[#Shell.Filter+1] = HitEnt
 								Shell.HeatPen = true
@@ -1069,7 +1083,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						effectdata:SetScale(1)
 						util.Effect("dakteflameimpact", effectdata, true, true)
 						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-						sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+						--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 					else
 						Shell.Filter[#Shell.Filter+1] = HitEnt
 						if Shell.DakDamage >= 0 then
@@ -1295,7 +1309,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						effectdata:SetScale(1)
 						util.Effect("dakteflameimpact", effectdata, true, true)
 						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-						sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+						--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 					else
 						effectdata:SetOrigin(HitPos)
 						effectdata:SetEntity(Shell.DakGun)
@@ -1347,8 +1361,11 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				if PenMult == 0 or worldShellTrace.FractionLeftSolid == 0 then
 					Shell.Grounded = 1
 				else
+					--print(PenMult)
 					Shell.Pos = HitPos + ((Shell.DakVelocity:GetNormalized())*Shell.DakPenetration*PenMult) + Shell.DakVelocity:GetNormalized()
 					Shell.DakPenetration = Shell.DakPenetration * PenMult
+					Shell.DakVelocity = Shell.DakVelocity * PenMult
+					Shell.DakDamage = Shell.DakDamage * PenMult
 					local effectdata = EffectData()
 					effectdata:SetOrigin(HitPos)
 					effectdata:SetEntity(HitEnt)
@@ -1364,7 +1381,6 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					Shell.PenetratedGround = 1
 				end
 			end
-
 			Shell.ExplodeNow=false
 			if Shell.DakExplosive and Shell.PenetratedGround~=1 then
 				local effectdata3 = EffectData()
@@ -1414,7 +1430,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetScale(1)
 					util.Effect("dakteflameimpact", effectdata, true, true)
 					PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-					sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+					--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
 				else
 					effectdata:SetOrigin(HitPos)
 					effectdata:SetEntity(Shell.DakGun)
@@ -1604,8 +1620,9 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					local TDRatio = 0
 					local PenRatio = 0
 					local CompArmor
-					if HitEnt.IsComposite == 1 then
+					if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
 						CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.DakVelocity:GetNormalized(), Shell.Filter )
+						if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 						if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end 
 						if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end 
 						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakShellType == "HESH" then
@@ -1690,7 +1707,8 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					end
 					if HitNonHitable and HitAng >= 70 and HitEnt.DakArmor>=Shell.DakCaliber*0.85 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Shattered = 1 end
 					if HitNonHitable and HitAng >= 80 and HitEnt.DakArmor>=Shell.DakCaliber*0.85 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Shattered = 1 Failed = 1 end
-					if HitEnt.IsComposite == 1 then
+					if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+						if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 						if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end 
 						if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end 
 						EffArmor = CompArmor
@@ -1799,7 +1817,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 					else
 						if Shell.DakShellType == "HESH" then
-							if HitEnt.IsComposite == 1 then
+							if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
 								if Shell.DakCaliber*1.25 > CompArmor and HitAng < 80 then
 									Shell.Filter[#Shell.Filter+1] = HitEnt
 									Shell.HeatPen = true
@@ -1824,7 +1842,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 						end
 						if Shell.DakShellType == "HE" then
-							if HitEnt.IsComposite == 1 then
+							if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
 								if Shell.DakFragPen*10 > CompArmor and HitAng < 70 then
 									Shell.Filter[#Shell.Filter+1] = HitEnt
 									Shell.HeatPen = true
@@ -1892,7 +1910,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							effectdata:SetScale(1)
 							util.Effect("dakteflameimpact", effectdata, true, true)
 							PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-							sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
+							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 						else
 							Shell.Filter[#Shell.Filter+1] = HitEnt
 							if Shell.DakDamage >= 0 then
@@ -2110,7 +2128,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							effectdata:SetScale(1)
 							util.Effect("dakteflameimpact", effectdata, true, true)
 							PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-							sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
+							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 						else
 							effectdata:SetOrigin(ContShellTrace.HitPos)
 							effectdata:SetEntity(Shell.DakGun)
@@ -2150,7 +2168,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 			end
 			if HitEnt:IsWorld() or Shell.ExplodeNow==true then
 				if not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1) then
-				local worldtrace = {}
+					local worldtrace = {}
 					worldtrace.filter = Shell.Filter
 					worldtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
 					worldtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
@@ -2164,6 +2182,8 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					else
 						Shell.Pos = ContShellTrace.HitPos + ((Shell.DakVelocity:GetNormalized())*Shell.DakPenetration*PenMult) + Shell.DakVelocity:GetNormalized()
 						Shell.DakPenetration = Shell.DakPenetration * PenMult
+						Shell.DakVelocity = Shell.DakVelocity * PenMult
+						Shell.DakDamage = Shell.DakDamage * PenMult
 						local effectdata = EffectData()
 						effectdata:SetOrigin(ContShellTrace.HitPos)
 						effectdata:SetEntity(HitEnt)
@@ -2230,7 +2250,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						util.Effect("dakteflameimpact", effectdata, true, true)
 						local Targets = ents.FindInSphere( ContShellTrace.HitPos, 150 )
 						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-						sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
+						--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 					else
 						effectdata:SetOrigin(ContShellTrace.HitPos)
 						effectdata:SetEntity(Shell.DakGun)
@@ -2360,7 +2380,8 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 						end
 					end
 					local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 then
+					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+						if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end 
 						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*ExpTrace.Entity.EntityMods.CompKEMult
@@ -2541,7 +2562,8 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 						end
 					end
 					local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 then
+					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+						if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*ExpTrace.Entity.EntityMods.CompKEMult
@@ -2720,7 +2742,8 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 					end
 				end
 				local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-				if ExpTrace.Entity.IsComposite == 1 then
+				if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+					if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 					if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 					if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
 					EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*ExpTrace.Entity.EntityMods.CompKEMult
@@ -2939,7 +2962,8 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 							end
 						end
 						local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-						if ExpTrace.Entity.IsComposite == 1 then
+						if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+							if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 							if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 							if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end 
 							EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Shell.Filter )*ExpTrace.Entity.EntityMods.CompKEMult
@@ -3450,7 +3474,8 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 						end
 					end
 					local EffArmor = (DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(SpallTrace.HitNormal:Dot(Direction)))
-					if SpallTrace.Entity.IsComposite == 1 then
+					if SpallTrace.Entity.IsComposite == 1 or (SpallTrace.Entity.SPPOwner ~= nil and SpallTrace.Entity.SPPOwner:IsWorld()) then
+						if SpallTrace.Entity.EntityMods == nil then SpallTrace.Entity.EntityMods = {} end
 						if SpallTrace.Entity.EntityMods.CompKEMult == nil then SpallTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if SpallTrace.Entity.EntityMods.CompCEMult == nil then SpallTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = (SpallTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*SpallTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal, Filter  )*SpallTrace.Entity.EntityMods.CompKEMult
@@ -3641,7 +3666,8 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 						end
 					end
 					local EffArmor = (DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(SpallTrace.HitNormal:Dot(Direction)))
-					if SpallTrace.Entity.IsComposite == 1 then
+					if SpallTrace.Entity.IsComposite == 1 or (SpallTrace.Entity.SPPOwner ~= nil and SpallTrace.Entity.SPPOwner:IsWorld()) then
+						if SpallTrace.Entity.EntityMods == nil then SpallTrace.Entity.EntityMods = {} end
 						if SpallTrace.Entity.EntityMods.CompKEMult == nil then SpallTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if SpallTrace.Entity.EntityMods.CompCEMult == nil then SpallTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = (SpallTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*SpallTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( SpallTrace.Entity, SpallTrace.HitPos, SpallTrace.Normal, Filter  )*SpallTrace.Entity.EntityMods.CompKEMult
@@ -3851,7 +3877,8 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						end
 					end
 					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
-					if HEATTrace.Entity.IsComposite == 1 then
+					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity.SPPOwner ~= nil and HEATTrace.Entity.SPPOwner:IsWorld()) then
+						if HEATTrace.Entity.EntityMods == nil then HEATTrace.Entity.EntityMods = {} end
 						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*HEATTrace.Entity.EntityMods.CompCEMult
@@ -4049,7 +4076,8 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						end
 					end
 					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
-					if HEATTrace.Entity.IsComposite == 1 then
+					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity.SPPOwner ~= nil and HEATTrace.Entity.SPPOwner:IsWorld()) then
+						if HEATTrace.Entity.EntityMods == nil then HEATTrace.Entity.EntityMods = {} end
 						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*HEATTrace.Entity.EntityMods.CompCEMult
@@ -4263,7 +4291,8 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 						end
 					end
 					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
-					if HEATTrace.Entity.IsComposite == 1 then
+					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity.SPPOwner ~= nil and HEATTrace.Entity.SPPOwner:IsWorld()) then
+						if HEATTrace.Entity.EntityMods == nil then HEATTrace.Entity.EntityMods = {} end
 						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = DTCompositesTrace( HEATTrace.Entity, HEATTrace.HitPos, HEATTrace.Normal, Shell.Filter )*HEATTrace.Entity.EntityMods.CompCEMult
@@ -4432,7 +4461,8 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 					
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 then
+					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+						if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end 
 						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Filter )*ExpTrace.Entity.EntityMods.CompKEMult
@@ -4621,7 +4651,8 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
 					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 then
+					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+						if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end 
 						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
 						EffArmor = (ExpTrace.Entity:GetPhysicsObject():GetVolume()^(1/3))*ExpTrace.Entity.EntityMods.CompCEMult--DTCompositesTrace( ExpTrace.Entity, ExpTrace.HitPos, ExpTrace.Normal, Filter )*ExpTrace.Entity.EntityMods.CompKEMult

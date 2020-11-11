@@ -3,6 +3,8 @@ AddCSLuaFile("shared.lua")
 
 include("shared.lua")
 
+--make a check to see if the trace for determining speed going up or down a hill started underground, if so then just cut the speed as the hill is so steep it is beyond the limits and ends up giving a speed boost
+
 ENT.DakMaxHealth = 25
 ENT.DakHealth = 25
 ENT.DakName = "Light Motor"

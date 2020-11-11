@@ -221,32 +221,34 @@ function ENT:Think()
 						self.MainTurret = self.TurretControls[1]
 						local GunPercentage
 						for i=1, #self.TurretControls do
-							if self.TurretControls[i].GunMass ~= nil and self.MainTurret.GunMass ~= nil then
-								if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
-									self.MainTurret = self.TurretControls[i].GunMass
+							if IsValid(self.MainTurret) then 
+								if self.TurretControls[i].GunMass ~= nil and self.MainTurret.GunMass ~= nil then
+									if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
+										self.MainTurret = self.TurretControls[i]
+									end
+									local RotationSpeed = self.TurretControls[i].RotationSpeed
+									local TurretCost = math.log(RotationSpeed*100,100)
+									if self.TurretControls[i].RemoteWeapon == true then
+										TurretCost = TurretCost * 1.5
+									end
+									if self.TurretControls[i]:GetFCS() == true then
+										self.ColdWar = 1
+										TurretCost = TurretCost * 1.5
+									end
+									if self.TurretControls[i]:GetStabilizer() == true then
+										self.ColdWar = 1
+										TurretCost = TurretCost * 1.25
+									elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
+										TurretCost = TurretCost * 1
+									else
+										TurretCost = TurretCost * 0.75
+									end
+									if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
+										TurretCost = TurretCost * 0.5
+									end
+									--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
+									GunHandlingMult = GunHandlingMult + math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)
 								end
-								local RotationSpeed = self.TurretControls[i].RotationSpeed
-								local TurretCost = math.log(RotationSpeed*100,100)
-								if self.TurretControls[i].RemoteWeapon == true then
-									TurretCost = TurretCost * 1.5
-								end
-								if self.TurretControls[i]:GetFCS() == true then
-									self.ColdWar = 1
-									TurretCost = TurretCost * 1.5
-								end
-								if self.TurretControls[i]:GetStabilizer() == true then
-									self.ColdWar = 1
-									TurretCost = TurretCost * 1.25
-								elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
-									TurretCost = TurretCost * 1
-								else
-									TurretCost = TurretCost * 0.75
-								end
-								if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
-									TurretCost = TurretCost * 0.5
-								end
-								--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
-								GunHandlingMult = GunHandlingMult + math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)
 							end
 						end
 					end
@@ -1128,13 +1130,15 @@ function ENT:Think()
 								local physobj = CurrentRes:GetPhysicsObject()
 								if CurrentRes.PhysicsClipped == true then
 									if CurrentRes.DakMassSet ~= true then
-										local SA = physobj:GetSurfaceArea()
-										local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
-										if mass > 0 then
-											SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
-											physobj:SetMass(mass)
+										if CurrentRes.EntityMods.DakClippedArmor ~= nil then
+											local SA = physobj:GetSurfaceArea()
+											local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
+											if mass > 0 then
+												SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
+												physobj:SetMass(mass)
+											end
+											CurrentRes.DakMassSet = true
 										end
-										CurrentRes.DakMassSet = true
 									end
 								end
 								
@@ -1664,23 +1668,42 @@ function ENT:PreEntityCopy()
 	local entids = {}
 
 	local CompositesIDs = {}
-	if table.Count(self.Composites)>0 then
-		for i = 1, table.Count(self.Composites) do
-			if not(self.Composites[i]==nil) then
-				table.insert(CompositesIDs,self.Composites[i]:EntIndex())
+	if self.Composites ~= nil then
+		if table.Count(self.Composites)>0 then
+			for i = 1, table.Count(self.Composites) do
+				if not(self.Composites[i]==nil) then
+					table.insert(CompositesIDs,self.Composites[i]:EntIndex())
+				end
 			end
 		end
+		info.CompositesCount = table.Count(self.Composites)
 	end
-	info.CompositesCount = table.Count(self.Composites)
+
 	local ERAIDs = {}
-	if table.Count(self.ERA)>0 then
-		for i = 1, table.Count(self.ERA) do
-			if not(self.ERA[i]==nil) then
-				table.insert(ERAIDs,self.ERA[i]:EntIndex())
+	if self.ERA ~= nil then
+		if table.Count(self.ERA)>0 then
+			for i = 1, table.Count(self.ERA) do
+				if not(self.ERA[i]==nil) then
+					table.insert(ERAIDs,self.ERA[i]:EntIndex())
+				end
+			end
+		end
+		info.ERACount = table.Count(self.ERA)
+	end
+
+	if self.Contraption~= nil then 
+		if table.Count(self.Contraption)>0 then
+			for i=1, #self.Contraption do
+				local CurrentRes = self.Contraption[i]
+				if CurrentRes ~= NULL and CurrentRes ~= nil then
+					local physobj = CurrentRes:GetPhysicsObject()
+					if CurrentRes.PhysicsClipped == true then
+						CurrentRes.EntityMods.DakClippedArmor = CurrentRes.DakArmor
+					end
+				end
 			end
 		end
 	end
-	info.ERACount = table.Count(self.ERA)
 
 	info.DakName = self.DakName
 	info.DakHealth = self.DakHealth
