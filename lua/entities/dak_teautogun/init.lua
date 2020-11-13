@@ -1050,7 +1050,7 @@ function ENT:Think()
 				local breechoffset
 				breechoffset, _ = self:GetModelBounds()
 				breechoffset = math.abs(breechoffset.x*(self.DakCaliber/100)) * -1
-				local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetForward()*1000), self.DakCaliber, {self, self:GetParent(), self:GetParent():GetParent()}, self)
+				local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetForward()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self)
 				local ShellSize = (self.ShellLengthMult*10*self.DakCaliber*0.0393701)
 				if self.ReloadMult == nil then
 					if math.Round(BackDist,2) > math.Round(ShellSize*0.5,2) and math.Round(BackDist,2) <= math.Round(ShellSize,2) then

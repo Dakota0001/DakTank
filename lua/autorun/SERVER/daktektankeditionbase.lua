@@ -233,7 +233,7 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 
 
 							if ShellTrace.Hit then
-								if not(ShellTrace.HitSky) then
+								if not(ShellTrace.HitSky and (ShellTrace.HitNormal == Vector(0,0,-1))) then
 									if ShellList[i].IsGuided then
 										DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 									else
