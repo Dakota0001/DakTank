@@ -700,12 +700,12 @@ function ENT:Think()
 							if self.SortedAmmo[box][1].DakAmmoType == self.DakAmmoType then
 								if self.SortedAmmo[box][1].DakAmmo > 0 then
 									if IsValid(self.DakTankCore) then
-										if self.DakTankCore.Modern and self.DakTankCore.ColdWar then
-											if self.DakTankCore.Modern == 1 then
+										if self.DakTankCore.Modern or self.DakTankCore.ColdWar then
+											if self.DakTankCore.Modern and self.DakTankCore.Modern == 1 then
 												self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
 												self.DakCooldown = self.DakCooldown * 0.7
 											end
-											if self.DakTankCore.ColdWar == 1 then
+											if self.DakTankCore.ColdWar and self.DakTankCore.ColdWar == 1 then
 												self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
 											end
 										end
@@ -786,12 +786,12 @@ function ENT:Think()
 							if self.SortedAmmo[box][1].DakAmmoType == self.DakAmmoType then
 								if self.SortedAmmo[box][1].DakAmmo > 0 then
 									if IsValid(self.DakTankCore) then
-										if self.DakTankCore.Modern and self.DakTankCore.ColdWar then
-											if self.DakTankCore.Modern == 1 then
+										if self.DakTankCore.Modern or self.DakTankCore.ColdWar then
+											if self.DakTankCore.Modern and self.DakTankCore.Modern == 1 then
 												self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
 												self.DakCooldown = self.DakCooldown * 0.7
 											end
-											if self.DakTankCore.ColdWar == 1 then
+											if self.DakTankCore.ColdWar and self.DakTankCore.ColdWar == 1 then
 												self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
 											end
 										end
@@ -1685,12 +1685,12 @@ function ENT:Think()
 							if self.SortedAmmo[box][1].DakAmmoType == self.DakAmmoType then
 								if self.SortedAmmo[box][1].DakAmmo > 0 then
 									if IsValid(self.DakTankCore) then
-										if self.DakTankCore.Modern and self.DakTankCore.ColdWar then
-											if self.DakTankCore.Modern == 1 then
+										if self.DakTankCore.Modern or self.DakTankCore.ColdWar then
+											if self.DakTankCore.Modern and self.DakTankCore.Modern == 1 then
 												self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
 												self.DakCooldown = self.DakCooldown * 0.7
 											end
-											if self.DakTankCore.ColdWar == 1 then
+											if self.DakTankCore.ColdWar and self.DakTankCore.ColdWar == 1 then
 												self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
 											end
 										end
@@ -1771,12 +1771,12 @@ function ENT:Think()
 							if self.SortedAmmo[box][1].DakAmmoType == self.DakAmmoType then
 								if self.SortedAmmo[box][1].DakAmmo > 0 then
 									if IsValid(self.DakTankCore) then
-										if self.DakTankCore.Modern and self.DakTankCore.ColdWar then
-											if self.DakTankCore.Modern == 1 then
+										if self.DakTankCore.Modern or self.DakTankCore.ColdWar then
+											if self.DakTankCore.Modern and self.DakTankCore.Modern == 1 then
 												self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
 												self.DakCooldown = self.DakCooldown * 0.7
 											end
-											if self.DakTankCore.ColdWar == 1 then
+											if self.DakTankCore.ColdWar and self.DakTankCore.ColdWar == 1 then
 												self.DakMagazine = self.SortedAmmo[box][1].DakMaxAmmo
 											end
 										end

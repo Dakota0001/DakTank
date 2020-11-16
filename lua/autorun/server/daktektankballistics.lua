@@ -532,9 +532,9 @@ function DTGetStandoffMult(Start, End, Caliber, Filter, ShellType)
 	end
 	if FirstArmor~=nil and SecondArmor~=nil then
 		local Dist = FirstArmor:Distance(SecondArmor)
-		local StandoffCalibers = ((Dist * 25.4)/Caliber) + 1.65
+		local StandoffCalibers = ((Dist * 25.4)/Caliber) + 2.6
 		if ShellType == "HEAT"  then
-			StandoffCalibers = ((Dist * 25.4)/Caliber)
+			StandoffCalibers = ((Dist * 25.4)/Caliber) + 1.06
 		end
 		if StandoffCalibers > 7.5 then
 			return (1.4 / (StandoffCalibers/7.5))
@@ -3820,7 +3820,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					--lose 2.54mm of pen per inch of air
 					local HeatPenLoss = Pos:Distance(HEATTrace.HitPos)*2.54
 
-					StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 1.65
+					StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 2.6
 					if StandoffCalibers > 7.5 then
 						HEATPen = HEATPen * 1.4 / (StandoffCalibers/7.5)
 					else
@@ -4021,7 +4021,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					--lose 2.54mm of pen per inch of air
 					local HeatPenLoss = Pos:Distance(HEATTrace.HitPos)*2.54
 
-					StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber)
+					StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 1.06
 					if StandoffCalibers > 7.5 then
 						HEATPen = HEATPen * 1.4 / (StandoffCalibers/7.5)
 					else
@@ -4229,10 +4229,10 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 					if not(Triggered) then
 						local StandoffCalibers = 0
 						if Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
-							StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 1.65
+							StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 2.6
 						end
 						if Shell.DakShellType == "HEAT" then
-							StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber)
+							StandoffCalibers = ((Pos:Distance(HEATTrace.HitPos) * 25.4)/Shell.DakCaliber) + 1.06
 						end
 						if StandoffCalibers > 7.5 then
 							Pen = Pen * 1.4 / (StandoffCalibers/7.5)
