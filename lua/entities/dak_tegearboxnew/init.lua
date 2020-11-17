@@ -964,7 +964,7 @@ function ENT:Think()
 
 				local TerrainBraking = 0
 				if TerrainMultiplier < 1 then
-					TerrainBraking = (1-TerrainMultiplier)*0.5
+					TerrainBraking = (1-TerrainMultiplier)*0.25
 				end
 				local brakestiffness = self:GetBrakeStiffness()
 				if self.Brakes>0 then
