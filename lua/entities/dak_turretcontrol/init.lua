@@ -224,6 +224,15 @@ function ENT:Think()
 				self.DakActive2 = self.Inputs.Active2.Value
 				local DakTurret = self.Inputs.Turret.Value
 				self.DakTurret = DakTurret
+				local hash = {}
+				local res = {}
+				for _,v in ipairs(self.DakTurretMotors) do
+			   		if (not hash[v]) then
+			    		res[#res+1] = v
+			       		hash[v] = true
+			   		end
+				end
+				self.DakTurretMotors = res
 				if #self.DakTurretMotors > 0 then
 					for i = 1, #self.DakTurretMotors do
 						if IsValid(self.DakTurretMotors[i]) then
