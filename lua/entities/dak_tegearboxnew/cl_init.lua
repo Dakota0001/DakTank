@@ -79,6 +79,7 @@ function ENT:Draw()
 	local wheelmins, wheelmaxs = wheelmodel:GetHitBoxBounds(0,0)
 	local wheelbounds = (wheelmaxs - wheelmins)*0.5
 	local wheelmodelZ = wheelbounds[3]
+	local WheelYaw = self:GetNWFloat("WheelYaw")
 	--if (self.lastslowthink == nil) or CurTime() >= self.lastslowthink+1 then 
 		self.SideDist = self:GetSideDist()
 	 	self.TrackLength = self:GetTrackLength()
@@ -95,6 +96,9 @@ function ENT:Draw()
 	 	self.RearWheelHeight = self:GetRearWheelHeight()
 	 	self.TreadWidth = self:GetTreadWidth()
 	 	self.TreadHeight = self:GetTreadHeight()
+	 	if self:GetWheeledMode() == true then
+		 	self.TreadHeight = 0
+		 end
 
 	 	self.WheelColor = self:GetWheelColor()
 	 	self.TreadColor = self:GetTreadColor()
@@ -155,15 +159,28 @@ function ENT:Draw()
 		local WheelMult
 		local WheelHeightMult
 		for i=1, WheelsPerSide do
+			wheelmodel:SetBodygroup( 1, self:GetWheelBodygroup1() )
+			wheelmodel:SetBodygroup( 2, self:GetWheelBodygroup2() )
+			wheelmodel:SetBodygroup( 3, self:GetWheelBodygroup3() )
 			if i == 1 then
 				WheelMult = RearWheelHeight
+				if self:GetRearSprocket() == true then
+					wheelmodel:SetBodygroup( 2, 1 )
+				end
 			elseif i == WheelsPerSide then
 				WheelMult = FrontWheelHeight
+				if self:GetFrontSprocket() == true then
+					wheelmodel:SetBodygroup( 2, 1 )
+				end
 			else
 				WheelMult = WheelHeight
 			end
 			WheelHeightMult = WheelMult/(wheelbounds[3]*2)
-			Pos = Base:GetPos() + (ForwardEnt:GetForward()*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (ForwardEnt:GetRight()*SideDist)
+			optionalforward = 0
+			if self["GetWheelForwardOffset"..i] ~= nil then
+				optionalforward = self["GetWheelForwardOffset"..i](self)
+			end
+			Pos = Base:GetPos() + (ForwardEnt:GetForward()*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (0.01*optionalforward) + (ForwardOffset))) + (ForwardEnt:GetRight()*SideDist)
 			trace = {}
 				trace.start = Pos + ForwardEnt:GetUp()*RideHeight
 				if i==WheelsPerSide then 
@@ -185,28 +202,62 @@ function ENT:Draw()
 			self.RightAngTable[i] = self.RightAngTable[i] - RotateAngle/math.pi
 
 			mat = Matrix()
-			scale = Vector( WheelHeightMult, wheelwidthmult, WheelHeightMult )
+			if self:GetOffsetYaw() then
+				scale = Vector( wheelwidthmult, WheelHeightMult, WheelHeightMult )
+			else
+				scale = Vector( WheelHeightMult, wheelwidthmult, WheelHeightMult )
+			end
 			mat:Scale( scale )
 			wheelmodel:EnableMatrix( "RenderMultiply", mat )
 			wheelmodel:SetPos( CurTrace.HitPos+ForwardEnt:GetUp()*wheelmodelZ*WheelHeightMult+ForwardEnt:GetUp()*self.TreadHeight)
-			wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(self.RightAngTable[i],180,0) ) )
+			if self:GetOffsetYaw() then
+				if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(0,180-WheelYaw-90,self.RightAngTable[i]) ) )
+				elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(0,180+WheelYaw-90,self.RightAngTable[i]) ) )
+				else
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(0,180-90,self.RightAngTable[i]) ) )
+				end
+			else
+				if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(self.RightAngTable[i],180-WheelYaw,0) ) )
+				elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(self.RightAngTable[i],180+WheelYaw,0) ) )
+				else
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(self.RightAngTable[i],180,0) ) )
+				end
+			end
 			wheelmodel:SetupBones()
 			render.SetColorModulation( WheelColor.x, WheelColor.y, WheelColor.z )
 			wheelmodel:DrawModel()
 			render.SetColorModulation( 1, 1, 1 )
 		end
+
 		self.RightScroll = self.RightScroll - Speed/(TreadMatRight:Height()*0.5)
 		TreadMatRight:SetVector("$translate",Vector(0,self.RightScroll,0))
 		for i=1, WheelsPerSide do
+			wheelmodel:SetBodygroup( 1, self:GetWheelBodygroup1() )
+			wheelmodel:SetBodygroup( 2, self:GetWheelBodygroup2() )
+			wheelmodel:SetBodygroup( 3, self:GetWheelBodygroup3() )
 			if i == 1 then
 				WheelMult = RearWheelHeight
+				if self:GetRearSprocket() == true then
+					wheelmodel:SetBodygroup( 2, 1 )
+				end
 			elseif i == WheelsPerSide then
 				WheelMult = FrontWheelHeight
+				if self:GetFrontSprocket() == true then
+					wheelmodel:SetBodygroup( 2, 1 )
+				end
 			else
 				WheelMult = WheelHeight
 			end
 			WheelHeightMult = WheelMult/(wheelbounds[3]*2)
-			Pos = Base:GetPos() + (ForwardEnt:GetForward()*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (ForwardEnt:GetRight()*SideDist)
+			optionalforward = 0 
+			if self["GetWheelForwardOffset"..i] ~= nil then
+				optionalforward = self["GetWheelForwardOffset"..i](self)
+			end
+			Pos = Base:GetPos() + (ForwardEnt:GetForward()*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (0.01*optionalforward) + (ForwardOffset))) - (ForwardEnt:GetRight()*SideDist)
 			trace = {}
 				trace.start = Pos + ForwardEnt:GetUp()*RideHeight
 				if i==WheelsPerSide then 
@@ -228,11 +279,31 @@ function ENT:Draw()
 			self.LeftAngTable[i] = self.LeftAngTable[i] - RotateAngle/math.pi
 
 			mat = Matrix()
-			scale = Vector( WheelHeightMult, wheelwidthmult, WheelHeightMult )
+			if self:GetOffsetYaw() then
+				scale = Vector( wheelwidthmult, WheelHeightMult, WheelHeightMult )
+			else
+				scale = Vector( WheelHeightMult, wheelwidthmult, WheelHeightMult )
+			end
 			mat:Scale( scale )
 			wheelmodel:EnableMatrix( "RenderMultiply", mat )
 			wheelmodel:SetPos( CurTrace.HitPos+ForwardEnt:GetUp()*wheelmodelZ*WheelHeightMult+ForwardEnt:GetUp()*self.TreadHeight)
-			wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(self.LeftAngTable[i],0,0) ) )
+			if self:GetOffsetYaw() then
+				if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(0,0-WheelYaw-90,self.LeftAngTable[i]) ) )
+				elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(0,0+WheelYaw-90,self.LeftAngTable[i]) ) )
+				else
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(0,0-90,self.LeftAngTable[i]) ) )
+				end
+			else
+				if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(self.LeftAngTable[i],0-WheelYaw,0) ) )
+				elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(self.LeftAngTable[i],0+WheelYaw,0) ) )
+				else
+					wheelmodel:SetAngles( ForwardEnt:LocalToWorldAngles( -Angle(self.LeftAngTable[i],0,0) ) )
+				end
+			end
 			wheelmodel:SetupBones()
 			render.SetColorModulation( WheelColor.x, WheelColor.y, WheelColor.z )
 			wheelmodel:DrawModel()
@@ -240,7 +311,7 @@ function ENT:Draw()
 		end
 		self.LeftScroll = self.LeftScroll - Speed/(TreadMatLeft:Height()*0.5)
 		TreadMatLeft:SetVector("$translate",Vector(0,self.LeftScroll,0))
-		
+
 		local pos1
 		local pos2
 		local x1
@@ -274,12 +345,34 @@ function ENT:Draw()
 				LeftWheelNodes[#LeftWheelNodes+1] = NewPos
 			end
 		end
+
 		local TreadSideOffset = ForwardEnt:WorldToLocal(Base:GetPos()).y
-		local LeftTreadPoints = quickhull(LeftWheelNodes)
-		for i=1, #LeftTreadPoints-1 do
+		if self:GetWheeledMode() == false then
+			local LeftTreadPoints = quickhull(LeftWheelNodes)
+			for i=1, #LeftTreadPoints-1 do
+				mat = Matrix()
+				pos1 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[i][1],SideDist+TreadSideOffset,LeftTreadPoints[i][2]))
+				pos2 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[i+1][1],SideDist+TreadSideOffset,LeftTreadPoints[i+1][2]))
+				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
+				mat:Scale( scale )
+				treadmodel:EnableMatrix( "RenderMultiply", mat )
+				treadmodel:SetPos( (pos1 + pos2)/2 )
+				x1 = ForwardEnt:WorldToLocal(pos1).x
+				y1 = ForwardEnt:WorldToLocal(pos1).z
+				x2 = ForwardEnt:WorldToLocal(pos2).x
+				y2 = ForwardEnt:WorldToLocal(pos2).z
+				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
+				treadmodel:SetupBones()
+				render.ModelMaterialOverride( TreadMatLeft )
+				TreadMatLeft:SetVector("$newscale",Vector((scale.x*512/TreadMatLeft:Height()),512/TreadMatLeft:Width(),5))
+				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
+				treadmodel:DrawModel()
+				render.SetColorModulation( 1, 1, 1 )
+				render.ModelMaterialOverride()
+			end
 			mat = Matrix()
-			pos1 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[i][1],SideDist+TreadSideOffset,LeftTreadPoints[i][2]))
-			pos2 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[i+1][1],SideDist+TreadSideOffset,LeftTreadPoints[i+1][2]))
+			pos1 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[1][1],SideDist+TreadSideOffset,LeftTreadPoints[1][2]))
+			pos2 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[#LeftTreadPoints][1],SideDist+TreadSideOffset,LeftTreadPoints[#LeftTreadPoints][2]))
 			scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
 			mat:Scale( scale )
 			treadmodel:EnableMatrix( "RenderMultiply", mat )
@@ -297,25 +390,6 @@ function ENT:Draw()
 			render.SetColorModulation( 1, 1, 1 )
 			render.ModelMaterialOverride()
 		end
-		mat = Matrix()
-		pos1 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[1][1],SideDist+TreadSideOffset,LeftTreadPoints[1][2]))
-		pos2 = ForwardEnt:LocalToWorld(Vector(LeftTreadPoints[#LeftTreadPoints][1],SideDist+TreadSideOffset,LeftTreadPoints[#LeftTreadPoints][2]))
-		scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-		mat:Scale( scale )
-		treadmodel:EnableMatrix( "RenderMultiply", mat )
-		treadmodel:SetPos( (pos1 + pos2)/2 )
-		x1 = ForwardEnt:WorldToLocal(pos1).x
-		y1 = ForwardEnt:WorldToLocal(pos1).z
-		x2 = ForwardEnt:WorldToLocal(pos2).x
-		y2 = ForwardEnt:WorldToLocal(pos2).z
-		treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-		treadmodel:SetupBones()
-		render.ModelMaterialOverride( TreadMatLeft )
-		TreadMatLeft:SetVector("$newscale",Vector((scale.x*512/TreadMatLeft:Height()),512/TreadMatLeft:Width(),5))
-		render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-		treadmodel:DrawModel()
-		render.SetColorModulation( 1, 1, 1 )
-		render.ModelMaterialOverride()
 
 		local RightWheelNodes = {}
 		for i=1, WheelsPerSide do
@@ -339,11 +413,33 @@ function ENT:Draw()
 				RightWheelNodes[#RightWheelNodes+1] = NewPos
 			end
 		end
-		local RightTreadPoints = quickhull(RightWheelNodes)
-		for i=1, #RightTreadPoints-1 do
+
+		if self:GetWheeledMode() == false then
+			local RightTreadPoints = quickhull(RightWheelNodes)
+			for i=1, #RightTreadPoints-1 do
+				mat = Matrix()
+				pos1 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[i][1],-SideDist+TreadSideOffset,RightTreadPoints[i][2]))
+				pos2 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[i+1][1],-SideDist+TreadSideOffset,RightTreadPoints[i+1][2]))
+				scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
+				mat:Scale( scale )
+				treadmodel:EnableMatrix( "RenderMultiply", mat )
+				treadmodel:SetPos( (pos1 + pos2)/2 )
+				x1 = ForwardEnt:WorldToLocal(pos1).x
+				y1 = ForwardEnt:WorldToLocal(pos1).z
+				x2 = ForwardEnt:WorldToLocal(pos2).x
+				y2 = ForwardEnt:WorldToLocal(pos2).z
+				treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
+				treadmodel:SetupBones()
+				render.ModelMaterialOverride( TreadMatRight )
+				TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
+				render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
+				treadmodel:DrawModel()
+				render.SetColorModulation( 1, 1, 1 )
+				render.ModelMaterialOverride()
+			end
 			mat = Matrix()
-			pos1 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[i][1],-SideDist+TreadSideOffset,RightTreadPoints[i][2]))
-			pos2 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[i+1][1],-SideDist+TreadSideOffset,RightTreadPoints[i+1][2]))
+			pos1 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[1][1],-SideDist+TreadSideOffset,RightTreadPoints[1][2]))
+			pos2 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[#RightTreadPoints][1],-SideDist+TreadSideOffset,RightTreadPoints[#RightTreadPoints][2]))
 			scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
 			mat:Scale( scale )
 			treadmodel:EnableMatrix( "RenderMultiply", mat )
@@ -361,25 +457,6 @@ function ENT:Draw()
 			render.SetColorModulation( 1, 1, 1 )
 			render.ModelMaterialOverride()
 		end
-		mat = Matrix()
-		pos1 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[1][1],-SideDist+TreadSideOffset,RightTreadPoints[1][2]))
-		pos2 = ForwardEnt:LocalToWorld(Vector(RightTreadPoints[#RightTreadPoints][1],-SideDist+TreadSideOffset,RightTreadPoints[#RightTreadPoints][2]))
-		scale = Vector( (pos1:Distance(pos2))/12, Width, Height )
-		mat:Scale( scale )
-		treadmodel:EnableMatrix( "RenderMultiply", mat )
-		treadmodel:SetPos( (pos1 + pos2)/2 )
-		x1 = ForwardEnt:WorldToLocal(pos1).x
-		y1 = ForwardEnt:WorldToLocal(pos1).z
-		x2 = ForwardEnt:WorldToLocal(pos2).x
-		y2 = ForwardEnt:WorldToLocal(pos2).z
-		treadmodel:SetAngles( ForwardEnt:LocalToWorldAngles( Angle(math.atan2(y1-y2,x2-x1)*57.2958,0,0) ) )
-		treadmodel:SetupBones()
-		render.ModelMaterialOverride( TreadMatRight )
-		TreadMatRight:SetVector("$newscale",Vector((scale.x*512/TreadMatRight:Height()),512/TreadMatRight:Width(),5))
-		render.SetColorModulation( TreadColor.x, TreadColor.y, TreadColor.z )
-		treadmodel:DrawModel()
-		render.SetColorModulation( 1, 1, 1 )
-		render.ModelMaterialOverride()
 	end
 	wheelmodel:Remove()
 	treadmodel:Remove()

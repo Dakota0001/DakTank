@@ -61,6 +61,7 @@ function ENT:Initialize()
 	self.LeftRidePosChanges = {}
 	self.SlowThinkTime = CurTime()
 	self.RealYaw = 0
+	self.WheelYaw = 0
 	for i=1, self.WheelsPerSide do
 		self.RightChanges[i] = 0
 		self.LeftChanges[i] = 0
@@ -477,6 +478,14 @@ function ENT:Think()
 									self.LBoost = 1
 									self.RBoost = 1
 								end
+								if self.CarTurning == 1 then
+									if self.WheelYaw > 0 then
+										self.WheelYaw = self.WheelYaw - 1
+									end
+									if self.WheelYaw < 0 then
+										self.WheelYaw = self.WheelYaw + 1
+									end
+								end
 							else
 								if self.CarTurning==0 then
 									self.LBoost = 1
@@ -631,7 +640,11 @@ function ENT:Think()
 										if #self.DakTankCore.Motors>0 then
 											for i=1, #self.DakTankCore.Motors do
 												if IsValid(self.DakTankCore.Motors[i]) then
-													self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
+													if self.CarTurning == 0 then
+														self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
+													else
+														self.DakTankCore.Motors[i].Sound:ChangePitch( math.Clamp(((self.Speed-self.LastTopSpeed)/self.MaxSpeedDif)*math.Min(throttle,1),0,1)*60+((self.Speed/self.TopSpeed)*90)+50 , 0.1 )
+													end
 												end
 											end
 										end
@@ -801,6 +814,26 @@ function ENT:Think()
 									end
 								end
 							end
+						else
+							if self.MoveLeft>0 and self.MoveRight==0 then
+								if self.WheelYaw > -self:GetTurnAngle() then
+									self.WheelYaw = self.WheelYaw - 1
+								end
+							end
+							if self.MoveRight>0 and self.MoveLeft==0 then
+								if self.WheelYaw < self:GetTurnAngle() then
+									self.WheelYaw = self.WheelYaw + 1
+								end
+							end
+							if self.MoveRight==0 and self.MoveLeft==0 then
+								if self.WheelYaw > 0 then
+									self.WheelYaw = self.WheelYaw - 1
+								end
+								if self.WheelYaw < 0 then
+									self.WheelYaw = self.WheelYaw + 1
+								end
+							end
+							self:SetNWFloat("WheelYaw",self.WheelYaw)
 						end
 
 						if not(self.MoveForward>0) and not(self.MoveReverse>0) and not(self.MoveLeft>0) and not(self.MoveRight>0) then
@@ -856,7 +889,7 @@ function ENT:Think()
 				local CurTraceDist
 				local ForwardEnt = self.ForwardEnt
 				local WheelsPerSide = self.WheelsPerSide--5
-				local SuspensionForceMult = 1
+				local SuspensionForceMult = (5/self.WheelsPerSide)
 				local TrackLength = self.TrackLength
 				local ForwardOffset = self.ForwardOffset
 				local RideLimit = self.RideLimit
@@ -933,7 +966,10 @@ function ENT:Think()
 				if TerrainMultiplier < 1 then
 					TerrainBraking = (1-TerrainMultiplier)*0.5
 				end
-
+				local brakestiffness = self:GetBrakeStiffness()
+				if self.Brakes>0 then
+					brakestiffness = 1
+				end
 				--Right side
 				for i=1, WheelsPerSide do
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*basesize[2]*0.95)
@@ -955,12 +991,54 @@ function ENT:Think()
 					lastchange = (CurTraceDist-self.RightChanges[i])/TickInt
 					self.RightChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.RightPosChanges[i]
-					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.RightBrake,TerrainBraking),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
+					local directionalbraking = 0
+					local localfriction, _ = WorldToLocal( ForwardEnt:GetPos()+lastvel, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles())
+					if self.MoveForward == 1 then
+						if localfriction.x < 0 then
+							--directionalbraking = 1
+						end
+					elseif self.MoveReverse == 1 then
+						if localfriction.x > 0 then
+							--directionalbraking = 1
+						end
+					end
+					localfriction = localfriction * Vector(math.max(self.RightBrake*brakestiffness,TerrainBraking,directionalbraking),1,0)
+					local worldfriction, _ = LocalToWorld(localfriction, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles())
+					if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
+						localfriction, _ = WorldToLocal( ForwardEnt:GetPos()+lastvel, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles() + Angle(0,self.WheelYaw,0))
+						directionalbraking = 0 
+						if self.MoveForward == 1 then
+							if localfriction.x < 0 then
+								--directionalbraking = 1
+							end
+						elseif self.MoveReverse == 1 then
+							if localfriction.x > 0 then
+								--directionalbraking = 1
+							end
+						end
+						localfriction = localfriction * Vector(math.max(self.RightBrake*brakestiffness,TerrainBraking,directionalbraking),1,0)
+						worldfriction, _ = LocalToWorld(localfriction, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles() + Angle(0,self.WheelYaw, 0))
+					elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
+						localfriction, _ = WorldToLocal( ForwardEnt:GetPos()+lastvel, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles() + Angle(0,-self.WheelYaw,0))
+						directionalbraking = 0 
+						if self.MoveForward == 1 then
+							if localfriction.x < 0 then
+								--directionalbraking = 1
+							end
+						elseif self.MoveReverse == 1 then
+							if localfriction.x > 0 then
+								--directionalbraking = 1
+							end
+						end
+						localfriction = localfriction * Vector(math.max(self.RightBrake*brakestiffness,TerrainBraking,directionalbraking),1,0)
+						worldfriction, _ = LocalToWorld(localfriction, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles() + Angle(0,-self.WheelYaw, 0))
+					end
+					lastvel = worldfriction-ForwardEnt:GetPos()
 					self.RightPosChanges[i] = CurTraceHitPos
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
 						AbsorbForce = 0.2 *(5/WheelsPerSide)
-						FrictionForce = 2*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
+						FrictionForce = 1*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 					else
 						AbsorbForce = 0.0
 						FrictionForce = 0
@@ -976,10 +1054,17 @@ function ENT:Think()
 					end
 
 					local limitmult = 1 + multval
-					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce)
+					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
+					--[[
+					if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
+						lastvelnorm:Rotate(Angle(0,self.WheelYaw,0))
+					elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
+						lastvelnorm:Rotate(Angle(0,self.WheelYaw,0))
+					end
+					]]--
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.RightRidePosChanges[i] = RidePos
 					--print(FrictionForceFinal) ----------FIX ISSUE WHERE THIS SPERGS OUT AND GETS BIG FOR NO RAISIN
@@ -1008,13 +1093,54 @@ function ENT:Think()
 					lastchange = (CurTraceDist-self.LeftChanges[i])/TickInt
 					self.LeftChanges[i] = CurTraceDist
 					lastvel = CurTraceHitPos - self.LeftPosChanges[i]
-					lastvel = -ForwardEnt:GetPos()+ForwardEnt:LocalToWorld(Vector(math.max(self.LeftBrake,TerrainBraking),1,0)*ForwardEnt:WorldToLocal(ForwardEnt:GetPos()+lastvel))
+					local directionalbraking = 0
+					local localfriction, _ = WorldToLocal( ForwardEnt:GetPos()+lastvel, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles())
+					if self.MoveForward == 1 then
+						if localfriction.x < 0 then
+							--directionalbraking = 1
+						end
+					elseif self.MoveReverse == 1 then
+						if localfriction.x > 0 then
+							--directionalbraking = 1
+						end
+					end
+					localfriction = localfriction * Vector(math.max(self.LeftBrake*brakestiffness,TerrainBraking,directionalbraking),1,0)
+					local worldfriction, _ = LocalToWorld(localfriction, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles())
+					if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
+						localfriction, _ = WorldToLocal( ForwardEnt:GetPos()+lastvel, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles() + Angle(0,self.WheelYaw,0))
+						directionalbraking = 0 
+						if self.MoveForward == 1 then
+							if localfriction.x < 0 then
+								--directionalbraking = 1
+							end
+						elseif self.MoveReverse == 1 then
+							if localfriction.x > 0 then
+								--directionalbraking = 1
+							end
+						end
+						localfriction = localfriction * Vector(math.max(self.LeftBrake*brakestiffness,TerrainBraking,directionalbraking),1,0)
+						worldfriction, _ = LocalToWorld(localfriction, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles() + Angle(0,self.WheelYaw, 0))
+					elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
+						localfriction, _ = WorldToLocal( ForwardEnt:GetPos()+lastvel, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles() + Angle(0,-self.WheelYaw,0))
+						directionalbraking = 0 
+						if self.MoveForward == 1 then
+							if localfriction.x < 0 then
+								--directionalbraking = 1
+							end
+						elseif self.MoveReverse == 1 then
+							if localfriction.x > 0 then
+								--directionalbraking = 1
+							end
+						end
+						localfriction = localfriction * Vector(math.max(self.LeftBrake*brakestiffness,TerrainBraking,directionalbraking),1,0)
+						worldfriction, _ = LocalToWorld(localfriction, Angle(0,0,0), ForwardEnt:GetPos(), ForwardEnt:GetAngles() + Angle(0,-self.WheelYaw, 0))
+					end
+					lastvel = worldfriction-ForwardEnt:GetPos()
 					self.LeftPosChanges[i] = CurTraceHitPos
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
-
 					if RidePos<-0.1 then
 						AbsorbForce = 0.2 *(5/WheelsPerSide)
-						FrictionForce = 2*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
+						FrictionForce = 1*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 					else
 						AbsorbForce = 0.0
 						FrictionForce = 0
@@ -1030,13 +1156,18 @@ function ENT:Think()
 					end
 
 					local limitmult = 1 + multval
-					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce)
-
+					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
-					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
+					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
+					--[[
+					if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
+						lastvelnorm:Rotate(Angle(0,self.WheelYaw,0))
+					elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
+						lastvelnorm:Rotate(Angle(0,self.WheelYaw,0))
+					end
+					--]]
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.LeftRidePosChanges[i] = RidePos
-
 					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*(TerrainMultiplier*self.LeftForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
 				
