@@ -407,6 +407,9 @@ end
 function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 	if tonumber(Caliber) == nil then return 0, NULL, 0, 0, 0, 0, 0, Vector(0,0,0) end
 	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
+	if IsValid(Ent) and (Ent:GetClass() == "dak_tegearbox" or Ent:GetClass() == "dak_tegearboxnew" or Ent:GetClass() == "dak_temotor") then
+		Armor = Armor * 0.25
+	end
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
@@ -426,6 +429,9 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
+		if IsValid(newEnt) and (newEnt:GetClass() == "dak_tegearbox" or newEnt:GetClass() == "dak_tegearboxnew" or newEnt:GetClass() == "dak_temotor") then
+			newArmor = newArmor * 0.25
+		end
 		if newEnt.Controller == core then
 			if newHitGun == 1 then HitGun = 1 end
 			if newHitGear == 1 then HitGear = 1 end		
