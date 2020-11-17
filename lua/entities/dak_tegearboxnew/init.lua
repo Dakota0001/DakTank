@@ -356,6 +356,7 @@ function ENT:Think()
 					if(self:GetParent():GetParent():IsValid()) then
 						self.phy = self:GetParent():GetParent():GetPhysicsObject()
 						self.base = self:GetParent():GetParent()
+						self.base:GetPhysicsObject():SetDamping( 0, 0 )
 					end
 				end
 				if not(self:GetParent():IsValid()) then
