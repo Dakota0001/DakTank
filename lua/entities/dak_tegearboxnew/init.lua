@@ -890,7 +890,7 @@ function ENT:Think()
 				local CurTraceDist
 				local ForwardEnt = self.ForwardEnt
 				local WheelsPerSide = self.WheelsPerSide--5
-				local SuspensionForceMult = (5/self.WheelsPerSide)
+				local SuspensionForceMult = (5/self.WheelsPerSide)*self:GetSuspensionForceMult()
 				local TrackLength = self.TrackLength
 				local ForwardOffset = self.ForwardOffset
 				local RideLimit = self.RideLimit
@@ -1057,7 +1057,7 @@ function ENT:Think()
 					local limitmult = 1 + multval
 					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
-					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
+					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
 					--[[
 					if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
@@ -1158,7 +1158,7 @@ function ENT:Think()
 
 					local limitmult = 1 + multval
 					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult
-					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)
+					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
 					--[[
 					if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
