@@ -79,6 +79,93 @@ function FireBurn(Pos, owner, gun)
 	end
 end
 
+function DTWorldPenBackTrace(Start, End, Filter, Caliber)
+	--print("backtracing")
+    local trace = {}
+		trace.start = Start
+		trace.endpos = End 
+		trace.filter = Filter
+		trace.mins = Vector(-Caliber*0.02,-Caliber*0.02,-Caliber*0.02)
+		trace.maxs = Vector(Caliber*0.02,Caliber*0.02,Caliber*0.02)
+		trace.mask = MASK_SOLID_BRUSHONLY
+	local Back = util.TraceHull( trace )
+
+    --debugoverlay.Line(Back.StartPos + Vector(0, 0, 1), Back.HitPos + Vector(0, 0, 1), 30, Color(0, 255, 255), true)
+    --debugoverlay.Cross(Back.HitPos, 5, 30, Color(255, 0, 0), true)
+
+    if Back.StartSolid then -- Started inside something
+        --nopen, return start
+        return false, Start
+    elseif not Back.HitWorld or Back.HitTexture == "TOOLS/TOOLSNODRAW" then -- Did not hit anything on the way back
+        --nopen, return start
+        return false, Start
+    else
+        --penned, return exit
+        return true, Back.HitPos
+    end
+end
+
+function DTWorldPen(Start,Dir,Pen,Filter,Caliber)
+	--print("NEW")
+	local penned = false
+	local exitpos = Start
+	local distance = 0
+	local Penetration = Pen --Pen is in mm, penetration is in inches/source units and signifies world penetration, however 25.4mm is equal to 1 inch and fits the conversion
+    local TraceData = {
+	    start = Start,
+	    endpos = Start + Dir * Pen,
+	    filter = Filter,
+	    mask = MASK_SOLID,
+	    mins = Vector(-Caliber*0.02,-Caliber*0.02,-Caliber*0.02),
+		maxs = Vector(Caliber*0.02,Caliber*0.02,Caliber*0.02)
+	}
+    local Trace = util.TraceHull(TraceData)
+
+    --debugoverlay.Line(TraceData.start, Trace.HitPos, 30, Color(0, 255, 0))
+    --debugoverlay.Cross(Trace.HitPos, 5, 30, Color(120, 255, 75), true)
+
+    if Trace.HitWorld then
+        --print("Hit World")
+
+        local Dig = util.TraceHull({
+            start  = Trace.HitPos + Dir,
+            endpos = Trace.HitPos + Dir * Penetration,
+            mask   = MASK_SOLID_BRUSHONLY,
+            mins = Vector(-Caliber*0.02,-Caliber*0.02,-Caliber*0.02),
+			maxs = Vector(Caliber*0.02,Caliber*0.02,Caliber*0.02)
+        })
+
+        --debugoverlay.Line(Dig.StartPos, Dig.HitPos, 30, Color(255, 255, 0), true)
+
+        if Dig.HitSky then
+            --print("FAIL - HIT SKY")
+            return penned, exitpos, distance
+        end
+
+        if Dig.StartSolid then
+            --print("Solid")
+
+            if Dig.Fraction == 0 then
+                --print("Impermeable") -- Trees and boulders on gm_fork set this off. Various other parts of the map do as well
+                penned, exitpos = DTWorldPenBackTrace(Trace.HitPos + Dir * Penetration, Start, Filter, Caliber) -- Just guess the starting position as the maximum penetration depth
+            	distance = Start:Distance(exitpos)
+            elseif Dig.FractionLeftSolid ~= 1 then
+                --print("SUCCESS")
+                --print(Dig.FractionLeftSolid)
+                --debugoverlay.Cross(Dig.StartPos, 5, 30, Color(255, 0, 0), true)
+                penned = true
+                exitpos = Dig.StartPos
+                distance = Start:Distance(exitpos)
+            end
+        else
+            --print("Hollow")
+            penned, exitpos = DTWorldPenBackTrace(Dig.HitPos, Start, Filter, Caliber)
+            distance = Start:Distance(exitpos)
+        end
+    end
+	return penned, exitpos, distance
+end
+
 function CanDamage(Ent)
 	if IsValid(Ent.SPPOwner) then
 		if Ent.SPPOwner:IsPlayer() then		
@@ -676,11 +763,7 @@ function DTShellAirBurst(HitPos,Shell,Normal)
 				effectdata:SetEntity(Shell.DakGun)
 				effectdata:SetAttachment(1)
 				effectdata:SetMagnitude(.5)
-				if Shell.DakDamage == 0 then
-					effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
-				else
-					effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
-				end
+				effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
 				if Shell.IsFrag then
 				else
 					util.Effect("dakteshellimpact", effectdata, true, true)
@@ -1354,24 +1437,22 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 			end
 		end
 		if HitEnt:IsWorld() or Shell.ExplodeNow==true then
-			if not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1) then
-				local worldtrace = {}
-				worldtrace.filter = Shell.Filter
-				worldtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
-				worldtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
-				worldtrace.mask = MASK_SOLID_BRUSHONLY
-				worldtrace.start = HitPos + (Shell.DakVelocity:GetNormalized())*Shell.DakCaliber*0.05
-				worldtrace.endpos = HitPos + (Shell.DakVelocity:GetNormalized())*Shell.DakPenetration --dirt/sand/gravel mix is about 1mm of RHA per source unit (inch), so if you can pen 100mm of RHA you can pen 100 inches of dirt. 
-				local worldShellTrace = util.TraceHull( worldtrace )
-				local PenMult = (1-worldShellTrace.FractionLeftSolid)
-				if PenMult == 0 or worldShellTrace.FractionLeftSolid == 0 then
-					Shell.Grounded = 1
-				else
-					--print(PenMult)
-					Shell.Pos = HitPos + ((Shell.DakVelocity:GetNormalized())*Shell.DakPenetration*PenMult) + Shell.DakVelocity:GetNormalized()
-					Shell.DakPenetration = Shell.DakPenetration * PenMult
-					Shell.DakVelocity = Shell.DakVelocity * PenMult
-					Shell.DakDamage = Shell.DakDamage * PenMult
+			local Penned, Exit, Dist = DTWorldPen(HitPos,Shell.DakVelocity:GetNormalized(),Shell.DakPenetration,Shell.Filter,Shell.DakCaliber)
+			if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then
+				--[[
+				if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" and Penned then
+					Shell.LifeTime = 0
+					DTHEAT(Exit,NULL,Shell.DakCaliber,Shell.DakPenetration,Shell.DakDamage,Shell.DakGun.DakOwner,Shell)
+					Shell.HeatPen = true
+				end
+				--]]
+				Shell.Pos = Exit
+				Shell.LifeTime = 0
+				Shell.DakVelocity = Vector(0,0,0)
+				Shell.DakDamage = 0
+				Shell.ExplodeNow = true
+			else
+				if Penned then
 					local effectdata = EffectData()
 					effectdata:SetOrigin(HitPos)
 					effectdata:SetEntity(HitEnt)
@@ -1379,94 +1460,102 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakCaliber*0.25)
 					util.Effect("dakteshellpenetrate", effectdata, true, true)
-					if Shell.DakShellType == "HE" or Shell.DakShellType == "SM" then
-						DTShellContinue(Shell.Pos,End,Shell,Normal)
+					if Shell.DakIsPellet then
+						sound.Play( Shell.DakPenSounds[math.random(1,#Shell.DakPenSounds)], HitPos, 100, 150, 0.25 )
 					else
-						DTShellContinue(Shell.Pos,End,Shell,Normal,true)
+						sound.Play( Shell.DakPenSounds[math.random(1,#Shell.DakPenSounds)], HitPos, 100, 100, 1 )
 					end
-					Shell.PenetratedGround = 1
+					util.Decal( "Impact.Concrete", HitPos, Exit, Shell.DakGun)
+					util.Decal( "Impact.Concrete", Exit, HitPos, Shell.DakGun)
+					Shell.Pos = Exit
+					DTShellContinue(Exit,End,Shell,Normal) --set new start a bit further away to prevent recurse
+					Shell.LifeTime = 0
+					Shell.DakVelocity = Shell.DakVelocity - (Shell.DakVelocity * (Dist/Shell.DakPenetration))
+					Shell.DakDamage = Shell.DakDamage - (Shell.DakDamage * (Dist/Shell.DakPenetration))
+					Shell.DakPenetration = Shell.DakPenetration - (Shell.DakPenetration * (Dist/Shell.DakPenetration))
+				else
+					Shell.Pos = Exit
+					Shell.LifeTime = 0
+					Shell.DakVelocity = Vector(0,0,0)
+					Shell.DakDamage = 0
+					Shell.ExplodeNow = true
 				end
 			end
-			Shell.ExplodeNow=false
-			if Shell.DakExplosive and Shell.PenetratedGround~=1 then
-				local effectdata3 = EffectData()
-				effectdata3:SetOrigin(HitPos)
-				effectdata3:SetEntity(Shell.DakGun)
-				effectdata3:SetAttachment(1)
-				effectdata3:SetMagnitude(.5)
-				effectdata3:SetScale(Shell.DakBlastRadius)
-				effectdata3:SetNormal( Normal )
-				if Shell.DakShellType == "SM" then
-					util.Effect("daktescalingsmoke", effectdata3, true, true)
-				else
-					util.Effect("daktescalingexplosion", effectdata3, true, true)
-				end
-
-				Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
-				if Shell.DakCaliber>=75 then
-					Shell.DakGun:SetNWBool("Exploding",true)
-					timer.Create( "ExplodeTimer"..Shell.DakGun:EntIndex(), 0.1, 1, function()
-						Shell.DakGun:SetNWBool("Exploding",false)
-					end)
-				else
-					local ExpSounds = {}
-					if Shell.DakCaliber < 20 then
-						ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
+			if Penned == false then
+				if Shell.DakExplosive then
+					local effectdata3 = EffectData()
+					effectdata3:SetOrigin(HitPos)
+					effectdata3:SetEntity(Shell.DakGun)
+					effectdata3:SetAttachment(1)
+					effectdata3:SetMagnitude(.5)
+					effectdata3:SetScale(Shell.DakBlastRadius)
+					effectdata3:SetNormal( Normal )
+					if Shell.DakShellType == "SM" then
+						util.Effect("daktescalingsmoke", effectdata3, true, true)
 					else
-						ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
-					end
-					sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 100, 1 )	
-				end
-				if Shell.Exploded ~= true then
-					if Shell.DakShellType == "HESH" then
-						DTShockwave(HitPos+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-					else
-						DTShockwave(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-						--DTExplosion(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-					end
-				end
-				Shell.Exploded = true
-			else
-				local effectdata = EffectData()
-				if Shell.DakIsFlame == 1 then
-					effectdata:SetOrigin(HitPos)
-					effectdata:SetEntity(Shell.DakGun)
-					effectdata:SetAttachment(1)
-					effectdata:SetMagnitude(.5)
-					effectdata:SetScale(1)
-					util.Effect("dakteflameimpact", effectdata, true, true)
-					PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-					--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
-				else
-					effectdata:SetOrigin(HitPos)
-					effectdata:SetEntity(Shell.DakGun)
-					effectdata:SetAttachment(1)
-					effectdata:SetMagnitude(.5)
-					if Shell.DakDamage == 0 then
-						effectdata:SetScale(0.5)
-					else
-						effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
-					end
-					if Shell.IsFrag then
-					else
-						util.Effect("dakteshellimpact", effectdata, true, true)
-					end
-					util.Decal( "Impact.Concrete", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*5), Shell.DakGun)
-					local ExpSounds = {}
-					if Shell.DakCaliber < 20 then
-						ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
-					else
-						ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
+						util.Effect("daktescalingexplosion", effectdata3, true, true)
 					end
 
-					if Shell.DakIsPellet then
-						sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 150, 0.25 )	
+					Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
+					if Shell.DakCaliber>=75 then
+						Shell.DakGun:SetNWBool("Exploding",true)
+						timer.Create( "ExplodeTimer"..Shell.DakGun:EntIndex(), 0.1, 1, function()
+							Shell.DakGun:SetNWBool("Exploding",false)
+						end)
 					else
+						local ExpSounds = {}
+						if Shell.DakCaliber < 20 then
+							ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
+						else
+							ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
+						end
 						sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 100, 1 )	
 					end
+					if Shell.Exploded ~= true then
+						if Shell.DakShellType == "HESH" then
+							DTShockwave(HitPos+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+						else
+							DTShockwave(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+							--DTExplosion(HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+						end
+					end
+					Shell.Exploded = true
+				else
+					local effectdata = EffectData()
+					if Shell.DakIsFlame == 1 then
+						effectdata:SetOrigin(HitPos)
+						effectdata:SetEntity(Shell.DakGun)
+						effectdata:SetAttachment(1)
+						effectdata:SetMagnitude(.5)
+						effectdata:SetScale(1)
+						util.Effect("dakteflameimpact", effectdata, true, true)
+						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
+						--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+					else
+						effectdata:SetOrigin(HitPos)
+						effectdata:SetEntity(Shell.DakGun)
+						effectdata:SetAttachment(1)
+						effectdata:SetMagnitude(.5)
+						effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
+						if Shell.IsFrag then
+						else
+							util.Effect("dakteshellimpact", effectdata, true, true)
+						end
+						util.Decal( "Impact.Concrete", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*5), Shell.DakGun)
+						local ExpSounds = {}
+						if Shell.DakCaliber < 20 then
+							ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
+						else
+							ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
+						end
+
+						if Shell.DakIsPellet then
+							sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 150, 0.25 )	
+						else
+							sound.Play( ExpSounds[math.random(1,#ExpSounds)], HitPos, 100, 100, 1 )	
+						end
+					end
 				end
-			end
-			if Shell.Grounded == 1 or Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then
 				Shell.RemoveNow = 1
 				if Shell.DakExplosive then
 					Shell.ExplodeNow = true
@@ -1475,8 +1564,6 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				Shell.DakVelocity = Vector(0,0,0)
 				Shell.DakDamage = 0
 			end
-			Shell.PenetratedGround = nil
-		else
 		end	
 
 		if Shell.DakPenetration <= 0 then
@@ -2173,23 +2260,22 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 				end
 			end
 			if HitEnt:IsWorld() or Shell.ExplodeNow==true then
-				if not(Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1) then
-					local worldtrace = {}
-					worldtrace.filter = Shell.Filter
-					worldtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
-					worldtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
-					worldtrace.mask = MASK_SOLID_BRUSHONLY
-					worldtrace.start = ContShellTrace.HitPos + (Shell.DakVelocity:GetNormalized())*Shell.DakCaliber*0.05
-					worldtrace.endpos = ContShellTrace.HitPos + (Shell.DakVelocity:GetNormalized())*Shell.DakPenetration --dirt/sand/gravel mix is about 1mm of RHA per source unit (inch), so if you can pen 100mm of RHA you can pen 100 inches of dirt. 
-					local worldShellTrace = util.TraceHull( worldtrace )
-					local PenMult = (1-worldShellTrace.FractionLeftSolid)
-					if PenMult == 0 or worldShellTrace.FractionLeftSolid == 0 then
-						Shell.Grounded = 1
-					else
-						Shell.Pos = ContShellTrace.HitPos + ((Shell.DakVelocity:GetNormalized())*Shell.DakPenetration*PenMult) + Shell.DakVelocity:GetNormalized()
-						Shell.DakPenetration = Shell.DakPenetration * PenMult
-						Shell.DakVelocity = Shell.DakVelocity * PenMult
-						Shell.DakDamage = Shell.DakDamage * PenMult
+				local Penned, Exit, Dist = DTWorldPen(ContShellTrace.HitPos,Shell.DakVelocity:GetNormalized(),Shell.DakPenetration,Shell.Filter,Shell.DakCaliber)
+				if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then
+					--[[
+					if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" and Penned then
+						Shell.LifeTime = 0
+						DTHEAT(Exit,NULL,Shell.DakCaliber,Shell.DakPenetration,Shell.DakDamage,Shell.DakGun.DakOwner,Shell)
+						Shell.HeatPen = true
+					end
+					]]--
+					Shell.Pos = Exit
+					Shell.LifeTime = 0
+					Shell.DakVelocity = Vector(0,0,0)
+					Shell.DakDamage = 0
+					Shell.ExplodeNow = true
+				else
+					if Penned then
 						local effectdata = EffectData()
 						effectdata:SetOrigin(ContShellTrace.HitPos)
 						effectdata:SetEntity(HitEnt)
@@ -2197,99 +2283,106 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(Shell.DakCaliber*0.25)
 						util.Effect("dakteshellpenetrate", effectdata, true, true)
-						if Shell.DakShellType == "HE" or Shell.DakShellType == "SM" then
-							DTShellContinue(Shell.Pos,End,Shell,Normal)
+						if Shell.DakIsPellet then
+							sound.Play( Shell.DakPenSounds[math.random(1,#Shell.DakPenSounds)], ContShellTrace.HitPos, 100, 150, 0.25 )
 						else
-							DTShellContinue(Shell.Pos,End,Shell,Normal,true)
+							sound.Play( Shell.DakPenSounds[math.random(1,#Shell.DakPenSounds)], ContShellTrace.HitPos, 100, 100, 1 )
 						end
-						Shell.PenetratedGround = 1
+						util.Decal( "Impact.Concrete", ContShellTrace.HitPos, Exit, Shell.DakGun)
+						util.Decal( "Impact.Concrete", Exit, ContShellTrace.HitPos, Shell.DakGun)
+						Shell.Pos = Exit
+						DTShellContinue(Exit,End,Shell,Normal) --set new start a bit further away to prevent recurse
+						Shell.LifeTime = 0
+						Shell.DakVelocity = Shell.DakVelocity - (Shell.DakVelocity * (Dist/Shell.DakPenetration))
+						Shell.DakDamage = Shell.DakDamage - (Shell.DakDamage * (Dist/Shell.DakPenetration))
+						Shell.DakPenetration = Shell.DakPenetration - (Shell.DakPenetration * (Dist/Shell.DakPenetration))
+					else
+						Shell.Pos = Exit
+						Shell.LifeTime = 0
+						Shell.DakVelocity = Vector(0,0,0)
+						Shell.DakDamage = 0
+						Shell.ExplodeNow = true
 					end
 				end
-
-				Shell.ExplodeNow=false
-				if Shell.DakExplosive and Shell.PenetratedGround~=1 then
-					local effectdata3 = EffectData()
-					effectdata3:SetOrigin(ContShellTrace.HitPos)
-					effectdata3:SetEntity(Shell.DakGun)
-					effectdata3:SetAttachment(1)
-					effectdata3:SetMagnitude(.5)
-					effectdata3:SetScale(Shell.DakBlastRadius)
-					effectdata3:SetNormal( Normal )
-					if Shell.DakShellType == "SM" then
-						util.Effect("daktescalingsmoke", effectdata3, true, true)
-					else
-						util.Effect("daktescalingexplosion", effectdata3, true, true)
-					end
-
-					Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
-					if Shell.DakCaliber>=75 then
-						Shell.DakGun:SetNWBool("Exploding",true)
-						timer.Create( "ExplodeTimer"..Shell.DakGun:EntIndex(), 0.1, 1, function()
-							Shell.DakGun:SetNWBool("Exploding",false)
-						end)
-					else
-						local ExpSounds = {}
-						if Shell.DakCaliber < 20 then
-							ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
+				if Penned == false then
+					if Shell.DakExplosive then
+						local effectdata3 = EffectData()
+						effectdata3:SetOrigin(ContShellTrace.HitPos)
+						effectdata3:SetEntity(Shell.DakGun)
+						effectdata3:SetAttachment(1)
+						effectdata3:SetMagnitude(.5)
+						effectdata3:SetScale(Shell.DakBlastRadius)
+						effectdata3:SetNormal( Normal )
+						if Shell.DakShellType == "SM" then
+							util.Effect("daktescalingsmoke", effectdata3, true, true)
 						else
-							ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
-						end
-						sound.Play( ExpSounds[math.random(1,#ExpSounds)], ContShellTrace.HitPos, 100, 100, 1 )	
-					end
-					if Shell.Exploded ~= true then
-						if Shell.DakShellType == "HESH" then
-							DTShockwave(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-						else
-							DTShockwave(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-							--DTExplosion(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
-						end
-					end
-					Shell.Exploded = true
-				else
-					local effectdata = EffectData()
-					if Shell.DakIsFlame == 1 then
-						effectdata:SetOrigin(ContShellTrace.HitPos)
-						effectdata:SetEntity(Shell.DakGun)
-						effectdata:SetAttachment(1)
-						effectdata:SetMagnitude(.5)
-						effectdata:SetScale(1)
-						util.Effect("dakteflameimpact", effectdata, true, true)
-						local Targets = ents.FindInSphere( ContShellTrace.HitPos, 150 )
-						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-						--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
-					else
-						effectdata:SetOrigin(ContShellTrace.HitPos)
-						effectdata:SetEntity(Shell.DakGun)
-						effectdata:SetAttachment(1)
-						effectdata:SetMagnitude(.5)
-						if Shell.DakDamage == 0 then
-							effectdata:SetScale(0.5)
-						else
-							effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
-						end
-						if Shell.IsFrag then
-						else
-							util.Effect("dakteshellimpact", effectdata, true, true)
-						end
-						util.Decal( "Impact.Concrete", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*5), Shell.DakGun)
-						if HitEnt:GetClass()=="dak_crew" then
-							util.Decal( "Blood", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*500), Shell.DakGun)
-						end
-						local ExpSounds = {}
-						if Shell.DakCaliber < 20 then
-							ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
-						else
-							ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
+							util.Effect("daktescalingexplosion", effectdata3, true, true)
 						end
 
-						if Shell.DakIsPellet then
-							sound.Play( ExpSounds[math.random(1,#ExpSounds)], ContShellTrace.HitPos, 100, 150, 0.25 )	
+						Shell.DakGun:SetNWFloat("ExpDamage",Shell.DakSplashDamage)
+						if Shell.DakCaliber>=75 then
+							Shell.DakGun:SetNWBool("Exploding",true)
+							timer.Create( "ExplodeTimer"..Shell.DakGun:EntIndex(), 0.1, 1, function()
+								Shell.DakGun:SetNWBool("Exploding",false)
+							end)
 						else
+							local ExpSounds = {}
+							if Shell.DakCaliber < 20 then
+								ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
+							else
+								ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
+							end
 							sound.Play( ExpSounds[math.random(1,#ExpSounds)], ContShellTrace.HitPos, 100, 100, 1 )	
 						end
+						if Shell.Exploded ~= true then
+							if Shell.DakShellType == "HESH" then
+								DTShockwave(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+							else
+								DTShockwave(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+								--DTExplosion(ContShellTrace.HitPos+(Normal*2),Shell.DakSplashDamage*0.5,Shell.DakBlastRadius,Shell.DakCaliber,Shell.DakFragPen,Shell.DakGun.DakOwner,Shell)
+							end
+						end
+						Shell.Exploded = true
+					else
+						local effectdata = EffectData()
+						if Shell.DakIsFlame == 1 then
+							effectdata:SetOrigin(ContShellTrace.HitPos)
+							effectdata:SetEntity(Shell.DakGun)
+							effectdata:SetAttachment(1)
+							effectdata:SetMagnitude(.5)
+							effectdata:SetScale(1)
+							util.Effect("dakteflameimpact", effectdata, true, true)
+							local Targets = ents.FindInSphere( ContShellTrace.HitPos, 150 )
+							PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
+							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
+						else
+							effectdata:SetOrigin(ContShellTrace.HitPos)
+							effectdata:SetEntity(Shell.DakGun)
+							effectdata:SetAttachment(1)
+							effectdata:SetMagnitude(.5)
+							effectdata:SetScale(Shell.DakCaliber*(Shell.DakBaseVelocity/29527.6))
+							if Shell.IsFrag then
+							else
+								util.Effect("dakteshellimpact", effectdata, true, true)
+							end
+							util.Decal( "Impact.Concrete", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*5), Shell.DakGun)
+							if HitEnt:GetClass()=="dak_crew" then
+								util.Decal( "Blood", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*500), Shell.DakGun)
+							end
+							local ExpSounds = {}
+							if Shell.DakCaliber < 20 then
+								ExpSounds = {"physics/surfaces/sand_impact_bullet1.wav","physics/surfaces/sand_impact_bullet2.wav","physics/surfaces/sand_impact_bullet3.wav","physics/surfaces/sand_impact_bullet4.wav"}
+							else
+								ExpSounds = {"daktanks/dakexp1.mp3","daktanks/dakexp2.mp3","daktanks/dakexp3.mp3","daktanks/dakexp4.mp3"}
+							end
+
+							if Shell.DakIsPellet then
+								sound.Play( ExpSounds[math.random(1,#ExpSounds)], ContShellTrace.HitPos, 100, 150, 0.25 )	
+							else
+								sound.Play( ExpSounds[math.random(1,#ExpSounds)], ContShellTrace.HitPos, 100, 100, 1 )	
+							end
+						end
 					end
-				end
-				if Shell.Grounded == 1 or Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then
 					Shell.RemoveNow = 1
 					if Shell.DakExplosive then
 						Shell.ExplodeNow = true
@@ -2298,7 +2391,6 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					Shell.DakVelocity = Vector(0,0,0)
 					Shell.DakDamage = 0
 				end
-				Shell.PenetratedGround = nil
 			end	
 
 			if Shell.DakPenetration <= 0 then
