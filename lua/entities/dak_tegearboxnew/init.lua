@@ -880,6 +880,7 @@ function ENT:Think()
 				local GravxTicks = physenv.GetGravity()*(1/66.66)
 				
 				local Pos
+				local ForcePos
 				local selfpos = self.base:GetPos()
 				local trace = {}
 				local CurTrace
@@ -979,7 +980,8 @@ function ENT:Think()
 				end
 				--Right side
 				for i=1, WheelsPerSide do
-					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*basesize[2]*0.95)
+					ForcePos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*basesize[2]*0.95)
+					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*self.SideDist)
 					if i==WheelsPerSide then 
 						CurRideHeight = RideHeight - FrontWheelRaise
 					elseif i==1 then
@@ -1074,12 +1076,13 @@ function ENT:Think()
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.RightRidePosChanges[i] = RidePos
 					--print(FrictionForceFinal) ----------FIX ISSUE WHERE THIS SPERGS OUT AND GETS BIG FOR NO RAISIN
-					self.phy:ApplyForceOffset( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.RightForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
+					self.phy:ApplyForceOffset( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.RightForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,ForcePos)
 				end
 
 				--Left side
 				for i=1, WheelsPerSide do
-					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*basesize[2]*0.95)
+					ForcePos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*basesize[2]*0.95)
+					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*self.SideDist)
 					if i==WheelsPerSide then 
 						CurRideHeight = RideHeight - FrontWheelRaise
 					elseif i==1 then
@@ -1175,7 +1178,7 @@ function ENT:Think()
 					
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.LeftRidePosChanges[i] = RidePos
-					self.phy:ApplyForceOffset( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.LeftForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
+					self.phy:ApplyForceOffset( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.LeftForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,ForcePos)
 				end
 				
 				self.LastWheelsPerSide = WheelsPerSide
