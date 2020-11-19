@@ -530,7 +530,26 @@ function ENT:Think()
 			       			if self.MoveForward == 0 and self.MoveReverse > 0 then
 			       				throttle = self.MoveReverse
 			       			end
-							if self.Speed < G1Speed then
+			       			--if self.ShiftTime == nil then self.ShiftTime = 0 end
+			       			--if CurTime() - 5 > self.ShiftTime then
+			       			if self.Speed > 0 and self.Speed < G1Speed and not(self.Gear == 1) then
+								self.Gear = 1
+								--self.ShiftTime = CurTime()
+							end
+							if self.Speed > G1Speed and self.Speed < G2Speed and not(self.Gear == 2) then
+								self.Gear = 2
+								--self.ShiftTime = CurTime()
+							end
+							if self.Speed > G2Speed and self.Speed < G3Speed and not(self.Gear == 3) then
+								self.Gear = 3
+								--self.ShiftTime = CurTime()
+							end
+							if self.Speed > G3Speed and self.Speed < G4Speed and not(self.Gear == 4) then
+								self.Gear = 4
+								--self.ShiftTime = CurTime()
+							end
+							--end
+							if self.Gear == 1 then
 								--self.Gear = 1
 								GearBoost = 0.4
 								self.CurTopSpeed = G1Speed
@@ -540,7 +559,7 @@ function ENT:Think()
 								self.RightForce = (self.PhysicalMass/3000)*self.RBoost*self.Perc*(1/self.GearRatio)*self.HPperTon*50*GearBoost * math.Min(throttle,1)
 								--LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*4),0,8*math.abs(self.Perc)) )
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*4),0,8*math.abs(self.Perc)) )
-							elseif self.Speed < G2Speed then
+							elseif self.Gear == 2 then
 								--self.Gear = 2
 								GearBoost = 0.15
 								self.CurTopSpeed = G2Speed
@@ -550,7 +569,7 @@ function ENT:Think()
 								self.RightForce = (self.PhysicalMass/3000)*self.RBoost*self.Perc*(1/self.GearRatio)*self.HPperTon*50*GearBoost * math.Min(throttle,1)
 								--LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc)) )
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*5),0,4*math.abs(self.Perc)) )
-							elseif self.Speed < G3Speed then
+							elseif self.Gear == 3 then
 								--self.Gear = 3
 								GearBoost = 0.1
 								self.CurTopSpeed = G3Speed
@@ -570,19 +589,6 @@ function ENT:Think()
 								self.RightForce = (self.PhysicalMass/3000)*self.RBoost*self.Perc*(1/self.GearRatio)*self.HPperTon*50*GearBoost * math.Min(throttle,1)
 								--LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc)) )
 								--RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/self.GearRatio)*self.HPperTon*150*math.Clamp(self.TopSpeed/(self.Speed*1.5),0,1*math.abs(self.Perc)) )
-							end
-
-							if self.Speed > 0 and self.Speed < G1Speed and not(self.Gear == 1) then
-								self.Gear = 1 
-							end
-							if self.Speed > G1Speed and self.Speed < G2Speed and not(self.Gear == 2) then
-								self.Gear = 2 
-							end
-							if self.Speed > G2Speed and self.Speed < G3Speed and not(self.Gear == 3) then
-								self.Gear = 3
-							end
-							if self.Speed > G3Speed and self.Speed < G4Speed and not(self.Gear == 4) then
-								self.Gear = 4
 							end
 
 							if self.lastshift == nil then self.lastshift = 0 end
@@ -1059,17 +1065,16 @@ function ENT:Think()
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
-					--[[
+					local rotatedforward = ForwardEnt:GetForward()
 					if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
-						lastvelnorm:Rotate(Angle(0,self.WheelYaw,0))
+						rotatedforward:Rotate(Angle(0,-self.WheelYaw,0))
 					elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
-						lastvelnorm:Rotate(Angle(0,self.WheelYaw,0))
+						rotatedforward:Rotate(Angle(0,-self.WheelYaw,0))
 					end
-					]]--
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.RightRidePosChanges[i] = RidePos
 					--print(FrictionForceFinal) ----------FIX ISSUE WHERE THIS SPERGS OUT AND GETS BIG FOR NO RAISIN
-					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*(TerrainMultiplier*self.RightForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
+					self.phy:ApplyForceOffset( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.RightForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
 
 				--Left side
@@ -1160,16 +1165,17 @@ function ENT:Think()
 					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
-					--[[
+					
+					local rotatedforward = ForwardEnt:GetForward()
 					if i <= self:GetRearTurningWheels() and i <= WheelsPerSide*0.5 then
-						lastvelnorm:Rotate(Angle(0,self.WheelYaw,0))
+						rotatedforward:Rotate(Angle(0,-self.WheelYaw,0))
 					elseif WheelsPerSide-(i-1) <= self:GetForwardTurningWheels() and i >= WheelsPerSide*0.5 then
-						lastvelnorm:Rotate(Angle(0,self.WheelYaw,0))
+						rotatedforward:Rotate(Angle(0,-self.WheelYaw,0))
 					end
-					--]]
+					
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.LeftRidePosChanges[i] = RidePos
-					self.phy:ApplyForceOffset( self.TimeMult*((forward*Vector(1,1,0))*4*(TerrainMultiplier*self.LeftForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
+					self.phy:ApplyForceOffset( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.LeftForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,Pos)
 				end
 				
 				self.LastWheelsPerSide = WheelsPerSide
