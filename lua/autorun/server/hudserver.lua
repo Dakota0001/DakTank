@@ -180,6 +180,7 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						net.WriteString( util.TableToJSON( InfoTable1 ) )
 						net.WriteString( util.TableToJSON( InfoTable2 ) )
 						net.WriteString( util.TableToJSON( InfoTable3 ) )
+						net.WriteString( util.TableToJSON( Target.frontarmortable ) )
 						net.Send( CurPlayer )
 					end
 				end

@@ -678,6 +678,22 @@ function ENT:Think()
 						if math.abs(diff.z) > self.BestHeight then self.BestHeight = math.abs(diff.z) end
 					end
 					self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
+					local biggestsize = math.max(self.BestLength,self.BestWidth,self.BestHeight)
+					local pixels = 50
+					local startpos = self:GetParent():GetParent():GetPos()+(up*biggestsize*0.75)+(right*-biggestsize*0.5)
+					local curarmor = 0
+					local frontarmortable = {}
+					for i=1, pixels do
+						for j=1, pixels do
+							addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
+							SpallLiner = 0
+							curarmor, _, _, _, _, _, _, _, _ = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
+							frontarmortable[#frontarmortable+1] = curarmor
+						end
+					end
+					frontarmortable[#frontarmortable+1] = self.FrontalArmor
+					self.frontarmortable = frontarmortable
+
 
 					firepowermult = math.max((self.BoxVolume*0.01/250000),firepowermult)
 
