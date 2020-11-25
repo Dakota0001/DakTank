@@ -734,22 +734,25 @@ function ENT:Think()
 					end
 
 					self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
-
-					local biggestsize = math.max(self.BestWidth,self.BestHeight)*2
-					local pixels = 50
+					local biggestsize = math.max(math.min(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
+					local pixels = 100
 					local startpos = self:GetParent():GetParent():GetPos()+(up*self.BestHeight*0.5)+(right*-biggestsize*0.5)+(up*biggestsize*0.5)
 					local curarmor = 0
-					local frontarmortable = {}
+					self.frontarmortable = {}
 					for i=1, pixels do
-						for j=1, pixels do
-							addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
-							SpallLiner = 0
-							curarmor, _, _, _, _, _, _, _, _ = DTGetArmorRecurse(startpos+addpos+forward*distance, startpos+addpos-forward*distance, "AP", 75, player.GetAll(), self)
-							frontarmortable[#frontarmortable+1] = curarmor
-						end
+						timer.Simple(engine.TickInterval()*i,function()
+							for j=1, pixels do
+								addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
+								SpallLiner = 0
+								curarmor, _, _, _, _, _, _, _, _ = DTGetArmorRecurse(startpos+addpos+forward*distance, startpos+addpos-forward*distance, "AP", 75, player.GetAll(), self)
+								self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor)
+							end
+						end)
 					end
-					frontarmortable[#frontarmortable+1] = self.FrontalArmor
-					self.frontarmortable = frontarmortable
+					timer.Simple(engine.TickInterval()*pixels+1,function()
+						self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
+					end)
+					--self.frontarmortable = frontarmortable
 
 					firepowermult = math.max((self.BoxVolume*0.01/250000),firepowermult)
 

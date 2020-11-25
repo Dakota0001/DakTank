@@ -101,16 +101,18 @@ hook.Add("HUDPaint", "DakTankInfoReadout", function()
 	    surface.SetDrawColor(0,255,0,255)
 	    surface.DrawOutlinedRect( x*0.05+475, y*0.2+yadd, 200, 200)
 
-	    local pixels = 50
+	    local pixels = 100
 	    local curpixel = 0
 	    local pixelsize = 200/pixels
-	    local maxarmor = FrontArmor[#FrontArmor]*1.5
-	    for i=1, pixels do
-			for j=1, pixels do
-				curpixel = curpixel + 1	
-				if FrontArmor[curpixel] ~= 0 then
-					surface.SetDrawColor(255*(FrontArmor[curpixel]/maxarmor),255-255*math.min(1,FrontArmor[curpixel]/maxarmor),0,200)
-	    			surface.DrawRect(x*0.05+475+200-(1*(pixelsize)*j), y*0.2+yadd+(1*(pixelsize)*i), pixelsize, pixelsize)
+	    if #FrontArmor > pixels*pixels then
+		    local maxarmor = FrontArmor[#FrontArmor]*1.5
+		    for i=1, pixels do
+				for j=1, pixels do
+					curpixel = curpixel + 1	
+					if FrontArmor[curpixel] ~= 0 then
+						surface.SetDrawColor(255*(FrontArmor[curpixel]/maxarmor),255-255*math.min(1,FrontArmor[curpixel]/maxarmor),0,200)
+		    			surface.DrawRect(x*0.05+475+200-(1*(pixelsize)*j), y*0.2+yadd+(1*(pixelsize)*i), pixelsize, pixelsize)
+					end
 				end
 			end
 		end
