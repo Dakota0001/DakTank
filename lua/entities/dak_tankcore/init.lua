@@ -113,7 +113,10 @@ function ENT:Initialize()
 	--local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
 
-	
+	self.APSEnable = false
+	self.APSArc = 0
+	self.APSShots = 0
+	self.APSMinCaliber = 0
 
 	self.Outputs = WireLib.CreateOutputs( self, { "Health","HealthPercent","Crew" } )
 	self.Soundtime = CurTime()
@@ -137,6 +140,8 @@ function ENT:Initialize()
 	self.BoxVolume = 100000000
 	self.PenMult = 0
 	self.DPSMult = 0
+
+	self.Forward = self:GetForward()
 end
 
 
@@ -262,6 +267,16 @@ function ENT:Think()
 					if self:GetForceModern() == true then
 						self.Modern = 1
 					end
+
+					self.APSEnable = self:GetEnableAPS()
+					self.APSArc = self:GetAPSArc()
+					self.APSShots = self:GetAPSShots()
+					self.APSMinCaliber = self:GetAPSMinCaliber()
+
+					if self.APSEnable == true then
+						self.Modern = 1
+					end
+
 					self.CanSpawn = true
 
 					local GunHandlingMult = 0
@@ -332,6 +347,7 @@ function ENT:Think()
 						right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
 						up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
 					end
+					self.Forward = forward
 
 					--setup system to check layers of armor between first impact and crew and determine if a spall liner exists 
 
@@ -770,7 +786,13 @@ function ENT:Think()
 					self.PreCost = self.ArmorMult*50 + self.FirepowerMult*50
 					--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
 					self.PreCost = self.PreCost*((self.SpeedMult+self.GunHandlingMult)*0.5)
-					self.Cost = math.Round(self.PreCost)
+
+					self.APSCost = 0
+					if self.APSEnable == true then
+						self.APSCost = (self.APSShots*4)*(self.APSArc/360)
+					end
+
+					self.Cost = math.Round(self.PreCost+self.APSCost)
 
 					local curera = "WWII"
 					if self.ColdWar == 1 then curera = "Cold War" end

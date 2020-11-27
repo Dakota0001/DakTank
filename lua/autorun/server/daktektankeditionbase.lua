@@ -234,11 +234,54 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 
 							if ShellTrace.Hit then
 								if not(ShellTrace.HitSky and (ShellTrace.HitNormal == Vector(0,0,-1))) then
-									if ShellList[i].IsGuided then
-										DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
-									else
-										DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+									--check if aps is near if shellvel is low enough and shell type is right
+									--also check if thing is large enough caliber
+									--if caliber too big to kill then halve pen?
+									--determine if shell is moving towards or away from APS
+									if ShellList[i].ShotDown == nil then ShellList[i].ShotDown = 0 end
+									local ExpPos = ShellTrace.StartPos
+									if ShellList[i].DakVelocity:Length() < 27559.1 then --max vel of shell it can catch 700m/s based off en.wikipedia.org/wiki/Drozd
+										if (ShellList[i].DakShellType == "HEAT" or ShellList[i].DakShellType == "HEATFS" or ShellList[i].DakShellType == "ATGM") and  ShellList[i].ShotDown ~= 1 then
+											local APS = ents.FindByClass( "dak_tankcore" )
+											local Done = 0
+											for i=1, #APS do
+												if APS[i].APSEnable == true then
+													if ShellList[i].DakCaliber >= APS[i].APSMinCaliber then
+														if Done == 0 then
+															if ShellTrace.HitPos:Distance(APS[i]:GetPos()) < 275 then --it's in range ~7m based off drozd again
+																if ShellTrace.StartPos:Distance(APS[i]:GetPos())>ShellTrace.HitPos:Distance(APS[i]:GetPos()) then --it's coming at us
+																	local _, a = WorldToLocal( APS[i]:GetPos(), (ShellTrace.StartPos-APS[i]:GetPos()):GetNormalized():Angle(), APS[i]:GetPos(), APS[i].Forward:Angle() )
+																	if math.abs(a.yaw) <= APS[i].APSArc*0.5 then --may need to convert this to angle later for readouts, but this value is nice
+																		if APS[i].APSShots > 0 then
+																			--play some effect or sound or something maybe
+																			APS[i].APSShots = APS[i].APSShots - 1
+																			Done = 1
+																			ShellList[i].ShotDown = 1
+																			ExpPos = APS[i]:GetPos() + (ShellTrace.StartPos-APS[i]:GetPos()):GetNormalized()*275
+																		end
+																	end
+																end
+															end
+														end
+													end
+												end
+											end
+										end
 									end
+									if ShellList[i].ShotDown == 1 then
+										if ShellList[i].DakShellType == "HEAT" or ShellList[i].DakShellType == "HEATFS" or ShellList[i].DakShellType == "ATGM" then
+											ShellList[i].RemoveNow = 1
+											ShellList[i].ExplodeNow = true
+											DTShellAirBurst(ExpPos,ShellList[i],trace.endpos-trace.start)
+										end
+									else
+										if ShellList[i].IsGuided then
+											DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+										else
+											DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
+										end
+									end
+									
 								end
 							else
 								if ShellList[i].FuzeDelay~=nil and ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then

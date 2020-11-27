@@ -14,6 +14,7 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						local InfoTable3 = {}
 
 						InfoTable1[1] = "DakTank Info Scanner"
+						InfoTable1[2] = ""
 						local Era = "WWII"
 						if Target.ColdWar == 1 then
 							Era = "Cold War"
@@ -21,19 +22,20 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						if Target.Modern == 1 then
 							Era = "Modern"
 						end
-						InfoTable1[2] = Target.Cost.." point "..Era.." "..math.Round(Target.TotalMass*0.001,2).." ton tank."
-						InfoTable1[3] = "-Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
-						InfoTable1[4] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
+						InfoTable1[3] = Target.Cost.." point "..Era.." "..math.Round(Target.TotalMass*0.001,2).." ton tank."
+						InfoTable1[4] = "-Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
+						InfoTable1[5] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
 						if Target.Gearbox ~= nil and Target.Gearbox.DakHP ~= nil then
-							InfoTable1[5] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
+							InfoTable1[6] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
 						else
-							InfoTable1[5] = "-HP/T: 0."
+							InfoTable1[6] = "-HP/T: 0."
 						end
 						
-						InfoTable1[6] = "-Crew Count: "..(#Target.Crew)
+						InfoTable1[7] = "-Crew Count: "..(#Target.Crew)
 
-						
 						local info2count = 1
+						InfoTable2[info2count] = ""
+						local info2count = 2
 						InfoTable2[info2count] = "Guns"
 						local GunsSorted = table.Copy( Target.Guns )
 						table.sort( GunsSorted, function(a, b)
@@ -61,29 +63,46 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 							end
 						end )
 
+						InfoTable2[info2count] = ""
+						info2count = info2count + 1
 						InfoTable2[info2count] = "Turrets: "..(#TurretsSorted)
 						for i=1, #TurretsSorted do
 							info2count = info2count + 1
-							InfoTable2[info2count] = "-Turret "..i
-							info2count = info2count + 1
+							local motors = "N/A"
+							local weight = "N/A"
+							local speed = "N/A"
 							if TurretsSorted[i].DakTurretMotors ~= nil then
-								InfoTable2[info2count] = "--Motors: "..(#TurretsSorted[i].DakTurretMotors)
-							else
-								InfoTable2[info2count] = "--Motors: N/A"
+								motors = #TurretsSorted[i].DakTurretMotors
 							end
-							info2count = info2count + 1
 							if TurretsSorted[i].GunMass ~= nil then
-								InfoTable2[info2count] = "--Weight: "..math.Round(TurretsSorted[i].GunMass/1000,2).." tons"
-							else
-								InfoTable2[info2count] = "--Weight: N/A tons"
+								weight = math.Round(TurretsSorted[i].GunMass/1000,2)
 							end
-							info2count = info2count + 1
 							if TurretsSorted[i].RotationSpeed ~= nil then
-								InfoTable2[info2count] = "--Speed: "..math.Round((TurretsSorted[i].RotationSpeed*1/engine.TickInterval()),2).." degrees/s"
-							else
-								InfoTable2[info2count] = "--Speed: N/A degrees/s"
+								speed = math.Round((TurretsSorted[i].RotationSpeed*1/engine.TickInterval()),2)
 							end
+							InfoTable2[info2count] = "-Turret "..i..", "..motors.." motors, "..weight.." tons, "..speed.." deg/s"
 						end
+
+						info2count = info2count + 1
+						InfoTable2[info2count] = ""
+
+						info2count = info2count + 1
+						if Target.APSEnable == true then
+							local arc = "N/A"
+							local shots = "N/A"
+							if Target.APSShots ~= nil then
+								shots = Target.APSShots
+							end
+							if Target.APSArc ~= nil then
+								arc = Target.APSArc
+							end
+							InfoTable2[info2count] = "APS Enabled, "..arc.." arc, "..shots.." rounds"
+						else
+							InfoTable2[info2count] = "No APS"
+						end
+
+						info2count = info2count + 1
+						InfoTable2[info2count] = ""
 
 						InfoTable3[1] = "Debugging"
 						local info3count = 1
