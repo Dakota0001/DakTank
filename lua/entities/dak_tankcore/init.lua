@@ -114,7 +114,9 @@ function ENT:Initialize()
 	self.timer = CurTime()
 
 	self.APSEnable = false
-	self.APSArc = 0
+	self.APSFrontalArc = false
+	self.APSSideArc = false
+	self.APSRearArc = false
 	self.APSShots = 0
 	self.APSMinCaliber = 0
 
@@ -269,7 +271,9 @@ function ENT:Think()
 					end
 
 					self.APSEnable = self:GetEnableAPS()
-					self.APSArc = self:GetAPSArc()
+					self.APSFrontalArc = self:GetAPSFrontalArc()
+					self.APSSideArc = self:GetAPSSideArc()
+					self.APSRearArc = self:GetAPSRearArc()
 					self.APSShots = self:GetAPSShots()
 					self.APSMinCaliber = self:GetAPSMinCaliber()
 
@@ -789,7 +793,17 @@ function ENT:Think()
 
 					self.APSCost = 0
 					if self.APSEnable == true then
-						self.APSCost = (self.APSShots*4)*(self.APSArc/360)
+						local roundcost = 0
+						if self.APSFrontalArc == true then
+							roundcost = roundcost + 1
+						end
+						if self.APSSideArc == true then
+							roundcost = roundcost + 1
+						end
+						if self.APSRearArc == true then
+							roundcost = roundcost + 1
+						end
+						self.APSCost = self.APSShots*roundcost
 					end
 
 					self.Cost = math.Round(self.PreCost+self.APSCost)

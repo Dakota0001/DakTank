@@ -88,15 +88,22 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 
 						info2count = info2count + 1
 						if Target.APSEnable == true then
-							local arc = "N/A"
+							--local arc = "N/A"
 							local shots = "N/A"
 							if Target.APSShots ~= nil then
 								shots = Target.APSShots
 							end
-							if Target.APSArc ~= nil then
-								arc = Target.APSArc
+							local arcstring = ""
+							if Target.APSFrontalArc == true then
+								arcstring = arcstring.."F"
 							end
-							InfoTable2[info2count] = "APS Enabled, "..arc.." arc, "..shots.." rounds"
+							if Target.APSSideArc == true then
+								arcstring = arcstring.."S"
+							end
+							if Target.APSRearArc == true then
+								arcstring = arcstring.."R"
+							end
+							InfoTable2[info2count] = "APS Enabled, "..arcstring.." arc, "..shots.." rounds"
 						else
 							InfoTable2[info2count] = "No APS"
 						end
