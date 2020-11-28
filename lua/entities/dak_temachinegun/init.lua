@@ -669,6 +669,7 @@ function ENT:PreEntityCopy()
 	info.DakFireSound1 = self.DakFireSound1
 	info.DakFireSound2 = self.DakFireSound2
 	info.DakFireSound3 = self.DakFireSound3
+	info.DakMass = self.DakMass
 
 	--Materials
 	info.DakMat0 = self:GetSubMaterial(0)
@@ -701,7 +702,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 			self.DakFireSound2 = Ent.EntityMods.DakTek.DakFireSound2
 			self.DakFireSound3 = Ent.EntityMods.DakTek.DakFireSound3
 		end
-		
+		self.DakMass = Ent.EntityMods.DakTek.DakMass
 
 		self.DakOwner = Player
 		self:SetColor(Ent.EntityMods.DakTek.DakColor)

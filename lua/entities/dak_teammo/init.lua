@@ -415,6 +415,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		if self.DakAmmo > self.DakMaxAmmo then
 			self.DakAmmo = self.DakMaxAmmo
 		end
+		if self:GetPhysicsObject():GetMass() ~= 500 then self:GetPhysicsObject():SetMass(500) end
 	else
 		-- steel density 0.132 kg/in3
 		self.ShellVolume = math.pi*(((self.DakCaliber*0.5)*0.0393701)^2)*(self.DakCaliber*0.0393701*13)
@@ -466,9 +467,9 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		if self.DakAmmo > self.DakMaxAmmo then
 			self.DakAmmo = self.DakMaxAmmo
 		end
+		if self:GetPhysicsObject():GetMass() ~= math.Round((self.ShellMass*self.DakAmmo)+10) then self:GetPhysicsObject():SetMass(math.Round((self.ShellMass*self.DakAmmo)+10)) end
 	end
 	self.DakAmmo = self.DakMaxAmmo
-
 end
 
 function ENT:CheckClip(Ent, HitPos)
