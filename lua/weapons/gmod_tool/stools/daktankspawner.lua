@@ -2182,7 +2182,7 @@ function TOOL.BuildCPanel( panel )
 	end
 	gunData["Autoloading Recoilless Rifle"] = function()
 		EntType   = "dak_teautogun"
-		ShellLength = 50/50
+		ShellLength = 25/50
 		ShellLengthExact = 6.5
 		AmmoTypes = { "High Explosive","High Explosive Anti Tank","High Explosive Anti Tank Fin Stabilized","High Explosive Squash Head","Smoke" }
 		DermaNumSlider:SetMinMax( 20, 150 )
