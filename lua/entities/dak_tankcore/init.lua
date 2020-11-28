@@ -1014,7 +1014,7 @@ function ENT:Think()
 						self.Clips = {}
 						for i=1, #res do
 							CurrentRes = res[i]
-							if CurrentRes:IsSolid() then
+							if CurrentRes:IsValid() and CurrentRes:IsSolid() then
 								self.Contraption[#self.Contraption+1] = CurrentRes
 								if CurrentRes:GetClass()=="dak_tegearbox" or CurrentRes:GetClass()=="dak_tegearboxnew" then
 									CurrentRes.DakTankCore = self

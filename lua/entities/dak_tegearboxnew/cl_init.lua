@@ -80,6 +80,8 @@ function ENT:Draw()
 	local wheelbounds = (wheelmaxs - wheelmins)*0.5
 	local wheelmodelZ = wheelbounds[3]
 	local WheelYaw = self:GetNWFloat("WheelYaw")
+	local hydrabias = self:GetNWFloat("Hydra")
+	local hydrabiasside = self:GetNWFloat("HydraSide")
 	--if (self.lastslowthink == nil) or CurTime() >= self.lastslowthink+1 then 
 		self.SideDist = self:GetSideDist()
 	 	self.TrackLength = self:GetTrackLength()
@@ -182,13 +184,27 @@ function ENT:Draw()
 			end
 			Pos = Base:GetPos() + (ForwardEnt:GetForward()*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (0.01*optionalforward) + (ForwardOffset))) + (ForwardEnt:GetRight()*SideDist)
 			trace = {}
+				local extralength = 0
+				if i>WheelsPerSide*0.5 then
+					extralength = (hydrabias*(math.floor(WheelsPerSide*0.5)-(WheelsPerSide-i))/math.floor(WheelsPerSide*0.5)*RideHeight)
+				end
+				if i<=WheelsPerSide*0.5 then
+					extralength = -(hydrabias*(math.floor(WheelsPerSide*0.5)-(i-1))/math.floor(WheelsPerSide*0.5)*RideHeight)
+				end
+				math.Max(extralength,0)
+				if hydrabiasside>0 then
+					extralength = extralength - math.abs(hydrabiasside)*RideHeight
+				end
 				trace.start = Pos + ForwardEnt:GetUp()*RideHeight
-				if i==WheelsPerSide then 
-					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+FrontWheelRaise)
+				
+				if i==WheelsPerSide then
+					if FrontWheelRaise > 0 then extralength = 0 end
+					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+FrontWheelRaise+extralength)
 				elseif i==1 then
-					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+RearWheelRaise)
+					if RearWheelRaise > 0 then extralength = 0 end
+					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+RearWheelRaise+extralength)
 				else
-					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight)
+					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+extralength)
 				end
 				trace.filter = self
 				trace.mask = MASK_SOLID_BRUSHONLY
@@ -259,13 +275,27 @@ function ENT:Draw()
 			end
 			Pos = Base:GetPos() + (ForwardEnt:GetForward()*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (0.01*optionalforward) + (ForwardOffset))) - (ForwardEnt:GetRight()*SideDist)
 			trace = {}
+				local extralength = 0
+				if i>WheelsPerSide*0.5 then
+					extralength = (hydrabias*(math.floor(WheelsPerSide*0.5)-(WheelsPerSide-i))/math.floor(WheelsPerSide*0.5)*RideHeight)
+				end
+				if i<=WheelsPerSide*0.5 then
+					extralength = -(hydrabias*(math.floor(WheelsPerSide*0.5)-(i-1))/math.floor(WheelsPerSide*0.5)*RideHeight)
+				end
+				math.Max(extralength,0)
+				if hydrabiasside<0 then
+					extralength = extralength - math.abs(hydrabiasside)*RideHeight
+				end
 				trace.start = Pos + ForwardEnt:GetUp()*RideHeight
-				if i==WheelsPerSide then 
-					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+FrontWheelRaise)
+				
+				if i==WheelsPerSide then
+					if FrontWheelRaise > 0 then extralength = 0 end
+					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+FrontWheelRaise+extralength)
 				elseif i==1 then
-					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+RearWheelRaise)
+					if RearWheelRaise > 0 then extralength = 0 end
+					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+RearWheelRaise+extralength)
 				else
-					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight)
+					trace.endpos = Pos + ForwardEnt:GetUp()*(-RideHeight+extralength)
 				end
 				trace.filter = self
 				trace.mask = MASK_SOLID_BRUSHONLY

@@ -24,7 +24,7 @@ function ENT:Initialize()
 	self.DakHealth = self.DakMaxHealth
 	self.DakSpeed = 2
 	--local phys = self:GetPhysicsObject()
-	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "CarTurning", "ForwardFacingEntity [ENTITY]" })
+	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "CarTurning", "ForwardFacingEntity [ENTITY]", "SuspensionBias", "SuspensionBiasSide", "NoBiasSpeedLimit", "NoSideBiasSpeedLimit" })
  	self.Perc = 0
  	self.TurnPerc = 0
  	self.YawAng = Angle(0,self:GetAngles().yaw,0)
@@ -75,7 +75,12 @@ function ENT:Initialize()
 	function self:SetupDataTables()
  		self:NetworkVar("Entity",0,"ForwardEnt")
  		self:NetworkVar("Entity",1,"Base")
+ 		self:NetworkVar("Float",0,"WheelYaw")
+ 		self:NetworkVar("Float",1,"Hydra")
+ 		self:NetworkVar("Float",2,"HydraSide")
  	end
+ 	self:SetNWFloat("Hydra",0)
+ 	self:SetNWFloat("HydraSide",0)
  	self:SetNWEntity("ForwardEnt",self)
  	self:SetNWEntity("Base",self)
 end
@@ -87,7 +92,7 @@ function ENT:Think()
  	self.WheelsPerSide = self:GetWheelsPerSide()
  	self.RideHeight = self:GetRideHeight()
  	self.RideLimit = self:GetRideLimit()
- 	self.SuspensionBias =self:GetSuspensionBias()
+	self.SuspensionBias = self:GetSuspensionBias()
  	self.FrontWheelRaise = self:GetFrontWheelRaise()
  	self.RearWheelRaise = self:GetRearWheelRaise()
  	self.ForwardOffset = self:GetForwardOffset()
@@ -913,6 +918,24 @@ function ENT:Think()
 				local weightforce = self.PhysicalMass*-GravxTicks --note, raise tick interval if I increase interval
 				local wheelforce = weightforce/((WheelsPerSide-2)*2)
 
+				local hydrabias = math.Clamp(self.Inputs.SuspensionBias.Value,-1,1)
+				if self.lasthydrabias == nil then self.lasthydrabias = hydrabias end
+				if self.Inputs.NoBiasSpeedLimit.Value == 0 then
+					hydrabias = math.Clamp(hydrabias,self.lasthydrabias-(0.25/RideHeight),self.lasthydrabias+(0.25/RideHeight))
+				else
+					hydrabias = math.Clamp(hydrabias,self.lasthydrabias-(5/RideHeight),self.lasthydrabias+(5/RideHeight))
+				end
+				self:SetNWFloat("Hydra",hydrabias)
+				self.lasthydrabias = hydrabias
+				local hydrabiasside = math.Clamp(self.Inputs.SuspensionBiasSide.Value,-1,1)
+				if self.lasthydrabiasside == nil then self.lasthydrabiasside = hydrabiasside end
+				if self.Inputs.NoSideBiasSpeedLimit.Value == 0 then
+					hydrabiasside = math.Clamp(hydrabiasside,self.lasthydrabiasside-(0.25/RideHeight),self.lasthydrabiasside+(0.25/RideHeight))
+				else
+					hydrabiasside = math.Clamp(hydrabiasside,self.lasthydrabiasside-(5/RideHeight),self.lasthydrabiasside+(5/RideHeight))
+				end
+				self:SetNWFloat("HydraSide",hydrabiasside)
+				self.lasthydrabiasside = hydrabiasside
 				local SuspensionBias = self.SuspensionBias
 
 				local wheelweightforce = Vector(0,0,(self.AddonMass/(WheelsPerSide*2))*-9.8*engine.TickInterval())
@@ -980,6 +1003,17 @@ function ENT:Think()
 				end
 				--Right side
 				for i=1, WheelsPerSide do
+					RideHeight = self.RideHeight
+
+					if i>WheelsPerSide*0.5 then
+						RideHeight = RideHeight-(hydrabias*(math.floor(WheelsPerSide*0.5)-(WheelsPerSide-i))/math.floor(WheelsPerSide*0.5)*RideHeight)
+					end
+					if i<=WheelsPerSide*0.5 then
+						RideHeight = RideHeight+(hydrabias*(math.floor(WheelsPerSide*0.5)-(i-1))/math.floor(WheelsPerSide*0.5)*RideHeight)
+					end
+
+					RideHeight = RideHeight+hydrabiasside*RideHeight
+
 					ForcePos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*basesize[2]*0.95)
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*self.SideDist)
 					if i==WheelsPerSide then 
@@ -1047,23 +1081,22 @@ function ENT:Think()
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
 						AbsorbForce = 0.2 *(5/WheelsPerSide)
+						if math.abs(hydrabias) > 0 then AbsorbForce = 1 end
 						FrictionForce = 1*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 					else
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
 
-					local multval = i/WheelsPerSide
-					if multval == 0.5 then
-						multval = 1
-					elseif multval > 0.5 then
-						multval = multval*SuspensionBias
-					elseif multval < 0.5 then
-						multval = -multval*SuspensionBias
+					local multval = 1
+					if i<=WheelsPerSide*0.5 then
+						multval = multval+SuspensionBias
+					end
+					if i>WheelsPerSide*0.5 then
+						multval = multval-SuspensionBias
 					end
 
-					local limitmult = 1 + multval
-					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult
+					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult*multval
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
@@ -1081,6 +1114,17 @@ function ENT:Think()
 
 				--Left side
 				for i=1, WheelsPerSide do
+					RideHeight = self.RideHeight
+
+					if i>WheelsPerSide*0.5 then
+						RideHeight = RideHeight-(hydrabias*(math.floor(WheelsPerSide*0.5)-(WheelsPerSide-i))/math.floor(WheelsPerSide*0.5)*RideHeight)
+					end
+					if i<=WheelsPerSide*0.5 then
+						RideHeight = RideHeight+(hydrabias*(math.floor(WheelsPerSide*0.5)-(i-1))/math.floor(WheelsPerSide*0.5)*RideHeight)
+					end
+
+					RideHeight = RideHeight-hydrabiasside*RideHeight
+
 					ForcePos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*basesize[2]*0.95)
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*self.SideDist)
 					if i==WheelsPerSide then 
@@ -1149,23 +1193,22 @@ function ENT:Think()
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
 						AbsorbForce = 0.2 *(5/WheelsPerSide)
+						if math.abs(hydrabias) > 0 then AbsorbForce = 1 end
 						FrictionForce = 1*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 					else
 						AbsorbForce = 0.0
 						FrictionForce = 0
 					end
 
-					local multval = i/WheelsPerSide
-					if multval == 0.5 then
-						multval = 1
-					elseif multval > 0.5 then
-						multval = multval*SuspensionBias
-					elseif multval < 0.5 then
-						multval = -multval*SuspensionBias
+					local multval = 1
+					if i<=WheelsPerSide*0.5 then
+						multval = multval+SuspensionBias
+					end
+					if i>WheelsPerSide*0.5 then
+						multval = multval-SuspensionBias
 					end
 
-					local limitmult = 1 + multval
-					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit*limitmult)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult
+					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult*multval
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
 					
