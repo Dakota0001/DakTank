@@ -634,7 +634,7 @@ function ENT:Think()
 											if #self.DakTankCore.Motors>0 then
 												for i=1, #self.DakTankCore.Motors do
 													if IsValid(self.DakTankCore.Motors[i]) then
-														self.DakTankCore.Motors[i].Sound:ChangePitch( math.max((math.min(math.max(self.MoveRight,self.MoveLeft)/1)*100,100),50) , 0.5 )
+														self.DakTankCore.Motors[i].Sound:ChangePitch( math.max( math.min( math.max(self.MoveRight,self.MoveLeft)/1*100,100) ,50) , 0.5 )
 													end
 												end
 											end
