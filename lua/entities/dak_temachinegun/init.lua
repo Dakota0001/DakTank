@@ -224,7 +224,7 @@ function ENT:Think()
 
 				self.DakAP = "Flamethrower Fuel"
 
-				self.BaseDakShellDamage = 0.2*25
+				self.BaseDakShellDamage = 0.75
 				self.BaseDakShellMass = 1
 				self.DakShellSplashDamage = 0.2
 				self.BaseDakShellPenetration = 0.0001
@@ -385,7 +385,7 @@ function ENT:Think()
 
 				self.DakAP = "Flamethrower Fuel"
 
-				self.BaseDakShellDamage = 0.2*25
+				self.BaseDakShellDamage = 0.75
 				self.BaseDakShellMass = 1
 				self.DakShellSplashDamage = 0.2
 				self.BaseDakShellPenetration = 0.0001
@@ -495,7 +495,7 @@ function ENT:DakTEFire()
 				end
 				--FIREBULLETHERE
 				self.LastFireTime = CurTime()
-				local shootOrigin = self:GetPos() + (self:GetForward()*self:GetModelRadius())
+				local shootOrigin = self:GetPos()
 				local shootAngles = (self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
 				local initvel = self.DakTankCore:GetVelocity()
 				if self.DakTankCore:GetParent():IsValid() then

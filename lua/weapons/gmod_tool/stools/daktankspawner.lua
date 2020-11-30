@@ -2109,7 +2109,7 @@ function TOOL.BuildCPanel( panel )
 	end
 	gunList["Flamethrower"] = function()
 		DLabel:SetPos( 15, 380 )
-		DLabel:SetText( "Flamethrower\n\nFlamethrower capable of igniting infantry, softening armor and stalling engines.\n\nWeapon Stats:\nArmor:          50mm\nWeight:        50kg\nHealth:          10\nDamage:        5\nRate of Fire: 3960 streams/minute\n" )
+		DLabel:SetText( "Flamethrower\n\nFlamethrower capable of igniting infantry, softening armor and stalling engines.\n\nWeapon Stats:\nArmor:          50mm\nWeight:        50kg\nHealth:          10\nDamage:        0.75\nRate of Fire: 3960 streams/minute\n" )
 		DermaNumSlider:SetVisible( false )
 	end
 	gunList["HMG"] = function()
@@ -2572,7 +2572,7 @@ function TOOL.BuildCPanel( panel )
 			
 		if AmmoBoxSelect:GetSelected() == "Flamethrower" then
 			DLabel:SetPos( 15, 380 )
-			DLabel:SetText( "Flamethrower Fuel\n\nFlamethrower fuel tank, more armored than normal ammo boxes but more likely to be crit, use with caution.\n\nCrate Stats:\nArmor:  12.5mm\nWeight: 500kg\nHealth:  30\n\nFuel Stats:\nCapacity:      15 seconds\nDamage:        5\nRate of Fire: 3960 streams/minute" )
+			DLabel:SetText( "Flamethrower Fuel\n\nFlamethrower fuel tank, more armored than normal ammo boxes but more likely to be crit, use with caution.\n\nCrate Stats:\nArmor:  12.5mm\nWeight: 500kg\nHealth:  30\n\nFuel Stats:\nCapacity:      15 seconds\nDamage:        0.75\nRate of Fire: 3960 streams/minute" )
 			RunConsoleCommand( "daktankspawner_SpawnSettings", "Flamethrower Fuel" )
 			RunConsoleCommand( "daktankspawner_SpawnEnt", "dak_teammo" )
 		else

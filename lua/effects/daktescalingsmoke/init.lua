@@ -2,8 +2,11 @@ function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
 	local size = data:GetScale()/78
 	local emitter = ParticleEmitter( Pos )
+	local normal = data:GetNormal()
+
 
 	local dustsize = data:GetScale()/10
+	local dustspawns = math.min(dustsize,dustsize*0.5)
 	if dustsize > 1 then
 		local pregroundtrace = {}
 			pregroundtrace.start = Pos
@@ -12,9 +15,11 @@ function EFFECT:Init( data )
 		local groundtrace = util.TraceLine(pregroundtrace)
 		local dusttime = dustsize*0.1
 		if groundtrace.Hit then
-			for i = 1,dustsize*1 do
+			for i = 1,dustspawns*1 do
 				local ang = math.Rand(0,360) * math.pi/180
-				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(dustsize*math.Rand(0,2.5)*math.cos(ang),dustsize*math.Rand(0,2.5)*math.sin(ang),dustsize*0.125)) 
+				local vec = Vector(dustsize*math.Rand(0,2.5)*math.cos(ang),dustsize*math.Rand(0,2.5)*math.sin(ang),dustsize*0.125)
+				vec:Rotate(Angle(normal:Angle().x-90,normal:Angle().y,0))
+				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+vec ) 
 				 
 				if particle == nil then particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(math.Rand(-dustsize*10,dustsize*10),math.Rand(-dustsize*10,dustsize*10),-75))  end
 				
@@ -38,10 +43,12 @@ function EFFECT:Init( data )
 					particle:SetBounce(0)
 				end
 			end
-			for i = 1,dustsize*1 do
+			for i = 1,dustspawns*1 do
 
 				local ang = math.Rand(0,360) * math.pi/180
-				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(dustsize*math.Rand(2.5,5)*math.cos(ang),dustsize*math.Rand(2.5,5)*math.sin(ang),dustsize*0.125)) 
+				local vec = Vector(dustsize*math.Rand(2.5,5)*math.cos(ang),dustsize*math.Rand(2.5,5)*math.sin(ang),dustsize*0.125)
+				vec:Rotate(Angle(normal:Angle().x-90,normal:Angle().y,0))
+				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+vec) 
 				 
 				if particle == nil then particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(math.Rand(-dustsize*10,dustsize*10),math.Rand(-dustsize*10,dustsize*10),-75))  end
 				
@@ -65,10 +72,12 @@ function EFFECT:Init( data )
 					particle:SetBounce(0)
 				end
 			end
-			for i = 1,dustsize*1 do
+			for i = 1,dustspawns*1 do
 
 				local ang = math.Rand(0,360) * math.pi/180
-				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(dustsize*math.Rand(5,7.5)*math.cos(ang),dustsize*math.Rand(5,7.5)*math.sin(ang),dustsize*0.125)) 
+				local vec = Vector(dustsize*math.Rand(5,7.5)*math.cos(ang),dustsize*math.Rand(5,7.5)*math.sin(ang),dustsize*0.125)
+				vec:Rotate(Angle(normal:Angle().x-90,normal:Angle().y,0))
+				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+vec) 
 				 
 				if particle == nil then particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(math.Rand(-dustsize*10,dustsize*10),math.Rand(-dustsize*10,dustsize*10),-75))  end
 				
@@ -92,16 +101,18 @@ function EFFECT:Init( data )
 					particle:SetBounce(0)
 				end
 			end
-			for i = 1,dustsize*1 do
+			for i = 1,dustspawns*1 do
 
 				local ang = math.Rand(0,360) * math.pi/180
-				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(dustsize*math.Rand(7.5,10)*math.cos(ang),dustsize*math.Rand(7.5,10)*math.sin(ang),dustsize*0.125)) 
-				 
+
+				local vec = Vector(dustsize*math.Rand(7.5,10)*math.cos(ang),dustsize*math.Rand(7.5,10)*math.sin(ang),dustsize*0.125)
+				vec:Rotate(Angle(normal:Angle().x-90,normal:Angle().y,0))
+				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+vec ) 
 				if particle == nil then particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(math.Rand(-dustsize*10,dustsize*10),math.Rand(-dustsize*10,dustsize*10),-75))  end
 				
 				if (particle) then
 					local power = math.Rand(0.75,1.25)
-					particle:SetVelocity(Vector(0,0,power * dustsize))
+					particle:SetVelocity(Vector(0,0,power * 100 * dustsize))
 					particle:SetLifeTime(0) 
 					--particle:SetDieTime((dustsize/5)+math.Rand(0,5))
 					particle:SetDieTime(dusttime)
@@ -114,13 +125,13 @@ function EFFECT:Init( data )
 					particle:SetRoll(math.Rand( 0, 360 ))
 					particle:SetColor(math.random(227,227),math.random(211,211),math.random(161,161),math.random(50,50))
 					particle:SetGravity( Vector(0,0,0) ) 
-					particle:SetAirResistance(dustsize*100*power) 
+					particle:SetAirResistance(dustsize*500*power) 
 					particle:SetCollide(false)
 					particle:SetBounce(0)
 				end
 			end
 
-			for i = 1,dustsize*0.5 do
+			for i = 1,dustspawns*0.5 do
 				local ang = math.Rand(0,360) * math.pi/180
 				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(dustsize*3.5*math.cos(ang),dustsize*3.5*math.sin(ang),-25)) 
 				 
@@ -139,13 +150,13 @@ function EFFECT:Init( data )
 					particle:SetAngleVelocity( Angle(math.Rand(-0.5,0.5),0,0) ) 
 					particle:SetRoll(math.Rand( 0, 360 ))
 					particle:SetColor(math.random(227,227),math.random(211,211),math.random(161,161),math.random(50,50))
-					particle:SetGravity( Vector(0,0,dustsize*35*0.5*math.Rand(0.9,1.1)) ) 
-					particle:SetAirResistance(dustsize*25*math.Rand(0.9,1.1)) 
+					particle:SetGravity( Vector(0,0,dustsize*35*1*math.Rand(0.9,1.1)) ) 
+					particle:SetAirResistance(100*25*math.Rand(0.9,1.1)) 
 					particle:SetCollide(false)
 					particle:SetBounce(0)
 				end
 			end
-			for i = 1,dustsize*0.5 do
+			for i = 1,dustspawns*0.5 do
 				local ang = math.Rand(0,360) * math.pi/180
 				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(dustsize*math.Rand(0,2.5)*math.cos(ang),dustsize*math.Rand(0,2.5)*math.sin(ang),-25)) 
 				 
@@ -164,33 +175,33 @@ function EFFECT:Init( data )
 					particle:SetAngleVelocity( Angle(math.Rand(-0.5,0.5),0,0) ) 
 					particle:SetRoll(math.Rand( 0, 360 ))
 					particle:SetColor(math.random(227,227),math.random(211,211),math.random(161,161),math.random(50,50))
-					particle:SetGravity( Vector(0,0,dustsize*40*0.5*math.Rand(0.9,1.1)) ) 
-					particle:SetAirResistance(dustsize*25*math.Rand(0.9,1.1)) 
+					particle:SetGravity( Vector(0,0,dustsize*40*1*math.Rand(0.9,1.1)) ) 
+					particle:SetAirResistance(100*25*math.Rand(0.9,1.1)) 
 					particle:SetCollide(false)
 					particle:SetBounce(0)
 				end
 			end
-			for i = 1,dustsize*0.25 do
+			for i = 1,dustspawns*0.5 do
 				local ang = math.Rand(0,360) * math.pi/180
-				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(dustsize*math.Rand(0,0.5)*math.cos(ang),dustsize*math.Rand(0,0.5)*math.sin(ang),-25)) 
+				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(dustsize*math.Rand(0,1)*math.cos(ang),dustsize*math.Rand(0,1)*math.sin(ang),-25)) 
 				 
 				if particle == nil then particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(math.Rand(-dustsize*10,dustsize*10),math.Rand(-dustsize*10,dustsize*10),-25))  end
 				
 				if (particle) then
-					particle:SetVelocity(Vector(0,0,math.Rand(dustsize*25,dustsize*50)))
+					particle:SetVelocity(Vector(0,0,math.Rand(dustsize*5,dustsize*25)))
 					particle:SetLifeTime(0) 
 					--particle:SetDieTime((dustsize/5)+math.Rand(0,5))
 					particle:SetDieTime(dusttime)
 					particle:SetStartAlpha(50)
 					particle:SetEndAlpha(0)
-					particle:SetStartSize(dustsize*0.125*math.Rand(0.5,2)) 
-					particle:SetEndSize((dustsize)*1.25*math.Rand(0.9,1.1))
+					particle:SetStartSize(dustsize*0.25*math.Rand(0.5,2)) 
+					particle:SetEndSize((dustsize)*1.75*math.Rand(0.9,1.1))
 					particle:SetAngles( Angle(0,0,0) )
 					particle:SetAngleVelocity( Angle(math.Rand(-0.5,0.5),0,0) ) 
 					particle:SetRoll(math.Rand( 0, 360 ))
 					particle:SetColor(math.random(227,227),math.random(211,211),math.random(161,161),math.random(50,50))
-					particle:SetGravity( Vector(0,0,dustsize*15*0.5*math.Rand(0.75,1.25)) ) 
-					particle:SetAirResistance(dustsize*25*math.Rand(0.9,1.1)) 
+					particle:SetGravity( Vector(0,0,dustsize*15*1*math.Rand(0.25,1.25)) ) 
+					particle:SetAirResistance(100*25*math.Rand(0.5,1.5)) 
 					particle:SetCollide(false)
 					particle:SetBounce(0)
 				end

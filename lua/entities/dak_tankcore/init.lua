@@ -599,7 +599,7 @@ function ENT:Think()
 								name = name6
 							elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
 								name = name4
-							elseif name2 == "AP" or name2 == "HE" then
+							elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
 								name = name2
 							end
 							if name == "APFSDS" then
@@ -634,6 +634,8 @@ function ENT:Think()
 								if self.Guns[i].DakMaxHealth*1.25 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.25 end
 							elseif name == "HE" then
 								if self.Guns[i].DakBaseShellFragPen > MaxPen then MaxPen = self.Guns[i].DakBaseShellFragPen end
+							elseif name == "SM" then
+								if self.Guns[i].DakMaxHealth*0.1 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*0.1 end
 							end
 						end
 					end
@@ -650,7 +652,7 @@ function ENT:Think()
 							name = name6
 						elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
 							name = name4
-						elseif name2 == "AP" or name2 == "HE" then
+						elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
 							name = name2
 						end
 						shells = self.Ammoboxes[k]:GetPhysicsObject():GetVolume()/shellvol
@@ -707,19 +709,29 @@ function ENT:Think()
 					local DPS = 0
 					local TotalDPS = 0
 					local ShotsPerSecond
-					for g=1, #self.Guns do 
+					for g=1, #self.Guns do
+						local ShellDamage = self.Guns[g].BaseDakShellDamage
+						if self.Guns[g].DakGunType == "Smoke Launcher" then
+							ShellDamage = self.Guns[g].BaseDakShellDamage/4
+						end
+						if self.Guns[g].DakGunType == "Flamethrower" then
+							ShellDamage = 0.75
+						end
+						if self.Guns[g].DakGunType == "ATGM Launcher" or self.Guns[g].DakGunType == "Dual ATGM Launcher" or self.Guns[g].DakGunType == "Autoloading ATGM Launcher" or self.Guns[g].DakGunType == "Autoloading Dual ATGM Launcher" then
+							ShellDamage = self.Guns[g].BaseDakShellDamage/8
+						end
+
+						--also have an exception here for flamethrower damage per shot
 						if self.Guns[g]:GetClass() == "dak_teautogun" then
 							ShotsPerSecond = 1/((self.Guns[g].DakCooldown * (1/self.Guns[g].FireRateMod))+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
-							--print(1/((self.Guns[g].DakCooldown)+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime)))
-							--print(ShotsPerSecond)
-							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+							DPS = ShellDamage*ShotsPerSecond
 							if self.Guns[g].ReadyRounds == 2 then 
 								DPS = DPS*2 
 							end
 						end
 						if self.Guns[g]:GetClass() == "dak_tegun" then
 							ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
-							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+							DPS = ShellDamage*ShotsPerSecond
 							if self.Guns[g].ReadyRounds == 2 then 
 								DPS = DPS*2 
 							end
@@ -727,7 +739,7 @@ function ENT:Think()
 						if self.Guns[g]:GetClass() == "dak_temachinegun" then
 							self.Guns[g].ShellLengthExact = 6.5
 							ShotsPerSecond = 1/(self.Guns[g].DakCooldown*(1/self.Guns[g].FireRateMod))
-							DPS = self.Guns[g].BaseDakShellDamage*ShotsPerSecond
+							DPS = ShellDamage*ShotsPerSecond
 							if self.Guns[g].ReadyRounds == 2 then 
 								DPS = DPS*2 
 							end
@@ -1038,7 +1050,7 @@ function ENT:Think()
 										name = name6
 									elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
 										name = name4
-									elseif name2 == "AP" or name2 == "HE" then
+									elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
 										name = name2
 									end
 									if name == "APFSDS" then
@@ -1237,7 +1249,7 @@ function ENT:Think()
 						local SA = 0
 						for i=1, #self.Contraption do
 							CurrentRes = self.Contraption[i]
-							if CurrentRes ~= NULL and CurrentRes ~= nil then
+							if CurrentRes ~= NULL and CurrentRes ~= nil and CurrentRes:IsValid() then
 								local physobj = CurrentRes:GetPhysicsObject()
 								if CurrentRes.PhysicsClipped == true then
 									if CurrentRes.DakMassSet ~= true then

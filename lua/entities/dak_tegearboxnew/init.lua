@@ -1255,7 +1255,7 @@ function ENT:Think()
 
 		self.SpeedTable[#self.SpeedTable+1] = self.LastYaw-self.base:GetAngles().yaw
 		if #self.SpeedTable > 2 then
-			 table.remove( self.SpeedTable, 1 )
+			table.remove( self.SpeedTable, 1 )
 		end
 		local totalspeed = 0
 		for i=1, #self.SpeedTable do

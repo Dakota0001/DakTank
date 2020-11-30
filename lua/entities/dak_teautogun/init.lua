@@ -781,7 +781,7 @@ function ENT:Think()
 					local found = 0
 					local box = 1
 					local distance = 0
-					while found == 0 and box < #self.SortedAmmo do
+					while found == 0 and box <= #self.SortedAmmo do
 						if IsValid(self.SortedAmmo[box][1]) then
 							if self.SortedAmmo[box][1].DakAmmoType == self.DakAmmoType then
 								if self.SortedAmmo[box][1].DakAmmo > 0 then
@@ -1766,7 +1766,7 @@ function ENT:Think()
 					local found = 0
 					local box = 1
 					local distance = 0
-					while found == 0 and box < #self.SortedAmmo do
+					while found == 0 and box <= #self.SortedAmmo do
 						if IsValid(self.SortedAmmo[box][1]) then
 							if self.SortedAmmo[box][1].DakAmmoType == self.DakAmmoType then
 								if self.SortedAmmo[box][1].DakAmmo > 0 then
@@ -2293,7 +2293,7 @@ function ENT:DakTEAutoFire()
 					self.timer2 = CurTime()
 				end
 				self.LastFireTime = CurTime()
-				local shootOrigin = self:GetPos() + (self:GetForward()*self:GetModelRadius())
+				local shootOrigin = self:GetPos()
 				local shootAngles = (self:GetForward()*self.DakShellVelocity):GetNormalized():Angle()
 				local initvel = self.DakTankCore:GetVelocity()
 				if self.DakTankCore:GetParent():IsValid() then

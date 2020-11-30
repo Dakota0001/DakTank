@@ -603,7 +603,7 @@ function DTGetStandoffMult(Start, End, Caliber, Filter, ShellType)
 	while Go == 1 and Recurse<25 do
 		local trace = {}
 			trace.start = Start
-			trace.endpos = End 
+			trace.endpos = End
 			trace.filter = Filter
 		local ShellSimTrace = util.TraceLine( trace )
 		if IsValid(ShellSimTrace.Entity) then
@@ -1436,7 +1436,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 			end
 		end
-		if HitEnt:IsWorld() or Shell.ExplodeNow==true then
+		if HitEnt:IsWorld() or Shell.ExplodeNow==true or HitEnt==NULL then
 			local Penned, Exit, Dist = DTWorldPen(HitPos,Shell.DakVelocity:GetNormalized(),Shell.DakPenetration,Shell.Filter,Shell.DakCaliber)
 			if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" or Shell.DakIsFlame == 1 then
 				--[[
@@ -1451,6 +1451,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				Shell.DakVelocity = Vector(0,0,0)
 				Shell.DakDamage = 0
 				Shell.ExplodeNow = true
+				Penned = false
 			else
 				if Penned then
 					local effectdata = EffectData()
@@ -1489,7 +1490,14 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata3:SetAttachment(1)
 					effectdata3:SetMagnitude(.5)
 					effectdata3:SetScale(Shell.DakBlastRadius)
-					effectdata3:SetNormal( Normal )
+					local newertrace = {}
+						newertrace.start = HitPos+Vector(0,0,100)
+						newertrace.endpos = HitPos-Vector(0,0,100)
+						newertrace.filter = Shell.Filter
+						newertrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+						newertrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+					local EffectTrace = util.TraceHull( newertrace )
+					effectdata3:SetNormal( EffectTrace.HitNormal )
 					if Shell.DakShellType == "SM" then
 						util.Effect("daktescalingsmoke", effectdata3, true, true)
 					else
@@ -1596,7 +1604,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 		newtrace.filter = Shell.Filter
 		newtrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
 		newtrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
-	local ContShellTrace = util.TraceLine( newtrace )
+	local ContShellTrace = util.TraceHull( newtrace )
 	local ContCheckShellLineTrace = util.TraceLine( newtrace )
 	Normal = ContCheckShellLineTrace.HitNormal
 	if (Shell.DakShellType == "APHE" or Shell.DakShellType == "HE" or Shell.DakShellType == "SM") and not(ContShellTrace.Hit) and not(HitNonHitable) then
@@ -2312,7 +2320,14 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						effectdata3:SetAttachment(1)
 						effectdata3:SetMagnitude(.5)
 						effectdata3:SetScale(Shell.DakBlastRadius)
-						effectdata3:SetNormal( Normal )
+						local newertrace = {}
+							newertrace.start = ContShellTrace.HitPos+Vector(0,0,100)
+							newertrace.endpos = ContShellTrace.HitPos-Vector(0,0,100)
+							newertrace.filter = Shell.Filter
+							newertrace.mins = Vector(-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02,-Shell.DakCaliber*0.02)
+							newertrace.maxs = Vector(Shell.DakCaliber*0.02,Shell.DakCaliber*0.02,Shell.DakCaliber*0.02)
+						local EffectTrace = util.TraceHull( newertrace )
+						effectdata3:SetNormal( EffectTrace.HitNormal )
 						if Shell.DakShellType == "SM" then
 							util.Effect("daktescalingsmoke", effectdata3, true, true)
 						else
