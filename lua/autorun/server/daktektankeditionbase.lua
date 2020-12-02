@@ -231,7 +231,6 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 								end
 							end
 
-
 							if ShellTrace.Hit then
 								if not(ShellTrace.HitSky and (ShellTrace.HitNormal == Vector(0,0,-1))) then
 									--check if aps is near if shellvel is low enough and shell type is right
@@ -246,40 +245,42 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 											local Done = 0
 											for i=1, #APS do
 												if APS[i].APSEnable == true then
-													if ShellList[i].DakCaliber >= APS[i].APSMinCaliber then
-														if Done == 0 then
-															if ShellTrace.HitPos:Distance(APS[i]:GetPos()) < 275 then --it's in range ~7m based off drozd again
-																if ShellTrace.StartPos:Distance(APS[i]:GetPos())>ShellTrace.HitPos:Distance(APS[i]:GetPos()) then --it's coming at us
-																	local _, a = WorldToLocal( APS[i]:GetPos(), (ShellTrace.StartPos-APS[i]:GetPos()):GetNormalized():Angle(), APS[i]:GetPos(), APS[i].Forward:Angle() )
-																	local frontalhit = false
-																	local sidehit = false
-																	local rearhit = false
-																	if math.abs(a.yaw) >= 0 and math.abs(a.yaw) <= 45 then
-																		frontalhit = true
-																	end
-																	if math.abs(a.yaw) >= 45 and math.abs(a.yaw) <= 135 then
-																		sidehit = true
-																	end
-																	if math.abs(a.yaw) >= 135 and math.abs(a.yaw) <= 180 then
-																		rearhit = true
-																	end
-																	local CanShoot = false
-																	if APS[i].APSFrontalArc == true and frontalhit == true then
-																		CanShoot = true
-																	end
-																	if APS[i].APSSideArc == true and sidehit == true then
-																		CanShoot = true
-																	end
-																	if APS[i].APSRearArc == true and rearhit == true then
-																		CanShoot = true
-																	end
-																	if CanShoot == true then --may need to convert this to angle later for readouts, but this value is nice
-																		if APS[i].APSShots > 0 then
-																			--play some effect or sound or something maybe
-																			APS[i].APSShots = APS[i].APSShots - 1
-																			Done = 1
-																			ShellList[i].ShotDown = 1
-																			ExpPos = APS[i]:GetPos() + (ShellTrace.StartPos-APS[i]:GetPos()):GetNormalized()*275
+													if ShellList[i] ~= nil then
+														if ShellList[i].DakCaliber >= APS[i].APSMinCaliber then
+															if Done == 0 then
+																if ShellTrace.HitPos:Distance(APS[i]:GetPos()) < 275 then --it's in range ~7m based off drozd again
+																	if ShellTrace.StartPos:Distance(APS[i]:GetPos())>ShellTrace.HitPos:Distance(APS[i]:GetPos()) then --it's coming at us
+																		local _, a = WorldToLocal( APS[i]:GetPos(), (ShellTrace.StartPos-APS[i]:GetPos()):GetNormalized():Angle(), APS[i]:GetPos(), APS[i].Forward:Angle() )
+																		local frontalhit = false
+																		local sidehit = false
+																		local rearhit = false
+																		if math.abs(a.yaw) >= 0 and math.abs(a.yaw) <= 45 then
+																			frontalhit = true
+																		end
+																		if math.abs(a.yaw) >= 45 and math.abs(a.yaw) <= 135 then
+																			sidehit = true
+																		end
+																		if math.abs(a.yaw) >= 135 and math.abs(a.yaw) <= 180 then
+																			rearhit = true
+																		end
+																		local CanShoot = false
+																		if APS[i].APSFrontalArc == true and frontalhit == true then
+																			CanShoot = true
+																		end
+																		if APS[i].APSSideArc == true and sidehit == true then
+																			CanShoot = true
+																		end
+																		if APS[i].APSRearArc == true and rearhit == true then
+																			CanShoot = true
+																		end
+																		if CanShoot == true then --may need to convert this to angle later for readouts, but this value is nice
+																			if APS[i].APSShots > 0 then
+																				--play some effect or sound or something maybe
+																				APS[i].APSShots = APS[i].APSShots - 1
+																				Done = 1
+																				ShellList[i].ShotDown = 1
+																				ExpPos = APS[i]:GetPos() + (ShellTrace.StartPos-APS[i]:GetPos()):GetNormalized()*275
+																			end
 																		end
 																	end
 																end

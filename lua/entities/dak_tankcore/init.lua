@@ -835,14 +835,6 @@ function ENT:Think()
 							self.DakHealth = self.DakMaxHealth
 						end
 					end
-					if not self:GetModel() == self.DakModel then
-						self:SetModel(self.DakModel)
-						self:PhysicsInit(SOLID_VPHYSICS)
-						self:SetMoveType(MOVETYPE_VPHYSICS)
-						self:SetSolid(SOLID_VPHYSICS)
-					end
-					
-					
 
 					if self.recheckmass == nil then
 						local Mass = 0
@@ -1459,7 +1451,7 @@ function ENT:Think()
 											self.Composites[i].IsComposite = 1
 											weightvalcomp = math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density)
 											if self.Composites[i]:GetPhysicsObject():GetMass() ~= weightvalcomp then self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) ) end
-											self.Composites[i].DakArmor = math.sqrt(math.sqrt(self.Composites[i]:GetPhysicsObject():GetVolume()))*KE
+											self.Composites[i].DakArmor = 10*KE
 										end
 									end
 								end
@@ -1481,7 +1473,7 @@ function ENT:Think()
 												end
 												local weightval = math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) 
 												if self.ERA[i]:GetPhysicsObject():GetMass() ~= weightval then self.ERA[i]:GetPhysicsObject():SetMass( weightval ) end
-												self.ERA[i].DakArmor = math.sqrt(math.sqrt(self.ERA[i]:GetPhysicsObject():GetVolume()))*2.5
+												self.ERA[i].DakArmor = 2.5
 											end
 										end
 									end
