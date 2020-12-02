@@ -1028,7 +1028,11 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					end
 					Shell.Filter[#Shell.Filter+1] = HitEnt
 					if Shattered == 1 then
-						DTSpall(HitPos,EffArmor,HitEnt,Shell.DakCaliber*2,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.DakVelocity:GetNormalized())
+						if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
+							DTSpall(HitPos,EffArmor,HitEnt,Shell.DakCaliber*0.5,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.DakVelocity:GetNormalized())
+						else
+							DTSpall(HitPos,EffArmor,HitEnt,Shell.DakCaliber*2,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.DakVelocity:GetNormalized())
+						end
 					else
 						DTSpall(HitPos,EffArmor,HitEnt,Shell.DakCaliber,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.DakVelocity:GetNormalized())
 					end
@@ -1866,7 +1870,11 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 						Shell.Filter[#Shell.Filter+1] = HitEnt
 						if Shattered == 1 then
-							DTSpall(ContShellTrace.HitPos,EffArmor,HitEnt,Shell.DakCaliber*2,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.DakVelocity:GetNormalized())
+							if Shell.DakShellType == "HEAT" or Shell.DakShellType == "HEATFS" or Shell.DakShellType == "ATGM" then
+								DTSpall(ContShellTrace.HitPos,EffArmor,HitEnt,Shell.DakCaliber*0.5,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.DakVelocity:GetNormalized())
+							else
+								DTSpall(ContShellTrace.HitPos,EffArmor,HitEnt,Shell.DakCaliber*2,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.DakVelocity:GetNormalized())
+							end
 						else
 							DTSpall(ContShellTrace.HitPos,EffArmor,HitEnt,Shell.DakCaliber,(CurrentPen),Shell.DakGun.DakOwner,Shell,Shell.DakVelocity:GetNormalized())
 						end
@@ -3452,6 +3460,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 	end
 	if Shell.DakShellType == "HEAT" then
 		--SpallMass = (SpallVolume*0.0078125) * 0.05
+		Caliber = Caliber/8
 		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*5*0.005
 		SpallPen = Armor * 0.2
 		traces = traces*2
@@ -3459,6 +3468,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 	end
 	if Shell.DakShellType == "HEATFS" then
 		--SpallMass = (SpallVolume*0.0078125) * 0.05
+		Caliber = Caliber/8
 		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*5*0.005
 		SpallPen = Armor * 0.2
 		--traces = 20
