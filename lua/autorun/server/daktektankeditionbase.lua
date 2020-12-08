@@ -329,7 +329,7 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 				end
 				ShellList[i].LifeTime = ShellList[i].LifeTime + DakTankBulletThinkDelay
 			end
-		end	
+		end
 		if #RemoveList > 0 then
 			for i = 1, #RemoveList do
 				table.remove( ShellList, RemoveList[i] )
@@ -337,74 +337,3 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 		end
 	--end
 end )
-
-function DTCreatePath(MapPos)
-	--MapPos is needed as a user input of anywhere on the map's game area that the code can find boundaries from
-	--this saves us from dealing with issues of maps in underground spots or with weird hills or whatever other oddities
-	--just set it to a position above all obstacles
-	--flatgrass: Vector(702.671875, 1826.617432, -6953.648438)
-
-	--MapPos
-	local uptrace = util.TraceLine( {
-		start = MapPos,
-		endpos = MapPos+Vector(0,0,10000000),
-		mask = MASK_SOLID_BRUSHONLY
-	} )
-	local toptrace = util.TraceLine( {
-		start = uptrace.HitPos,
-		endpos = uptrace.HitPos+Vector(0,10000000,0),
-		mask = MASK_SOLID_BRUSHONLY
-	} )
-	local bottomtrace = util.TraceLine( {
-		start = uptrace.HitPos,
-		endpos = uptrace.HitPos+Vector(0,-10000000,0),
-		mask = MASK_SOLID_BRUSHONLY
-	} )
-	local lefttrace = util.TraceLine( {
-		start = uptrace.HitPos,
-		endpos = uptrace.HitPos+Vector(-10000000,0,0),
-		mask = MASK_SOLID_BRUSHONLY
-	} )
-	local righttrace = util.TraceLine( {
-		start = uptrace.HitPos,
-		endpos = uptrace.HitPos+Vector(10000000,0,0),
-		mask = MASK_SOLID_BRUSHONLY
-	} )
-	local CornerPos = Vector(lefttrace.HitPos.x,toptrace.HitPos.y,uptrace.HitPos.z)
-
-	--set nodelist to global in practice
-	local NodeList = {}
-
-	local MapWidth = math.abs(lefttrace.HitPos.x)+math.abs(righttrace.HitPos.x)
-	local MapHeight = math.abs(toptrace.HitPos.y)+math.abs(bottomtrace.HitPos.y)
-	local GridSize = 250
-	local XGridNodes = math.floor(MapWidth/GridSize)
-	local YGridNodes = math.floor(MapHeight/GridSize)
-
-	local x = 0
-	local y = 0
-
-	for i=1, XGridNodes do
-		for j=1, YGridNodes do
-			local xpos = lefttrace.HitPos.x + ((i-1)*GridSize)
-			local ypos = toptrace.HitPos.y - ((j-1)*GridSize)
-			local nodetrace = util.TraceLine( {
-				start = Vector(xpos,ypos,uptrace.HitPos.z),
-				endpos = Vector(xpos,ypos,uptrace.HitPos.z)+Vector(0,0,-10000000),
-			} )
-			NodeList[#NodeList+1] = nodetrace.HitPos
-			y = y + 1
-		end
-		x = x + 1 
-	end
-	DTFindPath(Vector(0,0,0),Vector(0,0,0),NodeList)
-	print(#NodeList.." Nodes")
-end
-
-function DTFindPath(Start, End, Table)
-	local starttime = SysTime()
-	for i = 1, #Table do
-		local potato = i + 25
-	end
-	print(SysTime()-starttime)
-end

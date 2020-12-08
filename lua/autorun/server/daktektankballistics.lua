@@ -3223,7 +3223,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 		for i = 1, #Targets do
 			local CurShockwaveTarget = Targets[i]
 			local Class = CurShockwaveTarget:GetClass()
-			if Class == "dak_bot" or Class == "dak_crew" or CurShockwaveTarget:IsPlayer() or CurShockwaveTarget:IsNPC() then
+			if Class == "dak_bot" or Class == "dak_crew" or Class == "dak_gamemode_bot" or CurShockwaveTarget:IsPlayer() or CurShockwaveTarget:IsNPC() then
 				if CurShockwaveTarget:IsValid() then
 					local trace = {}
 					trace.start = Pos
@@ -3247,6 +3247,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 									end
 								end
 							else
+								local Dist = ExpTrace.Entity:GetPos():Distance(Pos)
 								if CurShockwaveTarget:GetClass() == "dak_bot" then
 									if Shell.DakShellType == "SM" then
 										CurShockwaveTarget:SetHealth(CurShockwaveTarget:Health()-( 1*(1-(Dist/Radius)) ))
@@ -3273,7 +3274,6 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 									end
 								else
 									local ExpPain = DamageInfo()
-									local Dist = ExpTrace.Entity:GetPos():Distance(Pos)
 									if Shell.DakShellType == "SM" then
 										ExpPain:SetDamageForce( ExpTrace.Normal*(1*(1-(Dist/Radius))) )
 										ExpPain:SetDamage( 1*(1-(Dist/Radius)) )

@@ -532,7 +532,7 @@ function ENT:Think()
 														end
 													end
 												end
-												if base ~= NULL then
+												if base ~= NULL and base:IsValid() then
 													self.TarVel = base:GetVelocity()
 												else
 													self.TarVel = Vector(0,0,0)
