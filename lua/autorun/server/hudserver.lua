@@ -15,6 +15,12 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 
 						InfoTable1[1] = "DakTank Info Scanner"
 						InfoTable1[2] = ""
+						--tank name here self:GetTankName()
+						if Target:GetTankName() == "" then
+							InfoTable1[3] = "[pick name in tankcore C menu]"
+						else
+							InfoTable1[3] = Target:GetTankName()
+						end
 						local Era = "WWII"
 						if Target.ColdWar == 1 then
 							Era = "Cold War"
@@ -22,20 +28,20 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						if Target.Modern == 1 then
 							Era = "Modern"
 						end
-						InfoTable1[3] = Target.Cost.." point "..Era.." "..math.Round(Target.TotalMass*0.001,2).." ton tank."
-						InfoTable1[4] = "-Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
-						InfoTable1[5] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
+						InfoTable1[4] = Target.Cost.." point "..Era.." "..math.Round(Target.TotalMass*0.001,2).." ton tank."
+						InfoTable1[5] = "-Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
+						InfoTable1[6] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
 						if Target.Gearbox ~= nil and Target.Gearbox.DakHP ~= nil then
-							InfoTable1[6] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
+							InfoTable1[7] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
 						else
-							InfoTable1[6] = "-HP/T: 0."
+							InfoTable1[7] = "-HP/T: 0."
 						end
 						
-						InfoTable1[7] = "-Crew Count: "..(#Target.Crew)
+						InfoTable1[8] = "-Crew Count: "..(#Target.Crew)
 
 						local info2count = 1
 						InfoTable2[info2count] = ""
-						local info2count = 2
+						info2count = 2
 						InfoTable2[info2count] = "Guns"
 						local GunsSorted = table.Copy( Target.Guns )
 						table.sort( GunsSorted, function(a, b)
