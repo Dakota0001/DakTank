@@ -25,7 +25,7 @@ net.Receive( "daktankshotfired", function()
 	local Dist = PlayerPos:Distance(GunPos)
 	local pitch = math.Rand(0.95, 1.05)
 	local Dir = LocalPlayer():GetPos()+((GunPos-LocalPlayer():GetPos()):GetNormalized()*1000)
-	local Vol = math.Clamp(math.pow( 0.5,PlayerPos:Distance(GunPos)/5000 ),0,1)
+	local Vol = math.Clamp(math.pow( 0.5,PlayerPos:Distance(GunPos)/(Caliber*250) ),0,1)
 	if Vol > 0.01 then
 		timer.Simple(Dist/13503.9, function()
 			sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
