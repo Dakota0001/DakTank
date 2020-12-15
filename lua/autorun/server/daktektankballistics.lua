@@ -3326,14 +3326,23 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 											ExpPain:SetDamage( Damage*1*(1-(Dist/Radius)) )
 										end
 									end
-									if Owner:IsValid() and Owner:IsPlayer() and Shell and Shell.DakGun then
-										ExpPain:SetAttacker( Owner )
-										ExpPain:SetInflictor( Shell.DakGun )
+									if Owner ~= nil then
+										if Owner:IsValid() and Owner:IsPlayer() and Shell and Shell.DakGun then
+											ExpPain:SetAttacker( Owner )
+											ExpPain:SetInflictor( Shell.DakGun )
+										else
+											ExpPain:SetAttacker( game.GetWorld() )
+											ExpPain:SetInflictor( game.GetWorld() )
+										end
 									else
 										ExpPain:SetAttacker( game.GetWorld() )
 										ExpPain:SetInflictor( game.GetWorld() )
 									end
-									ExpPain:SetReportedPosition( Shell.DakGun:GetPos() )
+									if Shell.DakGun:GetPos() == NULL then
+										ExpPain:SetReportedPosition( Shell.Pos )
+									else
+										ExpPain:SetReportedPosition( Shell.DakGun:GetPos() )
+									end
 									ExpPain:SetDamagePosition( ExpTrace.Entity:WorldSpaceCenter() )
 									ExpPain:SetDamageType(DMG_BLAST)
 									ExpTrace.Entity:TakeDamageInfo( ExpPain )

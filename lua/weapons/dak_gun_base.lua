@@ -71,6 +71,7 @@ function SWEP:Initialize()
 		end
 	end
 	self.PrimaryLastFire = 0
+	self.PrimaryMessage = 0
 	self.Fired = 0
 
  	--gun info
@@ -121,7 +122,7 @@ end
 function SWEP:PrimaryAttack()
 	if not IsFirstTimePredicted() then return end
 	if self.PrimaryLastFire+self.PrimaryCooldown<CurTime() then
-		if (self.heavyweapon == true and self.Owner:Crouching() and self.Owner:OnGround()) or self.heavyweapon == false or self.heavyweapon == nil then 
+		if (self.heavyweapon == true and self.Owner:GetVelocity()==Vector(0,0,0) and self.Owner:OnGround()) or self.heavyweapon == false or self.heavyweapon == nil then 
 			if self.Weapon:Clip1() > 0 then
 				if SERVER then
 					if ( self.Owner:IsPlayer() ) then
@@ -208,7 +209,9 @@ function SWEP:PrimaryAttack()
 				if self.IsRifle == true then
 					FinalRecoil = FinalRecoil * 0.5
 				end
-				if self.Owner.PerkType == 5 then FinalRecoil = FinalRecoil * 0.5 end
+				if SERVER then self:SetNWInt( "OwnerPerk", self.Owner.PerkType ) end
+				if self:GetNWInt("OwnerPerk") == 5 then FinalRecoil = FinalRecoil * 0.25 end
+				if self.heavyweapon == true then FinalRecoil = FinalRecoil * 0.25 end
 				if self.SpreadStacks<5 then
 					self.SpreadStacks = self.SpreadStacks + (ShotForce/10000)
 				end
@@ -239,6 +242,15 @@ function SWEP:PrimaryAttack()
 				if SERVER then
 					self:Reload()
 				end
+			end
+		end
+		if (self.heavyweapon == true and not(self.Owner:GetVelocity()==Vector(0,0,0) and self.Owner:OnGround())) then
+			if self.PrimaryMessage == nil then self.PrimaryMessage = 0 end
+			if self.PrimaryMessage+1<CurTime() then
+				if SERVER then
+					self.Owner:ChatPrint("You must stand still and be on the ground to fire this weapon!")
+				end
+				self.PrimaryMessage = CurTime()
 			end
 		end
 	end
