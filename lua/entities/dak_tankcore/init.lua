@@ -64,6 +64,7 @@ hook.Add("AdvDupe_FinishPasting", "daktank_tankcore_check", function(dupe)
 								ent.ScaleSet = true
 								ent:SetMoveType(MOVETYPE_VPHYSICS)
 								ent:SetSolid(SOLID_VPHYSICS)
+								ent:GetPhysicsObject():EnableMotion( false )
 								ent:EnableCustomCollisions( true )
 								local mins2, maxs2 = ent:GetHitBoxBounds( 0, 0 )
 								ent:SetCollisionBounds( mins2*CalMult, maxs2*CalMult )
