@@ -1018,7 +1018,7 @@ function ENT:Think()
 
 			--if not(self.BaseDakShellDamage==nil) then self.DakShellSplashDamage = self.BaseDakShellDamage/2 end
 			self.Loaders = 0
-			if self.DakTankCore and self.TurretController then
+			if self.DakTankCore and self.TurretController and self.DakTankCore.Off ~= true then
 				if self.DakTankCore.Crew then
 					if #self.DakTankCore.Crew>0 then
 						for i=1, #self.DakTankCore.Crew do
@@ -2207,7 +2207,7 @@ function ENT:DakTEAutoAmmoCheck()
 		local breechoffset
 		breechoffset, _ = self:GetModelBounds()
 		breechoffset = math.abs(breechoffset.x*(self.DakCaliber/100)) * -1
-		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) then
+		if not(self.DakTankCore.Ammoboxes == nil) and IsValid(self.TurretController) and self.DakTankCore.Off ~= true then
 			for i = 1, #self.DakTankCore.Ammoboxes do
 				if IsValid(self.DakTankCore.Ammoboxes[i]) then
 					if (self.HasMag == 0 and self.IsAutoLoader == 1) and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
@@ -2228,7 +2228,7 @@ function ENT:DakTEAutoAmmoCheck()
 			table.sort( self.SortedAmmo, function( a, b ) return a[2] < b[2] end )
 		else
 			for i = 1, #self.DakTankCore.Ammoboxes do
-				if IsValid(self.DakTankCore.Ammoboxes[i]) then
+				if IsValid(self.DakTankCore.Ammoboxes[i]) and self.DakTankCore.Off ~= true then
 					if self:GetParent():GetParent() == self.DakTankCore.Ammoboxes[i]:GetParent():GetParent() then
 						if self.DakTankCore.Ammoboxes[i].DakAmmoType == self.DakAmmoType then
 							self.AmmoCount = self.AmmoCount + self.DakTankCore.Ammoboxes[i].DakAmmo

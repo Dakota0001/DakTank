@@ -258,7 +258,7 @@ function ENT:Think()
 		self.FirstCheck = true
 		self.DakHealth = self.DakMaxHealth
 	end
-	if IsValid(self.DakTankCore) and IsValid(self.DakTankCore.Motors[1]) then
+	if IsValid(self.DakTankCore) and IsValid(self.DakTankCore.Motors[1]) and self.DakTankCore.Off ~= true then
 		self.DakSpeed = 0
 		self.DakFuel = 0
 		self.DakFuelReq = 0
@@ -336,7 +336,7 @@ function ENT:Think()
 		
 		self.CarTurning = self.Inputs.CarTurning.Value
 
-	    if IsValid(self.DakTankCore) then
+	    if IsValid(self.DakTankCore) and self.DakTankCore.Off ~= true then
 	    	if self.setup == nil then
 	    		if self:GetParent():IsValid() then
 	    			if self:GetParent():GetParent():IsValid() then

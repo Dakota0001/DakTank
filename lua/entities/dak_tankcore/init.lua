@@ -10,6 +10,140 @@ ENT.HitBox = {}
 ENT.DakActive = 0
 ENT.DakFuel = nil
 
+util.AddNetworkString( "daktankcoreera" )
+util.AddNetworkString( "daktankcoredetail" )
+util.AddNetworkString( "daktankcoreeraremove" )
+util.AddNetworkString( "daktankcoredetailremove" )
+util.AddNetworkString( "daktankcoredie" )
+
+concommand.Add("daktank_unmake", function()
+	cores = ents.FindByClass("dak_tankcore")
+	for i=1, #cores do
+		local core = cores[i]
+		core.Off = true
+		core.BuildInfo = {}
+		core.OldParent = core:GetParent()
+		core:SetParent(nil)
+		for j=1, #core.Contraption do
+			if core.Contraption[j]~=core then
+				core.BuildInfo[j] = {}
+				core.BuildInfo[j].Pos = core.Contraption[j]:GetPos()
+				core.BuildInfo[j].Ang = core.Contraption[j]:GetAngles()
+				core.BuildInfo[j].Parent = core.Contraption[j]:GetParent()
+				core.BuildInfo[j].Move = core.Contraption[j]:GetMoveType()
+				core.Contraption[j].Pos = core.Contraption[j]:GetPos()
+				core.Contraption[j].Ang = core.Contraption[j]:GetAngles()
+				core.Contraption[j].OldParent = core.Contraption[j]:GetParent()
+				core.Contraption[j].Move = core.Contraption[j]:GetMoveType()
+				core.Contraption[j]:SetParent(nil)
+				core.Contraption[j]:SetMoveType(MOVETYPE_NONE)
+			end
+		end
+		for j=1, #core.Contraption do
+			core.Contraption[j]:SetPos(core:GetPos()+Vector(math.random(-500,500),math.random(-500,500),-500))
+			core.Contraption[j]:SetAngles(AngleRand())
+		end
+	end
+end)
+
+function MoveEntToPos(ent)
+	ent:SetPos(ent:GetPos()+Vector(0,0,math.random(400,1000)))
+	local num = math.random(1,4)
+	local scream = ""
+	if num == 1 then
+		scream = "ambient/halloween/female_scream_0"..math.random(1,9)..".wav"
+	end
+	if num == 2 then
+		scream = "ambient/halloween/female_scream_10.wav"
+	end
+	if num == 3 then
+
+		scream = "ambient/halloween/male_scream_0"..math.random(3,9)..".wav"
+	end
+	if num == 4 then
+		scream = "ambient/halloween/male_scream_"..math.random(10,23)..".wav"
+	end
+
+	local tr = util.TraceLine( {
+		start = ent:GetPos()+Vector(0,0,10000),
+		endpos = ent:GetPos()+Vector(0,0,-10000),
+		--filter = function( ent ) if ( ent:GetClass() == "prop_physics" ) then return true end end
+		mask = MASK_NPCWORLDSTATIC
+	} )
+
+	local effectdata = EffectData()
+	effectdata:SetOrigin(tr.HitPos)
+	effectdata:SetEntity(ent)
+	effectdata:SetAttachment(1)
+	effectdata:SetMagnitude(.5)
+	effectdata:SetScale(math.random(5,25))
+	util.Effect("dakteshellimpact", effectdata, true, true)
+
+	ent:EmitSound(scream,100,100*math.Rand(0.9,1.1),1*math.Rand(0.9,1.1),CHAN_AUTO)
+	timer.Create(ent:EntIndex().."ang", 0.01, 10000, function()
+		local moveang = (ent.Ang-ent:GetAngles())
+		ent:SetAngles(ent:GetAngles()+Angle(math.Clamp(moveang.pitch,-1,1),math.Clamp(moveang.yaw,-1,1),math.Clamp(moveang.roll,-1,1)))
+		ent:SetMoveType(ent.Move)
+		if math.Clamp(moveang.pitch,-1,1)==moveang.pitch and math.Clamp(moveang.yaw,-1,1)==moveang.yaw and math.Clamp(moveang.roll,-1,1)==moveang.roll then
+			timer.Stop( ent:EntIndex().."ang" )
+		end
+	end)
+	timer.Simple( math.random(1,3), function()
+		timer.Create(ent:EntIndex().."move", 0.01, 10000, function()
+			local movevec = (ent.Pos-ent:GetPos())
+			ent:SetPos(ent:GetPos()+Vector(math.Clamp(movevec.x,-5,5),math.Clamp(movevec.y,-5,5),math.Clamp(movevec.z,-5,5)))
+			ent:SetMoveType(ent.Move)
+
+			if math.Clamp(movevec.x,-5,5)==movevec.x and math.Clamp(movevec.y,-5,5)==movevec.y and math.Clamp(movevec.z,-5,5)==movevec.z then
+				if ent.soundplayed == nil then
+					ent:EmitSound("doors/heavy_metal_stop1.wav",100,100*math.Rand(0.9,1.1),1*math.Rand(0.9,1.1),CHAN_AUTO)
+					ent.soundplayed = true
+					timer.Stop( ent:EntIndex().."move" )
+					if ent.Controller.THETOLL == nil then ent.Controller.THETOLL = 0 end
+					ent.Controller.THETOLL = ent.Controller.THETOLL + 1
+					if ent.Controller.THETOLL >= #ent.Controller.Contraption-1 then
+						for i=1, #ent.Controller.Contraption do
+							ent.Controller.Contraption[i]:SetParent(ent.Controller.Contraption[i].OldParent)
+							ent.Controller.Contraption[i]:SetMoveType(MOVETYPE_NONE)
+						end
+						timer.Simple( 1, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(25,10,-20)) end )
+						timer.Simple( 1, function() ent.Controller:GetParent():GetParent():SetAngles(ent.Controller:GetParent():GetParent():GetAngles()+Angle(-15,-40,0)) end )
+						timer.Simple( 2, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(-79,-51,40)) end )
+						timer.Simple( 2, function() ent.Controller:GetParent():GetParent():SetAngles(ent.Controller:GetParent():GetParent():GetAngles()+Angle(-5,-130,0)) end )
+						timer.Simple( 3, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(40.5,-30.75,-50)) end )
+						timer.Simple( 3, function() ent.Controller:GetParent():GetParent():SetAngles(ent.Controller:GetParent():GetParent():GetAngles()+Angle(30,152,0)) end )
+						timer.Simple( 4, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(13.5,-10.25,0)) end )
+						timer.Simple( 4, function() ent.Controller:GetParent():GetParent():SetAngles(ent.Controller:GetParent():GetParent():GetAngles()+Angle(-10,18,0)) end )
+						timer.Simple( 4.1, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-10)) end )
+						timer.Simple( 4.2, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-23)) end )
+						timer.Simple( 4.3, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-2)) end )
+						timer.Simple( 4.4, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-3)) end )
+						timer.Simple( 4.5, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-13)) end )
+						timer.Simple( 4.6, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-27)) end )
+						timer.Simple( 4.7, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-1)) end )
+						timer.Simple( 4.8, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-3)) end )
+						timer.Simple( 4.9, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-0)) end )
+						timer.Simple( 5, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-8)) end )
+					end
+				end
+			end
+
+		end)
+	end)
+end
+
+concommand.Add("daktank_remake", function()
+	cores = ents.FindByClass("dak_tankcore")
+	for i=1, #cores do
+		local core = cores[i]
+		for j=1, #core.Contraption do
+			if core.Contraption[j]~=core then
+				timer.Create( core:EntIndex()..core.Contraption[j]:EntIndex().."start", math.Rand(1,15), 1, function() MoveEntToPos(core.Contraption[j]) end )
+			end
+		end
+	end
+end)
+
 hook.Add("AdvDupe_FinishPasting", "daktank_tankcore_check", function(dupe)
 	local ents = dupe[1].CreatedEntities
 	for id, data in pairs(dupe[1].EntityList) do
@@ -144,6 +278,12 @@ function ENT:Initialize()
 	self.PenMult = 0
 	self.DPSMult = 0
 
+	self.PhysEra = true
+	self.LastPhysEra = true
+
+	self.PhysDetail = true
+	self.LastPhysDetail = true
+
 	self.Forward = self:GetForward()
 end
 
@@ -253,8 +393,7 @@ end
 ]]--
 function ENT:Think()
 	local systime = SysTime()
-	
-	if IsValid(self) then
+	if IsValid(self) and self.Off~=true then
 		if IsValid(self:GetParent()) then
 			if IsValid(self:GetParent():GetParent()) then
 				self.Base = self:GetParent():GetParent()
@@ -1002,6 +1141,7 @@ function ENT:Think()
 						self.Fuel={}
 						self.Tread={}
 						self.ERA={}
+						self.DETAIL={}
 						self.Seats={}
 						self.GunCount = 0
 						self.MachineGunCount = 0
@@ -1020,7 +1160,18 @@ function ENT:Think()
 						for i=1, #res do
 							CurrentRes = res[i]
 							if CurrentRes:IsValid() and CurrentRes:IsSolid() then
-								self.Contraption[#self.Contraption+1] = CurrentRes
+								if CurrentRes:GetParent():IsValid() then
+									CurrentRes:SetMoveType(MOVETYPE_NONE)
+								end
+								if CurrentRes:GetClass()=="prop_physics" and CurrentRes:GetPhysicsObject():GetMass()<=1 then
+									if table.Count(CurrentRes:GetChildren()) == 0 and CurrentRes:GetParent():IsValid() then
+										self.DETAIL[#self.DETAIL+1]=CurrentRes
+									else
+										self.Contraption[#self.Contraption+1] = CurrentRes
+									end
+								else
+									self.Contraption[#self.Contraption+1] = CurrentRes
+								end
 								if CurrentRes:GetClass()=="dak_tegearbox" or CurrentRes:GetClass()=="dak_tegearboxnew" then
 									CurrentRes.DakTankCore = self
 									CurrentRes.Controller = self
@@ -1128,8 +1279,7 @@ function ENT:Think()
 									end
 									if CurrentRes.EntityMods==nil then
 									else
-										if CurrentRes.EntityMods.CompositeType == nil or CurrentRes.IsComposite == nil then
-											
+										if CurrentRes.EntityMods.CompositeType == nil and CurrentRes.IsComposite == nil then
 											if CurrentRes.EntityMods.ArmorType == nil then
 												self.RHAWeight = self.RHAWeight + CurrentRes:GetPhysicsObject():GetMass()
 											else
@@ -1155,21 +1305,31 @@ function ENT:Think()
 										else
 											if CurrentRes.EntityMods.CompositeType == "NERA" then
 												self.Modern = 1
+												local Density = 2000
+												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
 												self.NERAWeight = self.NERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "Stillbrew" then
 												self.Modern = 1
+												local Density = 5750
+												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
 												self.StillbrewWeight = self.StillbrewWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "Textolite" then
 												self.ColdWar = 1
+												local Density = 1850
+												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
 												self.TextoliteWeight = self.TextoliteWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "Concrete" then
+												local Density = 2400
+												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
 												self.ConcreteWeight = self.ConcreteWeight + CurrentRes:GetPhysicsObject():GetMass()
 											end
 											if CurrentRes.EntityMods.CompositeType == "ERA" then
 												self.ColdWar = 1
+												local Density = 1732
+												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
 												self.ERAWeight = self.ERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												self.ERA[#self.ERA+1]=CurrentRes
 											end
@@ -1295,11 +1455,12 @@ function ENT:Think()
 							self.Controller = self
 							if #self.Contraption>0 then
 								local ContraptionCurrent
+								self.HitBox = {}
+								self.ERA = {}
 								for i=1, #self.Contraption do
 									ContraptionCurrent = self.Contraption[i]
 									if ContraptionCurrent.Controller == nil or ContraptionCurrent.Controller == NULL or ContraptionCurrent.Controller == self then
 										if IsValid(ContraptionCurrent) then
-											
 											if ContraptionCurrent.DakName == nil and (ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA~=1) then
 												if ContraptionCurrent:IsSolid() then
 													self.HitBox[#self.HitBox+1] = ContraptionCurrent
@@ -1362,41 +1523,6 @@ function ENT:Think()
 								end
 							end
 							
-							if self.ERA then
-								if table.Count(self.ERA) > 0 then
-									local effectdata
-									local ExpSounds = {"daktanks/eraexplosion.mp3"}
-									local EntMod 
-									for i = 1, table.Count(self.ERA) do
-										if not(IsValid(self.ERA[i])) then
-											table.remove( self.ERA, i )
-										end
-										if self.ERA[i] ~= nil and self.ERA[i] ~= NULL then
-											EntMod = self.ERA[i].EntityMods
-											if self.ERA[i].IsComposite ~= 1 then self.ERA[i].IsComposite = 1 end
-											if EntMod.CompKEMult ~= 2.5 then EntMod.CompKEMult = 2.5 end
-											if EntMod.CompCEMult ~= 88.9 then EntMod.CompCEMult = 88.9 end
-											if self.ERA[i].DakName ~= "ERA" then self.ERA[i].DakName = "ERA" end
-											if self.ERA[i].IsERA ~= 1 then self.ERA[i].IsERA = 1 end
-											if self.ColdWar ~= 1 then self.ColdWar = 1 end
-											if self.ERA[i].DakHealth <= 0 then
-												effectdata = EffectData()
-												effectdata:SetOrigin(self.ERA[i]:GetPos())
-												effectdata:SetEntity(self)
-												effectdata:SetAttachment(1)
-												effectdata:SetMagnitude(.5)
-												effectdata:SetScale(50)
-												effectdata:SetNormal( Vector(0,0,0) )
-												util.Effect("daktescalingexplosionold", effectdata, true, true)
-												sound.Play( ExpSounds[math.random(1,#ExpSounds)], self.ERA[i]:GetPos(), 100, 100, 1 )
-												self.ERA[i]:DTExplosion(self.ERA[i]:GetPos(),25,50,40,5,self.DakOwner)
-												self.ERA[i]:Remove()
-											end
-										end
-										
-									end
-								end
-							end
 							--print("ERA: "..(SysTime()-debugtime))
 							if self.Composites then
 								if table.Count(self.Composites) > 0 then
@@ -1460,7 +1586,165 @@ function ENT:Think()
 							--print("Comps: "..(SysTime()-debugtime))
 							local debugtime = SysTime()
 							if self.ERA then
+								if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
+									self.PhysEra = false
+								else
+									self.PhysEra = true
+								end
+								if self.PhysEra ~= self.LastPhysEra and false then
+									if self.PhysEra == true then
+										self.ERA = {}
+										for i=1, #self.ERAInfoTable do
+											local cur = self.ERAInfoTable[i]
+											local eraplate = ents.Create("prop_physics")
+											local parentent = ents.GetByIndex( cur.Parent )
+											eraplate:SetModel(cur.Model)
+											eraplate:SetPos(parentent:LocalToWorld(cur.LocalPos))
+											eraplate:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
+											eraplate:SetMaterial(cur.Mat)
+											eraplate:SetColor(cur.Col)
+											eraplate:SetParent(parentent)
+											eraplate.EntityMods = cur.EntityMods
+											eraplate.DakName = "ERA"
+											eraplate.Controller = self
+											eraplate.DakOwner = self.DakOwner
+											eraplate.DakPooled = 1
+											eraplate.DakHealth = 5
+											eraplate.DakMaxHealth = 5
+											eraplate:PhysicsInit(SOLID_VPHYSICS)
+											eraplate:SetMoveType(MOVETYPE_NONE)
+											eraplate:SetSolid(SOLID_VPHYSICS)
+											eraplate:CPPISetOwner(self.DakOwner)
+											self.ERA[#self.ERA+1] = eraplate
+										end
+										net.Start( "daktankcoreeraremove" )
+										net.WriteEntity( self )
+										net.Broadcast()
+									 	for i = 1, #self.ERAHandlers do
+											self.ERAHandlers[i]:SetMoveType(MOVETYPE_NONE)
+											self.ERAHandlers[i]:PhysicsInit(SOLID_NONE)
+											self.ERAHandlers[i]:Remove()
+										end
+										self.ERAHandlers = {}
+									else
+										self.ERAInfoTable = {}
+										for i = 1, table.Count(self.ERA) do
+											local cur = self.ERA[i]
+											local currentERA = {}
+											currentERA.Parent = cur:GetParent():EntIndex()
+											if not(IsValid(cur:GetParent().ERAHandler)) then
+												cur:GetParent().ERAHandler = ents.Create("prop_physics")
+											 	cur:GetParent().ERAHandler:SetAngles(cur:GetParent():GetForward():Angle())
+											 	cur:GetParent().ERAHandler:SetPos(cur:GetParent():GetPos())
+											 	cur:GetParent().ERAHandler:SetMoveType(MOVETYPE_NONE)
+											 	cur:GetParent().ERAHandler:PhysicsInit(SOLID_NONE)
+											 	cur:GetParent().ERAHandler:SetParent(cur:GetParent())
+											 	cur:GetParent().ERAHandler:SetModel( "models/props_junk/PopCan01a.mdl" )
+											 	cur:GetParent().ERAHandler:DrawShadow(false)
+											 	cur:GetParent().ERAHandler:SetColor( Color(255, 255, 255, 0) )
+											 	cur:GetParent().ERAHandler:SetRenderMode( RENDERMODE_TRANSCOLOR )
+											 	cur:GetParent().ERAHandler:Spawn()
+											 	cur:GetParent().ERAHandler:Activate()
+											 	cur:GetParent().ERAHandler:SetMoveType(MOVETYPE_NONE)
+											 	cur:GetParent().ERAHandler:PhysicsInit(SOLID_NONE)
+											 	ERAHandler:CPPISetOwner(self.DakOwner)
+											 	if self.ERAHandlers == nil then self.ERAHandlers = {} end
+												self.ERAHandlers[#self.ERAHandlers+1] = cur:GetParent().ERAHandler
+											end
+											currentERA.Model = cur:GetModel()
+											currentERA.LocalPos = cur:GetParent():WorldToLocal(cur:GetPos())
+											currentERA.LocalAng = cur:GetParent():WorldToLocalAngles(cur:GetAngles())
+											currentERA.Mat = cur:GetMaterial()
+											currentERA.Col = cur:GetColor()
+											currentERA.Mass = cur:GetPhysicsObject():GetMass()
+											currentERA.EntityMods = cur.EntityMods
+											local a,b = cur:GetPhysicsObject():GetAABB()
+											a:Rotate(cur:GetAngles())
+											b:Rotate(cur:GetAngles())
+											currentERA.mins = a
+											currentERA.maxs = b
+											cur:Remove()
+											self.ERAInfoTable[#self.ERAInfoTable+1] = currentERA
+										end
+										for j = 1, #self.ERAHandlers do
+											local VectorTables = {}
+											local Mass = 0
+											for i = 1, #self.ERAInfoTable do
+												Mass = Mass + self.ERAInfoTable[i].Mass
+												if ents.GetByIndex( self.ERAInfoTable[i].Parent ) == self.ERAHandlers[j]:GetParent() then
+													local addition = self.ERAInfoTable[i].LocalPos
+													local min = self.ERAInfoTable[i].mins + addition
+													local max = self.ERAInfoTable[i].maxs + addition
+													VectorTables[#VectorTables+1] = {
+														Vector( min.y, min.y, min.z ),
+														Vector( min.x, min.y, max.z ),
+														Vector( min.x, max.y, min.z ),
+														Vector( min.x, max.y, max.z ),
+														Vector( max.x, min.y, min.z ),
+														Vector( max.x, min.y, max.z ),
+														Vector( max.x, max.y, min.z ),
+														Vector( max.x, max.y, max.z )
+													}
+													debugoverlay.Box( ents.GetByIndex( self.ERAInfoTable[i].Parent ):LocalToWorld( self.ERAInfoTable[i].LocalPos ), self.ERAInfoTable[i].mins, self.ERAInfoTable[i].maxs, 10, Color( math.random(0,255), math.random(0,255), math.random(0,255) ) )
+												end
+											end
+											self.ERAHandlers[j]:PhysicsDestroy()
+											self.ERAHandlers[j]:PhysicsInitMultiConvex(VectorTables)
+											self.ERAHandlers[j]:SetSolid( SOLID_VPHYSICS )
+											--self.ERAHandlers[j]:SetParent()
+											self.ERAHandlers[j]:SetMoveType( MOVETYPE_NONE )
+											self.ERAHandlers[j]:EnableCustomCollisions( true )
+											self.ERAHandlers[j].IsEraHandler = true
+											self.ERAHandlers[j].IsComposite = 1
+											self.ERAHandlers[j].EntityMods = {}
+											self.ERAHandlers[j].EntityMods.CompKEMult = 2.5
+											self.ERAHandlers[j].EntityMods.CompCEMult = 88.9
+											self.ERAHandlers[j].DakArmor = 10*self.ERAHandlers[j].EntityMods.CompKEMult
+											self.ERAHandlers[j].DakHealth = 9999999
+											self.ERAHandlers[j].DakMaxHealth = 9999999
+											self.ERAHandlers[j].EntityMods.IsERA = 1
+											self.ERAHandlers[j].EntityMods.DakName = "ERA HANDLER"
+											self.ERAHandlers[j]:GetPhysicsObject():SetMass(Mass)
+										end
+										net.Start( "daktankcoreera" )
+										net.WriteEntity( self )
+										net.WriteString( util.TableToJSON( self.ERAInfoTable ) )
+										net.Broadcast()
+										self.ERA = {}
+									end
+									self.LastPhysEra = self.PhysEra
+								end
 								if table.Count(self.ERA) > 0 then
+									local effectdata
+									local ExpSounds = {"daktanks/eraexplosion.mp3"}
+									local EntMod 
+									for i = 1, table.Count(self.ERA) do
+										if not(IsValid(self.ERA[i])) then
+											table.remove( self.ERA, i )
+										end
+										if self.ERA[i] ~= nil and self.ERA[i] ~= NULL then
+											EntMod = self.ERA[i].EntityMods
+											if self.ERA[i].IsComposite ~= 1 then self.ERA[i].IsComposite = 1 end
+											if EntMod.CompKEMult ~= 2.5 then EntMod.CompKEMult = 2.5 end
+											if EntMod.CompCEMult ~= 88.9 then EntMod.CompCEMult = 88.9 end
+											if self.ERA[i].DakName ~= "ERA" then self.ERA[i].DakName = "ERA" end
+											if self.ERA[i].IsERA ~= 1 then self.ERA[i].IsERA = 1 end
+											if self.ColdWar ~= 1 then self.ColdWar = 1 end
+											if self.ERA[i].DakHealth <= 0 then
+												effectdata = EffectData()
+												effectdata:SetOrigin(self.ERA[i]:GetPos())
+												effectdata:SetEntity(self)
+												effectdata:SetAttachment(1)
+												effectdata:SetMagnitude(.5)
+												effectdata:SetScale(50)
+												effectdata:SetNormal( Vector(0,0,0) )
+												util.Effect("daktescalingexplosionold", effectdata, true, true)
+												sound.Play( ExpSounds[math.random(1,#ExpSounds)], self.ERA[i]:GetPos(), 100, 100, 1 )
+												self.ERA[i]:DTExplosion(self.ERA[i]:GetPos(),25,50,40,5,self.DakOwner)
+												self.ERA[i]:Remove()
+											end
+										end
+									end
 									local weightval
 									for i = 1, table.Count(self.ERA) do
 										if IsValid(self.ERA[i]) then
@@ -1478,6 +1762,66 @@ function ENT:Think()
 											end
 										end
 									end
+								end
+							end
+							if self.DETAIL then
+								if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
+									self.PhysDetail = false
+								else
+									self.PhysDetail = true
+								end
+								if self.PhysDetail ~= self.LastPhysDetail then
+									if self.PhysDetail == true then
+										self.DETAIL = {}
+										for i=1, #self.DetailInfoTable do
+											local cur = self.DetailInfoTable[i]
+											local detailpiece = ents.Create("prop_physics")
+											local parentent = ents.GetByIndex( cur.Parent )
+											detailpiece:SetModel(cur.Model)
+											detailpiece:SetPos(parentent:LocalToWorld(cur.LocalPos))
+											detailpiece:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
+											detailpiece:SetMaterial(cur.Mat)
+											detailpiece:SetColor(cur.Col)
+											detailpiece:SetParent(parentent)
+											detailpiece.EntityMods = cur.EntityMods
+											--detailpiece.ClipData = cur.ClipData
+											detailpiece:PhysicsInit(SOLID_VPHYSICS)
+											detailpiece:SetMoveType(MOVETYPE_NONE)
+											detailpiece:SetSolid(SOLID_VPHYSICS)
+											detailpiece:CPPISetOwner(self.DakOwner)
+											if cur.ClipData ~= nil then
+												for j=1, #cur.ClipData do
+													ProperClipping.AddClip(detailpiece, cur.ClipData[j].n:Forward(), cur.ClipData[j].d, cur.ClipData[j].inside, true)
+												end
+											end
+											self.DETAIL[#self.DETAIL+1] = detailpiece
+										end
+										net.Start( "daktankcoredetailremove" )
+										net.WriteEntity( self )
+										net.Broadcast()
+									else
+										self.DetailInfoTable = {}
+										for i = 1, table.Count(self.DETAIL) do
+											local cur = self.DETAIL[i]
+											local currentDetail = {}
+											currentDetail.Parent = cur:GetParent():EntIndex()
+											currentDetail.Model = cur:GetModel()
+											currentDetail.LocalPos = cur:GetParent():WorldToLocal(cur:GetPos())
+											currentDetail.LocalAng = cur:GetParent():WorldToLocalAngles(cur:GetAngles())
+											currentDetail.Mat = cur:GetMaterial()
+											currentDetail.Col = cur:GetColor()
+											currentDetail.EntityMods = cur.EntityMods
+											currentDetail.ClipData = cur.ClipData
+											cur:Remove()
+											self.DetailInfoTable[#self.DetailInfoTable+1] = currentDetail
+										end
+										net.Start( "daktankcoredetail" )
+										net.WriteEntity( self )
+										net.WriteString( util.TableToJSON( self.DetailInfoTable ) )
+										net.Broadcast()
+										self.DETAIL = {}
+									end
+									self.LastPhysDetail = self.PhysDetail
 								end
 							end
 							--print("Total: "..(SysTime()-debugtime))
@@ -1586,10 +1930,7 @@ function ENT:Think()
 							if self.DakHealth then
 								if (self.DakHealth <= 0 or #self.Crew < 2 or self.LivingCrew < 2 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
 									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
-
 									self.RemoveTurretList = {}
-
-									
 									if math.random(1,100) <= self:GetTurretPop() then
 										for j=1, #self.TurretControls do
 											if IsValid(self.TurretControls[j]) then
@@ -1728,6 +2069,9 @@ function ENT:Think()
 									end
 									self.Dead=1
 									self.DeathTime=CurTime()
+									net.Start( "daktankcoredie" )
+									net.WriteEntity( self )
+									net.Broadcast()
 									local effectdata = EffectData()
 									effectdata:SetOrigin(self:GetParent():GetParent():GetPos())
 									effectdata:SetEntity(self)

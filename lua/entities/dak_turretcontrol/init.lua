@@ -199,7 +199,7 @@ function ENT:Think()
 	if #self.DakContraption > 0 then
 		local GunEnt = self.Inputs.Gun.Value
 
-		if IsValid(GunEnt) then
+		if IsValid(GunEnt) and self.Controller.Off~=true then
 			GunEnt.TurretController = self
 			if IsValid(GunEnt:GetParent()) then
 				if IsValid(GunEnt:GetParent():GetParent()) then
