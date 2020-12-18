@@ -917,7 +917,11 @@ function ENT:Think()
 								addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
 								SpallLiner = 0
 								curarmor, _, _, _, _, _, _, _, _ = DTGetArmorRecurse(startpos+addpos+forward*distance, startpos+addpos-forward*distance, "AP", 75, player.GetAll(), self)
-								self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor)
+								if curarmor~=nil then
+									self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor)
+								else
+									self.frontarmortable[#self.frontarmortable+1] = 0
+								end
 							end
 						end)
 					end
