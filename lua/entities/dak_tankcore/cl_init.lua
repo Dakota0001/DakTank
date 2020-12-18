@@ -8,7 +8,14 @@ end
 
 net.Receive( "daktankcoreera", function()
 	local core = net.ReadEntity()
-	local ERAInfoTable = util.JSONToTable(net.ReadString())
+	local segments = net.ReadInt(32)
+	local ERAInfoTable = {}
+	for i=1, segments do
+		local addition = util.JSONToTable(net.ReadString())
+		for j=1, #addition do
+			ERAInfoTable[#ERAInfoTable+1] = addition[j]
+		end
+	end
 	if core.ERA == nil then core.ERA = {} end
 	for i=1, #ERAInfoTable do
 		local cur = ERAInfoTable[i]
@@ -28,7 +35,14 @@ end )
 
 net.Receive( "daktankcoredetail", function()
 	local core = net.ReadEntity()
-	local DetailInfoTable = util.JSONToTable(net.ReadString())
+	local segments = net.ReadInt(32)
+	local DetailInfoTable = {}
+	for i=1, segments do
+		local addition = util.JSONToTable(net.ReadString())
+		for j=1, #addition do
+			DetailInfoTable[#DetailInfoTable+1] = addition[j]
+		end
+	end
 	if core.Detail == nil then core.Detail = {} end
 	for i=1, #DetailInfoTable do
 		local cur = DetailInfoTable[i]

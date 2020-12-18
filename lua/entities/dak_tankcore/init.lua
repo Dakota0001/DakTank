@@ -1708,7 +1708,14 @@ function ENT:Think()
 										end
 										net.Start( "daktankcoreera" )
 										net.WriteEntity( self )
-										net.WriteString( util.TableToJSON( self.ERAInfoTable ) )
+										net.WriteInt(math.ceil(#self.ERAInfoTable/50),32)
+										for i=1, math.ceil(#self.ERAInfoTable/50) do
+											local tablesegment = {}
+											for j=1+((i-1)*50), 50+((i-1)*50) do
+												tablesegment[#tablesegment+1] = self.ERAInfoTable[j]
+											end
+											net.WriteString( util.TableToJSON( tablesegment ) )
+										end
 										net.Broadcast()
 										self.ERA = {}
 									end
@@ -1817,7 +1824,14 @@ function ENT:Think()
 										end
 										net.Start( "daktankcoredetail" )
 										net.WriteEntity( self )
-										net.WriteString( util.TableToJSON( self.DetailInfoTable ) )
+										net.WriteInt(math.ceil(#self.DetailInfoTable/50),32)
+										for i=1, math.ceil(#self.DetailInfoTable/50) do
+											local tablesegment = {}
+											for j=1+((i-1)*50), 50+((i-1)*50) do
+												tablesegment[#tablesegment+1] = self.DetailInfoTable[j]
+											end
+											net.WriteString( util.TableToJSON( tablesegment ) )
+										end
 										net.Broadcast()
 										self.DETAIL = {}
 									end
