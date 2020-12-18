@@ -1706,17 +1706,16 @@ function ENT:Think()
 											self.ERAHandlers[j].EntityMods.DakName = "ERA HANDLER"
 											self.ERAHandlers[j]:GetPhysicsObject():SetMass(Mass)
 										end
-										net.Start( "daktankcoreera" )
-										net.WriteEntity( self )
-										net.WriteInt(math.ceil(#self.ERAInfoTable/50),32)
 										for i=1, math.ceil(#self.ERAInfoTable/50) do
 											local tablesegment = {}
 											for j=1+((i-1)*50), 50+((i-1)*50) do
 												tablesegment[#tablesegment+1] = self.ERAInfoTable[j]
 											end
+											net.Start( "daktankcoreera" )
+											net.WriteEntity( self )
 											net.WriteString( util.TableToJSON( tablesegment ) )
+											net.Broadcast()
 										end
-										net.Broadcast()
 										self.ERA = {}
 									end
 									self.LastPhysEra = self.PhysEra
@@ -1822,17 +1821,16 @@ function ENT:Think()
 											cur:Remove()
 											self.DetailInfoTable[#self.DetailInfoTable+1] = currentDetail
 										end
-										net.Start( "daktankcoredetail" )
-										net.WriteEntity( self )
-										net.WriteInt(math.ceil(#self.DetailInfoTable/50),32)
 										for i=1, math.ceil(#self.DetailInfoTable/50) do
 											local tablesegment = {}
 											for j=1+((i-1)*50), 50+((i-1)*50) do
 												tablesegment[#tablesegment+1] = self.DetailInfoTable[j]
 											end
+											net.Start( "daktankcoredetail" )
+											net.WriteEntity( self )
 											net.WriteString( util.TableToJSON( tablesegment ) )
+											net.Broadcast()
 										end
-										net.Broadcast()
 										self.DETAIL = {}
 									end
 									self.LastPhysDetail = self.PhysDetail
