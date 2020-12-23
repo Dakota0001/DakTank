@@ -38,7 +38,7 @@ net.Receive( "daktankcoredetail", function()
 			Detailplate:SetPos(parentent:LocalToWorld(cur.LocalPos))
 			Detailplate:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
 			Detailplate:SetMaterial(cur.Mat)
-			for j=1, #cur.SubMaterials do
+			for j=0, 31 do
 				Detailplate:SetSubMaterial( j, cur.SubMaterials[j] )
 			end
 			Detailplate:SetColor(cur.Col)

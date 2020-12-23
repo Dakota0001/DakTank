@@ -1828,13 +1828,8 @@ function ENT:Think()
 											currentDetail.EntityMods = cur.EntityMods
 											currentDetail.ClipData = cur.ClipData
 											currentDetail.SubMaterials = {}
-											local matnum = 0
-											local nonew = 0
-											while matnum < 31 and nonew == 0 do
-												matnum = matnum + 1
-												if cur:GetSubMaterial( matnum ) ~= "" then
-													currentDetail.SubMaterials[#currentDetail.SubMaterials+1] = cur:GetSubMaterial( matnum )
-												end
+											for j = 0, 31 do
+												currentDetail.SubMaterials[j] = cur:GetSubMaterial( j )
 											end
 											cur:Remove()
 											self.DetailInfoTable[#self.DetailInfoTable+1] = currentDetail
