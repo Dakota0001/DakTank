@@ -106,6 +106,7 @@ function MoveEntToPos(ent)
 							ent.Controller.Contraption[i]:SetParent(ent.Controller.Contraption[i].OldParent)
 							ent.Controller.Contraption[i]:SetMoveType(MOVETYPE_NONE)
 						end
+						--[[
 						timer.Simple( 1, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(25,10,-20)) end )
 						timer.Simple( 1, function() ent.Controller:GetParent():GetParent():SetAngles(ent.Controller:GetParent():GetParent():GetAngles()+Angle(-15,-40,0)) end )
 						timer.Simple( 2, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(-79,-51,40)) end )
@@ -124,6 +125,7 @@ function MoveEntToPos(ent)
 						timer.Simple( 4.8, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-3)) end )
 						timer.Simple( 4.9, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-0)) end )
 						timer.Simple( 5, function() ent.Controller:GetParent():GetParent():SetPos(ent.Controller:GetParent():GetParent():GetPos()+Vector(0,0,-8)) end )
+						]]--
 					end
 				end
 			end
@@ -1165,7 +1167,7 @@ function ENT:Think()
 							CurrentRes = res[i]
 							if CurrentRes:IsValid() and CurrentRes:IsSolid() then
 								if CurrentRes:GetParent():IsValid() then
-									CurrentRes:SetMoveType(MOVETYPE_NONE)
+									--CurrentRes:SetMoveType(MOVETYPE_NONE)
 								end
 								if CurrentRes:GetClass()=="prop_physics" and CurrentRes:GetPhysicsObject():GetMass()<=1 then
 									if table.Count(CurrentRes:GetChildren()) == 0 and CurrentRes:GetParent():IsValid() then
@@ -1616,7 +1618,7 @@ function ENT:Think()
 											eraplate.DakHealth = 5
 											eraplate.DakMaxHealth = 5
 											eraplate:PhysicsInit(SOLID_VPHYSICS)
-											eraplate:SetMoveType(MOVETYPE_NONE)
+											--eraplate:SetMoveType(MOVETYPE_NONE)
 											eraplate:SetSolid(SOLID_VPHYSICS)
 											eraplate:CPPISetOwner(self.DakOwner)
 											self.ERA[#self.ERA+1] = eraplate
@@ -1791,12 +1793,15 @@ function ENT:Think()
 											detailpiece:SetPos(parentent:LocalToWorld(cur.LocalPos))
 											detailpiece:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
 											detailpiece:SetMaterial(cur.Mat)
+											for j=1, #cur.SubMaterials do
+												detailpiece:SetSubMaterial( j, cur.SubMaterials[j] )
+											end
 											detailpiece:SetColor(cur.Col)
 											detailpiece:SetParent(parentent)
 											detailpiece.EntityMods = cur.EntityMods
 											--detailpiece.ClipData = cur.ClipData
 											detailpiece:PhysicsInit(SOLID_VPHYSICS)
-											detailpiece:SetMoveType(MOVETYPE_NONE)
+											--detailpiece:SetMoveType(MOVETYPE_NONE)
 											detailpiece:SetSolid(SOLID_VPHYSICS)
 											detailpiece:CPPISetOwner(self.DakOwner)
 											if cur.ClipData ~= nil then
@@ -1822,6 +1827,15 @@ function ENT:Think()
 											currentDetail.Col = cur:GetColor()
 											currentDetail.EntityMods = cur.EntityMods
 											currentDetail.ClipData = cur.ClipData
+											currentDetail.SubMaterials = {}
+											local matnum = 0
+											local nonew = 0
+											while matnum < 31 and nonew == 0 do
+												matnum = matnum + 1
+												if cur:GetSubMaterial( matnum ) ~= "" then
+													currentDetail.SubMaterials[#currentDetail.SubMaterials+1] = cur:GetSubMaterial( matnum )
+												end
+											end
 											cur:Remove()
 											self.DetailInfoTable[#self.DetailInfoTable+1] = currentDetail
 										end
