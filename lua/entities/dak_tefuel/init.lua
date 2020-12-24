@@ -11,20 +11,6 @@ ENT.DakHealth = 10
 ENT.DakPooled=0
 ENT.DakFuel = 0
 
-function CheckClip(Ent, HitPos)
-	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
-	local HitClip = false
-	local normal
-	local origin
-	for i=1, #Ent.ClipData do
-		normal = Ent:LocalToWorldAngles(Ent.ClipData[i]["n"]):Forward()
-		origin = Ent:LocalToWorld(Ent.ClipData[i]["n"]:Forward()*Ent.ClipData[i]["d"])
-		HitClip = HitClip or normal:Dot((origin - HitPos):GetNormalized()) > 0
-		if HitClip then return true end
-	end
-	return HitClip
-end
-
 function ENT:Initialize()
 
 	self:PhysicsInit(SOLID_VPHYSICS)
