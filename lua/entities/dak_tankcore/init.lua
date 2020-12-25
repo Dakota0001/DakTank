@@ -2176,14 +2176,18 @@ function ENT:PreEntityCopy()
 		info.ERACount = table.Count(self.ERA)
 	end
 
+	local DupeClips = {}
 	if self.Contraption~= nil then 
 		if table.Count(self.Contraption)>0 then
 			for i=1, #self.Contraption do
 				local CurrentRes = self.Contraption[i]
 				if CurrentRes ~= NULL and CurrentRes ~= nil then
 					local physobj = CurrentRes:GetPhysicsObject()
-					if CurrentRes.PhysicsClipped == true then
-						CurrentRes.EntityMods.DakClippedArmor = CurrentRes.DakArmor
+					if CurrentRes.EntityMods.DakClippedArmor ~= nil then
+						local clip = {}
+						clip.ID = CurrentRes:EntIndex()
+						clip.Armor = CurrentRes.DakArmor
+						DupeClips[#DupeClips+1] = clip
 					end
 				end
 			end
@@ -2198,6 +2202,7 @@ function ENT:PreEntityCopy()
 	duplicator.StoreEntityModifier( self, "DakTek", info )
 	duplicator.StoreEntityModifier( self, "DTComposites", CompositesIDs )
 	duplicator.StoreEntityModifier( self, "DTERA", ERAIDs )
+	duplicator.StoreEntityModifier( self, "DTClips", DupeClips )
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
 end
@@ -2258,6 +2263,24 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 				self.ERA = {}
 			end
 		end
+		
+		if Ent.EntityMods.DTClips ~= nil then
+			for i=1, #Ent.EntityMods.DTClips do
+				local cur = CreatedEntities[ Ent.EntityMods.DTClips[i].ID ]
+				if cur.EntityMods.DakClippedArmor ~= nil then
+					cur.EntityMods.DakClippedArmor = Ent.EntityMods.DTClips[i].Armor
+					local SA = cur:GetPhysicsObject():GetSurfaceArea()
+					local mass = math.ceil(((Ent.EntityMods.DTClips[i].Armor/1/(288/SA))/7.8125)*4.6311781,0)
+					cur.EntityMods.DakClippedArmor = Ent.EntityMods.DTClips[i].Armor
+					if mass > 0 then
+						SetMass( self.DakOwner, cur, { Mass = mass } )
+						cur:GetPhysicsObject():SetMass(mass)
+					end
+				end
+			end
+		end
+
+
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
