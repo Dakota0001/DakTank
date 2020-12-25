@@ -3355,41 +3355,13 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 		end
 		
 		for i = 1, #Shell.DakDamageList do
-			local CurTarget = CurTarget
+			local CurTarget = Shell.DakDamageList[i]
 			local HPPerc = 0
-			if CurTarget.SPPOwner:IsValid() and CurTarget.SPPOwner:IsPlayer() then
-				if CurTarget.SPPOwner:IsWorld() then
-					if CurTarget.DakIsTread==nil then
-						if CurTarget:GetPos():Distance(Pos) > Radius/2 then
-							if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
-								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-							else
-								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-							end
-						else
-							if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
-								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-							else
-								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-							end
-						end
-					end
-					CurTarget.DakLastDamagePos = Pos
-					if CurTarget.DakHealth <= 0 and CurTarget.DakPooled==0 then
-						if CurTarget:GetClass()=="dak_crew" then
-							if CurTarget.DakHealth <= 0 then
-								for blood=1, 15 do
-									util.Decal( "Blood", CurTarget:GetPos(), CurTarget:GetPos()+(VectorRand()*500), CurTarget)
-								end
-							end
-						end
-						Shell.RemoveList[#Shell.RemoveList+1] = CurTarget
-						--table.insert(Shell.RemoveList,CurTarget)
-					end
-				else
-					if CurTarget.SPPOwner:HasGodMode()==false and not(CurTarget.SPPOwner:IsWorld()) then	
+			if IsValid(CurTarget) then
+				if IsValid(CurTarget.SPPOwner) and CurTarget.SPPOwner:IsPlayer() then
+					if CurTarget.SPPOwner:IsWorld() then
 						if CurTarget.DakIsTread==nil then
-							if CurTarget:GetPos():Distance(Pos) > Radius/2 then 
+							if CurTarget:GetPos():Distance(Pos) > Radius/2 then
 								if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
 									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								else
@@ -3415,38 +3387,67 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 							Shell.RemoveList[#Shell.RemoveList+1] = CurTarget
 							--table.insert(Shell.RemoveList,CurTarget)
 						end
-					end
-				end
-			else
-				if CurTarget.DakIsTread==nil then
-					if CurTarget:GetPos():Distance(Pos) > Radius/2 then 
-						if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
-							DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-						else
-							DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-						end
 					else
-						if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
-							DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-						else
-							DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
-						end
-					end
-				end
-				CurTarget.DakLastDamagePos = Pos
-				if CurTarget.DakHealth <= 0 and CurTarget.DakPooled==0 then
-					if CurTarget:GetClass()=="dak_crew" then
-						if CurTarget.DakHealth <= 0 then
-							for blood=1, 15 do
-								util.Decal( "Blood", CurTarget:GetPos(), CurTarget:GetPos()+(VectorRand()*500), CurTarget)
+						if CurTarget.SPPOwner:HasGodMode()==false and not(CurTarget.SPPOwner:IsWorld()) then	
+							if CurTarget.DakIsTread==nil then
+								if CurTarget:GetPos():Distance(Pos) > Radius/2 then 
+									if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+										DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+									else
+										DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+									end
+								else
+									if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+										DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+									else
+										DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+									end
+								end
+							end
+							CurTarget.DakLastDamagePos = Pos
+							if CurTarget.DakHealth <= 0 and CurTarget.DakPooled==0 then
+								if CurTarget:GetClass()=="dak_crew" then
+									if CurTarget.DakHealth <= 0 then
+										for blood=1, 15 do
+											util.Decal( "Blood", CurTarget:GetPos(), CurTarget:GetPos()+(VectorRand()*500), CurTarget)
+										end
+									end
+								end
+								Shell.RemoveList[#Shell.RemoveList+1] = CurTarget
+								--table.insert(Shell.RemoveList,CurTarget)
 							end
 						end
 					end
-					Shell.RemoveList[#Shell.RemoveList+1] = CurTarget
-					--table.insert(Shell.RemoveList,CurTarget)
+				else
+					if CurTarget.DakIsTread==nil then
+						if CurTarget:GetPos():Distance(Pos) > Radius/2 then 
+							if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							else
+								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							end
+						else
+							if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
+								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							else
+								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							end
+						end
+					end
+					CurTarget.DakLastDamagePos = Pos
+					if CurTarget.DakHealth <= 0 and CurTarget.DakPooled==0 then
+						if CurTarget:GetClass()=="dak_crew" then
+							if CurTarget.DakHealth <= 0 then
+								for blood=1, 15 do
+									util.Decal( "Blood", CurTarget:GetPos(), CurTarget:GetPos()+(VectorRand()*500), CurTarget)
+								end
+							end
+						end
+						Shell.RemoveList[#Shell.RemoveList+1] = CurTarget
+						--table.insert(Shell.RemoveList,CurTarget)
+					end
 				end
 			end
-
 		end
 		for i = 1, #Shell.RemoveList do
 			if (string.Explode("_",Shell.RemoveList[i]:GetClass(),false)[1] == "dak") then
