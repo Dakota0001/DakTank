@@ -349,7 +349,7 @@ function ENT:Think()
 	 		end
 	 		if self.InertiaSet == nil then
 		 		if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
-		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/10000) )
+		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/6000) )
 			 		self.InertiaSet = 1
 			 	end
 		 	end
@@ -950,6 +950,7 @@ function ENT:Think()
 					end
 				end
 				local traceline = util.TraceLine
+				local tracehull = util.TraceHull
 				local TickInt = (1/66.66)
 				local clamp = math.Clamp
 				local abs = math.abs
@@ -1042,9 +1043,11 @@ function ENT:Think()
 					trace = {
 						start = Pos + up*(-CurRideHeight+100),
 						endpos = Pos + up*-CurRideHeight,
+						mins = Vector(-10,-10,-0),
+						maxs = Vector(10,10,0),
 						mask = MASK_SOLID_BRUSHONLY
 					}
-					CurTrace = traceline( trace )
+					CurTrace = tracehull( trace )
 					CurTraceHitPos = CurTrace.HitPos
 					CurTraceDist = math.max((CurTrace.StartPos-(CurTraceHitPos)):Length(),80)
 					lastchange = (CurTraceDist-self.RightChanges[i])/TickInt
@@ -1069,7 +1072,7 @@ function ENT:Think()
 					self.RightPosChanges[i] = CurTraceHitPos
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
-						AbsorbForce = 0.2 *(5/WheelsPerSide)
+						AbsorbForce = 0.25 *(5/WheelsPerSide)
 						if math.abs(hydrabias) > 0 then AbsorbForce = 1 end
 						FrictionForce = basefriction
 					else
@@ -1084,8 +1087,7 @@ function ENT:Think()
 					if i>halfwheels then
 						multval = multval-SuspensionBias
 					end
-
-					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.RightRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult*multval
+					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i])))) + wheelweightforce)*SuspensionForceMult*multval
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
@@ -1122,9 +1124,11 @@ function ENT:Think()
 					trace = {
 						start = Pos + up*(-CurRideHeight+100),
 						endpos = Pos + up*-CurRideHeight,
+						mins = Vector(-10,-10,-0),
+						maxs = Vector(10,10,0),
 						mask = MASK_SOLID_BRUSHONLY
 					}
-					CurTrace = traceline( trace )
+					CurTrace = tracehull( trace )
 					CurTraceHitPos = CurTrace.HitPos
 					CurTraceDist = math.max((CurTrace.StartPos-(CurTraceHitPos)):Length(),80)
 					lastchange = (CurTraceDist-self.LeftChanges[i])/TickInt
@@ -1149,7 +1153,7 @@ function ENT:Think()
 					self.LeftPosChanges[i] = CurTraceHitPos
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
-						AbsorbForce = 0.2 *(5/WheelsPerSide)
+						AbsorbForce = 0.25 *(5/WheelsPerSide)
 						if math.abs(hydrabias) > 0 then AbsorbForce = 1 end
 						FrictionForce = basefriction
 					else
@@ -1165,7 +1169,7 @@ function ENT:Think()
 						multval = multval-SuspensionBias
 					end
 
-					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos - self.LeftRidePosChanges[i]))) + wheelweightforce)*SuspensionForceMult*multval
+					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i])))) + wheelweightforce)*SuspensionForceMult*multval
 					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
 					

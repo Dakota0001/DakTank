@@ -1992,6 +1992,7 @@ function ENT:Think()
 																sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.TurretControls[j].Turret[l]:GetPos(), 100, 100, 0.25 )
 																if self.TurretControls[j].Turret[l]:IsVehicle() then
 																	if IsValid(self.TurretControls[j].Turret[l]:GetDriver()) then
+																		self.TurretControls[j].Turret[l]:GetDriver():SetNoDraw( false )
 																		self.TurretControls[j].Turret[l]:GetDriver():TakeDamage( 1000000, self.LastDamagedBy, self )
 																		--self.TurretControls[j].Turret[l]:GetDriver():Kill()
 																	end
@@ -2082,6 +2083,7 @@ function ENT:Think()
 														end
 														if self.Contraption[i]:IsVehicle() then
 															if IsValid(self.Contraption[i]:GetDriver()) then
+																self.Contraption[i]:GetDriver():SetNoDraw( false )
 																self.Contraption[i]:GetDriver():TakeDamage( 1000000, self.LastDamagedBy, self )
 																--self.Contraption[i]:GetDriver():Kill()
 															end
