@@ -306,7 +306,7 @@ function ENT:Think()
 	 		end
 	 		if self.InertiaSet == nil then
 		 		if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
-		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/10000) )
+		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/6000) )
 			 		self.InertiaSet = 1
 			 	end
 		 	end
@@ -524,7 +524,7 @@ function ENT:Think()
 							if self.Speed < G1Speed then
 								--self.Gear = 1
 								--GearBoost = 0.52 + math.Clamp(self.TopSpeed*0.15/(self.Speed),0,10*math.abs(self.Perc))
-								GearBoost = math.Clamp((self.TopSpeed/self.Speed)*0.1*0.3,0,5)
+								GearBoost = math.Clamp((self.TopSpeed/self.Speed)*0.03*0.85,0,5)
 								--print(GearBoost)
 								self.CurTopSpeed = G1Speed
 								self.LastTopSpeed = 0
@@ -544,7 +544,7 @@ function ENT:Think()
 								self.MaxSpeedDif = G2Speed - self.TopSpeed*0.1
 								--GearBoost = 0.1 + math.Clamp(self.CurTopSpeed/(self.Speed*5.25),0.05,0.15*math.abs(self.Perc))
 								--print(GearBoost)
-								GearBoost = (self.TopSpeed/self.Speed)*0.15*0.3
+								GearBoost = (self.TopSpeed/self.Speed)*0.0225*0.85
 								if self.CrewAlive == 1 then
 									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
 									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
@@ -557,7 +557,7 @@ function ENT:Think()
 								self.MaxSpeedDif = G3Speed - G2Speed
 								--GearBoost = 0.1 + math.Clamp(self.CurTopSpeed/(self.Speed*5.5),0.05,0.15*math.abs(self.Perc))
 								--print(GearBoost)
-								GearBoost = (self.TopSpeed/self.Speed)*0.2*0.495
+								GearBoost = (self.TopSpeed/self.Speed)*0.0495*0.85
 								if self.CrewAlive == 1 then
 									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
 									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
@@ -570,7 +570,7 @@ function ENT:Think()
 								self.MaxSpeedDif = G4Speed - G3Speed
 								--GearBoost = 0.1 + math.Clamp(self.CurTopSpeed/(self.Speed*10),0.05,0.15*math.abs(self.Perc))
 								--print(GearBoost)
-								GearBoost = (self.TopSpeed/self.Speed)*0.3*0.395
+								GearBoost = (self.TopSpeed/self.Speed)*0.05925*0.85
 								if self.CrewAlive == 1 then
 									LPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.LBoost*math.Clamp(Lmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
 									RPhys:ApplyTorqueCenter( (self.PhysicalMass/3000)*self.RBoost*math.Clamp(Rmult,0.0,2)*-self:GetRight()*self.Perc*(1/GearRatio)*self.HPperTon*300*Tweak*GearBoost * math.Min(throttle,1) )
@@ -726,7 +726,7 @@ function ENT:Think()
 												self.RightBrakesEnabled = 1
 											end
 											if self.CrewAlive == 1 then
-												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
+												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 											end
 										else
 											if self.LeftBrakesEnabled == 0 then
@@ -734,7 +734,7 @@ function ENT:Think()
 												self.LeftBrakesEnabled = 1
 											end
 											if self.CrewAlive == 1 then
-												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*-self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
+												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*-self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 											end
 										end
 									end
@@ -745,7 +745,7 @@ function ENT:Think()
 												self.LeftBrakesEnabled = 1
 											end
 											if self.CrewAlive == 1 then
-												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
+												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 											end
 										else
 											if self.RightBrakesEnabled == 0 then
@@ -753,7 +753,7 @@ function ENT:Think()
 												self.RightBrakesEnabled = 1
 											end
 											if self.CrewAlive == 1 then
-												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*-self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
+												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*-self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth)*((self.TopSpeed - self.Speed)/self.TopSpeed) )
 											end
 										end
 									end
@@ -781,21 +781,21 @@ function ENT:Think()
 									if self.CrewAlive == 1 then
 										if self.MoveReverse>0 then
 											if self.MoveLeft>0 and self.MoveRight==0 then
-												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveLeft,1) )
-												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*-self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveLeft,1) )
+												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveLeft,1) )
+												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*-self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveLeft,1) )
 											end
 											if self.MoveRight>0 and self.MoveLeft==0 then
-												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*-self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveRight,1) )
-												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveRight,1) )
+												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*-self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveRight,1) )
+												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveRight,1) )
 											end
 										else
 											if self.MoveLeft>0 and self.MoveRight==0 then
-												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*-self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveLeft,1) )
-												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveLeft,1) )
+												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*-self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveLeft,1) )
+												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveLeft,1) )
 											end
 											if self.MoveRight>0 and self.MoveLeft==0 then
-												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveRight,1) )
-												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*-self:GetRight()*10*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveRight,1) )
+												RPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveRight,1) )
+												LPhys:ApplyTorqueCenter( math.Clamp(self.DakFuel/self.DakFuelReq,0,1)*(self.PhysicalMass/3000)*self.Turn*-self:GetRight()*8*math.Clamp( (0.13*(1/GearRatio)*self.HPperTon) / math.abs(self.LastYaw-self.base:GetAngles().yaw) ,0,10*self.turnperc)*450*(self.DakHealth/self.DakMaxHealth) * math.Min(self.MoveRight,1) )
 											end
 										end
 									end
