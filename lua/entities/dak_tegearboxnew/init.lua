@@ -1072,7 +1072,7 @@ function ENT:Think()
 					self.RightPosChanges[i] = CurTraceHitPos
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
-						AbsorbForce = 0.25 *(5/WheelsPerSide)
+						AbsorbForce = self:GetSuspensionDamping() *(5/WheelsPerSide)
 						if math.abs(hydrabias) > 0 then AbsorbForce = 1 end
 						FrictionForce = basefriction
 					else
@@ -1153,7 +1153,7 @@ function ENT:Think()
 					self.LeftPosChanges[i] = CurTraceHitPos
 					RidePos = math.Clamp((CurTraceDist - 100),-10,10)
 					if RidePos<-0.1 then
-						AbsorbForce = 0.25 *(5/WheelsPerSide)
+						AbsorbForce = self:GetSuspensionDamping() *(5/WheelsPerSide)
 						if math.abs(hydrabias) > 0 then AbsorbForce = 1 end
 						FrictionForce = basefriction
 					else
