@@ -2295,6 +2295,15 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 end
 
 function ENT:OnRemove()
+	if self.Contraption and #self.Contraption>0 then
+		for i=1, #self.Contraption do
+			if self.Contraption[i]:IsVehicle() then
+				if IsValid(self.Contraption[i]:GetDriver()) then
+					self.Contraption[i]:GetDriver():SetNoDraw( false )
+				end
+			end
+		end
+	end
 	if table.Count(self.HitBox)>0 then
 		for i = 1, table.Count(self.HitBox) do
 			self.HitBox[i].DakPooled = 0

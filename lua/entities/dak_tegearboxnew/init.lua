@@ -1000,7 +1000,13 @@ function ENT:Think()
 				if TerrainMultiplier < 1 then
 					TerrainBraking = (1-TerrainMultiplier)*0.25
 				else
-					self.phy:ApplyForceCenter(engine.TickInterval()*self.TimeMult*-forward*self.PhysicalMass*math.abs(physenv.GetGravity().z)*(1-((90-ResistAng)/90)))
+					if not(self.Brakes>0) then
+						if not(self.MoveReverse>0) then
+							self.phy:ApplyForceCenter(engine.TickInterval()*self.TimeMult*-forward*self.PhysicalMass*math.abs(physenv.GetGravity().z)*(1-((90-ResistAng)/90)))
+						else
+							self.phy:ApplyForceCenter(engine.TickInterval()*self.TimeMult*forward*self.PhysicalMass*math.abs(physenv.GetGravity().z)*(1-((90-ResistAng)/90)))
+						end
+					end
 				end
 				local brakestiffness = self:GetBrakeStiffness()
 				if self.Brakes>0 then

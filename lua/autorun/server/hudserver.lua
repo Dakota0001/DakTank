@@ -196,7 +196,7 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 								if GunsSorted[i].IsAutoLoader == 1 then
 									if not(GunsSorted[i].Loaded == 1) then
 										info3count = info3count + 1
-										InfoTable3[info3count] = "-"..GunsSorted[i].DakName.." needs mag"
+										InfoTable3[info3count] = "-"..GunsSorted[i].DakName.." needs mag or mag is too small"
 									end
 								end
 							end

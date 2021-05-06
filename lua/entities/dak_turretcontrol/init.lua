@@ -177,6 +177,7 @@ function ENT:Initialize()
  	self.Accel = 0
 
  	self.ShortStop = self:GetShortStopStabilizer()
+ 	self.FixedGun = self:GetFixedGun()
 	self.Stabilizer = self:GetStabilizer()
 	self.FCS = self:GetFCS()
 end
@@ -427,7 +428,7 @@ function ENT:Think()
 						self.DakCamTrace = self.Inputs.CamTrace2.Value
 					end
 					if (Class == "dak_tegun" or Class == "dak_teautogun" or Class == "dak_temachinegun") then
-						if not(self.Parented) then
+						if not(self.Parented) and self.FixedGun == false then
 							timer.Simple( engine.TickInterval()*1, function()
 								constraint.RemoveAll( self.DakGun )
 								if IsValid(DakTurret) then
@@ -691,20 +692,22 @@ function ENT:Think()
 							end
 						end
 					end
-					if self.SpeedTable == nil then self.SpeedTable = {} end
-					if self.LastAccel == nil then self.LastAccel = 0 end
+					if self.FixedGun == false then
+						if self.SpeedTable == nil then self.SpeedTable = {} end
+						if self.LastAccel == nil then self.LastAccel = 0 end
 
-					self.SpeedTable[#self.SpeedTable+1] = (Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)-self.LastVel)
-					if #self.SpeedTable >= 5 then
-						 table.remove( self.SpeedTable, 1 )
+						self.SpeedTable[#self.SpeedTable+1] = (Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)-self.LastVel)
+						if #self.SpeedTable >= 5 then
+							 table.remove( self.SpeedTable, 1 )
+						end
+						local totalspeed = 0
+						for i=1, #self.SpeedTable do
+							totalspeed = totalspeed + self.SpeedTable[i]
+						end
+						self.Accel = (totalspeed/#self.SpeedTable)
+						self.LastVel = Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)
+						self.LastPos = BasePlate:GetPos()
 					end
-					local totalspeed = 0
-					for i=1, #self.SpeedTable do
-						totalspeed = totalspeed + self.SpeedTable[i]
-					end
-					self.Accel = (totalspeed/#self.SpeedTable)
-					self.LastVel = Vector(0,0,0):Distance(BasePlate:GetPos()-self.LastPos)
-					self.LastPos = BasePlate:GetPos()
 				end
 			end
 		end
