@@ -152,7 +152,7 @@ hook.Add("AdvDupe_FinishPasting", "daktank_tankcore_check", function(dupe)
 		local ent = ents[id]
 		if IsValid(ent) then
 			if ent:GetClass() == "dak_tankcore" then
-				timer.Simple(engine.TickInterval(),function()
+				timer.Simple(engine.TickInterval() + 1,function()
 					ent.DakFinishedPasting = 1
 				end)
 			end
