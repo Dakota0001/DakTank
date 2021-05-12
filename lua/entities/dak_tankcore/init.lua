@@ -972,7 +972,7 @@ function ENT:Think()
 					self.DakOwner:ChatPrint("Tank Analysis Complete: "..self.Cost.." point "..curera.." tank. Right click tank core with spawner for detailed readout.")
 				end
 
-				if not(self.Dead) and self.DakFinishedPasting == 1 then
+				if not(self.Dead) and (self.DakFinishedPasting == 1 or self.dupespawned==nil) then
 					if not(self.DakMaxHealth) then
 						self.DakMaxHealth = 10
 					end
@@ -2185,11 +2185,19 @@ function ENT:PreEntityCopy()
 				local CurrentRes = self.Contraption[i]
 				if CurrentRes ~= NULL and CurrentRes ~= nil then
 					local physobj = CurrentRes:GetPhysicsObject()
-					if CurrentRes.EntityMods.DakClippedArmor ~= nil then
-						local clip = {}
-						clip.ID = CurrentRes:EntIndex()
-						clip.Armor = CurrentRes.DakArmor
-						DupeClips[#DupeClips+1] = clip
+					if CurrentRes.EntityMods ~= nil then
+						if CurrentRes.EntityMods.DakClippedArmor ~= nil then
+							local clip = {}
+							clip.ID = CurrentRes:EntIndex()
+							clip.Armor = CurrentRes.DakArmor
+							DupeClips[#DupeClips+1] = clip
+						else
+							CurrentRes.EntityMods.DakClippedArmor = CurrentRes.DakArmor
+							local clip = {}
+							clip.ID = CurrentRes:EntIndex()
+							clip.Armor = CurrentRes.DakArmor
+							DupeClips[#DupeClips+1] = clip
+						end
 					end
 				end
 			end
@@ -2210,6 +2218,8 @@ function ENT:PreEntityCopy()
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
+	self.dupespawned = true
+
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
 		if Ent.EntityMods.DakTek.CompositesCount == nil then
 			self.NewComposites = {}
