@@ -8,7 +8,7 @@ local InfoTable3 = {}
 local FrontArmor = {}
 
 if !GetConVar( "EnableDakTankInfoScanner" ) then
-	CreateClientConVar( "EnableDakTankInfoScanner", "1", true, false )
+	CreateClientConVar( "EnableDakTankInfoScanner", "1", true, true )
 end
 
 surface.CreateFont( "DakTankHudFont1", {
@@ -64,13 +64,11 @@ net.Receive( "daktankhud", function()
 	InfoTable2 = util.JSONToTable(net.ReadString())
 	InfoTable3 = util.JSONToTable(net.ReadString())
 	FrontArmor = util.JSONToTable(net.ReadString())
-	active = true
-	lastactive = CurTime()
-	timer.Simple( 1, function() 
-		if CurTime() - lastactive > 0.5 then
-			active = false 
-		end
-	end )
+	if #FrontArmor == 0 then
+		active = false 
+	else
+		active = true
+	end
 end )
 
 hook.Add("HUDPaint", "DakTankInfoReadout", function()

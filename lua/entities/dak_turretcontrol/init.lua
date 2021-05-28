@@ -446,6 +446,7 @@ function ENT:Think()
 								 	self.turretaimer:Activate()
 								 	self.turretaimer:SetMoveType(MOVETYPE_NONE)
 								 	self.turretaimer:PhysicsInit(SOLID_NONE)
+								 	self.turretaimer.turretaimer = true
 									DakTurret:SetParent()
 									self.DakGun:SetParent()
 									constraint.RemoveAll( DakTurret )
