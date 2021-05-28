@@ -1977,7 +1977,7 @@ function ENT:Think()
 														end
 													end
 													for l=1, #self.TurretControls[j].Turret do
-														if self.TurretControls[j].Turret[l] ~= self.TurretControls[j].TurretBase then
+														if self.TurretControls[j].Turret[l] ~= self.TurretControls[j].TurretBase and self.TurretControls[j].Turret[l] ~= self.TurretControls[j].turretaimer then
 															if IsValid(self.TurretControls[j].Turret[l]) then
 																table.RemoveByValue( self.Contraption, self.TurretControls[j].Turret[l] )
 																self.TurretControls[j].Turret[l]:SetParent( self.TurretControls[j].TurretBase, -1 )
@@ -2009,11 +2009,30 @@ function ENT:Think()
 															end
 														end
 													end
-													self.TurretControls[j].TurretBase:SetParent(nil)
-													self.TurretControls[j].TurretBase:SetAngles(self.TurretControls[j].TurretBase:GetAngles() + Angle(math.Rand(-15,15),math.Rand(-15,15),math.Rand(-15,15)))
-													self.TurretControls[j].TurretBase:GetPhysicsObject():SetMass(self.TurretControls[j].GunMass)
-													self.TurretControls[j].TurretBase:GetPhysicsObject():ApplyForceCenter(self.TurretControls[j].TurretBase:GetUp()*2500*self:GetTurretPopForceMult()*self.TurretControls[j].TurretBase:GetPhysicsObject():GetMass())
+
+													TurretPhys = ents.Create("prop_physics")
+												 	TurretPhys:SetAngles(self.TurretControls[j].turretaimer:GetAngles())
+												 	TurretPhys:SetPos(self.TurretControls[j].turretaimer:GetPos())
+												 	TurretPhys:SetModel( self.TurretControls[j].TurretBase:GetModel() )
+												 	TurretPhys:SetParent(TurretPhys)
+												 	TurretPhys:DrawShadow(false)
+												 	TurretPhys:SetColor( Color(255, 255, 255, 0) )
+												 	TurretPhys:SetRenderMode( RENDERMODE_TRANSCOLOR )
+												 	TurretPhys.DakIsTread = true
+												 	TurretPhys:Spawn()
+												 	TurretPhys:Activate()
+												 	--TurretPhys:SetMoveType(MOVETYPE_VPHYSICS)
+												 	--TurretPhys:PhysicsInit(SOLID_VPHYSICS)
+
+												 	self.TurretControls[j].turretaimer:SetParent(TurretPhys)
+
+													TurretPhys:SetAngles(self.TurretControls[j].turretaimer:GetAngles() + Angle(math.Rand(-15,15),math.Rand(-15,15),math.Rand(-15,15)))
+													TurretPhys:GetPhysicsObject():SetMass(self.TurretControls[j].GunMass)
+													TurretPhys:GetPhysicsObject():ApplyForceCenter(TurretPhys:GetUp()*2500*self:GetTurretPopForceMult()*TurretPhys:GetPhysicsObject():GetMass())
+													TurretPhys:GetPhysicsObject():AddAngleVelocity(VectorRand()*500*self:GetTurretPopForceMult())
 													self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].TurretBase
+													self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].turretaimer
+													self.RemoveTurretList[#self.RemoveTurretList+1] = TurretPhys
 												end
 											end
 										end
@@ -2026,7 +2045,7 @@ function ENT:Think()
 											else
 												if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
 													self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
-													if self.Contraption[i] ~= self:GetParent():GetParent() and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self then
+													if self.Contraption[i] ~= self:GetParent():GetParent() and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self and self.Contraption[i].turretaimer ~= true then
 														if math.random(1,6)>1 then
 															if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_tegearboxnew" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or self.Contraption[i]:GetClass() == "gmod_wire_expression2" then
 																self.salvage = ents.Create( "dak_tesalvage" )

@@ -287,7 +287,7 @@ function ENT:Think()
 				self.DakHP = 0
 			end
 		end
-		self.DakSpeed = (self.DakSpeed * math.Clamp(self.DakFuel/self.DakFuelReq,0,1)) * math.Clamp(self.MaxHP/self.DakHP,0,1)
+		self.DakSpeed = (self.DakSpeed * 2 * math.Clamp(self.DakFuel/self.DakFuelReq,0,1)) * math.Clamp(self.MaxHP/self.DakHP,0,1)
 
 		self.CrewAlive = 1
 		if self.DakCrew == NULL then
@@ -733,24 +733,24 @@ function ENT:Think()
 										if math.abs(self.RealYaw)<1.5 then
 											self.LeftBrake = 0
 											self.RightBrake = 1
-											self.LeftForce = 0
+											self.LeftForce = self.LeftForce*2
 											self.RightForce = 0
 										else
 											self.LeftBrake = 1
 											self.RightBrake = 0
 											self.LeftForce = 0
-											self.RightForce = 0
+											self.RightForce = self.RightForce*2
 										end
 									else
 										if math.abs(self.RealYaw)<1.5 then
 											self.LeftBrake = 1
 											self.RightBrake = 0
 											self.LeftForce = 0
-											self.RightForce = 0
+											self.RightForce = self.RightForce*2
 										else
 											self.LeftBrake = 0
 											self.RightBrake = 1
-											self.LeftForce = 0
+											self.LeftForce = self.LeftForce*2
 											self.RightForce = 0
 										end
 									end
@@ -761,24 +761,24 @@ function ENT:Think()
 											self.LeftBrake = 1
 											self.RightBrake = 0
 											self.LeftForce = 0
-											self.RightForce = 0
+											self.RightForce = self.RightForce*2
 										else
 											self.LeftBrake = 0
 											self.RightBrake = 1
-											self.LeftForce = 0
+											self.LeftForce = self.LeftForce*2
 											self.RightForce = 0
 										end
 									else
 										if math.abs(self.RealYaw)<1.5 then
 											self.LeftBrake = 0
 											self.RightBrake = 1
-											self.LeftForce = 0
+											self.LeftForce = self.LeftForce*2
 											self.RightForce = 0
 										else
 											self.LeftBrake = 1
 											self.RightBrake = 0
 											self.LeftForce = 0
-											self.RightForce = 0
+											self.RightForce = self.RightForce*2
 										end
 									end
 								end
@@ -994,17 +994,19 @@ function ENT:Think()
 				local HeightDiff = FrontHit.z-BackHit.z
 				local ResistAng = math.atan(HeightDiff/TrackLength)*57.2958
 				if self.MoveReverse>0 then ResistAng = ResistAng*-1 end
-				local TerrainMultiplier = math.Clamp(((90-ResistAng)/90),0,1.5)
+				local TerrainMultiplier = math.Clamp(1-math.sin(math.rad(ResistAng)),0,1)
+
+
 
 				local TerrainBraking = 0
 				if TerrainMultiplier < 1 then
-					TerrainBraking = (1-TerrainMultiplier)*0.25
+					TerrainBraking = (1-TerrainMultiplier)*0.125
 				else
 					if not(self.Brakes>0) then
 						if not(self.MoveReverse>0) then
-							self.phy:ApplyForceCenter(engine.TickInterval()*self.TimeMult*-forward*self.PhysicalMass*math.abs(physenv.GetGravity().z)*(1-((90-ResistAng)/90)))
+							self.phy:ApplyForceCenter(engine.TickInterval()*self.TimeMult*-forward*self.PhysicalMass*math.abs(physenv.GetGravity().z)*math.sin(math.rad(ResistAng)))
 						else
-							self.phy:ApplyForceCenter(engine.TickInterval()*self.TimeMult*forward*self.PhysicalMass*math.abs(physenv.GetGravity().z)*(1-((90-ResistAng)/90)))
+							self.phy:ApplyForceCenter(engine.TickInterval()*self.TimeMult*forward*self.PhysicalMass*math.abs(physenv.GetGravity().z)*math.sin(math.rad(ResistAng)))
 						end
 					end
 				end
@@ -1013,7 +1015,7 @@ function ENT:Think()
 					brakestiffness = 1
 				end
 				local halfwheels = WheelsPerSide*0.5
-				local basefriction = 2*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
+				local basefriction = 1*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 				if self.CarTurning == 1 then
 					basefriction = 1*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 				end
@@ -1023,8 +1025,8 @@ function ENT:Think()
 				local rotatedforward
 				local ForwardEntPos = ForwardEnt:GetPos()
 				local ForwardEntAng = ForwardEnt:GetAngles()
-				local rightbraking = Vector(math.max(self.RightBrake*brakestiffness,TerrainBraking),1,0)
-				local leftbraking = Vector(math.max(self.LeftBrake*brakestiffness,TerrainBraking),1,0)
+				local rightbraking = Vector(math.max(self.RightBrake*brakestiffness,TerrainBraking),1,0)*2
+				local leftbraking = Vector(math.max(self.LeftBrake*brakestiffness,TerrainBraking),1,0)*2
 				local WheelYaw = self.WheelYaw
 				--Right side
 				for i=1, WheelsPerSide do

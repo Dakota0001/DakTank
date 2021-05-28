@@ -248,7 +248,7 @@ function ENT:Think()
 				self.DakHP = 0
 			end
 		end
-		self.DakSpeed = (self.DakSpeed * math.Clamp(self.DakFuel/self.DakFuelReq,0,1)) * math.Clamp(self.MaxHP/self.DakHP,0,1)
+		self.DakSpeed = (self.DakSpeed * 2 * math.Clamp(self.DakFuel/self.DakFuelReq,0,1)) * math.Clamp(self.MaxHP/self.DakHP,0,1)
 
 		self.CrewAlive = 1
 		if self.DakCrew == NULL then

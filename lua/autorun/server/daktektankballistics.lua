@@ -4701,7 +4701,7 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 				end
 				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
 					if(ExpTrace.Entity:GetParent():IsValid()) then
-						if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
+						if(ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():IsValid()) then
 							ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.0035*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
 						end
 					end
