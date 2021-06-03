@@ -1,14 +1,10 @@
 local x = ScrW()
 local y = ScrH()
-local active = false
 local InfoTable1 = {}
 local InfoTable2 = {}
 local InfoTable3 = {}
 local FrontArmor = {}
-
-if not GetConVar("EnableDakTankInfoScanner") then
-	CreateClientConVar("EnableDakTankInfoScanner", "1", true, true)
-end
+local CanDraw    = CreateClientConVar("EnableDakTankInfoScanner", "1", true, true):GetBool()
 
 surface.CreateFont("DakTankHudFont1", {
 	font = "Arial",
@@ -58,21 +54,18 @@ hook.Add("PopulateToolMenu", "DakTankInfoScannerPopulateToolMenu", function()
 end)
 
 -- Add stuff here
-net.Receive("daktankhud", function()
-	InfoTable1 = util.JSONToTable(net.ReadString())
-	InfoTable2 = util.JSONToTable(net.ReadString())
-	InfoTable3 = util.JSONToTable(net.ReadString())
-	FrontArmor = util.JSONToTable(net.ReadString())
+local function StopDrawing()
+	hook.Remove("HUDPaint", "DakTankInfoReadout")
+end
 
-	if #FrontArmor == 0 then
-		active = false
+local function DrawReadout()
+	-- Stop drawing when we sit in a vehicle
+	if LocalPlayer():InVehicle() then
+		print("in vehicle!")
+		StopDrawing()
+
+		return
 	else
-		active = true
-	end
-end)
-
-hook.Add("HUDPaint", "DakTankInfoReadout", function()
-	if active and GetConVar("EnableDakTankInfoScanner"):GetString() == "1" then
 		surface.SetDrawColor(0, 0, 0, 200)
 		surface.DrawRect(x * 0.05, y * 0.2, 450, 60 + 25 * (#InfoTable1 + #InfoTable2 + #InfoTable3))
 		surface.SetDrawColor(0, 255, 0, 255)
@@ -119,5 +112,31 @@ hook.Add("HUDPaint", "DakTankInfoReadout", function()
 				end
 			end
 		end
+	end
+end
+
+local function StartDrawing()
+	hook.Add("HUDPaint", "DakTankInfoReadout", DrawReadout)
+end
+
+net.Receive("daktankhud", function()
+	InfoTable1 = util.JSONToTable(net.ReadString())
+	InfoTable2 = util.JSONToTable(net.ReadString())
+	InfoTable3 = util.JSONToTable(net.ReadString())
+	FrontArmor = util.JSONToTable(net.ReadString())
+
+	if CanDraw and #FrontArmor == 0 then
+		StopDrawing()
+	else
+		StartDrawing()
+	end
+end)
+
+cvars.AddChangeCallback("EnableDakTankInfoScanner", function(_, _, New)
+	local Value = tobool(New)
+	CanDraw = Value
+
+	if not CanDraw then
+		StopDrawing()
 	end
 end)
