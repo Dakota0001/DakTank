@@ -4,6 +4,7 @@ local InfoTable1 = {}
 local InfoTable2 = {}
 local InfoTable3 = {}
 local FrontArmor = {}
+local Tally      = 0
 local CanDraw    = CreateClientConVar("EnableDakTankInfoScanner", "1", true, true):GetBool()
 
 surface.CreateFont("DakTankHudFont1", {
@@ -67,9 +68,9 @@ local function DrawReadout()
 		return
 	else
 		surface.SetDrawColor(0, 0, 0, 200)
-		surface.DrawRect(x * 0.05, y * 0.2, 450, 60 + 25 * (#InfoTable1 + #InfoTable2 + #InfoTable3))
+		surface.DrawRect(x * 0.05, y * 0.2, 450, 60 + 25 * Tally)
 		surface.SetDrawColor(0, 255, 0, 255)
-		surface.DrawOutlinedRect(x * 0.05, y * 0.2, 450, 60 + 25 * (#InfoTable1 + #InfoTable2 + #InfoTable3))
+		surface.DrawOutlinedRect(x * 0.05, y * 0.2, 450, 60 + 25 * Tally)
 		local spacing = 0
 
 		for i = 1, #InfoTable1 do
@@ -89,7 +90,7 @@ local function DrawReadout()
 
 		spacing = spacing + 25
 		draw.DrawText("This panel can be disabled at any time via the utilities menu.", "DakTankHudFont2", x * 0.05 + 10, y * 0.2 + 5 + spacing, Color(0, 255, 0, 255), TEXT_ALIGN_LEFT)
-		local yadd = 60 + 25 * (#InfoTable1 + #InfoTable2 + #InfoTable3) - 200
+		local yadd = 60 + 25 * Tally - 200
 		surface.SetDrawColor(0, 0, 0, 200)
 		surface.DrawRect(x * 0.05 + 475, y * 0.2 + yadd, 200, 200)
 		surface.SetDrawColor(0, 255, 0, 255)
@@ -107,7 +108,7 @@ local function DrawReadout()
 
 					if FrontArmor[curpixel] ~= 0 then
 						surface.SetDrawColor(255 * (FrontArmor[curpixel] / maxarmor), 255 - 255 * math.min(1, FrontArmor[curpixel] / maxarmor), 0, 200)
-						surface.DrawRect(x * 0.05 + 475 + 200 - (1 * (pixelsize) * j), y * 0.2 + yadd + (1 * (pixelsize) * i), pixelsize, pixelsize)
+						surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * j), y * 0.2 + yadd + (1 * pixelsize * i), pixelsize, pixelsize)
 					end
 				end
 			end
@@ -124,6 +125,8 @@ net.Receive("daktankhud", function()
 	InfoTable2 = util.JSONToTable(net.ReadString())
 	InfoTable3 = util.JSONToTable(net.ReadString())
 	FrontArmor = util.JSONToTable(net.ReadString())
+
+	Tally = #InfoTable1 + #InfoTable2 + #InfoTable3
 
 	if CanDraw and #FrontArmor == 0 then
 		StopDrawing()
