@@ -62,7 +62,6 @@ end
 local function DrawReadout()
 	-- Stop drawing when we sit in a vehicle
 	if LocalPlayer():InVehicle() then
-		print("in vehicle!")
 		StopDrawing()
 
 		return
