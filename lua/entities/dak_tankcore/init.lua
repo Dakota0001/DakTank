@@ -767,7 +767,7 @@ function ENT:Think()
 									if self.Guns[i].DakMaxHealth*5.40*0.658 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.40*0.658 end
 								end
 							elseif name == "HEAT" then
-								if self.Modern==1 then
+								if self.ColdWar==1 or self.Modern==1 then
 									if self.Guns[i].DakMaxHealth*5.4*0.431 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4*0.431 end
 								else
 									if self.Guns[i].DakMaxHealth*1.20 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.20 end
