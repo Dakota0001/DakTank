@@ -28,7 +28,7 @@ if SERVER then
 				include(File)
 
 				ServerCount = ServerCount + 1
-			elseif Sub == "sh_" then -- Shared
+			elseif Sub == "sh_" then
 				include(File)
 				AddCSLuaFile(File)
 
@@ -94,4 +94,4 @@ elseif CLIENT then
 end
 
 Load = nil
-MsgN("|\n=======[ Finished Loading DakTank ]=======\n")
+MsgN("|\n==========================================\n")
