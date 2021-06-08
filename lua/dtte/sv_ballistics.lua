@@ -15,6 +15,8 @@ local function CheckClip(Ent, HitPos)
 end
 --this function seemingly only works with that one broken visclip twisted suggested I use once
 ]]--
+local entity = FindMetaTable( "Entity" )
+
 DakTank = {}
 DakTank.PersistFireLast = 0
 DakTank.PersistFireLastDelay = math.random(0.25,0.5)
@@ -78,6 +80,43 @@ function FireBurn(Pos, owner, gun)
 		end
 	end
 end
+
+function entity:DTShellApplyForce(HitPos,Normal,Shell)
+	if IsValid(self:GetParent()) then
+		if IsValid(self:GetParent():GetParent()) then
+			if self.Controller then
+				if IsValid(self:GetParent():GetParent():GetPhysicsObject()) then
+					self:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( -Normal*(0.5*(((Shell.DakVelocity:Distance( Vector(0,0,0) ))*0.254)^2)*Shell.DakMass)/self.Controller.TotalMass*0.04,self:GetParent():GetParent():GetPos()+self:WorldToLocal(HitPos):GetNormalized() )
+				end
+			else
+				if IsValid(self:GetParent():GetParent():GetPhysicsObject()) then
+					local Div = Vector(self:GetParent():GetParent():OBBMaxs().x/75,self:GetParent():GetParent():OBBMaxs().y/75,self:GetParent():GetParent():OBBMaxs().z/75)
+					self:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/self:GetParent():GetParent():GetPhysicsObject():GetMass()*0.04,self:GetParent():GetParent():GetPos()+self:WorldToLocal(HitPos):GetNormalized() )
+				end
+			end
+		end
+	else
+		if IsValid(self:GetPhysicsObject()) then
+			local Div = Vector(self:OBBMaxs().x/75,self:OBBMaxs().y/75,self:OBBMaxs().z/75)
+			self:GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/self:GetPhysicsObject():GetMass()*0.04,self:GetPos()+self:WorldToLocal(HitPos):GetNormalized() )
+		end
+	end
+end
+
+function entity:DTHEApplyForce(HitPos, Pos, Damage, Traces, Multipler)
+	if IsValid(self:GetParent()) then
+		if IsValid(self:GetParent():GetParent()) then
+			if IsValid(self:GetParent():GetParent():GetPhysicsObject()) then
+				self:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (HitPos-Pos):GetNormalized()*(Damage/Traces)*Multipler*self:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(HitPos:Distance(Pos)/1000))  )
+			end
+		end
+	else
+		if IsValid(self:GetPhysicsObject()) then
+			self:GetPhysicsObject():ApplyForceCenter( (HitPos-Pos):GetNormalized()*(Damage/Traces)*Multipler*self:GetPhysicsObject():GetMass()*(1-(HitPos:Distance(Pos)/1000))  )
+		end
+	end
+end
+
 
 function DTWorldPenBackTrace(Start, End, Filter, Caliber)
 	--print("backtracing")
@@ -1011,20 +1050,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					--print("Shell Hit Function First Impact Damage")
 					--print(math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2))
 					if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") and not(Shell.DakIsFlame==1) then
-						if(HitEnt:GetParent():IsValid()) then
-							if(HitEnt:GetParent():GetParent():IsValid()) then
-								if HitEnt.Controller then
-									HitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( -Normal*(0.5*(((Shell.DakVelocity:Distance( Vector(0,0,0) ))*0.254)^2)*Shell.DakMass)/HitEnt.Controller.TotalMass*0.04,HitEnt:GetParent():GetParent():GetPos()+HitEnt:WorldToLocal(HitPos):GetNormalized() )
-								else
-									local Div = Vector(HitEnt:GetParent():GetParent():OBBMaxs().x/75,HitEnt:GetParent():GetParent():OBBMaxs().y/75,HitEnt:GetParent():GetParent():OBBMaxs().z/75)
-									HitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/HitEnt:GetParent():GetParent():GetPhysicsObject():GetMass()*0.04,HitEnt:GetParent():GetParent():GetPos()+HitEnt:WorldToLocal(HitPos):GetNormalized() )
-								end
-							end
-						end
-						if not(HitEnt:GetParent():IsValid()) then
-							local Div = Vector(HitEnt:OBBMaxs().x/75,HitEnt:OBBMaxs().y/75,HitEnt:OBBMaxs().z/75)
-							HitEnt:GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/HitEnt:GetPhysicsObject():GetMass()*0.04,HitEnt:GetPos()+HitEnt:WorldToLocal(HitPos):GetNormalized() )
-						end
+						HitEnt:DTShellApplyForce(HitPos,Normal,Shell)
 					end
 					Shell.Filter[#Shell.Filter+1] = HitEnt
 					if Shattered == 1 then
@@ -1155,20 +1181,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 					if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") and not(Shell.DakIsFlame==1) then
-						if(HitEnt:GetParent():IsValid()) then
-							if(HitEnt:GetParent():GetParent():IsValid()) then
-								if HitEnt.Controller then
-									HitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( -Normal*(0.5*(((Shell.DakVelocity:Distance( Vector(0,0,0) ))*0.254)^2)*Shell.DakMass)/HitEnt.Controller.TotalMass*0.04,HitEnt:GetParent():GetParent():GetPos()+HitEnt:WorldToLocal(HitPos):GetNormalized() )
-								else
-									local Div = Vector(HitEnt:GetParent():GetParent():OBBMaxs().x/75,HitEnt:GetParent():GetParent():OBBMaxs().y/75,HitEnt:GetParent():GetParent():OBBMaxs().z/75)
-									HitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/HitEnt:GetParent():GetParent():GetPhysicsObject():GetMass()*0.04,HitEnt:GetParent():GetParent():GetPos()+HitEnt:WorldToLocal(HitPos):GetNormalized() )
-								end							
-							end
-						end
-						if not(HitEnt:GetParent():IsValid()) then
-							local Div = Vector(HitEnt:OBBMaxs().x/75,HitEnt:OBBMaxs().y/75,HitEnt:OBBMaxs().z/75)
-							HitEnt:GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/HitEnt:GetPhysicsObject():GetMass()*0.04,HitEnt:GetPos()+HitEnt:WorldToLocal(HitPos):GetNormalized() )
-						end
+						HitEnt:DTShellApplyForce(HitPos,Normal,Shell)
 					end
 					
 					--print( math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))) ) -- hit angle
@@ -1881,20 +1894,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						--print("Shell Hit Function Secondary Impact Damage")
 						--print(math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2))
 						if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") and not(Shell.DakIsFlame==1) then
-							if(HitEnt:GetParent():IsValid()) then
-								if(HitEnt:GetParent():GetParent():IsValid()) then
-									if HitEnt.Controller then
-										HitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( -Normal*(0.5*(((Shell.DakVelocity:Distance( Vector(0,0,0) ))*0.254)^2)*Shell.DakMass)/HitEnt.Controller.TotalMass*0.04,HitEnt:GetParent():GetParent():GetPos()+HitEnt:WorldToLocal(ContShellTrace.HitPos):GetNormalized() )
-									else
-										local Div = Vector(HitEnt:GetParent():GetParent():OBBMaxs().x/75,HitEnt:GetParent():GetParent():OBBMaxs().y/75,HitEnt:GetParent():GetParent():OBBMaxs().z/75)
-										HitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/HitEnt:GetParent():GetParent():GetPhysicsObject():GetMass()*0.04,HitEnt:GetParent():GetParent():GetPos()+HitEnt:WorldToLocal(ContShellTrace.HitPos):GetNormalized() )
-									end
-								end
-							end
-							if not(HitEnt:GetParent():IsValid()) then
-								local Div = Vector(HitEnt:OBBMaxs().x/75,HitEnt:OBBMaxs().y/75,HitEnt:OBBMaxs().z/75)
-								HitEnt:GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/HitEnt:GetPhysicsObject():GetMass()*0.04,HitEnt:GetPos()+HitEnt:WorldToLocal(ContShellTrace.HitPos):GetNormalized() )
-							end
+							HitEnt:DTShellApplyForce(ContShellTrace.HitPos,Normal,Shell)
 						end
 						Shell.Filter[#Shell.Filter+1] = HitEnt
 						if Shattered == 1 then
@@ -2028,20 +2028,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 						end
 						if(HitEnt:IsValid() and HitEnt.Base ~= "base_nextbot" and HitEnt:GetClass()~="prop_ragdoll") and not(Shell.DakIsFlame==1) then
-							if(HitEnt:GetParent():IsValid()) then
-								if(HitEnt:GetParent():GetParent():IsValid()) then
-									if HitEnt.Controller then
-										HitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( -Normal*(0.5*(((Shell.DakVelocity:Distance( Vector(0,0,0) ))*0.254)^2)*Shell.DakMass)/HitEnt.Controller.TotalMass*0.04,HitEnt:GetParent():GetParent():GetPos()+HitEnt:WorldToLocal(ContShellTrace.HitPos):GetNormalized() )
-									else
-										local Div = Vector(HitEnt:GetParent():GetParent():OBBMaxs().x/75,HitEnt:GetParent():GetParent():OBBMaxs().y/75,HitEnt:GetParent():GetParent():OBBMaxs().z/75)
-										HitEnt:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/HitEnt:GetParent():GetParent():GetPhysicsObject():GetMass()*0.04,HitEnt:GetParent():GetParent():GetPos()+HitEnt:WorldToLocal(ContShellTrace.HitPos):GetNormalized() )
-									end
-								end
-							end
-							if not(HitEnt:GetParent():IsValid()) then
-								local Div = Vector(HitEnt:OBBMaxs().x/75,HitEnt:OBBMaxs().y/75,HitEnt:OBBMaxs().z/75)
-								HitEnt:GetPhysicsObject():ApplyForceOffset( Div*((Shell.DakVelocity:Distance( Vector(0,0,0) ))*Shell.DakMass/50000)/HitEnt:GetPhysicsObject():GetMass()*0.04,HitEnt:GetPos()+HitEnt:WorldToLocal(ContShellTrace.HitPos):GetNormalized() )
-							end
+							HitEnt:DTShellApplyForce(ContShellTrace.HitPos,Normal,Shell)
 						end
 						local effectdata = EffectData()
 						if Shell.DakIsFlame == 1 then
@@ -2051,7 +2038,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							effectdata:SetMagnitude(.5)
 							effectdata:SetScale(1)
 							util.Effect("dakteflameimpact", effectdata, true, true)
-							PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
+							PersistFire(ContShellTrace.HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 						else
 							Shell.Filter[#Shell.Filter+1] = HitEnt
@@ -2274,7 +2261,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							effectdata:SetMagnitude(.5)
 							effectdata:SetScale(1)
 							util.Effect("dakteflameimpact", effectdata, true, true)
-							PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
+							PersistFire(ContShellTrace.HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 						else
 							effectdata:SetOrigin(ContShellTrace.HitPos)
@@ -2414,7 +2401,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							effectdata:SetScale(1)
 							util.Effect("dakteflameimpact", effectdata, true, true)
 							local Targets = ents.FindInSphere( ContShellTrace.HitPos, 150 )
-							PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
+							PersistFire(ContShellTrace.HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
 							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
 						else
 							effectdata:SetOrigin(ContShellTrace.HitPos)
@@ -2596,14 +2583,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					end
 				end
 				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
-					if(ExpTrace.Entity:GetParent():IsValid()) then
-						if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-							ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-						end
-					end
-					if not(ExpTrace.Entity:GetParent():IsValid()) then
-						ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-					end
+					ExpTrace.Entity:DTHEApplyForce(ExpTrace.HitPos, Pos, Damage, traces, 0.35)
 				end	
 			end
 			if ExpTrace.Entity:IsValid() then
@@ -2778,14 +2758,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					end
 				end
 				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
-					if(ExpTrace.Entity:GetParent():IsValid()) then
-						if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-							ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-						end
-					end
-					if not(ExpTrace.Entity:GetParent():IsValid()) then
-						ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-					end
+					ExpTrace.Entity:DTHEApplyForce(ExpTrace.HitPos, Pos, Damage, traces, 0.35)
 				end	
 			end
 			if ExpTrace.Entity:IsValid() then
@@ -2959,14 +2932,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 				end
 			end
 			if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
-				if(ExpTrace.Entity:GetParent():IsValid()) then
-					if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-						ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-					end
-				end
-				if not(ExpTrace.Entity:GetParent():IsValid()) then
-					ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-				end
+				ExpTrace.Entity:DTHEApplyForce(ExpTrace.HitPos, Pos, Damage, traces, 0.35)
 			end	
 		end
 		if ExpTrace.Entity:IsValid() then
@@ -3178,14 +3144,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 						end
 					end
 					if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
-						if(ExpTrace.Entity:GetParent():IsValid()) then
-							if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-								ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-							end
-						end
-						if not(ExpTrace.Entity:GetParent():IsValid()) then
-							ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.35*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-						end
+						ExpTrace.Entity:DTHEApplyForce(ExpTrace.HitPos, Pos, Damage, traces, 0.35)
 					end	
 				end
 				--print((Damage/traces)*1)
@@ -4547,8 +4506,6 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 	end
 end
 
-local entity = FindMetaTable( "Entity" )
-
 function entity:CheckClip(Ent, HitPos)
 	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
 	
@@ -4700,14 +4657,7 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 					end
 				end
 				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity.Base == "base_nextbot") then
-					if(ExpTrace.Entity:GetParent():IsValid()) then
-						if(ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():IsValid()) then
-							ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.0035*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-						end
-					end
-					if not(ExpTrace.Entity:GetParent():IsValid()) then
-						ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.0035*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-					end
+					ExpTrace.Entity:DTHEApplyForce(ExpTrace.HitPos, Pos, Damage, traces, 0.0035)
 				end	
 			end
 			if ExpTrace.Entity:IsValid() then
@@ -4889,16 +4839,7 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 					end
 				end
 				if (ExpTrace.Entity:IsValid()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity:IsPlayer()) then
-					if(ExpTrace.Entity:GetParent():IsValid()) then
-						if(ExpTrace.Entity:GetParent():GetParent():IsValid()) then
-							if ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():IsValid() then
-								ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.0035*ExpTrace.Entity:GetParent():GetParent():GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-							end
-						end
-					end
-					if not(ExpTrace.Entity:GetParent():IsValid()) then
-						ExpTrace.Entity:GetPhysicsObject():ApplyForceCenter( (ExpTrace.HitPos-Pos):GetNormalized()*(Damage/traces)*0.0035*ExpTrace.Entity:GetPhysicsObject():GetMass()*(1-(ExpTrace.HitPos:Distance(Pos)/1000))  )
-					end
+					ExpTrace.Entity:DTHEApplyForce(ExpTrace.HitPos, Pos, Damage, traces, 0.0035)
 				end	
 			end
 			if ExpTrace.Entity:IsValid() then
