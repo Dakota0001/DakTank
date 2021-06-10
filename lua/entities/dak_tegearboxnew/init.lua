@@ -49,10 +49,10 @@ function ENT:Initialize()
 	self.Gear = 0
 	self.SideDist = self:GetSideDist()
  	self.TrackLength = self:GetTrackLength()
- 	self.WheelsPerSide = self:GetWheelsPerSide()
+ 	self.WheelsPerSide = math.Clamp(self:GetWheelsPerSide(),2,20)
  	self.RideHeight = self:GetRideHeight()
- 	self.RideLimit = self:GetRideLimit()
- 	self.SuspensionBias = self:GetSuspensionBias()
+ 	self.RideLimit = math.Clamp(self:GetRideLimit(),50,200)
+ 	self.SuspensionBias = math.Clamp(self:GetSuspensionBias(),-0.99,0.99)
 	self.RightChanges = {}
 	self.RightPosChanges = {}
 	self.RightRidePosChanges = {}
@@ -89,14 +89,14 @@ function ENT:Think()
 	local self = self
 	self.SideDist = self:GetSideDist()
  	self.TrackLength = self:GetTrackLength()
- 	self.WheelsPerSide = self:GetWheelsPerSide()
+ 	self.WheelsPerSide = math.Clamp(self:GetWheelsPerSide(),2,20)
  	self.RideHeight = self:GetRideHeight()
- 	self.RideLimit = self:GetRideLimit()
-	self.SuspensionBias = self:GetSuspensionBias()
+ 	self.RideLimit = math.Clamp(self:GetRideLimit(),50,200)
+	self.SuspensionBias = math.Clamp(self:GetSuspensionBias(),-0.99,0.99)
  	self.FrontWheelRaise = self:GetFrontWheelRaise()
  	self.RearWheelRaise = self:GetRearWheelRaise()
  	self.ForwardOffset = self:GetForwardOffset()
-	self.GearRatio = self:GetGearRatio()*0.01
+	self.GearRatio = math.Clamp(self:GetGearRatio(),50,100)*0.01
 
 	self.WheelHeight = self:GetWheelHeight()
  	self.FrontWheelHeight = self:GetFrontWheelHeight()
@@ -828,12 +828,12 @@ function ENT:Think()
 							end
 						else
 							if self.MoveLeft>0 and self.MoveRight==0 then
-								if self.WheelYaw > -self:GetTurnAngle() then
+								if self.WheelYaw > -math.Clamp(self:GetTurnAngle(),0,45) then
 									self.WheelYaw = self.WheelYaw - 1
 								end
 							end
 							if self.MoveRight>0 and self.MoveLeft==0 then
-								if self.WheelYaw < self:GetTurnAngle() then
+								if self.WheelYaw < math.Clamp(self:GetTurnAngle(),0,45) then
 									self.WheelYaw = self.WheelYaw + 1
 								end
 							end
@@ -902,7 +902,7 @@ function ENT:Think()
 				local CurTraceDist
 				local ForwardEnt = self.ForwardEnt
 				local WheelsPerSide = self.WheelsPerSide--math.min(self.WheelsPerSide,5)
-				local SuspensionForceMult = (5/WheelsPerSide)*self:GetSuspensionForceMult()
+				local SuspensionForceMult = (5/WheelsPerSide)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 				local TrackLength = self.TrackLength
 				local ForwardOffset = self.ForwardOffset
 				local RideLimit = self.RideLimit
@@ -1099,7 +1099,7 @@ function ENT:Think()
 					end
 					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i])))) + wheelweightforce)*SuspensionForceMult*multval
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
-					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
+					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
 					
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
@@ -1180,7 +1180,7 @@ function ENT:Think()
 					end
 
 					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i])))) + wheelweightforce)*SuspensionForceMult*multval
-					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*self:GetSuspensionForceMult()
+					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
 					
 					

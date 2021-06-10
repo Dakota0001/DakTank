@@ -219,7 +219,7 @@ function ENT:Think()
 	end
 
 	if IsValid(self.DakTankCore) and IsValid(self.DakTankCore.Motors[1]) then 
-		local GearRatio = self:GetGearRatio()*0.01
+		local GearRatio = math.Clamp(self:GetGearRatio(),50,100)*0.01
 		self.DakSpeed = 0
 		self.DakFuel = 0
 		self.DakFuelReq = 0

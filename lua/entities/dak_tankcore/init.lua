@@ -416,7 +416,7 @@ function ENT:Think()
 					self.APSFrontalArc = self:GetAPSFrontalArc()
 					self.APSSideArc = self:GetAPSSideArc()
 					self.APSRearArc = self:GetAPSRearArc()
-					self.APSShots = self:GetAPSShots()
+					self.APSShots = math.Clamp(self:GetAPSShots(),0,20)
 					self.APSMinCaliber = self:GetAPSMinCaliber()
 
 					if self.APSEnable == true then

@@ -80,7 +80,7 @@ function ENT:Initialize()
  		self:NetworkVar("String",0,"Model")
  	end
  	self:SetNWFloat("Caliber",self.DakCaliber)
- 	self.FireRateMod = self:GetRateOfFire()
+ 	self.FireRateMod = math.Clamp(self:GetRateOfFire(),0,1)
 
  	self.muzzle = ents.Create("prop_physics")
 
@@ -2305,7 +2305,7 @@ function ENT:DakTEAutoFire()
 
 				local shootDir = shootAngles:Forward()
 				
-				local Propellant = self:GetPropellant()*0.01
+				local Propellant = math.Clamp(self:GetPropellant(),10,100)*0.01
  				local Shell = {}
  				Shell.Pos = shootOrigin + ( self:GetForward() * 1 )
 				Shell.DakTrail = self.DakShellTrail
@@ -2487,7 +2487,7 @@ function ENT:DakTEAutoFire()
 end
 
 function ENT:DakTEAutoGunAmmoSwap()
-	local Propellant = self:GetPropellant()*0.01
+	local Propellant = math.Clamp(self:GetPropellant(),10,100)*0.01
 	if( self.AmmoSwap ) then
 		self.CurrentAmmoType = self.CurrentAmmoType+1
 		if self.CurrentAmmoType>11 then

@@ -154,8 +154,8 @@ function ENT:Think()
 		self.DakHealth = self.DakMaxHealth
 	end
 
-	self.DakSpeed = self.DakSpeed * (self.DakHealth/self.DakMaxHealth) * self:GetHorsePowerMultiplier()
-	self.DakHP = self.DakHP * (self.DakHealth/self.DakMaxHealth) * self:GetHorsePowerMultiplier()
+	self.DakSpeed = self.DakSpeed * (self.DakHealth/self.DakMaxHealth) * math.Clamp(self:GetHorsePowerMultiplier(),0,1)
+	self.DakHP = self.DakHP * (self.DakHealth/self.DakMaxHealth) * math.Clamp(self:GetHorsePowerMultiplier(),0,1)
 	if self.DakDead == true then 
 		self.DakHP = 0 
 		self.DakHealth = 0

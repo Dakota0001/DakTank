@@ -208,11 +208,11 @@ function ENT:Think()
 				end
 			end
 			if IsValid(self.DakGun) then
-				local Elevation = self:GetElevation()
-				local Depression = self:GetDepression()
-				local YawMin = self:GetYawMin()
-				local YawMax = self:GetYawMax()
-				local RotationMult = self:GetRotationSpeedMultiplier()
+				local Elevation = math.Clamp(self:GetElevation(),0,90)
+				local Depression = math.Clamp(self:GetDepression(),0,90)
+				local YawMin = math.Clamp(self:GetYawMin(),0,360)
+				local YawMax = math.Clamp(self:GetYawMax(),0,360)
+				local RotationMult = math.Clamp(self:GetRotationSpeedMultiplier(),0,1)
 				if self.FCS ~= true then
 					if self:GetTable().Inputs.CamTrace.Path and self:GetTable().Inputs.CamTrace.Path[1].Entity:GetClass()~="gmod_wire_cameracontroller" then self.FCS = true end
 					if self:GetTable().Inputs.CamTrace2.Path and self:GetTable().Inputs.CamTrace2.Path[1].Entity:GetClass()~="gmod_wire_cameracontroller" then self.FCS = true end
@@ -356,7 +356,7 @@ function ENT:Think()
 							end
 							if not(self.Controller.ColdWar == nil and self.Controller.Modern == nil) then
 								if not(self.Controller.ColdWar == 1 or self.Controller.Modern == 1) then
-									if IsValid(self.TurretBase) and (self:GetYawMin()+self:GetYawMax()>90) then
+									if IsValid(self.TurretBase) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
 										if self.DakCrew:IsValid() then
 											if self.DakCrew:GetParent():IsValid() then
 												if self.DakCrew:GetParent():GetParent():IsValid() then
@@ -371,7 +371,7 @@ function ENT:Think()
 											end
 										end
 									end
-									if not(IsValid(self.TurretBase)) and (self:GetYawMin()+self:GetYawMax()>90) then
+									if not(IsValid(self.TurretBase)) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
 										if self.DakCrew:IsValid() then
 											if self.DakCrew:GetParent():IsValid() then
 												if self.DakCrew:GetParent():GetParent():IsValid() then
@@ -387,7 +387,7 @@ function ENT:Think()
 										end
 									end
 								else
-									if IsValid(self.TurretBase) and (self:GetYawMin()+self:GetYawMax()>90) then
+									if IsValid(self.TurretBase) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
 										if self.DakCrew:IsValid() then
 											if self.DakCrew:GetParent():IsValid() then
 												if self.DakCrew:GetParent():GetParent():IsValid() then
@@ -402,7 +402,7 @@ function ENT:Think()
 											end
 										end
 									end
-									if not(IsValid(self.TurretBase)) and (self:GetYawMin()+self:GetYawMax()>90) then
+									if not(IsValid(self.TurretBase)) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
 										if self.DakCrew:IsValid() then
 											if self.DakCrew:GetParent():IsValid() then
 												if self.DakCrew:GetParent():GetParent():IsValid() then
@@ -625,20 +625,20 @@ function ENT:Think()
 									    	local GunYaw = self:WorldToLocalAngles(self.DakGun:GetAngles()).yaw
 									    	if GunYaw >=-45 and GunYaw <= 45 then
 									    		--print("Forward")
-									    		Elevation = self:GetFrontElevation()
-									    		Depression = self:GetFrontDepression()
+									    		Elevation = math.Clamp(self:GetFrontElevation(),0,90)
+									    		Depression = math.Clamp(self:GetFrontDepression(),0,90)
 									    	elseif GunYaw < -45 and GunYaw > -135 then
 									    		--print("Right")
-									    		Elevation = self:GetRightElevation()
-									    		Depression = self:GetRightDepression()
+									    		Elevation = math.Clamp(self:GetRightElevation(),0,90)
+									    		Depression = math.Clamp(self:GetRightDepression(),0,90)
 									    	elseif GunYaw > 45 and GunYaw < 135 then
 									    		--print("Left")
-									    		Elevation = self:GetLeftElevation()
-									    		Depression = self:GetLeftDepression()
+									    		Elevation = math.Clamp(self:GetLeftElevation(),0,90)
+									    		Depression = math.Clamp(self:GetLeftDepression(),0,90)
 									    	else
 									    		--print("Rear")
-									    		Elevation = self:GetRearElevation()
-									    		Depression = self:GetRearDepression()
+									    		Elevation = math.Clamp(self:GetRearElevation(),0,90)
+									    		Depression = math.Clamp(self:GetRearDepression(),0,90)
 									    	end
 									    end
 									    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+self.Shake), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
