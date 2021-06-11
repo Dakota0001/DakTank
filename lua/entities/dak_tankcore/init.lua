@@ -840,7 +840,7 @@ function ENT:Think()
 							self.DakOwner:ChatPrint("Please finish setting up the gearbox to get a correct cost for your tank.")
 						end
 					else
-						speedmult = 0.5
+						speedmult = 0.25
 						self.DakOwner:ChatPrint("No gearbox detected, towed gun assumed.")
 						--self.DakOwner:ChatPrint("Please give your tank a gearbox so that it may calculate its cost properly.")
 					end
