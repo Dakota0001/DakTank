@@ -3297,7 +3297,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 										ExpPain:SetAttacker( game.GetWorld() )
 										ExpPain:SetInflictor( game.GetWorld() )
 									end
-									if Shell.DakGun:GetPos() == NULL then
+									if Shell.DakGun == NULL or not(IsValid(Shell.DakGun)) then
 										ExpPain:SetReportedPosition( Shell.Pos )
 									else
 										ExpPain:SetReportedPosition( Shell.DakGun:GetPos() )

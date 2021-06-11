@@ -530,6 +530,15 @@ function ENT:DakTEFire()
 				Shell.DakFireSound = self.DakFireSound1
 				Shell.DakFirePitch = self.DakFirePitch
 				Shell.DakGun = self
+				local Driver = nil
+				for i=1, #self.DakTankCore.Seats do
+					if Driver == nil then
+						if IsValid(self.DakTankCore.Seats[i]:GetDriver()) then
+							Driver = self.DakTankCore.Seats[i]:GetDriver()
+						end
+					end
+				end
+				Shell.DakGun.DakOwner = Driver
 				Shell.Filter = table.Copy(self.DakTankCore.Contraption)
 				Shell.LifeTime = 0
 				Shell.Gravity = 0

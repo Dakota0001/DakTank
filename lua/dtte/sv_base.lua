@@ -320,19 +320,19 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 
 				if ShellList[i].DieTime then
 					if ShellList[i].DieTime<CurTime()then
-						RemoveList[#RemoveList+1] = i
+						RemoveList[#RemoveList+1] = ShellList[i]
 					end
 				end
 
 				if ShellList[i].RemoveNow == 1 then
-					RemoveList[#RemoveList+1] = i
+					RemoveList[#RemoveList+1] = ShellList[i]
 				end
 				ShellList[i].LifeTime = ShellList[i].LifeTime + DakTankBulletThinkDelay
 			end
 		end
 		if #RemoveList > 0 then
 			for i = 1, #RemoveList do
-				table.remove( ShellList, RemoveList[i] )
+				table.RemoveByValue( ShellList, RemoveList[i] )
 			end
 		end
 	--end
