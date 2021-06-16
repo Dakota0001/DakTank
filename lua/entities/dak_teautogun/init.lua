@@ -1,7 +1,6 @@
-AddCSLuaFile("cl_init.lua")
-AddCSLuaFile("shared.lua")
-
 include("shared.lua")
+
+----
 
 ENT.DakOwner = NULL
 ENT.DakName = "Base Gun"
@@ -99,11 +98,16 @@ function ENT:Initialize()
  	self.muzzle:Activate()
  	self.muzzle:SetMoveType(MOVETYPE_NONE)
  	self.muzzle:PhysicsInit(SOLID_NONE)
+
+	if self.DakCaliber then
+		self:SetScale(self.DakCaliber / 100)
+	end
 end
 
 function ENT:Think()
 	self.FuzeDelay = self.Inputs.FuzeDelay.Value
-	if self.ScaleSet == true then 
+	if self.ScaleSet == true then
+		print("scaleset")
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
 			--self:PhysicsInit(SOLID_VPHYSICS)
