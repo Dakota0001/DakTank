@@ -161,61 +161,10 @@ hook.Add("AdvDupe_FinishPasting", "daktank_tankcore_check", function(dupe)
 				end)
 			end
 			--also do guns while we're here
-			if ent:GetClass() == "dak_tegun" or ent:GetClass() == "dak_teautogun" or ent:GetClass() == "dak_temachinegun" then
-				ent.SlowThinkTime = 0
-				local ScalingGun = 0
-				if ent.DakModel == "models/daktanks/mortar100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/smokelauncher100mm.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/machinegun100mm.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/cannon100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/shortcannon100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/longcannon100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/autocannon100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/hmg100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/howitzer100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/launcher100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/duallauncher100mm2.mdl" then ScalingGun = 1 end
-				if ent.DakModel == "models/daktanks/recoillessrifle100mm2.mdl" then ScalingGun = 1 end
-				if ScalingGun == 1 then
-					if IsValid(ent) then
-						ent:PhysicsDestroy()	
-						--timer.Simple(2,function()
-							if IsValid(ent) then
-								local mins, maxs = ent:GetModelBounds()
-								local CalMult = (ent.DakCaliber/100)
-								mins = mins*CalMult
-								maxs = maxs*CalMult
-								local x0 = mins[1] -- Define the min corner of the box
-								local y0 = mins[2]
-								local z0 = mins[3]
-								local x1 = maxs[1] -- Define the max corner of the box
-								local y1 = maxs[2]
-								local z1 = maxs[3]
-								ent:PhysicsInitConvex( {
-								Vector( x0, y0, z0 ),
-								Vector( x0, y0, z1 ),
-								Vector( x0, y1, z0 ),
-								Vector( x0, y1, z1 ),
-								Vector( x1, y0, z0 ),
-								Vector( x1, y0, z1 ),
-								Vector( x1, y1, z0 ),
-								Vector( x1, y1, z1 )
-								} )
-								ent.ScaleSet = true
-								ent:SetMoveType(MOVETYPE_VPHYSICS)
-								ent:SetSolid(SOLID_VPHYSICS)
-								ent:GetPhysicsObject():EnableMotion( false )
-								ent:EnableCustomCollisions( true )
-								local mins2, maxs2 = ent:GetHitBoxBounds( 0, 0 )
-								ent:SetCollisionBounds( mins2*CalMult, maxs2*CalMult )
-								--ent:Activate()
-							end
-						--end)
-					end
-				else
-					ent.ScaleSet = true
-				end
+			
+			if ent.SetScale then
+				print(ent.DakCaliber)
+				ent:SetScale(ent.DakCaliber / 100)
 			end
 		end
 	end
