@@ -240,7 +240,6 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 
 						local ShellTrace = util.TraceHull( trace )
 
-						--end
 						if ShellTrace ~= nil then
 							if ShellList[i].Crushed ~= 1 then
 								local effectdata = EffectData()
