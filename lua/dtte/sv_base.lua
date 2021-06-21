@@ -5,6 +5,30 @@ hook.Add( "InitPostEntity", "DakTekTankEditionRunOnLoadHook", function()
 	print("DakTekTankEditionLoaded")
 end)
 
+local math = math
+local bmax = 16384
+local bmin = -bmax
+
+-- modifies original vector, returns false if it was clamped... not sure about the efficiency of this
+function Dak_clampVector(vec)
+
+	local x = vec.x
+	local y = vec.y
+	local z = vec.z
+
+	vec.x = math.min(math.max(x, bmin), bmax)
+	vec.y = math.min(math.max(y, bmin), bmax)
+	vec.z = math.min(math.max(z, bmin), bmax)
+
+	if x ~= vec.x or y ~= vec.y or z ~= vec.z then
+		--MsgN("resolving unsafe vector " .. tostring(vec))
+		return false
+	end
+
+	return true
+
+end
+local Dak_clampVector = Dak_clampVector
 
 DakTankShellList = {} --Create Entity list for storing things people spawn
 DakTankLastShellThink = 0
@@ -213,10 +237,12 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 						trace.mins = Vector(-ShellList[i].DakCaliber*0.02,-ShellList[i].DakCaliber*0.02,-ShellList[i].DakCaliber*0.02)
 						trace.maxs = Vector(ShellList[i].DakCaliber*0.02,ShellList[i].DakCaliber*0.02,ShellList[i].DakCaliber*0.02)
 
-						--if util.IsInWorld( trace.endpos ) or util.IsInWorld( trace.start ) then
-						--	ShellList[i].RemoveNow = 1
-						--else
+						if not Dak_clampVector(trace.start) or not Dak_clampVector(trace.endpos) then
+							ShellList[i].RemoveNow = 1
+						end
+
 						local ShellTrace = util.TraceHull( trace )
+
 						--end
 						if ShellTrace ~= nil then
 							if ShellList[i].Crushed ~= 1 then
