@@ -18,9 +18,9 @@ function Dak_clampVector(vec)
 
 	local safe = true
 
-	if x < bmin then vec.x = bmin; safe = nil elseif x > bmax then vec.x = bmin; safe = nil end
-	if y < bmin then vec.y = bmin; safe = nil elseif y > bmax then vec.y = bmin; safe = nil end
-	if z < bmin then vec.z = bmin; safe = nil elseif z > bmax then vec.z = bmin; safe = nil end
+	if x < bmin then vec.x = bmin; safe = nil elseif x > bmax then vec.x = bmax; safe = nil end
+	if y < bmin then vec.y = bmin; safe = nil elseif y > bmax then vec.y = bmax; safe = nil end
+	if z < bmin then vec.z = bmin; safe = nil elseif z > bmax then vec.z = bmax; safe = nil end
 
 	return safe
 
