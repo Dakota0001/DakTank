@@ -16,16 +16,13 @@ function Dak_clampVector(vec)
 	local y = vec.y
 	local z = vec.z
 
-	vec.x = math.min(math.max(x, bmin), bmax)
-	vec.y = math.min(math.max(y, bmin), bmax)
-	vec.z = math.min(math.max(z, bmin), bmax)
+	local safe = true
 
-	if x ~= vec.x or y ~= vec.y or z ~= vec.z then
-		--MsgN("resolving unsafe vector " .. tostring(vec))
-		return false
-	end
+	if x < bmin then vec.x = bmin; safe = nil elseif x > bmax then vec.x = bmin; safe = nil end
+	if y < bmin then vec.y = bmin; safe = nil elseif y > bmax then vec.y = bmin; safe = nil end
+	if z < bmin then vec.z = bmin; safe = nil elseif z > bmax then vec.z = bmin; safe = nil end
 
-	return true
+	return safe
 
 end
 local Dak_clampVector = Dak_clampVector
