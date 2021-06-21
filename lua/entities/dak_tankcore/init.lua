@@ -2088,7 +2088,7 @@ function ENT:Think()
 															self.salvage.launch = 1
 															if self.Contraption[i]:GetClass() == "dak_crew" then
 																if self.Contraption[i].DakHealth <= 0 then
-																	for i=1, 15 do
+																	for i=j, 15 do
 																		util.Decal( "Blood", self.Contraption[i]:GetPos(), self.Contraption[i]:GetPos()+(VectorRand()*500), self.Contraption[i])
 																	end
 																end
@@ -2298,7 +2298,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		if Ent.EntityMods.DTClips ~= nil then
 			for i=1, #Ent.EntityMods.DTClips do
 				local cur = CreatedEntities[ Ent.EntityMods.DTClips[i].ID ]
-				if cur.EntityMods.DakClippedArmor ~= nil then
+				if IsValid(cur) and cur.EntityMods.DakClippedArmor ~= nil then
 					cur.EntityMods.DakClippedArmor = Ent.EntityMods.DTClips[i].Armor
 					local SA = cur:GetPhysicsObject():GetSurfaceArea()
 					local mass = math.ceil(((Ent.EntityMods.DTClips[i].Armor/1/(288/SA))/7.8125)*4.6311781,0)
