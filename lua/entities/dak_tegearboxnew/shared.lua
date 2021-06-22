@@ -1,73 +1,283 @@
 ENT.Type = "anim"
 ENT.Base = "base_wire_entity"
-
 ENT.Spawnable = true
 ENT.AdminOnly = false
+ENT.RenderGroup = RENDERGROUP_OPAQUE
 
-ENT.Editable = true
 
-function ENT:SetupDataTables()
-	--Mobility
-	self:NetworkVar( "Float", 	0, "GearRatio", 	{ KeyName = "gearratio", 	Edit = {category = "Mobility",title = "Top Speed Bias", type = "Float", order = 1, min = 50, max = 100 } } )
-	if self:GetGearRatio()==0 then self:SetGearRatio( 100 ) end
-	self:NetworkVar( "Float", 	1, "RideLimit", 	{ KeyName = "ridelimit", 	Edit = {category = "Mobility",title = "Suspension Give", type = "Float", order = 2, min = 50, max = 200 } } )
-	if self:GetRideLimit()==0 then self:SetRideLimit( 100 ) end
-	self:NetworkVar( "Float", 	2, "SuspensionBias", 	{ KeyName = "suspensionbias", 	Edit = {category = "Mobility",title = "Suspension Bias", type = "Float", order = 3, min = -0.99, max = 0.99 } } )
-	if self:GetSuspensionBias()==0 then self:SetSuspensionBias( 0 ) end
-	self:NetworkVar( "Float", 	3, "BrakeStiffness", 	{ KeyName = "brakestiffness", 	Edit = {category = "Mobility",title = "Brake Turning Stiffness", type = "Float", order = 4, min = 0, max = 1 } } )
-	if self:GetBrakeStiffness()==0 then self:SetBrakeStiffness( 1 ) end
-	self:NetworkVar( "Float", 	4, "SuspensionDamping", 	{ KeyName = "suspensiondamping", 	Edit = {category = "Mobility",title = "Suspension Damping", type = "Float", order = 5, min = 0.1, max = 0.9 } } )
-	if self:GetSuspensionDamping()==0 then self:SetSuspensionDamping( 0.25 ) end
-	self:NetworkVar( "Float", 	5, "SuspensionForceMult", 	{ KeyName = "suspensionforcemult", 	Edit = {category = "Mobility",title = "Suspension Force Mult", type = "Float", order = 6, min = 0, max = 2 } } )
-	if self:GetSuspensionForceMult()==0 then self:SetSuspensionForceMult( 1 ) end
-	--Dimensions
-	self:NetworkVar( "Float", 	6, "TrackLength", 	{ KeyName = "tracklength", 	Edit = {category = "Dimensions",title = "Track Length", type = "Float", order = 7, min = 0, max = 1000 } } )
-	if self:GetTrackLength()==0 then self:SetTrackLength( 200 ) end
-	self:NetworkVar( "Float", 	7, "SideDist", 	{ KeyName = "sidedist", 	Edit = {category = "Dimensions",title = "Track Side Offset", type = "Float", order = 8, min = 0, max = 1000 } } )
-	if self:GetSideDist()==0 then self:SetSideDist( 50 ) end
-	self:NetworkVar( "Float", 	8, "RideHeight", 	{ KeyName = "rideheight", 	Edit = {category = "Dimensions",title = "Ground Clearance", type = "Float", order = 9, min = -200, max = 200 } } )
-	if self:GetRideHeight()==0 then self:SetRideHeight( 0 ) end
-	self:NetworkVar( "Float", 	9, "ForwardOffset", 	{category = "Mobility", KeyName = "forwardoffset", 	Edit = {category = "Dimensions",title = "Track Forward Offset", type = "Float", order = 10, min = -200, max = 200 } } )
-	if self:GetForwardOffset()==0 then self:SetForwardOffset( 0 ) end
-	--WheelDetails
-	self:NetworkVar( "Int", 	0, "WheelsPerSide", 	{ KeyName = "wheelsperside", 	Edit = {category = "Wheel Details",title = "Wheels Per Side", type = "Int", order = 11, min = 2, max = 20 } } )
-	if self:GetWheelsPerSide()==0 then self:SetWheelsPerSide( 7 ) end
-	self:NetworkVar( "Float", 	10, "FrontWheelRaise", 	{ KeyName = "frontwheelraise", 	Edit = {category = "Wheel Details",title = "Front Wheel Raise", type = "Float", order = 12, min = 0, max = 200 } } )
-	if self:GetFrontWheelRaise()==0 then self:SetFrontWheelRaise( 0 ) end
-	self:NetworkVar( "Float", 	11, "RearWheelRaise", 	{ KeyName = "rearwheelraise", 	Edit = {category = "Wheel Details",title = "Rear Wheel Raise", type = "Float", order = 13, min = 0, max = 200 } } )
-	if self:GetRearWheelRaise()==0 then self:SetRearWheelRaise( 0 ) end
-	self:NetworkVar( "String", 	0, "WheelModel", 	{ KeyName = "wheelmodel", 	Edit = {category = "Wheel Details",title = "Wheel Model", type = "String", order = 14 } } )
-	if self:GetWheelModel()=="" then self:SetWheelModel( "models/sprops/trans/miscwheels/tank20.mdl" ) end
-	self:NetworkVar( "Float", 	12, "WheelWidth", 	{ KeyName = "wheelwidth", 	Edit = {category = "Wheel Details",title = "Wheel Width", type = "Float", order = 15, min = 1, max = 100 } } )
-	if self:GetWheelWidth()==0 then self:SetWheelWidth( 12 ) end
-	self:NetworkVar( "Float", 	13, "WheelHeight", 	{ KeyName = "wheelheight", 	Edit = {category = "Wheel Details",title = "Wheel Diameter", type = "Float", order = 16, min = 1, max = 100 } } )
-	if self:GetWheelHeight()==0 then self:SetWheelHeight( 30 ) end
-	self:NetworkVar( "Float", 	14, "FrontWheelHeight", 	{ KeyName = "frontwheelheight", 	Edit = {category = "Wheel Details",title = "Front Wheel Diameter", type = "Float", order = 17, min = 1, max = 100 } } )
-	if self:GetFrontWheelHeight()==0 then self:SetFrontWheelHeight( 30 ) end
-	self:NetworkVar( "Float", 	15, "RearWheelHeight", 	{ KeyName = "rearwheelheight", 	Edit = {category = "Wheel Details",title = "Rear Wheel Diameter", type = "Float", order = 18, min = 1, max = 100 } } )
-	if self:GetRearWheelHeight()==0 then self:SetRearWheelHeight( 30 ) end
-	self:NetworkVar( "Vector", 	0, "WheelColor", 	{ KeyName = "wheelcolor", 	Edit = {category = "Wheel Details",title = "Wheel Color", type = "VectorColor", order = 19 } } )
-	if self:GetWheelColor()==Vector(0,0,0) then self:SetWheelColor(Vector(1,1,1)) end
-	self:NetworkVar( "Int", 	1, "WheelBodygroup1", 	{ KeyName = "wheelbodygroup1", 	Edit = {category = "Wheel Details", title = "Wheel Bodygroup 1", type = "Int", 		order = 20, min = 0, max = 25} } )
-	self:NetworkVar( "Int", 	2, "WheelBodygroup2", 	{ KeyName = "wheelbodygroup2", 	Edit = {category = "Wheel Details", title = "Wheel Bodygroup 2", type = "Int", 		order = 21, min = 0, max = 25} } )
-	self:NetworkVar( "Int", 	3, "WheelBodygroup3", 	{ KeyName = "wheelbodygroup3", 	Edit = {category = "Wheel Details", title = "Wheel Bodygroup 3", type = "Int", 		order = 22, min = 0, max = 25} } )
-	self:NetworkVar( "Bool", 	0, "FrontSprocket", 	{ KeyName = "frontsprocket", 	Edit = {category = "Wheel Details", title = "Front Sprocket", type = "Boolean", 		order = 23} } )
-	self:NetworkVar( "Bool", 	1, "RearSprocket", 	{ KeyName = "rearsprocket", 	Edit = {category = "Wheel Details", title = "Rear Sprocket", type = "Boolean", 		order = 24} } )
-	self:NetworkVar( "Bool", 	2, "OffsetYaw", 	{ KeyName = "offsetyaw", 	Edit = {category = "Wheel Details", title = "Offset Wheel Yaw", type = "Boolean", 		order = 25} } )
-	--Track Details
-	self:NetworkVar( "Float", 	16, "TreadWidth", 	{ KeyName = "treadwidth", 	Edit = {category = "Tread Details",title = "Tread Width", type = "Float", order = 26, min = 1, max = 100 } } )
-	if self:GetTreadWidth()==0 then self:SetTreadWidth( 12 ) end
-	self:NetworkVar( "Float", 	17, "TreadHeight", 	{ KeyName = "treadheight", 	Edit = {category = "Tread Details",title = "Tread Thickness", type = "Float", order = 27, min = 1, max = 100 } } )
-	if self:GetTreadHeight()==0 then self:SetTreadHeight( 3 ) end
-	self:NetworkVar( "Vector", 	1, "TreadColor", 	{ KeyName = "treadcolor", 	Edit = {category = "Tread Details",title = "Tread Color", type = "VectorColor", order = 28 } } )
-	if self:GetTreadColor()==Vector(0,0,0) then self:SetTreadColor(Vector(1,1,1)) end
-	--Wheeled Vehicle Options
-	self:NetworkVar( "Bool", 	3, "WheeledMode", 	{ KeyName = "wheeledmode", 	Edit = {category = "Wheeled Vehicle Options", title = "Wheeled Vehicle", type = "Boolean", 		order = 29} } )
-	self:NetworkVar( "Int", 	4, "ForwardTurningWheels", 	{ KeyName = "forwardturningwheels", 	Edit = {category = "Wheeled Vehicle Options", title = "Forward Turning Wheels", type = "Int", 		order = 30, min = 0, max = 10} } )
-	self:NetworkVar( "Int", 	5, "RearTurningWheels", 	{ KeyName = "rearturningwheels", 	Edit = {category = "Wheeled Vehicle Options", title = "Rear Turning Wheels", type = "Int", 		order = 31, min = 0, max = 10} } )
-	self:NetworkVar( "Float", 	18, "TurnAngle", 	{ KeyName = "turnangle", 	Edit = {category = "Wheeled Vehicle Options",title = "Turn Angle", type = "Float", order = 32, min = 0, max = 45 } } )
-	--Wheel Offset Options
-	for i=1, 20 do
-		self:NetworkVar( "Int", 	5+i, "WheelForwardOffset"..i, 	{ KeyName = "wheelforwardoffset"..i, 	Edit = {category = "Wheel Offsets", title = "Wheel Forward Offset "..i, type = "Int", 		order = 32+i, min = -10000, max = 10000} } )
+----------------------------------------------------------------
+local textures = {
+	["track_amx13"] = "Amx13",
+	["track_amx30"] = "Amx30",
+	["track_bmp"] = "BMP",
+	["track_chieftain"] = "Chieftain",
+	["track_generic"] = "Generic",
+	["track_kingtiger"] = "King Tiger",
+	["track_kv"] = "KV",
+	["track_leopard1"] = "Leopard 1",
+	["track_leopard2"] = "Leopard 2",
+	["track_m1"] = "M1",
+	["track_m2bradley"] = "M2 Bradley",
+	["track_m4"] = "M4",
+	["track_m4a1"] = "M4a1",
+	["track_m4a3e8"] = "M4a3e8",
+	["track_m60a1"] = "M60a1",
+	["track_maus"] = "Maus",
+	["track_panther"] = "Panther",
+	["track_panzer4"] = "Panzer 4",
+	["track_sheridan"] = "Sheridan",
+	["track_t30"] = "T30",
+	["track_t34"] = "T34",
+	["track_t54"] = "T54",
+	["track_t55"] = "T55",
+	["track_t62"] = "T62",
+	["track_t64"] = "T64",
+	["track_t72"] = "T72",
+	["track_t80"] = "T80",
+	["track_t90"] = "T90",
+	["track_tiger"] = "Tiger",
+	["track_type90"] = "Type90",
+}
+
+local modes = {
+	["halftracked"] = "Halftracked (experimental)",
+	["tracked"] = "Tracked",
+	["wheeled"] = "Wheeled",
+}
+
+function ENT:_DakVar_SETUP()
+	local category, hidepanel
+
+
+	----------------------------------------------------------------
+	category = "Gearbox Setup"
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "String", name = "VehicleMode", default = "tracked", values = modes},
+		{category = category, title = "Mode", rowcolor = Color(225, 255, 225)})
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "WheelOffsetX", min = -200, max = 200, default = 0},
+		{category = category, title = "X Offset"})
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "WheelOffsetY", min = 0, max = 1000, default = 50},
+		{category = category, title = "Y Offset"})
+
+
+	----------------------------------------------------------------
+	category = "Mobility Setup"
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "WheelOffsetZ", min = 0, max = 200, default = 20},
+		{category = category, title = "Ground Clearance", help = "Max length of wheel traces"})
+
+	self:_DakVar_REGISTER({type = "Float", name = "GearRatio", min = 50, max = 100, default = 100},
+		{category = category, title = "Top Speed Bias"})
+
+	self:_DakVar_REGISTER({type = "Float", name = "SuspensionBias", min = -0.99, max = 0.99, default = 0},
+		{category = category, title = "Suspension Bias"})
+
+	self:_DakVar_REGISTER({type = "Float", name = "RideLimit", min = 50, max = 200, default = 100},
+		{category = category, title = "Suspension Give"})
+
+	self:_DakVar_REGISTER({type = "Float", name = "SuspensionForceMult", min = 0, max = 2, default = 1},
+		{category = category, title = "Suspension Force"})
+
+	self:_DakVar_REGISTER({type = "Float", name = "SuspensionDamping", min = 0.1, max = 0.9, default = 0.25},
+		{category = category, title = "Suspension Damping"})
+
+	self:_DakVar_REGISTER({type = "Float", name = "BrakeStiffness", min = 0, max = 1, default = 1},
+		{category = category, title = "Brake Turning Stiffness"})
+
+
+	----------------------------------------------------------------
+	category = "Track Appearance"
+	hidepanel = {VehicleMode = {wheeled = true}}
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackWidth", min = 1, max = 200, default = 24},
+		{hidepanel = hidepanel, category = category, title = "Track Width"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackHeight", min = 1, max = 32, default = 3},
+		{hidepanel = hidepanel, category = category, title = "Track Height"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackTension", min = 0, max = 1, default = 0.5},
+		{hidepanel = hidepanel, category = category, title = "Track Tension"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "TrackMaterial", default = "track_generic", values = textures},
+		{hidepanel = hidepanel, category = category, title = "Track Material"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Vector", name = "TrackColor", default = Vector(255, 255, 255)},
+		{hidepanel = hidepanel, category = category, title = "Track Color", property = "Color"})
+
+
+	----------------------------------------------------------------
+	category = "General Wheel Appearance"
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "WheelBase", min = 1, max = 1000, default = 200},
+		{category = category, title = "Wheelbase", help = "Distance between front and rear wheels"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "WheelMaterial", default = ""},
+		{category = category, title = "Material", help = "Can set submaterials with comma separated values, ex: 0,path0,1,path1"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Vector", name = "WheelColor", default = Vector(255, 255, 255)},
+		{category = category, title = "Color", property = "Color"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Int", name = "RoadWTurnAngle", min = 0, max = 45, default = 0},
+		{hidepanel = {VehicleMode = {tracked = true}}, category = category, title = "Turning Angle"})
+
+	local hidepanel = {VehicleMode = {halftracked = true, tracked = true}}
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Int", name = "RoadWTurnFront", min = 0, max = 9, default = 0},
+		{hidepanel = hidepanel, category = category, title = "Front turning pairs", func = {max = {mul = 0.5, num = "GetRoadWCount"}}})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Int", name = "RoadWTurnRear", min = 0, max = 9, default = 0},
+		{hidepanel = hidepanel, category = category, title = "Rear turning pairs", func = {max = {mul = 0.5, num = "GetRoadWCount"}}})
+
+
+	----------------------------------------------------------------
+	category = "Halftrack Wheel Appearance"
+	hidepanel = {VehicleMode = {tracked = true, wheeled = true}}
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "HalfTWDiameter", min = 1, max = 200, default = 40},
+		{hidepanel = hidepanel, category = category, title = "Diameter"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "HalfTWWidth", min = 1, max = 200, default = 20},
+		{hidepanel = hidepanel, category = category, title = "Width"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "HalfTWModel", default = "models/sprops/trans/wheel_e/t_wheel15.mdl"},
+		{hidepanel = hidepanel, category = category, title = "Model"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "HalfTWBGroup", default = ""},
+		{hidepanel = hidepanel, category = category, title = "Bodygroup", help = "Each single-digit number in the string represents a separate bodygroup. Ex: 01004"})
+
+
+	----------------------------------------------------------------
+	category = "Drive Wheel Setup"
+	hidepanel = {VehicleMode = {wheeled = true}}
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "DriveWDiameter", min = 1, max = 200, default = 20},
+		{hidepanel = hidepanel, category = category, title = "Diameter"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "DriveWWidth", min = 1, max = 200, default = 20},
+		{hidepanel = hidepanel, category = category, title = "Width"})
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "DriveWOffsetZ", min = 0, max = 200, default = 20},
+		{hidepanel = hidepanel, category = category, title = "Z Offset"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "DriveWModel", default = "models/sprops/trans/miscwheels/tank15.mdl"},
+		{hidepanel = hidepanel, category = category, title = "Model"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "DriveWBGroup", default = "001"},
+		{hidepanel = hidepanel, category = category, title = "Bodygroup", help = "Each single-digit number in the string represents a separate bodygroup. Ex: 01004"})
+
+
+	----------------------------------------------------------------
+	category = "Road Wheel Setup"
+	hidepanel = {VehicleMode = {wheeled = true}}
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "RoadWType", default = "normal", values = {normal = "Normal", interleave = "Interleave"}},
+		{hidepanel = hidepanel, category = category, title = "Type"})
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Int", name = "RoadWCount", min = 0, max = 18, default = 5},
+		{category = category, title = "Count"})
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "RoadWDiameter", min = 1, max = 200, default = 20},
+		{category = category, title = "Diameter"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "RoadWWidth", min = 1, max = 200, default = 20},
+		{category = category, title = "Width"})
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "String", name = "RoadWOffsetsX", default = ""},
+		{category = category, title = "X Offsets", property = "idxoff", func = {num = "GetRoadWCount"}})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "RoadWModel", default = "models/sprops/trans/miscwheels/tank15.mdl"},
+		{category = category, title = "Model"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "RoadWBGroup"},
+		{category = category, title = "Bodygroup", help = "Each single-digit number in the string represents a separate bodygroup. Ex: 01004"})
+
+
+	----------------------------------------------------------------
+	category = "Idler Wheel Setup"
+	hidepanel = {VehicleMode = {wheeled = true}}
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "IdlerWDiameter", min = 1, max = 200, default = 20},
+		{hidepanel = hidepanel, category = category, title = "Diameter"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "IdlerWWidth", min = 1, max = 200, default = 20},
+		{hidepanel = hidepanel, category = category, title = "Width"})
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "IdlerWOffsetZ", min = 0, max = 200, default = 20},
+		{hidepanel = hidepanel, category = category, title = "Z Offset"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "IdlerWModel", default = "models/sprops/trans/miscwheels/tank15.mdl"},
+		{hidepanel = hidepanel, category = category, title = "Model"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "IdlerWBGroup"},
+		{hidepanel = hidepanel, category = category, title = "Bodygroup", help = "Each single-digit number in the string represents a separate bodygroup. Ex: 01004"})
+
+
+	----------------------------------------------------------------
+	category = "Roller Wheel Setup"
+	hidepanel = {VehicleMode = {wheeled = true}}
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Int", name = "RollerWCount", min = 0, max = 18, default = 2},
+		{hidepanel = hidepanel, category = category, title = "Count"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "RollerWDiameter", min = 1, max = 200, default = 10},
+		{hidepanel = hidepanel, category = category, title = "Diameter"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "RollerWWidth", min = 1, max = 200, default = 5},
+		{hidepanel = hidepanel, category = category, title = "Width"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "RollerWBias", min = 0, max = 1, default = 0},
+		{hidepanel = hidepanel, category = category, title = "Z Bias", help = "Weight of the slope toward front or rear"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "RollerWOffsetZ", min = -200, max = 200, default = 0},
+		{hidepanel = hidepanel, category = category, title = "Z Offset"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "RollerWModel", default = "models/sprops/trans/miscwheels/tank15.mdl"},
+		{hidepanel = hidepanel, category = category, title = "Model"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "RollerWBGroup"},
+		{hidepanel = hidepanel, category = category, title = "Bodygroup", help = "Each single-digit number in the string represents a separate bodygroup. Ex: 01004"})
+end
+
+
+----------------------------------------------------------------
+--	store indexed position offsets as a 2 character string
+--	networked strings have a 199 character limit
+--	ex: a3z9 means wheel 1 (a) has an offset weight of 0.333 (3/9) and wheel 26 (z) has an offset weight of 1 (9/9)
+local string = string
+local table = table
+local math = math
+
+local function a1z26_toTable(str, int)
+	local ret = {}
+	local key = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	local len = string.len(key)
+	for k, v in string.gmatch(str, "(%a+)(%-?%d+)") do
+		local idx = 0
+		for i = 1, #k do
+			local f = string.find(key, string.sub(k, i, i))
+			idx = idx + f + f*(len*(i - 1))
+		end
+		ret[idx] = tonumber(v)/int
 	end
+	return ret
+end
+
+local function a1z26_toString(tbl, int)
+	local ret = {}
+	local key = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	for k, v in pairs(tbl) do
+		local f = string.sub(key, k, k)
+		table.insert(ret, f .. math.Round(v*int))
+	end
+	return table.concat(ret)
+end
+
+function ENT:a1z26Encode(tbl)
+	return a1z26_toString(tbl, 9)
+end
+
+function ENT:a1z26Decode(str)
+	return a1z26_toTable(str, 9)
 end
