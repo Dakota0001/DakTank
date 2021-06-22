@@ -65,6 +65,9 @@ function ENT:_DakVar_SETUP()
 	----------------------------------------------------------------
 	category = "Mobility Setup"
 
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "WheelBase", min = 1, max = 1000, default = 200},
+		{category = category, title = "Wheelbase", help = "Distance between front and rear wheels"})
+
 	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "WheelOffsetZ", min = 0, max = 200, default = 20},
 		{category = category, title = "Ground Clearance", help = "Max length of wheel traces"})
 
@@ -91,27 +94,27 @@ function ENT:_DakVar_SETUP()
 	category = "Track Appearance"
 	hidepanel = {VehicleMode = {wheeled = true}}
 
-	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackWidth", min = 1, max = 200, default = 24},
-		{hidepanel = hidepanel, category = category, title = "Track Width"})
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackTension", min = 0, max = 1, default = 0.5},
+		{hidepanel = hidepanel, category = category, title = "Tension"})
 
 	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackHeight", min = 1, max = 32, default = 3},
-		{hidepanel = hidepanel, category = category, title = "Track Height"})
+		{hidepanel = hidepanel, category = category, title = "Height"})
 
-	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackTension", min = 0, max = 1, default = 0.5},
-		{hidepanel = hidepanel, category = category, title = "Track Tension"})
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackWidth", min = 1, max = 200, default = 24},
+		{hidepanel = hidepanel, category = category, title = "Width"})
+
+	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "TrackResolution", min = 1, max = 8, default = 2},
+		{hidepanel = hidepanel, category = category, title = "Resolution", help = "Material aspect ratio multiplier (Width*Resolution)"})
 
 	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "TrackMaterial", default = "track_generic", values = textures},
-		{hidepanel = hidepanel, category = category, title = "Track Material"})
+		{hidepanel = hidepanel, category = category, title = "Material"})
 
 	self:_DakVar_REGISTER({notify = CLIENT, type = "Vector", name = "TrackColor", default = Vector(255, 255, 255)},
-		{hidepanel = hidepanel, category = category, title = "Track Color", property = "Color"})
+		{hidepanel = hidepanel, category = category, title = "Color", property = "Color"})
 
 
 	----------------------------------------------------------------
 	category = "General Wheel Appearance"
-
-	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "WheelBase", min = 1, max = 1000, default = 200},
-		{category = category, title = "Wheelbase", help = "Distance between front and rear wheels"})
 
 	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "WheelMaterial", default = ""},
 		{category = category, title = "Material", help = "Can set submaterials with comma separated values, ex: 0,path0,1,path1"})

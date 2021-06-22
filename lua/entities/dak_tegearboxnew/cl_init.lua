@@ -273,7 +273,7 @@ local function calcbounds(min, max, pos)
 end
 
 local function resetbounds(self)
-	local rendermin, rendermax = Vector(0,0,-self.dak_wheels_groundClearance), Vector(0,0,self.dak_wheels_groundClearance*2)
+	local rendermin, rendermax = Vector(0, 0, -self.dak_wheels_groundClearance), Vector(0, 0, self.dak_wheels_groundClearance*2)
 	local renderpos, renderang = self:parentMatrix_Decomp()
 
 	renderpos, renderang = WorldToLocal(self:GetPos(), self:GetAngles(), renderpos, renderang)
@@ -544,6 +544,9 @@ function ENT:setup_wheels(vehicleMode)
 	self.dak_wheels_lastvel_ri = 0
 	self.dak_wheels_lastvel_le = 0
 
+	self.dak_tracks_textureres = self:GetTrackResolution() * self:GetTrackWidth()
+	self.dak_tracks_texturemap = 1 / self.dak_tracks_textureres
+
 	if vehicleMode == "wheeled" then
 		self.dak_wheels_count_trace = self.dak_wheels_count_ri
 		self:update_wheels(vehicleMode)
@@ -574,14 +577,14 @@ function ENT:update_wheels(vehicleMode)
 	local rot_ri = (360*vel_ri)/radius
 	self.dak_wheels_lastvel_ri = vel_ri
 	self.dak_wheels_lastpos_ri = pos_ri
-	self.dak_wheels_lastrot_ri = self.dak_wheels_lastrot_ri - vel_ri/64
+	self.dak_wheels_lastrot_ri = self.dak_wheels_lastrot_ri - vel_ri / self.dak_tracks_textureres--/64
 
 	local pos_le = basePos - bri
 	local vel_le = _mvec_dot(bfo, self.dak_wheels_lastpos_le - pos_le)
 	local rot_le = (360*vel_le)/radius
 	self.dak_wheels_lastvel_le = vel_le
 	self.dak_wheels_lastpos_le = pos_le
-	self.dak_wheels_lastrot_le = self.dak_wheels_lastrot_le - vel_le/64
+	self.dak_wheels_lastrot_le = self.dak_wheels_lastrot_le - vel_le / self.dak_tracks_textureres--/64
 
 	local wheel_yaw
 	if enableTurning[vehicleMode] then
@@ -767,24 +770,27 @@ end
 -- TRACKS
 local track_textures = {}
 local function createTrackTexture(path)
-	if not string.StartWith(path, "tanktrack_controller_new/") then
-		path = "tanktrack_controller_new/" .. path
+	local folders = { "dak/tracks/", "tanktrack_controller_new/" }
+	local diffuse
+
+	for k, v in pairs(folders) do
+		local check = v .. path
+		if track_textures[check] then
+			return track_textures[check]
+		end
+		if file.Exists(string.format("materials/%s_d.vtf", check), "GAME") then
+			path = check
+			diffuse = string.format("%s_d.vtf", check)
+			break
+		end
 	end
 
-	if track_textures[path] then
-		return track_textures[path]
+	if not diffuse then
+		diffuse = "hunter/myplastic"
 	end
-
-	local _d
-	if file.Exists(string.format("materials/%s_d.vtf", path), "GAME") then
-		_d = string.format("%s_d.vtf", path)
-	else
-		_d = "hunter/myplastic"
-	end
-
 
 	local shader = {
-		["$basetexture"]         = _d,
+		["$basetexture"]         = diffuse,
 		["$alphatest"]           = "1",
 		["$nocull"]              = "1",
 		["$color2"]              = "[1 1 1]",
@@ -811,7 +817,7 @@ end
 
 local trackverts_lines = {1, 3, 3, 4, 4, 2, 2, 6, 6, 5, 5, 1, 7, 8, 8, 8}
 local trackverts_model = function(y, z)
-	return {Vector(0, y*0.5, 0), Vector(0, -y*0.5, 0),Vector(0, y*0.375, z*0.5), Vector(0, -y*0.375, z*0.5),Vector(0, y*0.375, -z*0.5), Vector(0, -y*0.375, -z*0.5),Vector(0, 0, z*0.5), Vector(0, 0, -z*1.5)}
+	return {Vector(0, y*0.5, 0), Vector(0, -y*0.5, 0), Vector(0, y*0.375, z*0.5), Vector(0, -y*0.375, z*0.5), Vector(0, y*0.375, -z*0.5), Vector(0, -y*0.375, -z*0.5), Vector(0, 0, z*0.5), Vector(0, 0, -z*1.5)}
 end
 local _angle = Angle()
 local _div64 = 1/64
@@ -824,9 +830,6 @@ local function bisect_spline(index, spline, tensor, detail, step)
 	end
 	return detail - 1
 end
-
-local acci = 0
-local accn = 0
 
 function ENT:setup_tracks(vehicleMode)
 	local color = self:GetTrackColor()
@@ -867,14 +870,9 @@ function ENT:setup_tracks(vehicleMode)
 end
 
 function ENT:update_tracks(vehicleMode)
-	--local t = SysTime()
-
 	local min_detail = 4
 	local max_detail = cv_dt:GetInt()
 	local adaptive_detail = cv_ad:GetBool()
-
-	--local tracknodesdetail = 4
-	--local tracknodesdetailrad = 1/(45/tracknodesdetail)
 
 	local tension_det = 2--math_ceil(tracknodesdetail/2)
 	local tension_rad = (180/tension_det)*math_rad
@@ -999,6 +997,7 @@ function ENT:update_tracks(vehicleMode)
 
 	local trackmodel = self.dak_tracks_model
 	local trackmodelcount = self.dak_tracks_modelcount
+	local trackresolution = self.dak_tracks_texturemap
 
 	for i = 1, 2 do
 		local tracknodes, tracknodescount, trackverts, tracknormals
@@ -1032,7 +1031,7 @@ function ENT:update_tracks(vehicleMode)
 				normals = rawget(tracknormals, nodeid)
 			end
 
-			normals.len = _mvec_distance(node1, node2)*_div64
+			normals.len = _mvec_distance(node1, node2) * trackresolution--*_div64
 
 			_mvec_set(normals.up, _mang_up(_angle))
 			_mvec_set(normals.dn, -_mang_up(_angle))
@@ -1073,29 +1072,20 @@ function ENT:update_tracks(vehicleMode)
 	end
 
 	self.dak_tracks_ready = true
-
-	-- accn = accn + (SysTime() - t)
-	-- acci = acci + 1
-
-	-- if acci == 100 then
-	-- 	chat.AddText("BENCHMARK " .. (accn/acci))
-	-- 	acci = 0
-	-- 	accn = 0
-	-- end
 end
 
 local matfallback = Material("editor/wireframe")
+local flip1 = Vector(-1, 1, 1)
+local flip2 = Vector(1, 1, 1)
 
 function ENT:render_tracks(vehicleMode)
 	if not self.dak_tracks_ready then return end
 
 	cam.PushModelMatrix(self:parentMatrix_Get())
 
-	--local mins, maxs = self:GetRenderBounds()
-	--render.DrawWireframeBox(Vector(), Angle(), mins, maxs)
-
-	if self.dak_tracks_texture then
-		self.dak_tracks_texture:SetVector("$color2", self.dak_tracks_color)
+	local texture = self.dak_tracks_texture
+	if texture and self.dak_tracks_color then
+		texture:SetVector("$color2", self.dak_tracks_color)
 	end
 
 	for i = 1, 2 do
@@ -1116,7 +1106,11 @@ function ENT:render_tracks(vehicleMode)
 			trackscroll = self.dak_wheels_lastrot_le
 		end
 
-		render_SetMaterial(self.dak_tracks_texture or matfallback)
+		if texture then
+			texture:SetVector("$newscale", i == 1 and flip1 or flip2)
+		end
+
+		render_SetMaterial(texture or matfallback)
 
 		mesh_Begin(MATERIAL_QUADS, tracknodescount*7 + 7)
 
@@ -1128,15 +1122,15 @@ function ENT:render_tracks(vehicleMode)
 			local normals = rawget(tracknormals, nodeid)
 
 			if not normals or vertid + 15 > trackvertscount then
-				print("skipping", nodeid, vertid)
+				print("skipping", nodeid, vertid, "this should not happen")
 				goto SKIP_NODE
 			end
 
-			local normal_up = normals.up
-			local normal_dn = normals.dn
-			local normal_ri = normals.ri
+			local normal_up = normals.up or _mvec
+			local normal_dn = normals.dn or _mvec
+			local normal_ri = normals.ri or _mvec
 
-			local yscale = normals.len
+			local yscale = normals.len or 0
 			yshift = yshift - yscale
 
 			local yfinal1 = ytrans + yshift
@@ -1304,28 +1298,4 @@ function ENT:render_tracks(vehicleMode)
 
 	render_SetColorModulation(1, 1, 1)
 	cam.PopModelMatrix()
-
-
-
-	-- cam.Start2D()
-
-	-- for i = 1, self.dak_tracks_nodescount_ri do
-	-- 	local p1, _ = self:parentMatrix_toWorld(self.dak_tracks_nodes_ri[i])
-	-- 	p1 = p1:ToScreen()
-
-	-- 	local p2, _ = self:parentMatrix_toWorld(self.dak_tracks_nodes_ri[i + 1])
-	-- 	p2 = p2:ToScreen()
-
-	-- 	surface.SetDrawColor(0, 255, 0, 255)
-	-- 	surface.DrawRect(p1.x - 2, p1.y - 2, 4, 4)
-	-- 	surface.DrawLine(p1.x, p1.y, p2.x, p2.y)
-	-- 	surface.SetTextColor(0, 255, 0, 255)
-	-- 	surface.SetFont("BudgetLabel")
-	-- 	surface.SetTextPos(p1.x, p1.y)
-	-- 	surface.DrawText(i)
-	-- end
-
-	-- cam.End2D()
-
-
 end

@@ -7,6 +7,7 @@ do
 			self.Label = self:Add("DLabel")
 			self.Label:Dock(LEFT)
 			self.Label:DockMargin(4, 2, 2, 2)
+			self.Label:SetFont("DermaDefaultBold")
 
 			self.Container = self:Add("Panel")
 			self.Container:Dock(FILL)
@@ -14,7 +15,7 @@ do
 
 		PerformLayout = function(self)
 			self:SetTall(20)
-			self.Label:SetWide(self:GetWide()*0.33)
+			self.Label:SetWide(self:GetWide()*0.4)
 		end,
 
 		Setup = function(self, var, edit)
@@ -79,21 +80,19 @@ do
 
 			if disabled then
 				surface.SetDrawColor(Skin.Colours.Properties.Column_Disabled)
-				surface.DrawRect(w*0.33, 0, w, h)
-				surface.DrawRect(0, 0, w*0.33, h)
+				surface.DrawRect(w*0.4, 0, w, h)
+				surface.DrawRect(0, 0, w*0.4, h)
 			elseif editing then
 				surface.SetDrawColor(Skin.Colours.Properties.Column_Selected)
-				surface.DrawRect(0, 0, w*0.33, h)
+				surface.DrawRect(0, 0, w*0.4, h)
 			elseif self.m_special then
 				surface.SetDrawColor(self.m_special)
-				--surface.DrawRect(w*0.33, 0, w, h)
-				surface.DrawRect(0, 0, w*0.33, h)
+				surface.DrawRect(0, 0, w*0.4, h)
 			end
-
 
 			surface.SetDrawColor(Skin.Colours.Properties.Border)
 			surface.DrawRect(w - 1, 0, 1, h)
-			surface.DrawRect(w*0.33, 0, 1, h)
+			surface.DrawRect(w*0.4, 0, 1, h)
 			surface.DrawRect(0, h - 1, w, 1)
 
 			if disabled then
