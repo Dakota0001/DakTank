@@ -544,8 +544,8 @@ function ENT:setup_wheels(vehicleMode)
 	self.dak_wheels_lastvel_ri = 0
 	self.dak_wheels_lastvel_le = 0
 
-	self.dak_tracks_textureres = self:GetTrackResolution() * self:GetTrackWidth()
-	self.dak_tracks_texturemap = 1 / self.dak_tracks_textureres
+	self.dak_tracks_textureres = self:GetTrackResolution()*self:GetTrackWidth()
+	self.dak_tracks_texturemap = 1/self.dak_tracks_textureres
 
 	if vehicleMode == "wheeled" then
 		self.dak_wheels_count_trace = self.dak_wheels_count_ri
@@ -577,14 +577,14 @@ function ENT:update_wheels(vehicleMode)
 	local rot_ri = (360*vel_ri)/radius
 	self.dak_wheels_lastvel_ri = vel_ri
 	self.dak_wheels_lastpos_ri = pos_ri
-	self.dak_wheels_lastrot_ri = self.dak_wheels_lastrot_ri - vel_ri / self.dak_tracks_textureres--/64
+	self.dak_wheels_lastrot_ri = self.dak_wheels_lastrot_ri - vel_ri/self.dak_tracks_textureres
 
 	local pos_le = basePos - bri
 	local vel_le = _mvec_dot(bfo, self.dak_wheels_lastpos_le - pos_le)
 	local rot_le = (360*vel_le)/radius
 	self.dak_wheels_lastvel_le = vel_le
 	self.dak_wheels_lastpos_le = pos_le
-	self.dak_wheels_lastrot_le = self.dak_wheels_lastrot_le - vel_le / self.dak_tracks_textureres--/64
+	self.dak_wheels_lastrot_le = self.dak_wheels_lastrot_le - vel_le/self.dak_tracks_textureres
 
 	local wheel_yaw
 	if enableTurning[vehicleMode] then
@@ -820,7 +820,6 @@ local trackverts_model = function(y, z)
 	return {Vector(0, y*0.5, 0), Vector(0, -y*0.5, 0), Vector(0, y*0.375, z*0.5), Vector(0, -y*0.375, z*0.5), Vector(0, y*0.375, -z*0.5), Vector(0, -y*0.375, -z*0.5), Vector(0, 0, z*0.5), Vector(0, 0, -z*1.5)}
 end
 local _angle = Angle()
-local _div64 = 1/64
 
 local function bisect_spline(index, spline, tensor, detail, step)
 	local p1 = rawget(spline, index)
@@ -1031,7 +1030,7 @@ function ENT:update_tracks(vehicleMode)
 				normals = rawget(tracknormals, nodeid)
 			end
 
-			normals.len = _mvec_distance(node1, node2) * trackresolution--*_div64
+			normals.len = _mvec_distance(node1, node2)*trackresolution
 
 			_mvec_set(normals.up, _mang_up(_angle))
 			_mvec_set(normals.dn, -_mang_up(_angle))
