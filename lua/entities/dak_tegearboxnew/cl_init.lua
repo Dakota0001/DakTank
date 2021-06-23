@@ -1074,8 +1074,8 @@ function ENT:update_tracks(vehicleMode)
 end
 
 local matfallback = Material("editor/wireframe")
-local flip1 = Vector(-1, 1, 1)
-local flip2 = Vector(1, 1, 1)
+local flip1 = Vector(-1, -1, 1)
+local flip2 = Vector(1, -1, 1)
 
 function ENT:render_tracks(vehicleMode)
 	if not self.dak_tracks_ready then return end

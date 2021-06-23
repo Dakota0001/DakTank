@@ -516,24 +516,24 @@ function ENT:Think()
 								--print(self.LastYaw-self.base:GetAngles().yaw)
 							if self.MoveRight==0 and self.MoveLeft==0 then
 								if self.Speed > 0 then
-									local TurnVal = self.LastYaw-self.base:GetAngles().yaw
-									local ControlForce = math.Min(math.abs(self.RealYaw*2.5),10)
+									local _, temp = WorldToLocal( Vector(0,0,0), Angle(0,self.LastYaw,0), Vector(0,0,0), Angle(0,self.base:GetAngles().yaw,0) )
+									local TurnVal = temp.yaw
+									local ControlForce = math.Min(math.abs(TurnVal*2.5),100)
 									if self.Perc>=0 then
-										if self.RealYaw > 0.05 then
-											--math.abs(TurnVal)
+										if TurnVal > 0.05 then
 											self.LBoost = 0-ControlForce
 											self.RBoost = 2+ControlForce
 										end
-										if self.RealYaw < -0.05 then
+										if TurnVal < -0.05 then
 											self.LBoost = 2+ControlForce
 											self.RBoost = 0-ControlForce
 										end
 									else
-										if self.RealYaw > 0.05 then
+										if TurnVal > 0.05 then
 											self.LBoost = 2+ControlForce
 											self.RBoost = 0-ControlForce
 										end
-										if self.RealYaw < -0.05 then
+										if TurnVal < -0.05 then
 											self.LBoost = 0-ControlForce
 											self.RBoost = 2+ControlForce
 										end
@@ -551,9 +551,30 @@ function ENT:Think()
 									end
 								end
 							else
-								if self.CarTurning==0 then
-									self.LBoost = 1
-									self.RBoost = 1
+								if self.Speed > 0 then
+									local _, temp = WorldToLocal( Vector(0,0,0), Angle(0,self.LastYaw,0), Vector(0,0,0), Angle(0,self.base:GetAngles().yaw,0) )
+									local TurnVal = temp.yaw
+									local ControlForce = math.Min(math.abs(TurnVal*2.5),100)
+									if self.Perc>=0 then
+										if TurnVal > 0.05 and self.MoveRight==0 then
+											--math.abs(TurnVal)
+											self.LBoost = 0-ControlForce
+											self.RBoost = 2+ControlForce
+										end
+										if TurnVal < -0.05 and self.MoveLeft==0 then
+											self.LBoost = 2+ControlForce
+											self.RBoost = 0-ControlForce
+										end
+									else
+										if TurnVal > 0.05 and self.MoveLeft==0 then
+											self.LBoost = 2+ControlForce
+											self.RBoost = 0-ControlForce
+										end
+										if TurnVal < -0.05 and self.MoveRight==0 then
+											self.LBoost = 0-ControlForce
+											self.RBoost = 2+ControlForce
+										end
+									end
 								else
 									self.LBoost = 1
 									self.RBoost = 1
@@ -1086,6 +1107,7 @@ function ENT:Think()
 				local rightbraking = Vector(math.max(self.RightBrake*brakestiffness,TerrainBraking),1,0)*2
 				local leftbraking = Vector(math.max(self.LeftBrake*brakestiffness,TerrainBraking),1,0)*2
 				local WheelYaw = self.WheelYaw
+				local ShockForce = 20*self.PhysicalMass
 				--Right side
 				for i=1, WheelsPerSide do
 					RideHeight = self.RideHeight
@@ -1109,8 +1131,8 @@ function ENT:Think()
 						CurRideHeight = RideHeight
 					end
 					trace = {
-						start = Pos + up*(-CurRideHeight+100),
-						endpos = Pos + up*-CurRideHeight,
+						start = Pos + Vector(0,0,1)*(-CurRideHeight+100),
+						endpos = Pos + Vector(0,0,1)*-CurRideHeight,
 						mins = Vector(-10,-10,-0),
 						maxs = Vector(10,10,0),
 						mask = MASK_SOLID_BRUSHONLY
@@ -1155,9 +1177,9 @@ function ENT:Think()
 					if i>halfwheels then
 						multval = multval-SuspensionBias
 					end
-					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i])))) + wheelweightforce)*SuspensionForceMult*multval
+					SuspensionForce = (wheelweightforce+Vector(0,0,1)*math.min((self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i]))))),(3*self.PhysicalMass)))
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
-					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
+					AbsorbForceFinal = (-Vector(0,0,math.Clamp( self.PhysicalMass*lastchange/(WheelsPerSide*2),-ShockForce,ShockForce)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
 
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
@@ -1190,8 +1212,8 @@ function ENT:Think()
 					end
 
 					trace = {
-						start = Pos + up*(-CurRideHeight+100),
-						endpos = Pos + up*-CurRideHeight,
+						start = Pos + Vector(0,0,1)*(-CurRideHeight+100),
+						endpos = Pos + Vector(0,0,1)*-CurRideHeight,
 						mins = Vector(-10,-10,-0),
 						maxs = Vector(10,10,0),
 						mask = MASK_SOLID_BRUSHONLY
@@ -1236,12 +1258,9 @@ function ENT:Think()
 					if i>halfwheels then
 						multval = multval-SuspensionBias
 					end
-
-					SuspensionForce = (self.PhysicalMass/3000)*(((500*(100/(RideLimit)))*Vector(0,0,1)*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i])))) + wheelweightforce)*SuspensionForceMult*multval
-					AbsorbForceFinal = (-Vector(0,0,self.PhysicalMass*lastchange/(WheelsPerSide*2)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
+					SuspensionForce = (wheelweightforce+Vector(0,0,1)*math.min((self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i]))))),(3*self.PhysicalMass)))
+					AbsorbForceFinal = (-Vector(0,0, math.Clamp(self.PhysicalMass*lastchange/(WheelsPerSide*2),-ShockForce,ShockForce)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
-
-
 
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.LeftRidePosChanges[i] = RidePos
