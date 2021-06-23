@@ -404,7 +404,7 @@ do
 			slider.Label:DockMargin(8, 0, 0, 0)
 
 			slider:SetDark(true)
-			slider:SetDecimals(1)
+			slider:SetDecimals(2)
 			slider:SetMin(-1)
 			slider:SetMax(1)
 			slider:SetValue(0)
