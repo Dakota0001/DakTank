@@ -1349,7 +1349,7 @@ end
 function ENT:OnDuplicated(data)
 
 	local dt = data.DT
-	if not istable(dt) or dt.WheeledMode == nil or dt.WheelsPerSide == nil then
+	if not istable(dt) or dt.TrackLength == nil then
 
 		if data.EntityMods and data.EntityMods._DakVar_DUPED then -- hack...
 			self.dak_restoreLegacy = function()

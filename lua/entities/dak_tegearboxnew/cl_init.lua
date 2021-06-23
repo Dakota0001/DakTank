@@ -2,8 +2,8 @@
 include("shared.lua")
 
 local cv_part = CreateClientConVar("daktank_autotread_enable_particles", "1", true, false)
-local cv_dt = CreateClientConVar("daktank_autotread_max_detail", "4", true, false, "maximum track render quality", 4, 16)
-local cv_ad = CreateClientConVar("daktank_autotread_adaptive_detail", "0", true, false, "enhance track render quality as speed increases")
+local cv_dt = CreateClientConVar("daktank_autotread_max_detail", "8", true, false, "maximum track render quality", 4, 16)
+local cv_ad = CreateClientConVar("daktank_autotread_adaptive_detail", "1", true, false, "enhance track render quality as speed increases")
 
 local debugmode = false
 
