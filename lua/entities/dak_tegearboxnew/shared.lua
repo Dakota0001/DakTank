@@ -144,6 +144,12 @@ function ENT:_DakVar_SETUP()
 	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "HalfTWWidth", min = 1, max = 200, default = 20},
 		{hidepanel = hidepanel, category = category, title = "Width"})
 
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "HalfTOffsetX", min = 0, max = 1, default = 1},
+		{hidepanel = hidepanel, category = category, title = "X Offset %", help = "Percentage of HalfWheelbase*X"})
+
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "HalfTOffsetY", min = 0, max = 1, default = 1},
+		{hidepanel = hidepanel, category = category, title = "Y Offset %", help = "Percentage of HalfWheelY*Y"})
+
 	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "HalfTWModel", default = "models/sprops/trans/wheel_e/t_wheel15.mdl"},
 		{hidepanel = hidepanel, category = category, title = "Model"})
 
@@ -278,9 +284,9 @@ local function a1z26_toString(tbl, int)
 end
 
 function ENT:a1z26Encode(tbl)
-	return a1z26_toString(tbl, 9)
+	return a1z26_toString(tbl, 99)
 end
 
 function ENT:a1z26Decode(str)
-	return a1z26_toTable(str, 9)
+	return a1z26_toTable(str, 99)
 end

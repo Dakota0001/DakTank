@@ -127,7 +127,8 @@ function ENT:_DakVar_CHANGED(name, old, new)
 end
 
 function ENT:Think()
-	if self.dak_resetGearbox and self.dak_resetGearbox < CurTime() then
+	if not self.dak_resetInitial or self.dak_resetGearbox and self.dak_resetGearbox < CurTime() then
+		self.dak_resetInitial = true
 		self.dak_resetGearbox = nil
 		self.dak_vehicleMode = self:GetVehicleMode()
 		self:setup_gearbox(self.dak_vehicleMode)
@@ -331,6 +332,8 @@ local function setup_modelinfo(self, vehicleMode, dak_wheels_info)
 				model = self:GetHalfTWModel(),
 				width = self:GetHalfTWWidth(),
 				radius = self:GetHalfTWDiameter()*0.5,
+				offsetx = self:GetHalfTOffsetX(),
+				offsety = (1 - self:GetHalfTOffsetY())*self:GetWheelOffsetY(),
 				trace_start = self.dak_wheels_groundClearance,
 				trace_length = self.dak_wheels_groundClearance*2,
 			}
@@ -467,9 +470,10 @@ function ENT:setup_wheels(vehicleMode)
 			local wtype = 5
 			local info = self.dak_wheels_info[wtype]
 
-			local pos = Vector(wheelbase, 0, info.trace_start)
-
+			local pos = Vector(wheelbase*info.offsetx, info.offsety, info.trace_start)
 			rawset(self.dak_wheels_ri, 0, {type = wtype, info = info, turn = 1, opp = 1, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, 180, 0), angA = Angle(0, 180, 0)})
+
+			local pos = Vector(wheelbase*info.offsetx, -info.offsety, info.trace_start)
 			rawset(self.dak_wheels_le, 0, {type = wtype, info = info, turn = 1, opp = 1, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, 0, 0), angA = Angle(0, 0, 0)})
 		end
 
@@ -588,8 +592,11 @@ function ENT:update_wheels(vehicleMode)
 
 	local wheel_yaw
 	if enableTurning[vehicleMode] then
-		local rate = ft*45
-		self.dak_wheels_yaw = self.dak_wheels_yaw + math_Clamp(self:GetNWFloat("WheelYaw", 0) - self.dak_wheels_yaw, -rate, rate)
+		--local rate = ft*45
+		--self.dak_wheels_yaw = self.dak_wheels_yaw + math_Clamp(self:GetNWFloat("WheelYaw", 0) - self.dak_wheels_yaw, -rate, rate)
+		local yaw = self:GetNWFloat("WheelYaw", 0)
+		local rate = ft*5
+		self.dak_wheels_yaw = self.dak_wheels_yaw + rate*(yaw - self.dak_wheels_yaw)
 		wheel_yaw = self.dak_wheels_yaw
 	end
 
