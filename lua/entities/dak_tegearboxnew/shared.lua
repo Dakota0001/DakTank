@@ -89,6 +89,8 @@ function ENT:_DakVar_SETUP()
 	self:_DakVar_REGISTER({type = "Float", name = "BrakeStiffness", min = 0, max = 1, default = 1},
 		{category = category, title = "Brake Turning Stiffness"})
 
+	self:_DakVar_REGISTER({type = "Float", name = "DakFriction", min = 1, max = 2, default = 1},
+		{category = category, title = "Friction"})
 
 	----------------------------------------------------------------
 	category = "Track Appearance"

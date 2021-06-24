@@ -407,7 +407,9 @@ function ENT:Think()
 			end
 			if self.InertiaSet == nil then
 				if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
-					self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/6000) )
+					local oldinertia = self:GetParent():GetParent():GetPhysicsObject():GetInertia()
+					local multiplier = (self.TotalMass/6000)
+					self:GetParent():GetParent():GetPhysicsObject():SetInertia(Vector(oldinertia.x*multiplier, oldinertia.y*multiplier, oldinertia.z))
 					self.InertiaSet = 1
 				end
 			end
@@ -512,36 +514,7 @@ function ENT:Think()
 						if self.Speed < self.TopSpeed then
 							self.RBoost = 1
 							self.LBoost = 1
-								--TRACTION CONTROL
-								--print(self.LastYaw-self.base:GetAngles().yaw)
 							if self.MoveRight==0 and self.MoveLeft==0 then
-								if self.Speed > 0 then
-									local _, temp = WorldToLocal( Vector(0,0,0), Angle(0,self.LastYaw,0), Vector(0,0,0), Angle(0,self.base:GetAngles().yaw,0) )
-									local TurnVal = temp.yaw
-									local ControlForce = math.Min(math.abs(TurnVal*2.5),100)
-									if self.Perc>=0 then
-										if TurnVal > 0.05 then
-											self.LBoost = 0-ControlForce
-											self.RBoost = 2+ControlForce
-										end
-										if TurnVal < -0.05 then
-											self.LBoost = 2+ControlForce
-											self.RBoost = 0-ControlForce
-										end
-									else
-										if TurnVal > 0.05 then
-											self.LBoost = 2+ControlForce
-											self.RBoost = 0-ControlForce
-										end
-										if TurnVal < -0.05 then
-											self.LBoost = 0-ControlForce
-											self.RBoost = 2+ControlForce
-										end
-									end
-								else
-									self.LBoost = 1
-									self.RBoost = 1
-								end
 								if self.CarTurning == 1 then
 									if self.WheelYaw > 0 then
 										self.WheelYaw = self.WheelYaw - 1
@@ -550,35 +523,35 @@ function ENT:Think()
 										self.WheelYaw = self.WheelYaw + 1
 									end
 								end
-							else
-								if self.Speed > 0 then
-									local _, temp = WorldToLocal( Vector(0,0,0), Angle(0,self.LastYaw,0), Vector(0,0,0), Angle(0,self.base:GetAngles().yaw,0) )
-									local TurnVal = temp.yaw
-									local ControlForce = math.Min(math.abs(TurnVal*2.5),100)
-									if self.Perc>=0 then
-										if TurnVal > 0.05 and self.MoveRight==0 then
-											--math.abs(TurnVal)
-											self.LBoost = 0-ControlForce
-											self.RBoost = 2+ControlForce
-										end
-										if TurnVal < -0.05 and self.MoveLeft==0 then
-											self.LBoost = 2+ControlForce
-											self.RBoost = 0-ControlForce
-										end
-									else
-										if TurnVal > 0.05 and self.MoveLeft==0 then
-											self.LBoost = 2+ControlForce
-											self.RBoost = 0-ControlForce
-										end
-										if TurnVal < -0.05 and self.MoveRight==0 then
-											self.LBoost = 0-ControlForce
-											self.RBoost = 2+ControlForce
-										end
+							end
+							if self.Speed > 0 then
+								--TRACTION CONTROL
+								local _, temp = WorldToLocal( Vector(0,0,0), Angle(0,self.LastYaw,0), Vector(0,0,0), Angle(0,self.base:GetAngles().yaw,0) )
+								local TurnVal = temp.yaw
+								local ControlForce = math.Min(math.max(4,math.abs(TurnVal*5)),10)
+								if self.Perc>=0 then
+									if TurnVal > 0.05 and self.MoveRight==0 then
+										--math.abs(TurnVal)
+										self.LBoost = 0-ControlForce
+										self.RBoost = 2+ControlForce
+									end
+									if TurnVal < -0.05 and self.MoveLeft==0 then
+										self.LBoost = 2+ControlForce
+										self.RBoost = 0-ControlForce
 									end
 								else
-									self.LBoost = 1
-									self.RBoost = 1
+									if TurnVal > 0.05 and self.MoveLeft==0 then
+										self.LBoost = 2+ControlForce
+										self.RBoost = 0-ControlForce
+									end
+									if TurnVal < -0.05 and self.MoveRight==0 then
+										self.LBoost = 0-ControlForce
+										self.RBoost = 2+ControlForce
+									end
 								end
+							else
+								self.LBoost = 1
+								self.RBoost = 1
 							end
 							if self.CarTurning == 1 then
 								--ENSURE BRAKES ARE OFF
@@ -1017,7 +990,7 @@ function ENT:Think()
 				self.lasthydrabiasside = hydrabiasside
 				local SuspensionBias = self.SuspensionBias
 
-				local wheelweightforce = Vector(0,0,(self.AddonMass/(WheelsPerSide*2))*-9.8*engine.TickInterval())
+				local wheelweightforce = Vector(0,0,((self.TotalMass + self.AddonMass)/(WheelsPerSide*2))*-9.8*engine.TickInterval())
 				if self.LastWheelsPerSide ~= WheelsPerSide then
 					for i=1, WheelsPerSide do
 						self.RightChanges[i] = 0
@@ -1094,9 +1067,9 @@ function ENT:Think()
 					brakestiffness = 1
 				end
 				local halfwheels = WheelsPerSide*0.5
-				local basefriction = 1*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
+				local basefriction = self:GetDakFriction()*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 				if self.CarTurning == 1 then
-					basefriction = 1*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
+					basefriction = self:GetDakFriction()*(self.PhysicalMass*-GravxTicks).z * 0.9/(WheelsPerSide*2)
 				end
 				local multval = 1
 				local localfriction
@@ -1177,7 +1150,7 @@ function ENT:Think()
 					if i>halfwheels then
 						multval = multval-SuspensionBias
 					end
-					SuspensionForce = (wheelweightforce+Vector(0,0,1)*math.min((self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i]))))),(3*self.PhysicalMass)))
+					SuspensionForce = (wheelweightforce+Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(200/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i]))))))
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,math.Clamp( self.PhysicalMass*lastchange/(WheelsPerSide*2),-ShockForce,ShockForce)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
@@ -1258,7 +1231,7 @@ function ENT:Think()
 					if i>halfwheels then
 						multval = multval-SuspensionBias
 					end
-					SuspensionForce = (wheelweightforce+Vector(0,0,1)*math.min((self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i]))))),(3*self.PhysicalMass)))
+					SuspensionForce = (wheelweightforce+Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(200/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i]))))))
 					AbsorbForceFinal = (-Vector(0,0, math.Clamp(self.PhysicalMass*lastchange/(WheelsPerSide*2),-ShockForce,ShockForce)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
 
