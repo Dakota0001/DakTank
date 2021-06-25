@@ -297,7 +297,7 @@ local function setup_modelinfo(self, vehicleMode, dak_wheels_info)
 				model     = self:GetDriveWModel(),
 				width     = self:GetDriveWWidth(),
 				radius    = self:GetDriveWDiameter()*0.5,
-				offsetz   = self:GetDriveWOffsetZ(),
+				offsetz   = self:GetDriveWOffsetZ() + (self:GetDriveWDiameter()*0.5 + self:GetTrackHeight()),
 			}
 		end
 		if self:GetIdlerWEnabled() then
@@ -307,13 +307,13 @@ local function setup_modelinfo(self, vehicleMode, dak_wheels_info)
 				model     = self:GetIdlerWModel(),
 				width     = self:GetIdlerWWidth(),
 				radius    = self:GetIdlerWDiameter()*0.5,
-				offsetz   = self:GetIdlerWOffsetZ(),
+				offsetz   = self:GetIdlerWOffsetZ() + (self:GetIdlerWDiameter()*0.5 + self:GetTrackHeight()),
 			}
 		end
 
 		if self:GetRollerWCount() > 0 then
-			local bias1 = self:GetIdlerWOffsetZ()
-			local bias2 = self:GetDriveWOffsetZ()
+			local bias1 = self:GetIdlerWOffsetZ() + (self:GetIdlerWDiameter()*0.5 + self:GetTrackHeight())
+			local bias2 = self:GetDriveWOffsetZ() + (self:GetDriveWDiameter()*0.5 + self:GetTrackHeight())
 
 			dak_wheels_info[4] = {
 				name      = "roller",
