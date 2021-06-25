@@ -1397,8 +1397,8 @@ function ENT:OnDuplicated(data)
 				self:SetTrackColor(Vector(color.x*255, color.y*255, color.z*255))
 			end
 
-			self:SetDriveWOffsetZ(dt.FrontWheelRaise*0.5 - (dt.FrontWheelHeight + dt.TreadHeight)*0.5)
-			self:SetIdlerWOffsetZ(dt.RearWheelRaise*0.5 - (dt.RearWheelHeight + dt.TreadHeight)*0.5)
+			self:SetDriveWOffsetZ(dt.FrontWheelRaise - dt.FrontWheelHeight) -- bug?
+			self:SetIdlerWOffsetZ(dt.RearWheelRaise - dt.RearWheelHeight)
 			self:SetDriveWDiameter(dt.FrontWheelHeight)
 			self:SetIdlerWDiameter(dt.RearWheelHeight)
 		end
