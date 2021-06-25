@@ -1410,6 +1410,7 @@ function ENT:Think()
 							CurrentRes = self.Contraption[i]
 							if CurrentRes ~= NULL and CurrentRes ~= nil and CurrentRes:IsValid() then
 								local physobj = CurrentRes:GetPhysicsObject()
+								--[[
 								if CurrentRes.PhysicsClipped == true then
 									if CurrentRes.DakMassSet ~= true then
 										if CurrentRes.EntityMods.DakClippedArmor ~= nil then
@@ -1423,6 +1424,7 @@ function ENT:Think()
 										end
 									end
 								end
+								]]--
 								
 
 								if physobj:IsValid() then
@@ -2295,6 +2297,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 			end
 		end
 		
+		--[[
 		if Ent.EntityMods.DTClips ~= nil then
 			for i=1, #Ent.EntityMods.DTClips do
 				local cur = CreatedEntities[ Ent.EntityMods.DTClips[i].ID ]
@@ -2310,6 +2313,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 				end
 			end
 		end
+		]]--
 
 
 		self.DakName = Ent.EntityMods.DakTek.DakName

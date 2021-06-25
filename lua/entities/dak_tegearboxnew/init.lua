@@ -408,7 +408,7 @@ function ENT:Think()
 			if self.InertiaSet == nil then
 				if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
 					local oldinertia = self:GetParent():GetParent():GetPhysicsObject():GetInertia()
-					local multiplier = (self.TotalMass/6000)
+					local multiplier = 1--(self.TotalMass/6000)
 					self:GetParent():GetParent():GetPhysicsObject():SetInertia(Vector(oldinertia.x*multiplier, oldinertia.y*multiplier, oldinertia.z))
 					self.InertiaSet = 1
 				end
@@ -989,8 +989,8 @@ function ENT:Think()
 				self:SetNWFloat("HydraSide",hydrabiasside)
 				self.lasthydrabiasside = hydrabiasside
 				local SuspensionBias = self.SuspensionBias
+				local wheelweightforce = Vector(0,0,((self.AddonMass)/(WheelsPerSide*2))*-9.8*engine.TickInterval())
 
-				local wheelweightforce = Vector(0,0,((self.TotalMass + self.AddonMass)/(WheelsPerSide*2))*-9.8*engine.TickInterval())
 				if self.LastWheelsPerSide ~= WheelsPerSide then
 					for i=1, WheelsPerSide do
 						self.RightChanges[i] = 0
@@ -1080,7 +1080,7 @@ function ENT:Think()
 				local rightbraking = Vector(math.max(self.RightBrake*brakestiffness,TerrainBraking),1,0)*2
 				local leftbraking = Vector(math.max(self.LeftBrake*brakestiffness,TerrainBraking),1,0)*2
 				local WheelYaw = self.WheelYaw
-				local ShockForce = 20*self.PhysicalMass
+				local ShockForce = 10*self.PhysicalMass
 				--Right side
 				for i=1, WheelsPerSide do
 					RideHeight = self.RideHeight
@@ -1150,7 +1150,7 @@ function ENT:Think()
 					if i>halfwheels then
 						multval = multval-SuspensionBias
 					end
-					SuspensionForce = (wheelweightforce+Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(200/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i]))))))
+					SuspensionForce = wheelweightforce+(Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i]))))))
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,math.Clamp( self.PhysicalMass*lastchange/(WheelsPerSide*2),-ShockForce,ShockForce)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
@@ -1231,7 +1231,7 @@ function ENT:Think()
 					if i>halfwheels then
 						multval = multval-SuspensionBias
 					end
-					SuspensionForce = (wheelweightforce+Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(200/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i]))))))
+					SuspensionForce = wheelweightforce+(Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i]))))))
 					AbsorbForceFinal = (-Vector(0,0, math.Clamp(self.PhysicalMass*lastchange/(WheelsPerSide*2),-ShockForce,ShockForce)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
 
