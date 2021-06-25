@@ -172,7 +172,7 @@ function ENT:_DakVar_SETUP()
 	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "DriveWWidth", min = 1, max = 200, default = 20},
 		{hidepanel = hidepanel, category = category, title = "Width"})
 
-	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "DriveWOffsetZ", min = 0, max = 200, default = 20},
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "DriveWOffsetZ", min = -200, max = 200, default = 20},
 		{hidepanel = hidepanel, category = category, title = "Z Offset"})
 
 	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "DriveWModel", default = "models/sprops/trans/miscwheels/tank15.mdl"},
@@ -221,7 +221,7 @@ function ENT:_DakVar_SETUP()
 	self:_DakVar_REGISTER({notify = CLIENT, type = "Float", name = "IdlerWWidth", min = 1, max = 200, default = 20},
 		{hidepanel = hidepanel, category = category, title = "Width"})
 
-	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "IdlerWOffsetZ", min = 0, max = 200, default = 20},
+	self:_DakVar_REGISTER({notify = CLIENT,type = "Float", name = "IdlerWOffsetZ", min = -200, max = 200, default = 20},
 		{hidepanel = hidepanel, category = category, title = "Z Offset"})
 
 	self:_DakVar_REGISTER({notify = CLIENT, type = "String", name = "IdlerWModel", default = "models/sprops/trans/miscwheels/tank15.mdl"},
