@@ -1355,7 +1355,8 @@ function ENT:OnDuplicated(data)
 	self.dak_restoreLegacy = function()
 		MsgN(tostring(self), "restoring legacy daktank gearbox values")
 
-		-- old vars
+
+		-- mobility
 		self:SetVehicleMode(dt.WheeledMode == true and "wheeled" or "tracked")
 		self:SetWheelBase(dt.TrackLength)
 		self:SetWheelOffsetX(dt.ForwardOffset)
@@ -1368,29 +1369,48 @@ function ENT:OnDuplicated(data)
 		self:SetSuspensionForceMult(dt.SuspensionForceMult)
 		self:SetRideLimit(dt.RideLimit)
 		self:SetBrakeStiffness(dt.BrakeStiffness)
-		self:SetRoadWTurnFront(dt.ForwardTurningWheels)
-		self:SetRoadWTurnRear(dt.RearTurningWheels)
-		self:SetRoadWTurnAngle(dt.TurnAngle)
 
-		self:SetTrackHeight(dt.TreadHeight)
-		self:SetTrackWidth(dt.TreadWidth)
 
-		local color = dt.TreadColor
-		if isvector(color) then
-			self:SetTrackColor(Vector(color.x*255, color.y*255, color.z*255))
-		end
-
+		-- visual
 		local color = dt.WheelColor
 		if isvector(color) then
 			self:SetWheelColor(Vector(color.x*255, color.y*255, color.z*255))
 		end
 
-		self:SetDriveWOffsetZ(dt.FrontWheelRaise)
+		if dt.WheeledMode == true then
+			self:SetRoadWTurnFront(dt.ForwardTurningWheels)
+			self:SetRoadWTurnRear(dt.RearTurningWheels)
+			self:SetRoadWTurnAngle(dt.TurnAngle)
+
+			self:SetDriveWOffsetZ(dt.FrontWheelRaise)
+			self:SetIdlerWOffsetZ(dt.RearWheelRaise)
+			self:SetDriveWDiameter(dt.WheelHeight)
+			self:SetIdlerWDiameter(dt.WheelHeight)
+		else
+			self:SetTrackTension(1)
+			self:SetRollerWCount(0)
+			self:SetTrackHeight(dt.TreadHeight)
+			self:SetTrackWidth(dt.TreadWidth)
+
+			local color = dt.TreadColor
+			if isvector(color) then
+				self:SetTrackColor(Vector(color.x*255, color.y*255, color.z*255))
+			end
+
+			self:SetDriveWOffsetZ(dt.FrontWheelRaise*0.5 - dt.FrontWheelHeight*0.5 - dt.TreadHeight) -- bug?
+			self:SetIdlerWOffsetZ(dt.RearWheelRaise*0.5 - dt.RearWheelHeight*0.5 - dt.TreadHeight)
+			self:SetDriveWDiameter(dt.FrontWheelHeight)
+			self:SetIdlerWDiameter(dt.RearWheelHeight)
+		end
+
+
+		-- front
 		self:SetDriveWModel(dt.WheelModel)
-		self:SetDriveWDiameter(dt.FrontWheelHeight)
 		self:SetDriveWWidth(dt.WheelWidth)
 		self:SetDriveWBGroup(string.format("%d%d%d", dt.WheeBodygroup1 or 0, dt.WheeBodygroup2 or 0, (dt.FrontSprocket and 1) or tonumber(dt.WheelBodygroup3) or 0))
 
+
+		-- road
 		if tonumber(dt.WheelsPerSide) then
 			self:SetRoadWCount(dt.WheelsPerSide - (dt.WheeledMode and 0 or 2))
 		end
@@ -1398,18 +1418,12 @@ function ENT:OnDuplicated(data)
 		self:SetRoadWDiameter(dt.WheelHeight)
 		self:SetRoadWWidth(dt.WheelWidth)
 		self:SetRoadWBGroup(string.format("%d%d%d", dt.WheeBodygroup1 or 0, dt.WheelBodygroup2 or 0, dt.WheelBodygroup3 or 0))
-		// find a way to translate old wheelforwardoffset vars?
-		// old is in 1/100ths of a unit
 
-		self:SetIdlerWOffsetZ(dt.RearWheelRaise)
+
+		-- rear
 		self:SetIdlerWModel(dt.WheelModel)
-		self:SetIdlerWDiameter(dt.RearWheelHeight)
 		self:SetIdlerWWidth(dt.WheelWidth)
 		self:SetIdlerWBGroup(string.format("%d%d%d", dt.WheeBodygroup1 or 0, dt.WheeBodygroup2 or 0, (dt.RearSprocket and 1) or tonumber(dt.WheelBodygroup3) or 0))
-
-		-- new vars we don't need
-		self:SetTrackTension(1)
-		self:SetRollerWCount(0)
 	end
 
 end

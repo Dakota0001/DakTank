@@ -42,22 +42,6 @@ local _mmat_setTranslation, _mmat_setAngles =
 	  _mmat.SetTranslation, _mmat.SetAngles
 
 local debugtype = {
-	root  = {
-		enabled = true,
-		update  = function(self, ent, reset)
-			if reset or not self.data[ent] then
-				self.data[ent] = {}
-			end
-			return self.data[ent]
-		end,
-		render = function(self, ent, data)
-			for k, v in pairs(data) do
-				local p1 = self:LocalToWorld(v):ToScreen()
-				surface.SetDrawColor(255, 0, 255, 100)
-				surface.DrawRect(p1.x - 2, p1.y - 2, 4, 4)
-			end
-		end,
-	},
 	trace = {
 		enabled = true,
 		update  = function(self, ent, reset)
@@ -291,64 +275,69 @@ local function resetbounds(self)
 end
 
 local function setup_modelinfo(self, vehicleMode, dak_wheels_info)
-	if vehicleMode ~= "wheeled" then
-		dak_wheels_info[1] = {
-			name = "drive",
-			bodygroup = self:GetDriveWBGroup(),
-			model = self:GetDriveWModel(),
-			width = self:GetDriveWWidth(),
-			radius = self:GetDriveWDiameter()*0.5,
-			trace_start = self.dak_wheels_groundClearance + self:GetDriveWOffsetZ(),
-			trace_length = self.dak_wheels_groundClearance*2,
-		}
-		dak_wheels_info[3] = {
-			name = "idler",
-			bodygroup = self:GetIdlerWBGroup(),
-			model = self:GetIdlerWModel(),
-			width = self:GetIdlerWWidth(),
-			radius = self:GetIdlerWDiameter()*0.5,
-			trace_start = self.dak_wheels_groundClearance + self:GetIdlerWOffsetZ(),
-			trace_length = self.dak_wheels_groundClearance*2,
-		}
-
-		local bias1 = (self:GetIdlerWOffsetZ() + self:GetIdlerWDiameter()) - self.dak_wheels_groundClearance
-		local bias2 = (self:GetDriveWOffsetZ() + self:GetDriveWDiameter()) - self.dak_wheels_groundClearance
-
-		dak_wheels_info[4] = {
-			name = "roller",
-			bodygroup = self:GetRollerWBGroup(),
-			model = self:GetRollerWModel(),
-			width = self:GetRollerWWidth(),
-			radius = self:GetRollerWDiameter()*0.5,
-			offsetz = self:GetRollerWOffsetZ(),
-			bias1 = bias1 + self:GetRollerWBias()*(bias2 - bias1),
-			bias2 = bias2 + self:GetRollerWBias()*(bias1 - bias2),
-		}
-
+	if vehicleMode == "tracked" or vehicleMode == "halftracked" then
 		if vehicleMode == "halftracked" then
-			dak_wheels_info[5] = {
-				name = "halftrack",
-				bodygroup = self:GetHalfTWBGroup(),
-				model = self:GetHalfTWModel(),
-				width = self:GetHalfTWWidth(),
-				radius = self:GetHalfTWDiameter()*0.5,
-				offsetx = self:GetHalfTOffsetX(),
-				offsety = (1 - self:GetHalfTOffsetY())*self:GetWheelOffsetY(),
-				trace_start = self.dak_wheels_groundClearance,
+			dak_wheels_info[0] = {
+				name         = "halftrack",
+				bodygroup    = self:GetHalfTWBGroup(),
+				model        = self:GetHalfTWModel(),
+				width        = self:GetHalfTWWidth(),
+				radius       = self:GetHalfTWDiameter()*0.5,
+				offsetx      = self:GetHalfTOffsetX(),
+				offsety      = (1 - self:GetHalfTOffsetY())*self:GetWheelOffsetY(),
+				trace_start  = self.dak_wheels_groundClearance,
 				trace_length = self.dak_wheels_groundClearance*2,
+			}
+		end
+
+		if self:GetDriveWEnabled() then
+			dak_wheels_info[1] = {
+				name      = "drive",
+				bodygroup = self:GetDriveWBGroup(),
+				model     = self:GetDriveWModel(),
+				width     = self:GetDriveWWidth(),
+				radius    = self:GetDriveWDiameter()*0.5,
+				offsetz   = self:GetDriveWOffsetZ() + (self:GetDriveWDiameter()*0.5 + self:GetTrackHeight()),
+			}
+		end
+		if self:GetIdlerWEnabled() then
+			dak_wheels_info[3] = {
+				name      = "idler",
+				bodygroup = self:GetIdlerWBGroup(),
+				model     = self:GetIdlerWModel(),
+				width     = self:GetIdlerWWidth(),
+				radius    = self:GetIdlerWDiameter()*0.5,
+				offsetz   = self:GetIdlerWOffsetZ() + (self:GetIdlerWDiameter()*0.5 + self:GetTrackHeight()),
+			}
+		end
+
+		if self:GetRollerWCount() > 0 then
+			local bias1 = self:GetIdlerWOffsetZ() + (self:GetIdlerWDiameter()*0.5 + self:GetTrackHeight())
+			local bias2 = self:GetDriveWOffsetZ() + (self:GetDriveWDiameter()*0.5 + self:GetTrackHeight())
+
+			dak_wheels_info[4] = {
+				name      = "roller",
+				bodygroup = self:GetRollerWBGroup(),
+				model     = self:GetRollerWModel(),
+				width     = self:GetRollerWWidth(),
+				radius    = self:GetRollerWDiameter()*0.5,
+				offsetx   = self:a1z26Decode(self:GetRollerWOffsetsX()),
+				offsetz   = self:GetRollerWOffsetZ(),
+				bias1     = bias1 + self:GetRollerWBias()*(bias2 - bias1),
+				bias2     = bias2 + self:GetRollerWBias()*(bias1 - bias2),
 			}
 		end
 	end
 
 	dak_wheels_info[2] = {
 		name = "road",
-		bodygroup = self:GetRoadWBGroup(),
-		model = self:GetRoadWModel(),
-		width = self:GetRoadWWidth(),
-		radius = self:GetRoadWDiameter()*0.5,
-		type = self:GetRoadWType(),
-		offsetx = self:a1z26Decode(self:GetRoadWOffsetsX()),
-		trace_start = self.dak_wheels_groundClearance,
+		bodygroup    = self:GetRoadWBGroup(),
+		model        = self:GetRoadWModel(),
+		width        = self:GetRoadWWidth(),
+		radius       = self:GetRoadWDiameter()*0.5,
+		type         = self:GetRoadWType(),
+		offsetx      = self:a1z26Decode(self:GetRoadWOffsetsX()),
+		trace_start  = self.dak_wheels_groundClearance,
 		trace_length = self.dak_wheels_groundClearance*2,
 	}
 
@@ -445,6 +434,15 @@ local function setup_modelinfo(self, vehicleMode, dak_wheels_info)
 	end
 end
 
+local function addwheel(tbl, data)
+	data.index = table_insert(tbl, data)
+end
+
+local function setwheel(tbl, index, data)
+	data.index = index
+	rawset(tbl, index, data)
+end
+
 function ENT:setup_wheels(vehicleMode)
 	self.dak_wheels_info = {}
 	local dak_wheels_info = self.dak_wheels_info
@@ -457,90 +455,123 @@ function ENT:setup_wheels(vehicleMode)
 
 	local pos_ri = Vector(self:GetWheelOffsetX(), -self:GetWheelOffsetY(), 0)
 	local pos_le = Vector(self:GetWheelOffsetX(), self:GetWheelOffsetY(), 0)
-	local num_road = self:GetRoadWCount()
+
 	local wheelbase = self:GetWheelBase()
+	local wheelbasemove = 0
+	local wheeltracecount = 0
 
-	if vehicleMode == "tracked" or vehicleMode == "halftracked" then
-		local wheelbasemove = 0
+	-- halftrack wheel
+	local wtype = 0
+	local winfo = dak_wheels_info[wtype]
 
-		if vehicleMode == "halftracked" then
-			wheelbase = wheelbase*0.5
-			wheelbasemove = wheelbase*0.5
+	if winfo then
+		wheelbase = wheelbase*0.5
+		wheelbasemove = wheelbase*0.5
 
-			local wtype = 5
-			local info = self.dak_wheels_info[wtype]
+		local pos = Vector(wheelbase*winfo.offsetx, winfo.offsety, winfo.trace_start)
+		setwheel(self.dak_wheels_ri, 0, {trace = true, turn = 1, type = wtype, info = winfo, turn = 1, opp = 1, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, 180, 0), angA = Angle(0, 180, 0)})
 
-			local pos = Vector(wheelbase*info.offsetx, info.offsety, info.trace_start)
-			rawset(self.dak_wheels_ri, 0, {type = wtype, info = info, turn = 1, opp = 1, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, 180, 0), angA = Angle(0, 180, 0)})
+		local pos = Vector(wheelbase*winfo.offsetx, -winfo.offsety, winfo.trace_start)
+		setwheel(self.dak_wheels_le, 0, {trace = true, turn = 1, type = wtype, info = winfo, turn = 1, opp = 1, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, 0, 0), angA = Angle(0, 0, 0)})
 
-			local pos = Vector(wheelbase*info.offsetx, -info.offsety, info.trace_start)
-			rawset(self.dak_wheels_le, 0, {type = wtype, info = info, turn = 1, opp = 1, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, 0, 0), angA = Angle(0, 0, 0)})
+		wheeltracecount = wheeltracecount + 1
+	end
+
+	-- drive wheel
+	local wtype = 1
+	local winfo = dak_wheels_info[wtype]
+
+	if winfo then
+		local pos = Vector(wheelbase*0.5 - wheelbasemove, 0, winfo.offsetz)
+		addwheel(self.dak_wheels_ri, {type = wtype, info = winfo, opp = 1, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, 180, 0), angA = Angle(0, 180, 0)})
+		addwheel(self.dak_wheels_le, {type = wtype, info = winfo, opp = 1, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, 0, 0), angA = Angle(0, 0, 0)})
+	end
+
+	-- road wheel
+	local wtype = 2
+	local winfo = dak_wheels_info[wtype]
+
+	if winfo then
+		local add_i, add_n
+		if dak_wheels_info[1] and dak_wheels_info[3] then
+			add_i = 1
+			add_n = 1
+		elseif dak_wheels_info[1] then
+			add_i = 1
+			add_n = 0
+		elseif dak_wheels_info[3] then
+			add_i = 0
+			add_n = 0
+		else
+			add_i = 0
+			add_n = -1
 		end
 
-		local wheelnumRoller = self:GetRollerWCount()
-		for i = 0, num_road + wheelnumRoller + 1 do
-			local wtype = i == 0 and 1 or i <= num_road and 2 or i == num_road + 1 and 3 or 4
-			local info = dak_wheels_info[wtype]
+		local turn_f, turn_r, wheeled
+		if vehicleMode == "wheeled" then
+			turn_f = self:GetRoadWTurnFront()
+			turn_r = self:GetRoadWTurnRear()
+			wheeled = true
+		end
 
-			local pos, alt
+		local num_road = self:GetRoadWCount()
+		for i = 0, num_road - 1 do
+			local t0 = (i + add_i)/(num_road + add_n)
+			local t1 = (i + add_i + 1)/(num_road + add_n)
+			local pos = Vector(wheelbase*0.5 - wheelbase*(t0 - (winfo.offsetx[i + 1] or 0)*(t1 - t0)) - wheelbasemove, 0, winfo.trace_start)
 
-			if wtype == 1 or wtype == 3 then
-				local t0 = i/(num_road + 1)
-				pos = Vector(wheelbase*0.5 - wheelbase*t0 - wheelbasemove, 0, info.trace_start)
-
-			elseif wtype == 2 then
-				if info.type == "interleave" then
-					local even = num_road % 2 == 0 and 1 or 0
-					alt = i % 2 == even and true or false
+			local turn, alt
+			if wheeled then
+				if i > (num_road - 1)*0.5 then
+					turn = (i > (num_road  - 1) - turn_r) and -1
+				else
+					turn = (i < turn_f) and 1
 				end
-
-				local t0 = i/(num_road + 1)
-				local t1 = (i + 1)/(num_road + 1)
-				pos = Vector(wheelbase*0.5 - wheelbase*(t0 - (info.offsetx[i] or 0)*(t1 - t0)) - wheelbasemove, 0, info.trace_start)
-
-			elseif wtype == 4 then
-				local t0 = (i - num_road - 1)/(wheelnumRoller + 1)
-				pos = Vector(-wheelbase*0.5 + wheelbase*t0 - wheelbasemove, 0, info.bias1 + t0*(info.bias2 - info.bias1) + info.offsetz)
-
+			elseif winfo.type == "interleave" then
+				local even = num_road % 2 == 0 and 0 or 1
+				alt = i % 2 == even and true or false
 			end
 
 			local opp = alt and -1 or 1
-			table_insert(self.dak_wheels_ri, {type = wtype, info = info, alt = alt, opp = opp, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, alt and 0 or 180, 0), angA = Angle(0, alt and 0 or 180, 0)})
-			table_insert(self.dak_wheels_le, {type = wtype, info = info, alt = alt, opp = opp, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, alt and 180 or 0, 0), angA = Angle(0, alt and 180 or 0, 0)})
+
+			addwheel(self.dak_wheels_ri, {trace = true, turn = turn, type = wtype, info = winfo, alt = alt, opp = opp, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, alt and 0 or 180, 0), angA = Angle(0, alt and 0 or 180, 0)})
+			addwheel(self.dak_wheels_le, {trace = true, turn = turn, type = wtype, info = winfo, alt = alt, opp = opp, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, alt and 180 or 0, 0), angA = Angle(0, alt and 180 or 0, 0)})
+			wheeltracecount = wheeltracecount + 1
 		end
-	else
-		local turn_f = self:GetRoadWTurnFront()
-		local turn_r = self:GetRoadWTurnRear()
+	end
 
-		num_road = num_road - 1
-		for i = 0, num_road do
-			local wtype = 2
-			local info = self.dak_wheels_info[wtype]
+	-- idler wheel
+	local wtype = 3
+	local winfo = dak_wheels_info[wtype]
 
-			local t0 = i/num_road
-			local t1 = (i + 1)/num_road
-			local pos = Vector(wheelbase*0.5 - wheelbase*(t0 - (info.offsetx[i + 1] or 0)*(t1 - t0)), 0, info.trace_start)
+	if winfo then
+		local pos = Vector(-wheelbase*0.5 - wheelbasemove, 0, winfo.offsetz)
+		addwheel(self.dak_wheels_ri, {type = wtype, info = winfo, opp = 1, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, 180, 0), angA = Angle(0, 180, 0)})
+		addwheel(self.dak_wheels_le, {type = wtype, info = winfo, opp = 1, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, 0, 0), angA = Angle(0, 0, 0)})
+	end
 
-			local turn
-			if i > num_road*0.5 then
-				turn = (i > num_road - turn_r) and -1
-			else
-				turn = (i < turn_f) and 1
-			end
+	-- roller wheel
+	local wtype = 4
+	local winfo = dak_wheels_info[wtype]
 
-			table_insert(self.dak_wheels_ri, {type = wtype, info = info, turn = turn, opp = 1, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, 180, 0), angA = Angle(0, 180, 0)})
-			table_insert(self.dak_wheels_le, {type = wtype, info = info, turn = turn, opp = 1, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, 0, 0), angA = Angle(0, 0, 0)})
+	if winfo then
+		local num_roller = self:GetRollerWCount()
+		for i = 0, num_roller - 1 do
+			local t0 = (i + 1)/(num_roller + 1)
+			local t1 = (i + 2)/(num_roller + 1)
+			local pos = Vector(-wheelbase*0.5 + wheelbase*(t0 - (winfo.offsetx[i + 1] or 0)*(t1 - t0)) - wheelbasemove, 0, winfo.bias1 + t0*(winfo.bias2 - winfo.bias1) + winfo.offsetz)
+			addwheel(self.dak_wheels_ri, {type = wtype, info = winfo, opp = 1, posL = pos + pos_ri, posA = pos + pos_ri, angL = Angle(0, 180, 0), angA = Angle(0, 180, 0)})
+			addwheel(self.dak_wheels_le, {type = wtype, info = winfo, opp = 1, posL = pos + pos_le, posA = pos + pos_le, angL = Angle(0, 0, 0), angA = Angle(0, 0, 0)})
 		end
 	end
 
 	self.dak_wheels_count_ri = #self.dak_wheels_ri
 	self.dak_wheels_count_le = #self.dak_wheels_le
+	self.dak_wheels_count_trace = wheeltracecount
 
 	self.dak_wheels_yaw = 0
 	self.dak_wheels_bias_fo = 0
 	self.dak_wheels_bias_ri = 0
-	self.dak_wheels_bias_skip_fo = self:GetDriveWOffsetZ() > 0
-	self.dak_wheels_bias_skip_re = self:GetIdlerWOffsetZ() > 0
 	self.dak_wheels_lastpos_ri = self:GetPos()
 	self.dak_wheels_lastpos_le = self:GetPos()
 	self.dak_wheels_lastrot_ri = 0
@@ -551,12 +582,7 @@ function ENT:setup_wheels(vehicleMode)
 	self.dak_tracks_textureres = self:GetTrackResolution()*self:GetTrackWidth()
 	self.dak_tracks_texturemap = 1/self.dak_tracks_textureres
 
-	if vehicleMode == "wheeled" then
-		self.dak_wheels_count_trace = self.dak_wheels_count_ri
-		self:update_wheels(vehicleMode)
-	else
-		self.dak_wheels_count_trace = num_road + 2
-	end
+	self:update_wheels(vehicleMode)
 
 	resetbounds(self)
 end
@@ -592,34 +618,28 @@ function ENT:update_wheels(vehicleMode)
 
 	local wheel_yaw
 	if enableTurning[vehicleMode] then
-		--local rate = ft*45
-		--self.dak_wheels_yaw = self.dak_wheels_yaw + math_Clamp(self:GetNWFloat("WheelYaw", 0) - self.dak_wheels_yaw, -rate, rate)
 		local yaw = self:GetNWFloat("WheelYaw", 0)
 		local rate = ft*5
 		self.dak_wheels_yaw = self.dak_wheels_yaw + rate*(yaw - self.dak_wheels_yaw)
-		wheel_yaw = self.dak_wheels_yaw
+		wheel_yaw = math_abs(self.dak_wheels_yaw) > 0.01 and self.dak_wheels_yaw or nil
 	end
 
+	local trace_length = self.dak_wheels_groundClearance
 	local trace_count = self.dak_wheels_count_trace
 	local trace_count_half = trace_count*0.5
-	local trace_count_half_int = math_floor(trace_count_half)
-	local trace_length = self.dak_wheels_groundClearance
 
-	self.dak_wheels_bias_fo = self.dak_wheels_bias_fo + 2*ft*(self:GetNWFloat("Hydra", 0) - self.dak_wheels_bias_fo)
-	self.dak_wheels_bias_ri = self.dak_wheels_bias_ri + 2*ft*(self:GetNWFloat("HydraSide", 0) - self.dak_wheels_bias_ri)
+	self.dak_wheels_bias_fo = self.dak_wheels_bias_fo + 5*ft*(self:GetNWFloat("Hydra", 0) - self.dak_wheels_bias_fo)
+	self.dak_wheels_bias_ri = self.dak_wheels_bias_ri + 5*ft*(self:GetNWFloat("HydraSide", 0) - self.dak_wheels_bias_ri)
 
 	local bias_fo = self.dak_wheels_bias_fo
-	if bias_fo == 0 then
+	if math_abs(bias_fo) < 0.01 then
 		bias_fo = nil
 	end
 
 	local bias_ri = self.dak_wheels_bias_ri*trace_length
-	if bias_ri == 0 then
+	if math_abs(bias_ri) < 0.01 then
 		bias_ri = nil
 	end
-
-	local bias_skip_fo = self.dak_wheels_bias_skip_fo
-	local bias_skip_re = self.dak_wheels_bias_skip_re
 
 	local fx, fxscale_ri, fxscale_le
 	if cv_part:GetBool() then
@@ -647,32 +667,26 @@ function ENT:update_wheels(vehicleMode)
 		wheel_ri.angL.p = wheel_ri.angL.p + rot_ri*wheel_ri.opp
 		wheel_le.angL.p = wheel_le.angL.p - rot_le*wheel_le.opp
 
-		if wheel_yaw and wheel_ri.turn then
-			wheel_ri.angL.y = wheel_ri.angA.y - wheel_yaw*wheel_ri.turn
-			wheel_le.angL.y = wheel_le.angA.y - wheel_yaw*wheel_ri.turn
-		end
+		if wheel_ri.trace then
+			if wheel_yaw and wheel_ri.turn then
+				wheel_ri.angL.y = wheel_ri.angA.y - wheel_yaw*wheel_ri.turn
+				wheel_le.angL.y = wheel_le.angA.y - wheel_yaw*wheel_ri.turn
+			end
 
-		if i <= trace_count then
 			local length_base = wheel_ri.info.trace_length
 			local length_ri = 0
 			local length_le = 0
 
-			local bias_skip
-			if (bias_skip_fo and i == 1) or (bias_skip_re and i == trace_count) then
-				bias_skip = true
+			if bias_fo then
+				if i > trace_count_half then
+					length_base = length_base + (bias_fo*(trace_count_half - (trace_count - wheel_ri.index + 0.5))/trace_count_half*trace_length)
+				else
+					length_base = length_base - (bias_fo*(trace_count_half - (wheel_ri.index - 0.5))/trace_count_half*trace_length)
+				end
 			end
-			if not bias_skip then
-				if bias_fo then
-					if i > trace_count_half then
-						length_base = length_base + (bias_fo*(trace_count_half_int - (trace_count - i))/trace_count_half_int*trace_length)
-					else
-						length_base = length_base - (bias_fo*(trace_count_half_int - (i - 1))/trace_count_half_int*trace_length)
-					end
-				end
-				if bias_ri then
-					length_ri = bias_ri
-					length_le = -bias_ri
-				end
+			if bias_ri then
+				length_ri = bias_ri
+				length_le = -bias_ri
 			end
 
 			local wheel_z = baseUp*(wheel_ri.trackHeight or wheel_ri.info.radius)
