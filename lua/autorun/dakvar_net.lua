@@ -145,7 +145,7 @@ function _DakVar_INSTALL(DakEnt)
 
 		DakEnt["Set" .. vname] = function(_, value, nodupe)
 			value = sanitize[vtype](value, var)
-			if not value then
+			if value == nil then
 				return
 			end
 

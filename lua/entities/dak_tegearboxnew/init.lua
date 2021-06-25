@@ -1385,7 +1385,7 @@ function ENT:OnDuplicated(data)
 			self:SetWheelColor(Vector(color.x*255, color.y*255, color.z*255))
 		end
 
-		self:SetDriveWOffsetZ(dt.FrontWheelRaise)
+		self:SetDriveWOffsetZ(dt.FrontWheelRaise*0.5 + dt.FrontWheelHeight*0.5 - dt.RideHeight*0.5)
 		self:SetDriveWModel(dt.WheelModel)
 		self:SetDriveWDiameter(dt.FrontWheelHeight)
 		self:SetDriveWWidth(dt.WheelWidth)
@@ -1401,7 +1401,7 @@ function ENT:OnDuplicated(data)
 		// find a way to translate old wheelforwardoffset vars?
 		// old is in 1/100ths of a unit
 
-		self:SetIdlerWOffsetZ(dt.RearWheelRaise)
+		self:SetIdlerWOffsetZ(dt.RearWheelRaise*0.5 + dt.RearWheelHeight*0.5 - dt.RideHeight*0.5)
 		self:SetIdlerWModel(dt.WheelModel)
 		self:SetIdlerWDiameter(dt.RearWheelHeight)
 		self:SetIdlerWWidth(dt.WheelWidth)
