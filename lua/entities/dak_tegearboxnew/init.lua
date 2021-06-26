@@ -1096,12 +1096,16 @@ function ENT:Think()
 
 					ForcePos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*basesize[2]*0.95)
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) + (right*self.SideDist)
-					if i==WheelsPerSide then
-						CurRideHeight = FrontWheelRaise
-					elseif i==1 then
-						CurRideHeight = RearWheelRaise
-					else
+					if self:GetVehicleMode() == "wheeled" then
 						CurRideHeight = RideHeight
+					else
+						if i==WheelsPerSide then
+							CurRideHeight = FrontWheelRaise
+						elseif i==1 then
+							CurRideHeight = RearWheelRaise
+						else
+							CurRideHeight = RideHeight
+						end
 					end
 					trace = {
 						start = Pos + Vector(0,0,1)*(-CurRideHeight+100),
@@ -1176,12 +1180,16 @@ function ENT:Think()
 
 					ForcePos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*basesize[2]*0.95)
 					Pos = selfpos + (forward*(((i-1)*TrackLength/(WheelsPerSide-1)) - (TrackLength*0.5) + (ForwardOffset))) - (right*self.SideDist)
-					if i==WheelsPerSide then
-						CurRideHeight = FrontWheelRaise
-					elseif i==1 then
-						CurRideHeight = RearWheelRaise
-					else
+					if self:GetVehicleMode() == "wheeled" then
 						CurRideHeight = RideHeight
+					else
+						if i==WheelsPerSide then
+							CurRideHeight = FrontWheelRaise
+						elseif i==1 then
+							CurRideHeight = RearWheelRaise
+						else
+							CurRideHeight = RideHeight
+						end
 					end
 
 					trace = {

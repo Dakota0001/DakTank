@@ -645,12 +645,14 @@ function ENT:update_wheels(vehicleMode)
 	if cv_part:GetBool() then
 		fx = EffectData()
 
-		fxscale_ri = math_min(0.5, math_abs(vel_ri*0.5))
+		local effectmax = math_max(self:GetRoadWWidth()/30,0.5)
+
+		fxscale_ri = math_min(effectmax, math_abs(vel_ri*0.5))
 		if fxscale_ri == 0 then
 			fxscale_ri = nil
 		end
 
-		fxscale_le = math_min(0.5, math_abs(vel_le*0.5))
+		fxscale_le = math_min(effectmax, math_abs(vel_le*0.5))
 		if fxscale_le == 0 then
 			fxscale_le = nil
 		end
@@ -890,7 +892,7 @@ function ENT:setup_tracks(vehicleMode)
 end
 
 function ENT:update_tracks(vehicleMode)
-	local min_detail = 4
+	local min_detail = 6
 	local max_detail = cv_dt:GetInt()
 	local adaptive_detail = cv_ad:GetBool()
 
@@ -906,12 +908,12 @@ function ENT:update_tracks(vehicleMode)
 			trackroots = self.dak_wheels_ri
 			trackrootscount = self.dak_wheels_count_ri
 			tracknodes = self.dak_tracks_nodes_ri
-			tracknodesdetail = adaptive_detail and (min_detail + math_floor(math_abs(self.dak_wheels_lastvel_ri)*0.5)) or max_detail
+			tracknodesdetail = adaptive_detail and (min_detail + math_floor(math_abs(self.dak_wheels_lastvel_ri)*2)) or max_detail
 		else
 			trackroots = self.dak_wheels_le
 			trackrootscount = self.dak_wheels_count_le
 			tracknodes = self.dak_tracks_nodes_le
-			tracknodesdetail = adaptive_detail and (min_detail + math_floor(math_abs(self.dak_wheels_lastvel_le)*0.5)) or max_detail
+			tracknodesdetail = adaptive_detail and (min_detail + math_floor(math_abs(self.dak_wheels_lastvel_le)*2)) or max_detail
 		end
 
 		if tracknodesdetail > max_detail then
