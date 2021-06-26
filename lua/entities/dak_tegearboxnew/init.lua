@@ -1029,14 +1029,14 @@ function ENT:Think()
 
 
 				fronttrace = {
-					start = selfpos + Vector(0,0,100)+Angle(0,self:GetAngles().yaw,0):Forward()*(TrackLength*0.5),
-					endpos = selfpos + Vector(0,0,-1000)+Angle(0,self:GetAngles().yaw,0):Forward()*(TrackLength*0.5),
+					start = selfpos + Vector(0,0,100)+Angle(0,ForwardEnt:GetAngles().yaw,0):Forward()*(TrackLength*0.5),
+					endpos = selfpos + Vector(0,0,-1000)+Angle(0,ForwardEnt:GetAngles().yaw,0):Forward()*(TrackLength*0.5),
 					mask = MASK_SOLID_BRUSHONLY
 				}
 				FrontTrace = traceline( fronttrace )
 				backtrace = {
-					start = selfpos + Vector(0,0,100)+Angle(0,self:GetAngles().yaw,0):Forward()*-(TrackLength*0.5),
-					endpos = selfpos + Vector(0,0,-1000)+Angle(0,self:GetAngles().yaw,0):Forward()*-(TrackLength*0.5),
+					start = selfpos + Vector(0,0,100)+Angle(0,ForwardEnt:GetAngles().yaw,0):Forward()*-(TrackLength*0.5),
+					endpos = selfpos + Vector(0,0,-1000)+Angle(0,ForwardEnt:GetAngles().yaw,0):Forward()*-(TrackLength*0.5),
 					mask = MASK_SOLID_BRUSHONLY
 				}
 				BackTrace = traceline( backtrace )
