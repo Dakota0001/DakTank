@@ -105,14 +105,19 @@ end
 local waittime = 0
 function ENT:_DakVar_CHANGED(name, old, new)
 	self.dak_resetGearbox = CurTime() + waittime
+
+	if not self.dak_resetInitial then
+		self.dak_resetGearbox = CurTime() + 0.5
+		self.dak_resetInitial = true
+	end
+
 	if self._DakVar_ONCHANGED then
 		self:_DakVar_ONCHANGED(name, old, new)
 	end
 end
 
 function ENT:Think()
-	if not self.dak_resetInitial or self.dak_resetGearbox and self.dak_resetGearbox < CurTime() then
-		self.dak_resetInitial = true
+	if self.dak_resetGearbox and self.dak_resetGearbox < CurTime() then
 		self.dak_resetGearbox = nil
 		self.dak_vehicleMode = self:GetVehicleMode()
 		self:setup_gearbox(self.dak_vehicleMode)
