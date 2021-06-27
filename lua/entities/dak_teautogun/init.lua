@@ -946,6 +946,8 @@ function ENT:Think()
 				self.DakArmor = self.DakCaliber*5*0.2
 				self.DakMass = math.Round(0.2*((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*25))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*25)))*0.001*7.8125)/1000)
 				
+				self.recoilless = true
+
 				self.DakAP = math.Round(self.DakCaliber,2).."mmRRAPAmmo"
 				self.DakHE = math.Round(self.DakCaliber,2).."mmRRHEAmmo"
 				self.DakHEAT = math.Round(self.DakCaliber,2).."mmRRHEATAmmo"
@@ -1931,6 +1933,8 @@ function ENT:Think()
 				self.DakArmor = self.DakCaliber*5*0.2
 				self.DakMass = math.Round(0.2*((((self.DakCaliber*6.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*25))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*25)))*0.001*7.8125)/1000)
 				
+				self.recoilless = true
+
 				self.DakAP = math.Round(self.DakCaliber,2).."mmRRAPAmmo"
 				self.DakHE = math.Round(self.DakCaliber,2).."mmRRHEAmmo"
 				self.DakHEAT = math.Round(self.DakCaliber,2).."mmRRHEATAmmo"
@@ -2433,7 +2437,7 @@ function ENT:DakTEAutoFire()
 				effectdata:SetScale( self.DakMaxHealth*0.25 )
 				util.Effect( self.DakFireEffect, effectdata, true, true )
 				--self:EmitSound( self.DakFireSound1, 100, self.DakFirePitch, 1, 6)
-				if self.DakAmmoType == self.DakATGM then
+				if self.DakAmmoType == self.DakATGM or self.recoilless == true then
 					if(self:IsValid()) then
 						if(self.DakTankCore:GetParent():IsValid()) then
 							if(self.DakTankCore:GetParent():GetParent():IsValid()) then
