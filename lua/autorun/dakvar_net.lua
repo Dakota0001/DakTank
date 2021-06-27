@@ -172,7 +172,7 @@ function _DakVar_INSTALL(DakEnt)
 			if not istable(data) then
 				return
 			end
-			for vname in pairs(DakEnt._DakVar_LOOKUP) do
+			for vname in pairs(typeids) do -- DakEnt._DakVar_LOOKUP) do
 				if data[vname] and DakEnt["Set" .. vname] then
 					DakEnt["Set" .. vname](DakEnt, data[vname], true)
 				end
@@ -195,7 +195,7 @@ function _DakVar_INSTALL(DakEnt)
 			return
 		end
 		local dv = {}
-		for vname in pairs(DakEnt._DakVar_LOOKUP) do
+		for vname in pairs(typeids) do -- DakEnt._DakVar_LOOKUP) do
 			if DakEnt["Get" .. vname] then
 				dv[vname] = DakEnt["Get" .. vname](DakEnt, vname)
 			end
