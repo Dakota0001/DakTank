@@ -280,11 +280,8 @@ function ENT:Initialize()
 	self.PenMult = 0
 	self.DPSMult = 0
 
-	self.PhysEra = true
-	self.LastPhysEra = true
-
-	self.PhysDetail = true
-	self.LastPhysDetail = true
+	self.PhysEnabled = true
+	self.LastPhysEnabled = true
 
 	self.Forward = self:GetForward()
 end
@@ -1521,11 +1518,12 @@ function ENT:Think()
 							if self.Crew then
 								if table.Count(self.Crew) > 0 then
 									for i = 1, table.Count(self.Crew) do
-										if self.Crew[i].DakDead ~= true then
-											self.LivingCrew = self.LivingCrew + 1
-										end
 										if not(IsValid(self.Crew[i])) then
 											table.remove( self.Crew, i )
+										else
+											if self.Crew[i].DakDead ~= true then
+												self.LivingCrew = self.LivingCrew + 1
+											end
 										end
 									end
 								end
@@ -1595,12 +1593,12 @@ function ENT:Think()
 							local debugtime = SysTime()
 							if self.ERA then
 								if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
-									self.PhysEra = false
+									self.PhysEnabled = false
 								else
-									self.PhysEra = true
+									self.PhysEnabled = true
 								end
-								if self.PhysEra ~= self.LastPhysEra and false then
-									if self.PhysEra == true then
+								if self.PhysEnabled ~= self.LastPhysEnabled and false then
+									if self.PhysEnabled == true then
 										self.ERA = {}
 										for i=1, #self.ERAInfoTable do
 											local cur = self.ERAInfoTable[i]
@@ -1726,7 +1724,7 @@ function ENT:Think()
 										end
 										self.ERA = {}
 									end
-									self.LastPhysEra = self.PhysEra
+									self.LastPhysEnabled = self.PhysEnabled
 								end
 								if table.Count(self.ERA) > 0 then
 									local effectdata
@@ -1780,12 +1778,12 @@ function ENT:Think()
 							end
 							if self.DETAIL then
 								if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
-									self.PhysDetail = false
+									self.PhysEnabled = false
 								else
-									self.PhysDetail = true
+									self.PhysEnabled = true
 								end
-								if self.PhysDetail ~= self.LastPhysDetail then
-									if self.PhysDetail == true then
+								if self.PhysEnabled ~= self.LastPhysEnabled then
+									if self.PhysEnabled == true then
 										self.DETAIL = {}
 										for i=1, #self.DetailInfoTable do
 											local cur = self.DetailInfoTable[i]
@@ -1817,6 +1815,59 @@ function ENT:Think()
 										net.WriteEntity( self )
 										net.Broadcast()
 									else
+										--Crew checking
+										for i = 1, #self.Crew do
+											--get angle and kill if upwards direction is over 45 degrees from upwards compared to baseplate
+											if self.Crew[i]:IsValid() then
+												local a = self.Crew[i]:GetUp()
+												local b = self.Forward:Angle():Up()
+												local ans = math.acos(a:Dot(b) / (a:Length() * b:Length()))
+												if math.Round(math.deg(ans)) > 45 then
+													self.Crew[i].DakHealth = 0
+													if self.Crew[i].DakOwner:IsPlayer() then
+														if self.Crew[i].Job == 1 then
+															self.Crew[i].DakOwner:ChatPrint("Gunner Angle Invalid, Ejecting!") 
+														elseif self.Crew[i].Job == 2 then
+															self.Crew[i].DakOwner:ChatPrint("Driver Angle Invalid, Ejecting!") 
+														elseif self.Crew[i].Job == 3 then
+															self.Crew[i].DakOwner:ChatPrint("Loader Angle Invalid, Ejecting!") 
+														else
+															self.Crew[i].DakOwner:ChatPrint("Passenger Angle Invalid, Ejecting!") 
+														end
+													end
+													self.Crew[i]:SetMaterial("models/flesh")
+													self.Crew[i].DakDead = true
+													self.Crew[i]:Remove()
+												end
+											end
+											--kill if clipping other crew
+											if self.Crew[i]:IsValid() then
+												local bounds = self.Crew[i]:GetModelBounds()
+												bounds = math.min(math.abs(bounds.x),math.abs(bounds.y),math.abs(bounds.z))*1.9
+												for j = 1, #self.Crew do
+													if self.Crew[i] ~= self.Crew[j] then
+														if self.Crew[i]:GetPos():Distance(self.Crew[j]:GetPos()) < bounds then
+															self.Crew[i].DakHealth = 0
+															if self.Crew[i].DakOwner:IsPlayer() then
+																if self.Crew[i].Job == 1 then
+																	self.Crew[i].DakOwner:ChatPrint("Gunner Clipping Crew, Ejecting!") 
+																elseif self.Crew[i].Job == 2 then
+																	self.Crew[i].DakOwner:ChatPrint("Driver Clipping Crew, Ejecting!") 
+																elseif self.Crew[i].Job == 3 then
+																	self.Crew[i].DakOwner:ChatPrint("Loader Clipping Crew, Ejecting!") 
+																else
+																	self.Crew[i].DakOwner:ChatPrint("Passenger Clipping Crew, Ejecting!") 
+																end
+															end
+															self.Crew[i]:SetMaterial("models/flesh")
+															self.Crew[i].DakDead = true
+															self.Crew[i]:Remove()
+														end
+													end
+												end
+											end
+										end
+										--
 										self.DetailInfoTable = {}
 										for i = 1, table.Count(self.DETAIL) do
 											local cur = self.DETAIL[i]
@@ -1848,7 +1899,7 @@ function ENT:Think()
 										end
 										self.DETAIL = {}
 									end
-									self.LastPhysDetail = self.PhysDetail
+									self.LastPhysEnabled = self.PhysEnabled
 								end
 							end
 							--print("Total: "..(SysTime()-debugtime))
@@ -2090,7 +2141,7 @@ function ENT:Think()
 															self.salvage.launch = 1
 															if self.Contraption[i]:GetClass() == "dak_crew" then
 																if self.Contraption[i].DakHealth <= 0 then
-																	for i=j, 15 do
+																	for j=1, 15 do
 																		util.Decal( "Blood", self.Contraption[i]:GetPos(), self.Contraption[i]:GetPos()+(VectorRand()*500), self.Contraption[i])
 																	end
 																end
@@ -2331,8 +2382,10 @@ function ENT:OnRemove()
 	if self.Contraption and #self.Contraption>0 then
 		for i=1, #self.Contraption do
 			if self.Contraption[i]:IsVehicle() then
-				if IsValid(self.Contraption[i]:GetDriver()) then
-					self.Contraption[i]:GetDriver():SetNoDraw( false )
+				if IsValid(self.Contraption[i]) then
+					if IsValid(self.Contraption[i]:GetDriver()) then
+						self.Contraption[i]:GetDriver():SetNoDraw( false )
+					end
 				end
 			end
 		end
