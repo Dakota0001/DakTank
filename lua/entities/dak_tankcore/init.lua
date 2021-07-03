@@ -915,9 +915,41 @@ function ENT:Think()
 							for j=1, pixels do
 								addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
 								SpallLiner = 0
-								curarmor, _, _, _, _, _, _, _, _ = DTGetArmorRecurse(startpos+addpos+forward*distance, startpos+addpos-forward*distance, "AP", 75, player.GetAll(), self)
+
+								local fowardtrace = util.TraceHull( {
+									start = startpos+addpos+forward*distance,
+									endpos = startpos+addpos-forward*distance,
+									maxs = Vector(0,0,0),
+									mins = Vector(0,0,0),
+									filter = player.GetAll()
+								} )
+								local backwardtrace = util.TraceHull( {
+									start = startpos+addpos-forward*distance,
+									endpos = startpos+addpos+forward*distance,
+									maxs = Vector(0,0,0),
+									mins = Vector(0,0,0),
+									filter = player.GetAll()
+								} )
+								local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+								curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+forward*distance, startpos+addpos-forward*distance, depth, "AP", 75, player.GetAll(), self)
+								
+								local addval = 0
+
+								if ent:IsValid() then
+									local entclass = ent:GetClass()
+									if entclass == "dak_crew"then
+										addval = 70000
+									end
+									if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+										addval = 80000
+									end
+									if entclass == "dak_tefuel" then
+										addval = 90000
+									end
+								end
+
 								if curarmor~=nil then
-									self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor)
+									self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
 								else
 									self.frontarmortable[#self.frontarmortable+1] = 0
 								end
@@ -927,7 +959,61 @@ function ENT:Think()
 					timer.Simple(engine.TickInterval()*pixels+1,function()
 						self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
 					end)
-					--self.frontarmortable = frontarmortable
+
+					local biggestsize = math.max(math.max(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
+					local startpos = self:GetParent():GetParent():GetPos()+(up*self.BestHeight*0.5)+(forward*-biggestsize*0.5)+(up*biggestsize*0.5)
+					local curarmor = 0
+					self.sidearmortable = {}
+					for i=1, pixels do
+						timer.Simple(engine.TickInterval()*i,function()
+							for j=1, pixels do
+								addpos = (forward*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
+								SpallLiner = 0
+
+								local fowardtrace = util.TraceHull( {
+									start = startpos+addpos+right*distance,
+									endpos = startpos+addpos-right*distance,
+									maxs = Vector(0,0,0),
+									mins = Vector(0,0,0),
+									filter = player.GetAll()
+								} )
+								local backwardtrace = util.TraceHull( {
+									start = startpos+addpos-right*distance,
+									endpos = startpos+addpos+right*distance,
+									maxs = Vector(0,0,0),
+									mins = Vector(0,0,0),
+									filter = player.GetAll()
+								} )
+								local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+
+								curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+right*distance, startpos+addpos-right*distance, depth, "AP", 75, player.GetAll(), self)
+								
+								local addval = 0
+
+								if ent:IsValid() then
+									local entclass = ent:GetClass()
+									if entclass == "dak_crew"then
+										addval = 70000
+									end
+									if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+										addval = 80000
+									end
+									if entclass == "dak_tefuel" then
+										addval = 90000
+									end
+								end
+
+								if curarmor~=nil then
+									self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
+								else
+									self.sidearmortable[#self.sidearmortable+1] = 0
+								end
+							end
+						end)
+					end
+					timer.Simple(engine.TickInterval()*pixels+1,function()
+						self.sidearmortable[#self.sidearmortable+1] = self.SideArmor
+					end)
 
 					firepowermult = math.max((self.BoxVolume*0.01/250000),firepowermult)
 

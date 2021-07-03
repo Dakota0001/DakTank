@@ -1,5 +1,7 @@
 local LastThink = CurTime()
 util.AddNetworkString( "daktankhud" )
+util.AddNetworkString( "daktankhud2" )
+util.AddNetworkString( "daktankhud3" )
 hook.Add( "Think", "DakTankInfoScannerFunction", function()
 	if CurTime()-1 >= LastThink then
 		for i=1, #player.GetAll() do
@@ -30,15 +32,17 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 								Era = "Modern"
 							end
 							InfoTable1[4] = Target.Cost.." point "..Era.." "..math.Round(Target.TotalMass*0.001,2).." ton tank."
-							InfoTable1[5] = "-Best Average Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
-							InfoTable1[6] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
+							InfoTable1[5] = "-Average Frontal Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
+							InfoTable1[6] = "-Average Side Armor: "..(math.Round(Target.SideArmor,2)).."mm"
+							InfoTable1[7] = "-Hull Integrity: "..(math.Round(Target.DakMaxHealth,2)).." health"
+							InfoTable1[8] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
 							if Target.Gearbox ~= nil and Target.Gearbox.DakHP ~= nil then
-								InfoTable1[7] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
+								InfoTable1[9] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
 							else
-								InfoTable1[7] = "-HP/T: 0."
+								InfoTable1[9] = "-HP/T: 0."
 							end
 							
-							InfoTable1[8] = "-Crew Count: "..(#Target.Crew)
+							InfoTable1[10] = "-Crew Count: "..(#Target.Crew)
 
 							local info2count = 1
 							InfoTable2[info2count] = ""
@@ -52,10 +56,21 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 									return false
 								end
 							end )
+							local GunTally = 1
 							for i = 1, #GunsSorted do
 								info2count = info2count + 1
 								if GunsSorted[i].DakName ~= nil then
-									InfoTable2[info2count] = "-"..GunsSorted[i].DakName
+									if not(IsValid(GunsSorted[i+1])) or (GunsSorted[i+1] and GunsSorted[i].DakName ~= GunsSorted[i+1].DakName) then
+										if GunTally == 1 then
+											InfoTable2[info2count] = "-"..GunsSorted[i].DakName
+										else
+											InfoTable2[info2count] = "-"..GunTally.."x "..GunsSorted[i].DakName
+										end
+										GunTally = 1
+									else
+										info2count = info2count - 1
+										GunTally = GunTally + 1
+									end
 								else
 									InfoTable2[info2count] = "-N/A"
 								end
@@ -213,8 +228,20 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 							net.WriteString( util.TableToJSON( InfoTable1 ) )
 							net.WriteString( util.TableToJSON( InfoTable2 ) )
 							net.WriteString( util.TableToJSON( InfoTable3 ) )
-							net.WriteString( util.TableToJSON( Target.frontarmortable ) )
 							net.Send( CurPlayer )
+
+							timer.Simple(0.1,function()
+								net.Start( "daktankhud3" )
+								net.WriteString( util.TableToJSON( Target.frontarmortable ) )
+								net.Send( CurPlayer )
+							end)
+
+							timer.Simple(0.2,function()
+								net.Start( "daktankhud2" )
+								net.WriteString( util.TableToJSON( Target.sidearmortable ) )
+								net.Send( CurPlayer )
+							end)
+
 							CurPlayer.DakHudArmorLast = util.TableToJSON( Target.frontarmortable )
 						end
 					else
@@ -223,6 +250,11 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 						net.WriteString( util.TableToJSON( {} ) )
 						net.WriteString( util.TableToJSON( {} ) )
 						net.WriteString( util.TableToJSON( {} ) )
+						net.Send( CurPlayer )
+						net.Start( "daktankhud2" )
+						net.WriteString( util.TableToJSON( {} ) )
+						net.Send( CurPlayer )
+						net.Start( "daktankhud3" )
 						net.WriteString( util.TableToJSON( {} ) )
 						net.Send( CurPlayer )
 					end
