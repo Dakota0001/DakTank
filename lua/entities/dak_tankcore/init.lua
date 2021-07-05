@@ -911,6 +911,7 @@ function ENT:Think()
 					local delay = pixels/splits
 					local startpos = self:GetParent():GetParent():GetPos()+(up*self.BestHeight*0.5)+(right*-biggestsize*0.5)+(up*biggestsize*0.5)
 					local curarmor = 0
+					local ent
 					self.frontarmortable = {}
 					for i=1, pixels do
 						timer.Simple(engine.TickInterval()*delay*i,function()
