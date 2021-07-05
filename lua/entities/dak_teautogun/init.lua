@@ -104,13 +104,13 @@ function ENT:Initialize()
 
 	if self.DakCaliber then
 		self:SetScale(self.DakCaliber / 100)
+		self.ScaleSet = true
 	end
 end
 
 function ENT:Think()
 	self.FuzeDelay = self.Inputs.FuzeDelay.Value
 	if self.ScaleSet == true then
-		print("scaleset")
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
 			--self:PhysicsInit(SOLID_VPHYSICS)

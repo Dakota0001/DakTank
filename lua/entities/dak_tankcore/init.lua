@@ -161,10 +161,11 @@ hook.Add("AdvDupe_FinishPasting", "daktank_tankcore_check", function(dupe)
 				end)
 			end
 			--also do guns while we're here
-			
+
 			if ent.SetScale then
 				print(ent.DakCaliber)
 				ent:SetScale(ent.DakCaliber / 100)
+				ent.ScaleSet = true
 			end
 		end
 	end
