@@ -177,6 +177,8 @@ local function DrawReadout()
 					end
 				end
 			end
+		else
+			draw.DrawText("Scanning...", "DakTankHudFont1", x * 0.05 + 475, y * 0.2 + yadd - 250, Color(0, 255, 0, 255), TEXT_ALIGN_LEFT)
 		end
 		local curpixel = 0
 		if #SideArmor > pixels * pixels then
@@ -230,6 +232,8 @@ local function DrawReadout()
 					end
 				end
 			end
+		else
+			draw.DrawText("Scanning...", "DakTankHudFont1", x * 0.05 + 475, y * 0.2 + yadd, Color(0, 255, 0, 255), TEXT_ALIGN_LEFT)
 		end
 	end
 end

@@ -907,114 +907,118 @@ function ENT:Think()
 					self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
 					local biggestsize = math.max(math.min(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
 					local pixels = 100
+					local splits = 10
+					local delay = pixels/splits
 					local startpos = self:GetParent():GetParent():GetPos()+(up*self.BestHeight*0.5)+(right*-biggestsize*0.5)+(up*biggestsize*0.5)
 					local curarmor = 0
 					self.frontarmortable = {}
 					for i=1, pixels do
-						timer.Simple(engine.TickInterval()*i,function()
+						timer.Simple(engine.TickInterval()*delay*i,function()
 							for j=1, pixels do
-								addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
-								SpallLiner = 0
+								timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
+									addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
+									SpallLiner = 0
 
-								local fowardtrace = util.TraceHull( {
-									start = startpos+addpos+forward*distance,
-									endpos = startpos+addpos-forward*distance,
-									maxs = Vector(0,0,0),
-									mins = Vector(0,0,0),
-									filter = player.GetAll()
-								} )
-								local backwardtrace = util.TraceHull( {
-									start = startpos+addpos-forward*distance,
-									endpos = startpos+addpos+forward*distance,
-									maxs = Vector(0,0,0),
-									mins = Vector(0,0,0),
-									filter = player.GetAll()
-								} )
-								local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-								curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+forward*distance, startpos+addpos-forward*distance, depth, "AP", 75, player.GetAll(), self)
-								
-								local addval = 0
+									local fowardtrace = util.TraceHull( {
+										start = startpos+addpos+forward*distance,
+										endpos = startpos+addpos-forward*distance,
+										maxs = Vector(0,0,0),
+										mins = Vector(0,0,0),
+										filter = player.GetAll()
+									} )
+									local backwardtrace = util.TraceHull( {
+										start = startpos+addpos-forward*distance,
+										endpos = startpos+addpos+forward*distance,
+										maxs = Vector(0,0,0),
+										mins = Vector(0,0,0),
+										filter = player.GetAll()
+									} )
+									local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+									curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+forward*distance, startpos+addpos-forward*distance, depth, "AP", 75, player.GetAll(), self)
+									
+									local addval = 0
 
-								if ent:IsValid() then
-									local entclass = ent:GetClass()
-									if entclass == "dak_crew"then
-										addval = 70000
+									if ent:IsValid() then
+										local entclass = ent:GetClass()
+										if entclass == "dak_crew"then
+											addval = 70000
+										end
+										if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+											addval = 80000
+										end
+										if entclass == "dak_tefuel" then
+											addval = 90000
+										end
 									end
-									if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
-										addval = 80000
-									end
-									if entclass == "dak_tefuel" then
-										addval = 90000
-									end
-								end
 
-								if curarmor~=nil then
-									self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
-								else
-									self.frontarmortable[#self.frontarmortable+1] = 0
-								end
+									if curarmor~=nil then
+										self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
+									else
+										self.frontarmortable[#self.frontarmortable+1] = 0
+									end
+								end)
 							end
 						end)
 					end
-					timer.Simple(engine.TickInterval()*pixels+1,function()
+					timer.Simple(engine.TickInterval()*delay*pixels+1,function()
 						self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
 					end)
-
 					local biggestsize = math.max(math.max(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
 					local startpos = self:GetParent():GetParent():GetPos()+(up*self.BestHeight*0.5)+(forward*-biggestsize*0.5)+(up*biggestsize*0.5)
 					local curarmor = 0
 					self.sidearmortable = {}
 					for i=1, pixels do
-						timer.Simple(engine.TickInterval()*i,function()
+						timer.Simple(engine.TickInterval()*delay*i,function()
 							for j=1, pixels do
-								addpos = (forward*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
-								SpallLiner = 0
+								timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
+									addpos = (forward*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
+									SpallLiner = 0
 
-								local fowardtrace = util.TraceHull( {
-									start = startpos+addpos+right*distance,
-									endpos = startpos+addpos-right*distance,
-									maxs = Vector(0,0,0),
-									mins = Vector(0,0,0),
-									filter = player.GetAll()
-								} )
-								local backwardtrace = util.TraceHull( {
-									start = startpos+addpos-right*distance,
-									endpos = startpos+addpos+right*distance,
-									maxs = Vector(0,0,0),
-									mins = Vector(0,0,0),
-									filter = player.GetAll()
-								} )
-								local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+									local fowardtrace = util.TraceHull( {
+										start = startpos+addpos+right*distance,
+										endpos = startpos+addpos-right*distance,
+										maxs = Vector(0,0,0),
+										mins = Vector(0,0,0),
+										filter = player.GetAll()
+									} )
+									local backwardtrace = util.TraceHull( {
+										start = startpos+addpos-right*distance,
+										endpos = startpos+addpos+right*distance,
+										maxs = Vector(0,0,0),
+										mins = Vector(0,0,0),
+										filter = player.GetAll()
+									} )
+									local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
 
-								curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+right*distance, startpos+addpos-right*distance, depth, "AP", 75, player.GetAll(), self)
-								
-								local addval = 0
+									curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+right*distance, startpos+addpos-right*distance, depth, "AP", 75, player.GetAll(), self)
+									
+									local addval = 0
 
-								if ent:IsValid() then
-									local entclass = ent:GetClass()
-									if entclass == "dak_crew"then
-										addval = 70000
+									if ent:IsValid() then
+										local entclass = ent:GetClass()
+										if entclass == "dak_crew"then
+											addval = 70000
+										end
+										if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+											addval = 80000
+										end
+										if entclass == "dak_tefuel" then
+											addval = 90000
+										end
 									end
-									if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
-										addval = 80000
-									end
-									if entclass == "dak_tefuel" then
-										addval = 90000
-									end
-								end
 
-								if curarmor~=nil then
-									self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
-								else
-									self.sidearmortable[#self.sidearmortable+1] = 0
-								end
+									if curarmor~=nil then
+										self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
+									else
+										self.sidearmortable[#self.sidearmortable+1] = 0
+									end
+								end)
 							end
 						end)
 					end
-					timer.Simple(engine.TickInterval()*pixels+1,function()
+					timer.Simple(engine.TickInterval()*delay*pixels+1,function()
 						self.sidearmortable[#self.sidearmortable+1] = self.SideArmor
 					end)
-
 					firepowermult = math.max((self.BoxVolume*0.01/250000),firepowermult)
 
 					--print("Highest Armor: "..(armormult*50))

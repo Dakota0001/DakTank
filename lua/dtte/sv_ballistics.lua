@@ -341,11 +341,13 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 		DakTekTankEditionSetupNewEnt(HitEnt)
 	end
 	if (HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth~=nil and not(HitEnt.DakHealth <= 0))) then
-		if not((CheckClip(HitEnt,ShellSimTrace.HitPos)) or (HitEnt:GetPhysicsObject():GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
+		local physobj = HitEnt:GetPhysicsObject()
+		if not((CheckClip(HitEnt,ShellSimTrace.HitPos)) or (physobj:GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
+			local HitEntClass = HitEnt:GetClass()
+			local SA = physobj:GetSurfaceArea()
 			if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
 				DakTekTankEditionSetupNewEnt(HitEnt)
 			end
-			local SA = HitEnt:GetPhysicsObject():GetSurfaceArea()
 			if HitEnt.DakBurnStacks == nil then
 				HitEnt.DakBurnStacks = 0
 			end
@@ -357,16 +359,16 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 					HitEnt.DakArmor = HitEnt:OBBMaxs().x/2
 					HitEnt.DakIsTread = 1
 				else
-					if HitEnt:GetClass()=="prop_physics" then 
+					if HitEntClass=="prop_physics" then 
 						DTArmorSanityCheck(HitEnt)
 					end
 				end
 			end
 
-			if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_teautogun" or HitEnt:GetClass() == "dak_temachinegun" then
+			if HitEntClass == "dak_tegun" or HitEntClass == "dak_teautogun" or HitEntClass == "dak_temachinegun" then
 				HitGun = 1
 			end
-			if HitEnt:GetClass() == "dak_tegearbox" or HitEnt:GetClass() == "dak_tegearboxnew" then
+			if HitEntClass == "dak_tegearbox" or HitEntClass == "dak_tegearboxnew" then
 				HitGear = 1
 			end
 			local TDRatio = HitEnt.DakArmor/Caliber
@@ -415,20 +417,22 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 				if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
 					EffArmor = (DTGetArmor(HitEnt, ShellType, Caliber)/math.abs(ShellSimTrace.HitNormal:Dot(ShellSimTrace.Normal)) )
 				end
+				local mathmax = math.max
+				local mathpow = math.pow
 				if ShellType == "AP" or ShellType == "APHE" or ShellType == "HE" or ShellType == "HVAP" or ShellType == "SM" then
 					if HitAng > 24 then
-						local aVal = 2.251132 - 0.1955696*math.max( HitAng, 24 ) + 0.009955601*math.pow( math.max( HitAng, 24 ), 2 ) - 0.0001919089*math.pow( math.max( HitAng, 24 ), 3 ) + 0.000001397442*math.pow( math.max( HitAng, 20 ), 4 )
-						local bVal = 0.04411227 - 0.003575789*math.max( HitAng, 24 ) + 0.0001886652*math.pow( math.max( HitAng, 24 ), 2 ) - 0.000001151088*math.pow( math.max( HitAng, 24 ), 3 ) + 1.053822e-9*math.pow( math.max( HitAng, 20 ), 4 )
-						EffArmor = math.Clamp(DTGetArmor(HitEnt, ShellType, Caliber) * (aVal * math.pow( TDRatio, bVal )),DTGetArmor(HitEnt, ShellType, Caliber),10000000000)
+						local aVal = 2.251132 - 0.1955696*mathmax( HitAng, 24 ) + 0.009955601*mathpow( mathmax( HitAng, 24 ), 2 ) - 0.0001919089*mathpow( mathmax( HitAng, 24 ), 3 ) + 0.000001397442*mathpow( mathmax( HitAng, 20 ), 4 )
+						local bVal = 0.04411227 - 0.003575789*mathmax( HitAng, 24 ) + 0.0001886652*mathpow( mathmax( HitAng, 24 ), 2 ) - 0.000001151088*mathpow( mathmax( HitAng, 24 ), 3 ) + 1.053822e-9*mathpow( mathmax( HitAng, 20 ), 4 )
+						EffArmor = math.Clamp(DTGetArmor(HitEnt, ShellType, Caliber) * (aVal * mathpow( TDRatio, bVal )),DTGetArmor(HitEnt, ShellType, Caliber),10000000000)
 					else
 						EffArmor = (DTGetArmor(HitEnt, ShellType, Caliber)/math.abs(ShellSimTrace.HitNormal:Dot(ShellSimTrace.Normal)) )
 					end
 				end
 				if ShellType == "APDS" then
-					EffArmor = DTGetArmor(HitEnt, ShellType, Caliber) * math.pow( 2.71828, (math.pow( HitAng, 2.6 )*0.00003011) )
+					EffArmor = DTGetArmor(HitEnt, ShellType, Caliber) * mathpow( 2.71828, (mathpow( HitAng, 2.6 )*0.00003011) )
 				end
 				if ShellType == "APFSDS" then
-					EffArmor = DTGetArmor(HitEnt, ShellType, Caliber) * math.pow( 2.71828, (math.pow( HitAng, 2.6 )*0.00003011) )
+					EffArmor = DTGetArmor(HitEnt, ShellType, Caliber) * mathpow( 2.71828, (mathpow( HitAng, 2.6 )*0.00003011) )
 				end
 				if HitAng >= 70 and EffArmor >= 5 and (ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH") then Shatter = 1 end
 				if HitAng >= 80 and EffArmor >= 5 and (ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" or ShellType == "HESH") then Failed = 1 Shatter = 1 end
@@ -467,6 +471,12 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)
+		local newValid = false
+		local newEntClass
+		if newEnt:IsValid() then
+			newEntClass = newEnt:GetClass()
+			newValid = true
+		end
 		if newHitGun == 1 then HitGun = 1 end
 		if newHitGear == 1 then HitGear = 1 end		
 		if Armor == 0 or newArmor == 0 then
@@ -481,8 +491,8 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 			SpallLiner = 0
 			LinerThickness = 0
 		else
-			if newEnt:IsValid() then
-				if newEnt:GetClass() == "prop_physics" then
+			if newValid then
+				if newEntClass == "prop_physics" then
 					LinerThickness = LinerThickness + newArmor
 				end
 			end
@@ -492,9 +502,9 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 		end
 		Shatters = Shatters + Shattered
 		Fails = Fails + Failed
-		if newEnt:IsValid() then
-			if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
-				if newEnt:GetClass() == "dak_teammo" then
+		if newValid then
+			if newEntClass == "dak_crew" or newEntClass == "dak_teammo" or newEntClass == "dak_teautoloadingmodule" or newEntClass == "dak_tefuel" or newEnt:IsWorld() then
+				if newEntClass == "dak_teammo" then
 					if newEnt.DakAmmo > 0 then 
 						Go = 0 
 						if SpallLiner == 1 then
@@ -555,7 +565,13 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
-		if IsValid(newEnt) and (newEnt:GetClass() == "dak_tegearbox" or newEnt:GetClass() == "dak_tegearboxnew" or newEnt:GetClass() == "dak_temotor") then
+		local newValid = false
+		local newEntClass
+		if newEnt:IsValid() then
+			newEntClass = newEnt:GetClass()
+			newValid = true
+		end
+		if newValid and (newEntClass == "dak_tegearbox" or newEntClass == "dak_tegearboxnew" or newEntClass == "dak_temotor") then
 			newArmor = newArmor * 0.25
 		end
 		if newEnt.Controller == core then
@@ -573,8 +589,8 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 				SpallLiner = 0
 				LinerThickness = 0
 			else
-				if newEnt:IsValid() then
-					if newEnt:GetClass() == "prop_physics" then
+				if newValid then
+					if newEntClass == "prop_physics" then
 						LinerThickness = LinerThickness + newArmor
 					end
 				end
@@ -586,10 +602,10 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 			Fails = Fails + Failed
 			Armor = Armor + newArmor
 		end
-		if newEnt:IsValid() then
+		if newValid then
 			if newEnt.Controller == core then
-				if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
-					if newEnt:GetClass() == "dak_teammo" then
+				if newEntClass == "dak_crew" or newEntClass == "dak_teammo" or newEntClass == "dak_teautoloadingmodule" or newEntClass == "dak_tefuel" or newEnt:IsWorld() then
+					if newEntClass == "dak_teammo" then
 						if newEnt.DakAmmo > 0 then 
 							HitCrit = 1
 							CritEnt = newEnt
@@ -661,10 +677,16 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
-		if IsValid(newEnt) and (newEnt:GetClass() == "dak_tegearbox" or newEnt:GetClass() == "dak_tegearboxnew" or newEnt:GetClass() == "dak_temotor") then
+		local newValid = false
+		local newEntClass
+		if newEnt:IsValid() then
+			newEntClass = newEnt:GetClass()
+			newValid = true
+		end
+		if newValid and (newEntClass == "dak_tegearbox" or newEntClass == "dak_tegearboxnew" or newEntClass == "dak_temotor") then
 			newArmor = newArmor * 0.25
 		end
-		if IsValid(newEnt) and (newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel") then
+		if newValid and (newEntClass == "dak_crew" or newEntClass == "dak_teammo" or newEntClass == "dak_teautoloadingmodule" or newEntClass == "dak_tefuel") then
 			newArmor = 0
 		end
 		if newEnt.Controller == core then
@@ -682,8 +704,8 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 				SpallLiner = 0
 				LinerThickness = 0
 			else
-				if newEnt:IsValid() then
-					if newEnt:GetClass() == "prop_physics" then
+				if newValid then
+					if newEntClass == "prop_physics" then
 						LinerThickness = LinerThickness + newArmor
 					end
 				end
@@ -694,16 +716,16 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 			Shatters = Shatters + Shattered
 			Fails = Fails + Failed
 			if FirstPenPos:Distance(LastPenPos) <= depth then
-				if not(newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel") then
+				if not(newEntClass == "dak_crew" or newEntClass == "dak_teammo" or newEntClass == "dak_teautoloadingmodule" or newEntClass == "dak_tefuel") then
 					Armor = Armor + newArmor
 				end
 			end
 		end
-		if newEnt:IsValid() then
+		if newValid then
 			if CritEnt == NULL then
 				if newEnt.Controller == core then
-					if newEnt:GetClass() == "dak_crew" or newEnt:GetClass() == "dak_teammo" or newEnt:GetClass() == "dak_teautoloadingmodule" or newEnt:GetClass() == "dak_tefuel" or newEnt:IsWorld() then
-						if newEnt:GetClass() == "dak_teammo" then
+					if newEntClass == "dak_crew" or newEntClass == "dak_teammo" or newEntClass == "dak_teautoloadingmodule" or newEntClass == "dak_tefuel" or newEnt:IsWorld() then
+						if newEntClass == "dak_teammo" then
 							if newEnt.DakAmmo > 0 then 
 								HitCrit = 1
 								CritEnt = newEnt
