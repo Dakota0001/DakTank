@@ -514,7 +514,12 @@ function ENT:Think()
 									if SpallLiner == 1 then
 										SpallLinerCount = SpallLinerCount + 1
 									end
-								end
+								elseif gunhit==1 and ent.Controller == self and HitCrit == 1 then
+									ArmorValTable[#ArmorValTable+1] = ArmorVal1*100
+									if SpallLiner == 1 then
+										SpallLinerCount = SpallLinerCount + 1
+									end
+								end								
 								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
 								end
@@ -522,13 +527,13 @@ function ENT:Think()
 						end
 					end
 					local totalarmor = 0
-					table.sort( ArmorValTable, function(a, b) return a < b end )
 					local Ave = 0
 					local AveCount = 0
+					table.sort( ArmorValTable )
 					for i=1, #ArmorValTable do
-						totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
+						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
 						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
-							Ave = Ave + math.min(ArmorValTable[i],2200)
+							Ave = Ave + math.min(ArmorValTable[i],10000)
 							AveCount = AveCount + 1
 						end
 					end
@@ -553,6 +558,11 @@ function ENT:Think()
 									if SpallLiner == 1 then
 										SpallLinerCount = SpallLinerCount + 1
 									end
+								elseif gunhit==1 and ent.Controller == self and HitCrit == 1 then
+									ArmorValTable[#ArmorValTable+1] = ArmorVal1*100
+									if SpallLiner == 1 then
+										SpallLinerCount = SpallLinerCount + 1
+									end
 								end
 								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
@@ -563,10 +573,11 @@ function ENT:Think()
 					Ave = 0
 					AveCount = 0
 					totalarmor = 0
+					table.sort( ArmorValTable )
 					for i=1, #ArmorValTable do
-						totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
+						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
 						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
-							Ave = Ave + math.min(ArmorValTable[i],2200)
+							Ave = Ave + math.min(ArmorValTable[i],10000)
 							AveCount = AveCount + 1
 						end
 					end
@@ -590,6 +601,11 @@ function ENT:Think()
 									if SpallLiner == 1 then
 										SpallLinerCount = SpallLinerCount + 1
 									end
+								elseif gunhit==1 and ent.Controller == self and HitCrit == 1 then
+									ArmorValTable[#ArmorValTable+1] = ArmorVal1*100
+									if SpallLiner == 1 then
+										SpallLinerCount = SpallLinerCount + 1
+									end
 								end
 								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
@@ -600,10 +616,11 @@ function ENT:Think()
 					Ave = 0
 					AveCount = 0
 					totalarmor = 0
+					table.sort( ArmorValTable )
 					for i=1, #ArmorValTable do
-						totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
+						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
 						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
-							Ave = Ave + math.min(ArmorValTable[i],2200)
+							Ave = Ave + math.min(ArmorValTable[i],10000)
 							AveCount = AveCount + 1
 						end
 					end
@@ -627,6 +644,11 @@ function ENT:Think()
 									if SpallLiner == 1 then
 										SpallLinerCount = SpallLinerCount + 1
 									end
+								elseif gunhit==1 and ent.Controller == self and HitCrit == 1 then
+									ArmorValTable[#ArmorValTable+1] = ArmorVal1*100
+									if SpallLiner == 1 then
+										SpallLinerCount = SpallLinerCount + 1
+									end
 								end
 								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
@@ -637,10 +659,11 @@ function ENT:Think()
 					Ave = 0
 					AveCount = 0
 					totalarmor = 0
+					table.sort( ArmorValTable )
 					for i=1, #ArmorValTable do
-						totalarmor=totalarmor+math.min(ArmorValTable[i],2200)
+						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
 						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
-							Ave = Ave + math.min(ArmorValTable[i],2200)
+							Ave = Ave + math.min(ArmorValTable[i],10000)
 							AveCount = AveCount + 1
 						end
 					end

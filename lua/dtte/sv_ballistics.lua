@@ -1182,6 +1182,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if CanDamage(HitEnt) then
 						if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_temachinegun" or HitEnt:GetClass() == "dak_teautogun" then
 							DTDealDamage(HitEnt,math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+							DTDealDamage(HitEnt.Controller,math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
 							DTDealDamage(HitEnt,math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end
@@ -1303,6 +1304,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					if CanDamage(HitEnt) then
 						if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_temachinegun" or HitEnt:GetClass() == "dak_teautogun" then
 							DTDealDamage(HitEnt,Shell.DakDamage*0.25*0.001,Shell.DakGun)
+							DTDealDamage(HitEnt.Controller,Shell.DakDamage*0.25,Shell.DakGun)
 						else
 							DTDealDamage(HitEnt,Shell.DakDamage*0.25,Shell.DakGun)
 						end
@@ -2026,6 +2028,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						if CanDamage(HitEnt) then
 							if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_temachinegun" or HitEnt:GetClass() == "dak_teautogun" then
 								DTDealDamage(HitEnt,math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+								DTDealDamage(HitEnt.Controller,math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							else	
 								DTDealDamage(HitEnt,math.Clamp(Shell.DakDamage*((CurrentPen)/DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HitEnt, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							end
@@ -2149,7 +2152,8 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 						if CanDamage(HitEnt) then
 							if HitEnt:GetClass() == "dak_tegun" or HitEnt:GetClass() == "dak_temachinegun" or HitEnt:GetClass() == "dak_teautogun" then
-								DTDealDamage(HitEnt,Shell.DakDamage*0.25*0.01,Shell.DakGun)
+								DTDealDamage(HitEnt,Shell.DakDamage*0.25*0.001,Shell.DakGun)
+								DTDealDamage(HitEnt.Controller,Shell.DakDamage*0.25,Shell.DakGun)
 							else	
 								DTDealDamage(HitEnt,Shell.DakDamage*0.25,Shell.DakGun)
 							end
@@ -2660,6 +2664,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					if CanDamage(ExpTrace.Entity) then
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
+							DTDealDamage(ExpTrace.Entity.Controller, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
 						else
 							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
 						end
@@ -2835,6 +2840,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					if CanDamage(ExpTrace.Entity) then
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+							DTDealDamage(ExpTrace.Entity.Controller, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
 							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end
@@ -3008,6 +3014,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 				if CanDamage(ExpTrace.Entity) then
 					if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 						DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
+						DTDealDamage(ExpTrace.Entity.Controller, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
 					else
 						DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
 					end
@@ -3221,6 +3228,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 						if CanDamage(ExpTrace.Entity) then
 							if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2))*0.001,0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
+								DTDealDamage(ExpTrace.Entity.Controller, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
 							else	
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)),0,DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)*2),Shell.DakGun)
 							end
@@ -3462,12 +3470,14 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 							if CurTarget:GetPos():Distance(Pos) > Radius/2 then
 								if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
 									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+									DTDealDamage(CurTarget.Controller, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								else
 									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								end
 							else
 								if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
 									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+									DTDealDamage(CurTarget.Controller, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								else
 									DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 								end
@@ -3491,12 +3501,14 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 								if CurTarget:GetPos():Distance(Pos) > Radius/2 then 
 									if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
 										DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+										DTDealDamage(CurTarget.Controller, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 									else
 										DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 									end
 								else
 									if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
 										DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+										DTDealDamage(CurTarget.Controller, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 									else
 										DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 									end
@@ -3521,12 +3533,14 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 						if CurTarget:GetPos():Distance(Pos) > Radius/2 then 
 							if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
 								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius))*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+								DTDealDamage(CurTarget.Controller, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							else
 								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*(1-(CurTarget:GetPos():Distance(Pos)/Radius)),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							end
 						else
 							if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
 								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  )*0.001,0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
+								DTDealDamage(CurTarget.Controller, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							else
 								DTDealDamage(CurTarget, math.Clamp((  (Damage/table.Count(Shell.DakDamageList)) * (Pen/DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber))  ),0,DTGetArmor(CurTarget, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 							end
@@ -3696,6 +3710,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 					if CanDamage(SpallTrace.Entity) then
 						if SpallTrace.Entity:GetClass() == "dak_tegun" or SpallTrace.Entity:GetClass() == "dak_temachinegun" or SpallTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(SpallTrace.Entity, math.Clamp(SpallDamage*(SpallPen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+							DTDealDamage(SpallTrace.Entity.Controller, math.Clamp(SpallDamage*(SpallPen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
 							DTDealDamage(SpallTrace.Entity, math.Clamp(SpallDamage*(SpallPen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end
@@ -3889,6 +3904,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 					if CanDamage(SpallTrace.Entity) then
 						if SpallTrace.Entity:GetClass() == "dak_tegun" or SpallTrace.Entity:GetClass() == "dak_temachinegun" or SpallTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+							DTDealDamage(SpallTrace.Entity.Controller, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
 							DTDealDamage(SpallTrace.Entity, math.Clamp(Damage*(Pen/DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end
@@ -4098,6 +4114,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					if CanDamage(HEATTrace.Entity) then
 						if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(HEATTrace.Entity, math.Clamp(HEATDamage*(math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+							DTDealDamage(HEATTrace.Entity.Controller, math.Clamp(HEATDamage*(math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
 							DTDealDamage(HEATTrace.Entity, math.Clamp(HEATDamage*(math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end
@@ -4299,6 +4316,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					if CanDamage(HEATTrace.Entity) then
 						if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(HEATTrace.Entity, math.Clamp(HEATDamage*(math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+							DTDealDamage(HEATTrace.Entity.Controller, math.Clamp(HEATDamage*(math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
 							DTDealDamage(HEATTrace.Entity, math.Clamp(HEATDamage*(math.Clamp(HEATPen-HeatPenLoss,HEATPen*0.05,HEATPen)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end	
@@ -4512,6 +4530,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 					if CanDamage(HEATTrace.Entity) then
 						if HEATTrace.Entity:GetClass() == "dak_tegun" or HEATTrace.Entity:GetClass() == "dak_temachinegun" or HEATTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2)*0.001,Shell.DakGun)
+							DTDealDamage(HEATTrace.Entity.Controller, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						else
 							DTDealDamage(HEATTrace.Entity, math.Clamp(Damage*((Pen-HeatPenLoss)/DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)),0,DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)*2),Shell.DakGun)
 						end	
@@ -4737,6 +4756,7 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 					if CanDamage(ExpTrace.Entity) then
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(ExpTrace.Entity, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+							DTDealDamage(ExpTrace.Entity.Controller, math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 						else
 							if ExpTrace.Entity.IsERA == 1 then
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/EffArmor),0,EffArmor*2),self,true)
@@ -4921,6 +4941,7 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 					if CanDamage(ExpTrace.Entity) then
 						if ExpTrace.Entity:GetClass() == "dak_tegun" or ExpTrace.Entity:GetClass() == "dak_temachinegun" or ExpTrace.Entity:GetClass() == "dak_teautogun" then
 							DTDealDamage(ExpTrace.Entity,- math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber))*0.001,0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
+							DTDealDamage(ExpTrace.Entity.Controller,- math.Clamp((Damage/traces)*(Pen/DTGetArmor(ExpTrace.Entity, "HE", Caliber)),0,DTGetArmor(ExpTrace.Entity, "HE", Caliber)*2),self,true)
 						else
 							if ExpTrace.Entity.IsERA == 1 then
 								DTDealDamage(ExpTrace.Entity, math.Clamp((Damage*10/traces)*(Pen/EffArmor),0,EffArmor*2),self,true)
