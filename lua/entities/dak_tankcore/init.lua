@@ -482,21 +482,23 @@ function ENT:Think()
 					local right
 					local up
 					if IsValid(self.Gearbox) then
-						forward = Angle(0,self.Gearbox:GetAngles().yaw,0):Forward()
-						right = Angle(0,self.Gearbox:GetAngles().yaw,0):Right()
-						up = Angle(0,self.Gearbox:GetAngles().yaw,0):Up()
+						forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
+						right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
+						up = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Up()
+						self.ForwardEnt = self.Gearbox.ForwardEnt
 					elseif IsValid(self.MainTurret) then
 						forward = Angle(0,self.MainTurret:GetAngles().yaw,0):Forward()
 						right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
 						up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
+						self.ForwardEnt = self.MainTurret
 					end
 					self.Forward = forward
 
 					--setup system to check layers of armor between first impact and crew and determine if a spall liner exists 
 
 					--FRONT
-					local startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
-					local basesize = self:GetParent():GetParent():OBBMaxs()
+					local startpos = self.Base:GetPos()+(up*125)+(right*-125)
+					local basesize = self.Base:OBBMaxs()
 					local distance = math.Max((math.Max(basesize.x, basesize.y, basesize.z)*5),250)
 					local ArmorValTable = {}
 					local SpallLinerCount = 0
@@ -537,7 +539,7 @@ function ENT:Think()
 					count = 0
 					blocks = 0
 					HitCrit = 0
-					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(right*-125)
+					startpos = self.Base:GetPos()+(up*125)+(right*-125)
 					ArmorValTable = {}
 					SpallLinerCount = 0
 					for i=1, 50 do
@@ -574,7 +576,7 @@ function ENT:Think()
 					count = 0
 					blocks = 0
 					HitCrit = 0
-					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
+					startpos = self.Base:GetPos()+(up*125)+(forward*-125)
 					ArmorValTable = {}
 					SpallLinerCount = 0
 					for i=1, 25 do
@@ -611,7 +613,7 @@ function ENT:Think()
 					count = 0
 					blocks = 0
 					HitCrit = 0
-					startpos = self:GetParent():GetParent():GetPos()+(up*125)+(forward*-125)
+					startpos = self.Base:GetPos()+(up*125)+(forward*-125)
 					ArmorValTable = {}
 					SpallLinerCount = 0
 					for i=1, 25 do
@@ -829,15 +831,21 @@ function ENT:Think()
 					if IsValid(self.Gearbox) then
 						if self.Gearbox.DakHP ~= nil and self.Gearbox.MaxHP ~= nil and self.Gearbox.TotalMass ~= nil and self.Gearbox.HPperTon ~= nil then
 							if self.Gearbox:GetClass() == "dak_tegearboxnew" then
-								speedmult = math.Clamp((1+(math.Round(math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/((self.Gearbox.TotalMass*1.1)/1000),2)*0.05))*0.5,0,1.5)
+								local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
+								local t = (self.Gearbox.TotalMass+self.Gearbox:GetPhysicsObject():GetMass())/1000
+								local hpt = hp/t
+								speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 ))
 							else
-								speedmult = math.Clamp((1+(math.Round(math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000),2)*0.05))*0.5,0,1.5)
+								local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
+								local t = self.Gearbox.TotalMass/1000
+								local hpt = hp/t
+								speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,math.log( armormult + 1 , 2 ))
 							end
 						else
 							self.DakOwner:ChatPrint("Please finish setting up the gearbox to get a correct cost for your tank.")
 						end
 					else
-						speedmult = 0.25
+						speedmult = 0.125
 						self.DakOwner:ChatPrint("No gearbox detected, towed gun assumed.")
 						--self.DakOwner:ChatPrint("Please give your tank a gearbox so that it may calculate its cost properly.")
 					end
@@ -893,7 +901,7 @@ function ENT:Think()
 					self.PenMult = firepowermult*0.5
 					self.DPSMult = altfirepowermult*0.5
 					firepowermult = (altfirepowermult+firepowermult)*0.5
-					local basepos = self:GetParent():GetParent():GetPos()
+					local basepos = self.Base:GetPos()
 					self.BestLength = 0
 					self.BestWidth = 0
 					self.BestHeight = 0
@@ -908,8 +916,8 @@ function ENT:Think()
 					local biggestsize = math.max(math.min(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
 					local pixels = 100
 					local splits = 10
-					local delay = pixels/splits
-					local startpos = self:GetParent():GetParent():GetPos()+(up*self.BestHeight*0.5)+(right*-biggestsize*0.5)+(up*biggestsize*0.5)
+					local delay = (pixels/splits)
+					local startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(right*-biggestsize*0.5)+(up*biggestsize*0.5)
 					local curarmor = 0
 					local ent
 					self.frontarmortable = {}
@@ -917,108 +925,145 @@ function ENT:Think()
 						timer.Simple(engine.TickInterval()*delay*i,function()
 							for j=1, pixels do
 								timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
-									addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
-									SpallLiner = 0
-
-									local fowardtrace = util.TraceHull( {
-										start = startpos+addpos+forward*distance,
-										endpos = startpos+addpos-forward*distance,
-										maxs = Vector(0,0,0),
-										mins = Vector(0,0,0),
-										filter = player.GetAll()
-									} )
-									local backwardtrace = util.TraceHull( {
-										start = startpos+addpos-forward*distance,
-										endpos = startpos+addpos+forward*distance,
-										maxs = Vector(0,0,0),
-										mins = Vector(0,0,0),
-										filter = player.GetAll()
-									} )
-									local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-									curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+forward*distance, startpos+addpos-forward*distance, depth, "AP", 75, player.GetAll(), self)
-									
-									local addval = 0
-
-									if ent:IsValid() then
-										local entclass = ent:GetClass()
-										if entclass == "dak_crew"then
-											addval = 70000
+									if IsValid(self) then
+										if IsValid(self.Gearbox) then
+											forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
+											right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
+											up = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Up()
+											self.ForwardEnt = self.Gearbox.ForwardEnt
+										elseif IsValid(self.MainTurret) then
+											forward = Angle(0,self.MainTurret:GetAngles().yaw,0):Forward()
+											right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
+											up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
+											self.ForwardEnt = self.MainTurret
 										end
-										if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
-											addval = 80000
-										end
-										if entclass == "dak_tefuel" then
-											addval = 90000
-										end
-									end
+										startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(right*-biggestsize*0.5)+(up*biggestsize*0.5)
+										addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
+										SpallLiner = 0
 
-									if curarmor~=nil then
-										self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
-									else
-										self.frontarmortable[#self.frontarmortable+1] = 0
+										local fowardtrace = util.TraceHull( {
+											start = startpos+addpos+forward*distance,
+											endpos = startpos+addpos-forward*distance,
+											maxs = Vector(0,0,0),
+											mins = Vector(0,0,0),
+											filter = player.GetAll()
+										} )
+										local backwardtrace = util.TraceHull( {
+											start = startpos+addpos-forward*distance,
+											endpos = startpos+addpos+forward*distance,
+											maxs = Vector(0,0,0),
+											mins = Vector(0,0,0),
+											filter = player.GetAll()
+										} )
+
+										local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+										curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+forward*distance, startpos+addpos-forward*distance, depth, "AP", 75, player.GetAll(), self)
+										
+										local addval = 0
+
+										if IsValid(ent) then
+											local entclass = ent:GetClass()
+											if entclass == "dak_crew"then
+												addval = 70000
+											end
+											if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+												addval = 80000
+											end
+											if entclass == "dak_tefuel" then
+												addval = 90000
+											end
+										end
+
+										if self.frontarmortable~=nil then
+											if curarmor~=nil then
+												self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
+											else
+												self.frontarmortable[#self.frontarmortable+1] = 0
+											end
+										end
 									end
 								end)
 							end
 						end)
 					end
 					timer.Simple(engine.TickInterval()*delay*pixels+1,function()
-						self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
+						if self.frontarmortable~=nil then
+							self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
+						end
 					end)
 					local biggestsize = math.max(math.max(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
-					local startpos = self:GetParent():GetParent():GetPos()+(up*self.BestHeight*0.5)+(forward*-biggestsize*0.5)+(up*biggestsize*0.5)
+					local startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(forward*-biggestsize*0.5)+(up*biggestsize*0.5)
 					local curarmor = 0
 					self.sidearmortable = {}
 					for i=1, pixels do
 						timer.Simple(engine.TickInterval()*delay*i,function()
 							for j=1, pixels do
 								timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
-									addpos = (forward*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
-									SpallLiner = 0
-
-									local fowardtrace = util.TraceHull( {
-										start = startpos+addpos+right*distance,
-										endpos = startpos+addpos-right*distance,
-										maxs = Vector(0,0,0),
-										mins = Vector(0,0,0),
-										filter = player.GetAll()
-									} )
-									local backwardtrace = util.TraceHull( {
-										start = startpos+addpos-right*distance,
-										endpos = startpos+addpos+right*distance,
-										maxs = Vector(0,0,0),
-										mins = Vector(0,0,0),
-										filter = player.GetAll()
-									} )
-									local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-
-									curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+right*distance, startpos+addpos-right*distance, depth, "AP", 75, player.GetAll(), self)
-									
-									local addval = 0
-
-									if ent:IsValid() then
-										local entclass = ent:GetClass()
-										if entclass == "dak_crew"then
-											addval = 70000
+									if IsValid(self) then
+										if IsValid(self.Gearbox) then
+											forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
+											right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
+											up = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Up()
+											self.ForwardEnt = self.Gearbox.ForwardEnt
+										elseif IsValid(self.MainTurret) then
+											forward = Angle(0,self.MainTurret:GetAngles().yaw,0):Forward()
+											right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
+											up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
+											self.ForwardEnt = self.MainTurret
 										end
-										if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
-											addval = 80000
-										end
-										if entclass == "dak_tefuel" then
-											addval = 90000
-										end
-									end
+										startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(forward*-biggestsize*0.5)+(up*biggestsize*0.5)
+										addpos = (forward*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
+										SpallLiner = 0
 
-									if curarmor~=nil then
-										self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
-									else
-										self.sidearmortable[#self.sidearmortable+1] = 0
+										local fowardtrace = util.TraceHull( {
+											start = startpos+addpos+right*distance,
+											endpos = startpos+addpos-right*distance,
+											maxs = Vector(0,0,0),
+											mins = Vector(0,0,0),
+											filter = player.GetAll()
+										} )
+										local backwardtrace = util.TraceHull( {
+											start = startpos+addpos-right*distance,
+											endpos = startpos+addpos+right*distance,
+											maxs = Vector(0,0,0),
+											mins = Vector(0,0,0),
+											filter = player.GetAll()
+										} )
+										local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+
+										curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+right*distance, startpos+addpos-right*distance, depth, "AP", 75, player.GetAll(), self)
+										
+										local addval = 0
+
+										if IsValid(ent) then
+											local entclass = ent:GetClass()
+											if entclass == "dak_crew"then
+												addval = 70000
+											end
+											if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+												addval = 80000
+											end
+											if entclass == "dak_tefuel" then
+												addval = 90000
+											end
+										end
+
+										if self.sidearmortable~=nil then
+											if curarmor~=nil then
+												self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
+											else
+												self.sidearmortable[#self.sidearmortable+1] = 0
+											end
+										end
 									end
 								end)
 							end
 						end)
 					end
 					timer.Simple(engine.TickInterval()*delay*pixels+1,function()
-						self.sidearmortable[#self.sidearmortable+1] = self.SideArmor
+						if self.sidearmortable~=nil then
+							self.sidearmortable[#self.sidearmortable+1] = self.SideArmor
+						end
 					end)
 					firepowermult = math.max((self.BoxVolume*0.01/250000),firepowermult)
 
@@ -1075,10 +1120,10 @@ function ENT:Think()
 						local ParentMass = 0
 						local SA = 0
 						
-						self.Contraption = {self:GetParent():GetParent()}
+						self.Contraption = {self.Base}
 						local turrets = {}
 
-						for k, v in pairs(self:GetParent():GetParent():GetChildren()) do
+						for k, v in pairs(self.Base:GetChildren()) do
 							self.Contraption[#self.Contraption+1] = v
 							for k2, v2 in pairs(v:GetChildren()) do
 								self.Contraption[#self.Contraption+1] = v2
@@ -1202,10 +1247,10 @@ function ENT:Think()
 							turrets3[i].Extra = TurEnts
 						end
 
-						table.Add( self.Contraption, GetPhysCons( self:GetParent():GetParent() ) )
+						table.Add( self.Contraption, GetPhysCons( self.Base ) )
 
-						if table.Count(GetPhysCons( self:GetParent():GetParent() )) > 0 then
-							for k, v in pairs(GetPhysCons( self:GetParent():GetParent() )) do
+						if table.Count(GetPhysCons( self.Base )) > 0 then
+							for k, v in pairs(GetPhysCons( self.Base )) do
 								for k2, v2 in pairs(v:GetChildren()) do
 									self.Contraption[#self.Contraption+1] = v2
 									for k3, v3 in pairs(v2:GetChildren()) do
@@ -1683,7 +1728,7 @@ function ENT:Think()
 							--print("Comps: "..(SysTime()-debugtime))
 							local debugtime = SysTime()
 							if self.ERA then
-								if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
+								if self.Base:GetPhysicsObject():IsMotionEnabled() == true then
 									self.PhysEnabled = false
 								else
 									self.PhysEnabled = true
@@ -1868,7 +1913,7 @@ function ENT:Think()
 								end
 							end
 							if self.DETAIL then
-								if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
+								if self.Base:GetPhysicsObject():IsMotionEnabled() == true then
 									self.PhysEnabled = false
 								else
 									self.PhysEnabled = true
@@ -1910,10 +1955,11 @@ function ENT:Think()
 										for i = 1, #self.Crew do
 											--get angle and kill if upwards direction is over 45 degrees from upwards compared to baseplate
 											if self.Crew[i]:IsValid() then
-												local a = self.Crew[i]:GetUp()
+												local crewang = self.ForwardEnt:WorldToLocalAngles(self.Crew[i]:GetAngles())
+												local a = crewang:Up()
 												local b = self.Forward:Angle():Up()
 												local ans = math.acos(a:Dot(b) / (a:Length() * b:Length()))
-												if math.Round(math.deg(ans)) > 45 then
+												if math.Round(math.deg(ans),2) > 45 then
 													self.Crew[i].DakHealth = 0
 													if self.Crew[i].DakOwner:IsPlayer() then
 														if self.Crew[i].Job == 1 then
@@ -2061,7 +2107,7 @@ function ENT:Think()
 							end
 							self.DakHealth = self.CurrentHealth
 							
-							local curvel = self:GetParent():GetParent():GetVelocity()
+							local curvel = self.Base:GetVelocity()
 							if self.LastVel == nil then
 								self.LastVel = curvel
 							end
@@ -2097,7 +2143,7 @@ function ENT:Think()
 					--####################OPTIMIZE ZONE END###################--
 					--print("Total: "..(SysTime()-debugtime))
 							if self.DakHealth then
-								if (self.DakHealth <= 0 or #self.Crew < 2 or self.LivingCrew < 2 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() then
+								if (self.DakHealth <= 0 or #self.Crew < 2 or self.LivingCrew < 2 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self.Base:GetPhysicsObject():IsMotionEnabled() then
 									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
 									self.RemoveTurretList = {}
 									if math.random(1,100) <= self:GetTurretPop() then
@@ -2115,8 +2161,8 @@ function ENT:Think()
 													end
 													if IsValid(self) then
 														if IsValid(self:GetParent()) then
-															if IsValid(self:GetParent():GetParent()) then
-																constraint.RemoveAll( self:GetParent():GetParent() )
+															if IsValid(self.Base) then
+																constraint.RemoveAll( self.Base )
 															end
 														end
 													end
@@ -2189,7 +2235,7 @@ function ENT:Think()
 											else
 												if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
 													self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
-													if self.Contraption[i] ~= self:GetParent():GetParent() and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self and self.Contraption[i].turretaimer ~= true then
+													if self.Contraption[i] ~= self.Base and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self and self.Contraption[i].turretaimer ~= true then
 														if math.random(1,6)>1 then
 															if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_tegearboxnew" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or self.Contraption[i]:GetClass() == "gmod_wire_expression2" then
 																self.salvage = ents.Create( "dak_tesalvage" )
@@ -2263,7 +2309,7 @@ function ENT:Think()
 									net.WriteEntity( self )
 									net.Broadcast()
 									local effectdata = EffectData()
-									effectdata:SetOrigin(self:GetParent():GetParent():GetPos())
+									effectdata:SetOrigin(self.Base:GetPos())
 									effectdata:SetEntity(self)
 									effectdata:SetAttachment(1)
 									effectdata:SetMagnitude(.5)
@@ -2292,8 +2338,8 @@ function ENT:Think()
 							if IsValid(self:GetParent():Remove()) then
 								self:GetParent():Remove()
 							end
-							if IsValid(self:GetParent():GetParent():Remove()) then
-								self:GetParent():GetParent():Remove()
+							if IsValid(self.Base:Remove()) then
+								self.Base:Remove()
 							end
 						end
 					end

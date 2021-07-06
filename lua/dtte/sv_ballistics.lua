@@ -321,8 +321,10 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 		trace.start = Start
 		trace.endpos = End 
 		trace.filter = Filter
+		trace.min = Vector(0,0,0)
+		trace.max = Vector(0,0,0)
 		trace.ignoreworld = true
-	local ShellSimTrace = util.TraceLine( trace )
+	local ShellSimTrace = util.TraceHull( trace )
 	if core ~= nil and core ~= NULL then
 		if ShellSimTrace.Entity.Controller ~= nil then
 			if ShellSimTrace.Entity.Controller ~= core then

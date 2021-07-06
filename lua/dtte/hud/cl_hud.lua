@@ -178,6 +178,21 @@ local function DrawReadout()
 				end
 			end
 		else
+			for i = 1, pixels do
+				for j = 1, pixels do
+					curpixel = curpixel + 1
+					if FrontArmor[curpixel] ~= 0 then
+						surface.SetDrawColor(255, 0, 0, 200)
+						if not((FrontArmor[curpixel] == 70000 or FrontArmor[curpixel] == 80000 or FrontArmor[curpixel] == 90000) and mode == 2) then
+							surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * j), y * 0.2 + yadd - 250 + (1 * pixelsize * i), pixelsize, pixelsize)
+						end
+					end
+				end
+			end
+			surface.SetDrawColor(255, 0, 0, 200)
+			for i=1, (10000-#FrontArmor)*0.1 do
+				surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * math.random(1,100)), y * 0.2 + yadd - 250 + (1 * pixelsize * math.random(1,100)), pixelsize, pixelsize)
+			end
 			draw.DrawText("Scanning...", "DakTankHudFont1", x * 0.05 + 475, y * 0.2 + yadd - 250, Color(0, 255, 0, 255), TEXT_ALIGN_LEFT)
 		end
 		local curpixel = 0
@@ -233,6 +248,21 @@ local function DrawReadout()
 				end
 			end
 		else
+			for i = 1, pixels do
+				for j = 1, pixels do
+					curpixel = curpixel + 1
+					if SideArmor[curpixel] ~= 0 then
+						surface.SetDrawColor(255, 0, 0, 200)
+						if not((SideArmor[curpixel] == 70000 or SideArmor[curpixel] == 80000 or SideArmor[curpixel] == 90000) and mode == 2) then
+							surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * j), y * 0.2 + yadd + (1 * pixelsize * i), pixelsize, pixelsize)
+						end
+					end
+				end
+			end
+			surface.SetDrawColor(255, 0, 0, 200)
+			for i=1, (10000-#SideArmor)*0.1 do
+				surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * math.random(1,100)), y * 0.2 + yadd + (1 * pixelsize * math.random(1,100)), pixelsize, pixelsize)
+			end
 			draw.DrawText("Scanning...", "DakTankHudFont1", x * 0.05 + 475, y * 0.2 + yadd, Color(0, 255, 0, 255), TEXT_ALIGN_LEFT)
 		end
 	end
