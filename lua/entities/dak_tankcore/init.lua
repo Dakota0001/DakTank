@@ -532,7 +532,7 @@ function ENT:Think()
 					table.sort( ArmorValTable )
 					for i=1, #ArmorValTable do
 						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
-						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
+						if (i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3) or #ArmorValTable<4 then
 							Ave = Ave + math.min(ArmorValTable[i],10000)
 							AveCount = AveCount + 1
 						end
@@ -576,7 +576,7 @@ function ENT:Think()
 					table.sort( ArmorValTable )
 					for i=1, #ArmorValTable do
 						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
-						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
+						if (i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3) or #ArmorValTable<4 then
 							Ave = Ave + math.min(ArmorValTable[i],10000)
 							AveCount = AveCount + 1
 						end
@@ -619,7 +619,7 @@ function ENT:Think()
 					table.sort( ArmorValTable )
 					for i=1, #ArmorValTable do
 						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
-						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
+						if (i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3) or #ArmorValTable<4 then
 							Ave = Ave + math.min(ArmorValTable[i],10000)
 							AveCount = AveCount + 1
 						end
@@ -662,7 +662,7 @@ function ENT:Think()
 					table.sort( ArmorValTable )
 					for i=1, #ArmorValTable do
 						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
-						if i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3 then
+						if (i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3) or #ArmorValTable<4 then
 							Ave = Ave + math.min(ArmorValTable[i],10000)
 							AveCount = AveCount + 1
 						end
@@ -2166,7 +2166,13 @@ function ENT:Think()
 					--####################OPTIMIZE ZONE END###################--
 					--print("Total: "..(SysTime()-debugtime))
 							if self.DakHealth then
-								if (self.DakHealth <= 0 or #self.Crew < 2 or self.LivingCrew < 2 or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self.Base:GetPhysicsObject():IsMotionEnabled() then
+								local hasdriver = false
+								for i=1, #self.Seats do
+									if IsValid(self.Seats[i]:GetDriver()) then
+										hasdriver = true
+									end
+								end
+								if (self.DakHealth <= 0 or #self.Crew < 2 or self.LivingCrew <= math.max(#self.Crew-3,1) or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self.Base:GetPhysicsObject():IsMotionEnabled() or (gmod.GetGamemode().Name=="DakTank" and hasdriver and not(self.Base:GetPhysicsObject():IsMotionEnabled())) then
 									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
 									self.RemoveTurretList = {}
 									if math.random(1,100) <= self:GetTurretPop() then
