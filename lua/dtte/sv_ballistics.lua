@@ -548,6 +548,9 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 	if IsValid(Ent) and (Ent:GetClass() == "dak_tegearbox" or Ent:GetClass() == "dak_tegearboxnew" or Ent:GetClass() == "dak_temotor") then
 		Armor = Armor * 0.25
 	end
+	if IsValid(Ent) and Ent.Controller ~= core then
+		Armor = 0
+	end
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
@@ -603,6 +606,8 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 			Shatters = Shatters + Shattered
 			Fails = Fails + Failed
 			Armor = Armor + newArmor
+		else
+			newArmor = 0
 		end
 		if newValid then
 			if newEnt.Controller == core then
@@ -660,6 +665,9 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 	if IsValid(Ent) and (Ent:GetClass() == "dak_crew" or Ent:GetClass() == "dak_teammo" or Ent:GetClass() == "dak_teautoloadingmodule" or Ent:GetClass() == "dak_tefuel") then
 		Armor = 0
 		CritEnt = Ent
+	end
+	if IsValid(Ent) and Ent.Controller ~= core then
+		Armor = 0
 	end
 	local Recurse = 1
 	local NewFilter = Filter
@@ -722,6 +730,8 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 					Armor = Armor + newArmor
 				end
 			end
+		else
+			newArmor = 0
 		end
 		if newValid then
 			if CritEnt == NULL then
