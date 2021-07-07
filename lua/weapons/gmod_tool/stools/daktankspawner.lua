@@ -1337,41 +1337,8 @@ function TOOL:LeftClick( trace )
 			undo.Finish()
 			ply:AddCleanup( "daktek", self.spawnedent )
 			cleanup.Register("daktek")
-
-			if self.ScalingGun == 1 then
-				if self:GetClientInfo("SpawnEnt") == "dak_tegun" or self:GetClientInfo("SpawnEnt") == "dak_teautogun" or self:GetClientInfo("SpawnEnt") == "dak_temachinegun" then
-					local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
-					self.spawnedent:SetModelScale( self.spawnedent:GetModelScale() * (Caliber/1000), 0 )
-					local mins, maxs = self.spawnedent:GetCollisionBounds()
-					self.spawnedent:PhysicsDestroy()	
-					local x0 = mins[1] -- Define the min corner of the box
-					local y0 = mins[2]
-					local z0 = mins[3]
-					local x1 = maxs[1] -- Define the max corner of the box
-					local y1 = maxs[2]
-					local z1 = maxs[3]
-					self.spawnedent:PhysicsInitConvex( {
-					Vector( x0, y0, z0 ),
-					Vector( x0, y0, z1 ),
-					Vector( x0, y1, z0 ),
-					Vector( x0, y1, z1 ),
-					Vector( x1, y0, z0 ),
-					Vector( x1, y0, z1 ),
-					Vector( x1, y1, z0 ),
-					Vector( x1, y1, z1 )
-					} )
-					self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
-					self.spawnedent:SetSolid(SOLID_VPHYSICS)
-					self.spawnedent:EnableCustomCollisions( true )
-					self.spawnedent.DakOwner = self:GetOwner()
-					local mins2, maxs2 = self.spawnedent:GetHitBoxBounds( 0, 0 )
-					self.spawnedent:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
-					self.spawnedent.ScalingFinished = true
-					self.spawnedent:Spawn()
-					self.spawnedent:Activate()
-				end
-			end
 		end
+	
 		if (trace.Entity:GetClass() == "dak_gun") or (trace.Entity:GetClass() == "dak_tegun") or (trace.Entity:GetClass() == "dak_teautogun") or (trace.Entity:GetClass() == "dak_temachinegun") or (trace.Entity:GetClass() == "dak_laser") or (trace.Entity:GetClass() == "dak_xpulselaser") or (trace.Entity:GetClass() == "dak_launcher") or (trace.Entity:GetClass() == "dak_lams") then
 			if (self:GetClientInfo("SpawnEnt") == "dak_gun") or (self:GetClientInfo("SpawnEnt") == "dak_tegun") or (self:GetClientInfo("SpawnEnt") == "dak_temachinegun") or (self:GetClientInfo("SpawnEnt") == "dak_teautogun") or (self:GetClientInfo("SpawnEnt") == "dak_laser") or (self:GetClientInfo("SpawnEnt") == "dak_xpulselaser") or (self:GetClientInfo("SpawnEnt") == "dak_launcher") or (self:GetClientInfo("SpawnEnt") == "dak_lams") then
 				self.spawnedent:Spawn()
@@ -1388,39 +1355,6 @@ function TOOL:LeftClick( trace )
 				ply:AddCleanup( "daktek", self.spawnedent )
 				cleanup.Register("daktek")
 
-				if self.ScalingGun == 1 then
-					if self:GetClientInfo("SpawnEnt") == "dak_tegun" or self:GetClientInfo("SpawnEnt") == "dak_teautogun" or self:GetClientInfo("SpawnEnt") == "dak_temachinegun" then
-						local Caliber = self.DakCaliber*10--GetConVar("daktankspawner_DTTE_GunCaliber"):GetInt()
-						self.spawnedent:SetModelScale( self.spawnedent:GetModelScale() * (Caliber/1000), 0 )
-						local mins, maxs = self.spawnedent:GetCollisionBounds()
-						self.spawnedent:PhysicsDestroy()	
-						local x0 = mins[1] -- Define the min corner of the box
-						local y0 = mins[2]
-						local z0 = mins[3]
-						local x1 = maxs[1] -- Define the max corner of the box
-						local y1 = maxs[2]
-						local z1 = maxs[3]
-						self.spawnedent:PhysicsInitConvex( {
-						Vector( x0, y0, z0 ),
-						Vector( x0, y0, z1 ),
-						Vector( x0, y1, z0 ),
-						Vector( x0, y1, z1 ),
-						Vector( x1, y0, z0 ),
-						Vector( x1, y0, z1 ),
-						Vector( x1, y1, z0 ),
-						Vector( x1, y1, z1 )
-						} )
-						self.spawnedent:SetMoveType(MOVETYPE_VPHYSICS)
-						self.spawnedent:SetSolid(SOLID_VPHYSICS)
-						self.spawnedent:EnableCustomCollisions( true )
-						self.spawnedent.DakOwner = self:GetOwner()
-						local mins2, maxs2 = self.spawnedent:GetHitBoxBounds( 0, 0 )
-						self.spawnedent:SetCollisionBounds( mins2*Caliber/1000, maxs2*Caliber/1000 )
-						self.spawnedent.ScalingFinished = true
-						self.spawnedent:Spawn()
-						self.spawnedent:Activate()
-					end
-				end
 				self.spawnedent:GetPhysicsObject():EnableMotion(false)
 
 

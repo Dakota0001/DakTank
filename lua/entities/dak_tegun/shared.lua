@@ -1,5 +1,9 @@
-ENT.Type = "anim"
-ENT.Base = "base_wire_entity"
+AddCSLuaFile()
+AddCSLuaFile("cl_init.lua")
+
+DEFINE_BASECLASS("base_scalable_mconvex")
+
+----
 
 ENT.Spawnable = true
 ENT.AdminOnly = false
