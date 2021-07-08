@@ -38,6 +38,8 @@ net.Receive( "daktankcoredetail", function()
 			Detailplate:SetPos(parentent:LocalToWorld(cur.LocalPos))
 			Detailplate:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
 			Detailplate:SetMaterial(cur.Mat)
+			Detailplate:SetBodyGroups(cur.Bodygroups)
+			Detailplate:SetSkin(cur.Skin)
 			for j=0, 31 do
 				Detailplate:SetSubMaterial( j, cur.SubMaterials[j] )
 			end

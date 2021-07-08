@@ -507,20 +507,15 @@ function ENT:Think()
 						for j=1, 25 do
 							addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
 							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos-forward*distance, distance, "AP", 75, player.GetAll(), self)
 							if IsValid(ent) then
-								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
-									ArmorValTable[#ArmorValTable+1] = ArmorVal1
-									if SpallLiner == 1 then
-										SpallLinerCount = SpallLinerCount + 1
+								if ent.Controller == self then
+									if HitCrit == 1 then
+										ArmorValTable[#ArmorValTable+1] = ArmorVal1
+										if SpallLiner == 1 then
+											SpallLinerCount = SpallLinerCount + 1
+										end
 									end
-								elseif gunhit==1 and ent.Controller == self and HitCrit == 1 then
-									ArmorValTable[#ArmorValTable+1] = ArmorVal1*100
-									if SpallLiner == 1 then
-										SpallLinerCount = SpallLinerCount + 1
-									end
-								end								
-								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
 								end
 							end
@@ -551,20 +546,15 @@ function ENT:Think()
 						for j=1, 50 do
 							addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
 							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos+forward*distance, distance, "AP", 75, player.GetAll(), self)
 							if IsValid(ent) then
-								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
-									ArmorValTable[#ArmorValTable+1] = ArmorVal1
-									if SpallLiner == 1 then
-										SpallLinerCount = SpallLinerCount + 1
+								if ent.Controller == self then
+									if HitCrit == 1 then
+										ArmorValTable[#ArmorValTable+1] = ArmorVal1
+										if SpallLiner == 1 then
+											SpallLinerCount = SpallLinerCount + 1
+										end
 									end
-								elseif gunhit==1 and ent.Controller == self and HitCrit == 1 then
-									ArmorValTable[#ArmorValTable+1] = ArmorVal1*100
-									if SpallLiner == 1 then
-										SpallLinerCount = SpallLinerCount + 1
-									end
-								end
-								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
 								end
 							end
@@ -594,20 +584,15 @@ function ENT:Think()
 						for j=1, 25 do
 							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
 							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos-right*distance, distance, "AP", 75, player.GetAll(), self)
 							if IsValid(ent) then
-								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
-									ArmorValTable[#ArmorValTable+1] = ArmorVal1
-									if SpallLiner == 1 then
-										SpallLinerCount = SpallLinerCount + 1
+								if ent.Controller == self then
+									if HitCrit == 1 then
+										ArmorValTable[#ArmorValTable+1] = ArmorVal1
+										if SpallLiner == 1 then
+											SpallLinerCount = SpallLinerCount + 1
+										end
 									end
-								elseif gunhit==1 and ent.Controller == self and HitCrit == 1 then
-									ArmorValTable[#ArmorValTable+1] = ArmorVal1*100
-									if SpallLiner == 1 then
-										SpallLinerCount = SpallLinerCount + 1
-									end
-								end
-								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
 								end
 							end
@@ -637,20 +622,15 @@ function ENT:Think()
 						for j=1, 25 do
 							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
 							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos, "AP", 75, player.GetAll(), self)
+							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos+right*distance, distance, "AP", 75, player.GetAll(), self)
 							if IsValid(ent) then
-								if gunhit==0 and ent.Controller == self and HitCrit == 1 then
-									ArmorValTable[#ArmorValTable+1] = ArmorVal1
-									if SpallLiner == 1 then
-										SpallLinerCount = SpallLinerCount + 1
+								if ent.Controller == self then
+									if HitCrit == 1 then
+										ArmorValTable[#ArmorValTable+1] = ArmorVal1
+										if SpallLiner == 1 then
+											SpallLinerCount = SpallLinerCount + 1
+										end
 									end
-								elseif gunhit==1 and ent.Controller == self and HitCrit == 1 then
-									ArmorValTable[#ArmorValTable+1] = ArmorVal1*100
-									if SpallLiner == 1 then
-										SpallLinerCount = SpallLinerCount + 1
-									end
-								end
-								if gunhit==0 and ent.Controller == self then
 									HitTable[#HitTable+1] = hitpos
 								end
 							end
@@ -944,6 +924,7 @@ function ENT:Think()
 					local curarmor = 0
 					local ent
 					self.frontarmortable = {}
+					--local DebugTime = SysTime()
 					for i=1, pixels do
 						timer.Simple(engine.TickInterval()*delay*i,function()
 							for j=1, pixels do
@@ -1009,6 +990,7 @@ function ENT:Think()
 							end
 						end)
 					end
+					--print(SysTime()-DebugTime)
 					timer.Simple(engine.TickInterval()*delay*pixels+1,function()
 						if self.frontarmortable~=nil then
 							self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
@@ -1952,6 +1934,8 @@ function ENT:Think()
 											detailpiece:SetPos(parentent:LocalToWorld(cur.LocalPos))
 											detailpiece:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
 											detailpiece:SetMaterial(cur.Mat)
+											detailpiece:SetBodyGroups(cur.Bodygroups)
+											detailpiece:SetSkin(cur.Skin)
 											for j=1, #cur.SubMaterials do
 												detailpiece:SetSubMaterial( j, cur.SubMaterials[j] )
 											end
@@ -2028,6 +2012,33 @@ function ENT:Think()
 											end
 										end
 										--
+										--Phys hitbox creation
+										--[[
+											print("here")
+											local mins = Vector(-self.BestWidth,-self.BestLength,0)
+											local maxs = Vector(self.BestWidth,self.BestLength,self.BestHeight)
+											print(mins)
+											print(maxs)
+											self.PhysHitBox = ents.Create("prop_physics")
+											self.PhysHitBox:SetPos(self.Base:GetPos())
+											self.PhysHitBox:SetModel("models/props_interiors/pot01a.mdl")
+											self.PhysHitBox:SetAngles(self.Forward:Angle())
+											self.PhysHitBox:Spawn()
+											self.PhysHitBox:SetCollisionBounds( mins, maxs )
+											self.PhysHitBox:SetCustomCollisionCheck( true )
+											self.PhysHitBox:EnableCustomCollisions(true)
+											self.PhysHitBox:PhysicsInitBox( mins, maxs )
+									        self.PhysHitBox:SetSolid( SOLID_VPHYSICS )
+									        self.PhysHitBox:PhysWake()
+									        self.PhysHitBox:GetPhysicsObject():EnableMotion(false)
+									        self.PhysHitBox:GetPhysicsObject():EnableCollisions( true )
+									        self.PhysHitBox:GetPhysicsObject():EnableDrag(false)
+									        self.PhysHitBox:GetPhysicsObject():SetMass(0.01)
+									        self.PhysHitBox:GetPhysicsObject():SetBuoyancyRatio(0)
+									        --self.PhysHitBox:PhysicsInitShadow()
+									        self.PhysHitBox:SetParent(self.Base)
+									        ]]
+										--
 										self.DetailInfoTable = {}
 										for i = 1, table.Count(self.DETAIL) do
 											local cur = self.DETAIL[i]
@@ -2041,6 +2052,14 @@ function ENT:Think()
 											currentDetail.EntityMods = cur.EntityMods
 											currentDetail.ClipData = cur.ClipData
 											currentDetail.SubMaterials = {}
+											local bodygroupstring = ""
+											if #cur:GetBodyGroups() > 0 then
+												for j=0, #cur:GetBodyGroups() do
+													bodygroupstring = bodygroupstring..cur:GetBodygroup( j )
+												end
+											end
+											currentDetail.Bodygroups = bodygroupstring
+											currentDetail.Skin = cur:GetSkin()
 											for j = 0, 31 do
 												currentDetail.SubMaterials[j] = cur:GetSubMaterial( j )
 											end

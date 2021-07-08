@@ -257,7 +257,6 @@ end
 function DTArmorSanityCheck(Ent)
 	local SA = Ent:GetPhysicsObject():GetSurfaceArea()
 	if Ent.EntityMods == nil or Ent.EntityMods.Hardness == nil then Ent.ArmorMod = 7.8125 else Ent.ArmorMod = 7.8125 * Ent.EntityMods.Hardness end
-	
 	--Ent.DakArmor > (7.8125*(Ent:GetPhysicsObject():GetMass()/4.6311781)*(288/SA))*0.5
 	if Ent.DakBurnStacks == nil then Ent.DakBurnStacks = 0 end
 	if SA ~= nil then
@@ -266,7 +265,6 @@ function DTArmorSanityCheck(Ent)
 		end
 		if Ent.DakArmor <= 0 then Ent.DakArmor = 0.001 end
 	end
-	
 end
 
 function DTSimpleTrace(Start, End, Caliber, Filter, Gun)
@@ -542,7 +540,7 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	end
 end
 
-function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
+function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filter, core)
 	if tonumber(Caliber) == nil then return 0, NULL, 0, 0, 0, 0, 0, Vector(0,0,0) end
 	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 	if IsValid(Ent) and (Ent:GetClass() == "dak_tegearbox" or Ent:GetClass() == "dak_tegearboxnew" or Ent:GetClass() == "dak_temotor") then
@@ -550,6 +548,24 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 	end
 	if IsValid(Ent) and Ent.Controller ~= core then
 		Armor = 0
+	end
+	local HitCrit = 0
+	if IsValid(Ent) and Ent.Controller == core then
+		if Ent:GetClass() == "dak_crew" or Ent:GetClass() == "dak_teammo" or Ent:GetClass() == "dak_teautoloadingmodule" then
+			if Ent:GetClass() == "dak_teammo" then
+				if Ent.DakAmmo > 0 then 
+					HitCrit = 1
+					CritEnt = Ent
+					SpallLinerOnCrit = 0
+					HitGun = 0
+				end
+			else
+				HitCrit = 1
+				CritEnt = Ent
+				SpallLinerOnCrit = 0
+				HitGun = 0
+			end
+		end
 	end
 	local Recurse = 1
 	local NewFilter = Filter
@@ -561,7 +577,6 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 	local Shatters = HeatShattered
 	local Fails = HeatFailed
 	local Rico = 0
-	local HitCrit = 0
 	local Thickest = Armor
 	local SpallLiner = 0 
 	local SpallLinerOnCrit = 0
@@ -576,61 +591,65 @@ function DTGetArmorRecurseNoStop(Start, End, ShellType, Caliber, Filter, core)
 			newEntClass = newEnt:GetClass()
 			newValid = true
 		end
-		if newValid and (newEntClass == "dak_tegearbox" or newEntClass == "dak_tegearboxnew" or newEntClass == "dak_temotor") then
-			newArmor = newArmor * 0.25
-		end
-		if newEnt.Controller == core then
-			if newHitGun == 1 then HitGun = 1 end
-			if newHitGear == 1 then HitGear = 1 end		
-			if Armor == 0 or newArmor == 0 then
-				if Armor == 0 then
-					HeatShattered = Shattered
-					HeatFailed = Failed
-					FirstPenPos = LastPenPos
-				end
+		if Start:Distance(LastPenPos) > Distance and HitCrit == 1 then
+			Go = 0
+		else
+			if newValid and (newEntClass == "dak_tegearbox" or newEntClass == "dak_tegearboxnew" or newEntClass == "dak_temotor") then
+				newArmor = newArmor * 0.25
 			end
-			if newArmor >= Thickest then 
-				Thickest = newArmor
-				SpallLiner = 0
-				LinerThickness = 0
-			else
-				if newValid then
-					if newEntClass == "prop_physics" then
-						LinerThickness = LinerThickness + newArmor
+			if newEnt.Controller == core then
+				if newHitGun == 1 and HitCrit == 0 then HitGun = 1 end
+				if newHitGear == 1 then HitGear = 1 end		
+				if Armor == 0 or newArmor == 0 then
+					if Armor == 0 then
+						HeatShattered = Shattered
+						HeatFailed = Failed
+						FirstPenPos = LastPenPos
 					end
 				end
-				if LinerThickness >= Thickest*0.1 and Thickest > 0 then
-					SpallLiner = 1
+				if newArmor >= Thickest then 
+					Thickest = newArmor
+					SpallLiner = 0
+					LinerThickness = 0
+				else
+					if newValid then
+						if newEntClass == "prop_physics" then
+							LinerThickness = LinerThickness + newArmor
+						end
+					end
+					if LinerThickness >= Thickest*0.1 and Thickest > 0 then
+						SpallLiner = 1
+					end
 				end
+				Shatters = Shatters + Shattered
+				Fails = Fails + Failed
+				Armor = Armor + newArmor
+			else
+				newArmor = 0
 			end
-			Shatters = Shatters + Shattered
-			Fails = Fails + Failed
-			Armor = Armor + newArmor
-		else
-			newArmor = 0
-		end
-		if newValid then
-			if newEnt.Controller == core then
-				if newEntClass == "dak_crew" or newEntClass == "dak_teammo" or newEntClass == "dak_teautoloadingmodule" or newEntClass == "dak_tefuel" or newEnt:IsWorld() then
-					if newEntClass == "dak_teammo" then
-						if newEnt.DakAmmo > 0 then 
+			if newValid then
+				if newEnt.Controller == core then
+					if newEntClass == "dak_crew" or newEntClass == "dak_teammo" or newEntClass == "dak_teautoloadingmodule" then
+						if newEntClass == "dak_teammo" then
+							if newEnt.DakAmmo > 0 then 
+								HitCrit = 1
+								CritEnt = newEnt
+								if SpallLiner == 1 then
+									SpallLinerOnCrit = 1
+								end
+							end
+						else
 							HitCrit = 1
 							CritEnt = newEnt
 							if SpallLiner == 1 then
 								SpallLinerOnCrit = 1
 							end
 						end
-					else
-						HitCrit = 1
-						CritEnt = newEnt
-						if SpallLiner == 1 then
-							SpallLinerOnCrit = 1
-						end
 					end
 				end
+			else
+				Go = 0
 			end
-		else
-			Go = 0
 		end
 		if Recurse >= 25 then
 			return math.huge, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
@@ -700,7 +719,7 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 			newArmor = 0
 		end
 		if newEnt.Controller == core then
-			if newHitGun == 1 then HitGun = 1 end
+			if newHitGun == 1 and HitCrit == 0 then HitGun = 1 end
 			if newHitGear == 1 then HitGear = 1 end		
 			if Armor == 0 or newArmor == 0 then
 				if Armor == 0 then

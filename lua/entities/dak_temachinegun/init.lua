@@ -257,6 +257,7 @@ function ENT:Think()
 				self.DakFireSound3 = self.DakFireSound1
 			end
 			if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
+			self.DakArmor = 3.90625*(self:GetPhysicsObject():GetMass()/4.6311781)*(288/self:GetPhysicsObject():GetSurfaceArea()) - self.DakBurnStacks*0.25
 			self.SlowThinkTime = CurTime()
 		end
 
@@ -408,6 +409,7 @@ function ENT:Think()
 			if self:GetPhysicsObject():IsValid() then
 				if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 			end
+			self.DakArmor = 3.90625*(self:GetPhysicsObject():GetMass()/4.6311781)*(288/self:GetPhysicsObject():GetSurfaceArea()) - self.DakBurnStacks*0.25
 			self.SlowThinkTime = CurTime()
 		end
 	end

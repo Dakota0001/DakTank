@@ -766,6 +766,7 @@ function ENT:Think()
 
 			self:DakTEAmmoCheck()
 			
+			self.DakArmor = 3.90625*(self:GetPhysicsObject():GetMass()/4.6311781)*(288/self:GetPhysicsObject():GetSurfaceArea()) - self.DakBurnStacks*0.25
 			self.SlowThinkTime = CurTime()
 		end
 		if CurTime()>=self.MidThinkTime+0.33 and self.BaseDakShellDamage ~= nil then
@@ -1359,6 +1360,7 @@ function ENT:Think()
 			if self:GetPhysicsObject():IsValid() then
 				if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 			end
+			self.DakArmor = 3.90625*(self:GetPhysicsObject():GetMass()/4.6311781)*(288/self:GetPhysicsObject():GetSurfaceArea()) - self.DakBurnStacks*0.25
 			self.SlowThinkTime = CurTime()
 		end
 	end
