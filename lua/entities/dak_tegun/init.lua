@@ -685,7 +685,7 @@ function ENT:Think()
 					if self.DakCaliber >= 90 and self.DakCaliber < 110 then
 						self.DakFireSound1 = "daktanks/new/cannons/105mm/cannon_105mm_m4_shot_01.mp3"
 					end
-					if self.DakCaliber >= 110 and self.DakCaliber <= 120 then
+					if self.DakCaliber >= 110 then
 						self.DakFireSound1 = "daktanks/new/cannons/120mm/cannon_120mm_rh120_shot_01.mp3"
 					end
 				end
@@ -1352,7 +1352,7 @@ function ENT:Think()
 					if self.DakCaliber >= 90 and self.DakCaliber < 110 then
 						self.DakFireSound1 = "daktanks/new/cannons/105mm/cannon_105mm_m4_shot_01.mp3"
 					end
-					if self.DakCaliber >= 110 and self.DakCaliber <= 120 then
+					if self.DakCaliber >= 110 then
 						self.DakFireSound1 = "daktanks/new/cannons/120mm/cannon_120mm_rh120_shot_01.mp3"
 					end
 				end

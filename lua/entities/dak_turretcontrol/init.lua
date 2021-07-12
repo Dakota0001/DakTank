@@ -285,6 +285,8 @@ function ENT:Think()
 						end
 						self.Turret = res
 						self.TurretBase = DakTurret
+						self.DakGun.DakMovement = true
+						self.TurretBase.DakMovement = true
 						local Mass = 0
 
 						for i=1, #res do

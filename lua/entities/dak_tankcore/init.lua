@@ -240,6 +240,42 @@ local function SetMass( Player, Entity, Data )
 end
 duplicator.RegisterEntityModifier( "mass", SetMass )
 
+function DakTankCollisions(ent1, ent2, pos)
+	if IsValid(ent1.Controller) and IsValid(ent2.Controller) then
+		if ent1.Controller ~= ent2.Controller then
+			local tmp = ent1.Controller.Base:GetPos() - ent2.Controller.Base:GetPos()
+			local colspeed = -((ent1.Controller.Base:GetVelocity() - ent2.Controller.Base:GetVelocity()):Dot(tmp)/tmp:Length())
+			if colspeed > 0 then
+				local vec = ent1:GetPos() - ent2:GetPos()
+				local force1 = (1-(ent1.Controller.TotalMass/(ent2.Controller.TotalMass+ent1.Controller.TotalMass)))
+				local force2 = (1-(ent2.Controller.TotalMass/(ent2.Controller.TotalMass+ent1.Controller.TotalMass)))
+				ent1.Controller.Base:GetPhysicsObject():ApplyForceCenter(ent1.Controller.PhysMass * vec:GetNormalized() * colspeed * force1 * 2, pos)
+				ent2.Controller.Base:GetPhysicsObject():ApplyForceCenter(ent2.Controller.PhysMass * -vec:GetNormalized() * colspeed * force2 * 2, pos)
+			end
+			if colspeed*0.09144 >= 10 then
+				if ent1.SPPOwner:HasGodMode()==false and not(ent1.SPPOwner:IsWorld()) then
+					ent1.Controller.DakHealth = ent1.Controller.DakHealth - (5*colspeed*0.09144*(ent2.Controller.TotalMass/ent1.Controller.TotalMass))
+				end
+				if ent2.SPPOwner:HasGodMode()==false and not(ent2.SPPOwner:IsWorld()) then
+					ent2.Controller.DakHealth = ent2.Controller.DakHealth - (5*colspeed*0.09144*(ent1.Controller.TotalMass/ent2.Controller.TotalMass))
+				end
+			
+				ent1:EmitSound( "physics/metal/metal_large_debris2.wav" )
+				local effectdata = EffectData()
+				effectdata:SetOrigin(pos)
+				effectdata:SetEntity(ent1)
+				effectdata:SetAttachment(1)
+				effectdata:SetMagnitude(.5)
+				effectdata:SetScale(math.min((colspeed*0.09144)/10,10))
+				util.Effect("dakteshellbounce", effectdata)
+			--elseif colspeed*0.09144 > 1 and colspeed*0.09144 < 10 then
+			--	local sounds = {"npc/dog/dog_destroy_door1.wav"}
+			--	ent1:EmitSound( sounds[math.random(1,#sounds)] )
+			end
+		end
+	end
+end
+
 function ENT:Initialize()
 	self:SetModel( "models/bull/gates/logic.mdl" )
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -272,11 +308,14 @@ function ENT:Initialize()
 	self.DakBurnStacks = 0
 	self.SpawnTime = CurTime()
 	self.FrontalArmor = 0
+	self.RightArmor = 0
+	self.LeftArmor = 0
 	self.SideArmor = 0
 	self.RearArmor = 0
 	self.Modern = nil
 	self.ColdWar = nil
-	self.BoxVolume = 100000000
+	self.BoxSize = Vector(10000,10000,10000)
+	self.DakVolume = 1000000
 	self.PenMult = 0
 	self.DPSMult = 0
 
@@ -391,354 +430,544 @@ local function GetContraption(Ent)
 end
 ]]--
 function ENT:Think()
-	local systime = SysTime()
-	if IsValid(self) and self.Off~=true then
-		if IsValid(self:GetParent()) then
-			if IsValid(self:GetParent():GetParent()) then
-				self.Base = self:GetParent():GetParent()
-				if not(self.PreCostTimerFirst) then
-					self.PreCostTimerFirst = CurTime()
-					self.PreCostTimer = 0	
-				end
-				self.PreCostTimer = CurTime() - self.PreCostTimerFirst
-				if self.DakFinishedPasting == 1 and self.CanSpawn ~= true and (IsValid(self.Gearbox) or (self.TurretControls~=nil and IsValid(self.TurretControls[1]))) then
-					if self:GetForceColdWar() == true then
-						self.ColdWar = 1
+	if CurTime()-1 >= self.SlowThinkTime then
+		local systime = SysTime()
+		if IsValid(self) and self.Off~=true then
+			if IsValid(self:GetParent()) then
+				if IsValid(self:GetParent():GetParent()) then
+					self.Base = self:GetParent():GetParent()
+					if not(self.PreCostTimerFirst) then
+						self.PreCostTimerFirst = CurTime()
+						self.PreCostTimer = 0	
 					end
-					if self:GetForceModern() == true then
-						self.Modern = 1
-					end
+					self.PreCostTimer = CurTime() - self.PreCostTimerFirst
+					if self.DakFinishedPasting == 1 and self.CanSpawn ~= true and (IsValid(self.Gearbox) or (self.TurretControls~=nil and IsValid(self.TurretControls[1]))) then
+						if self:GetForceColdWar() == true then
+							self.ColdWar = 1
+						end
+						if self:GetForceModern() == true then
+							self.Modern = 1
+						end
 
-					self.APSEnable = self:GetEnableAPS()
-					self.APSFrontalArc = self:GetAPSFrontalArc()
-					self.APSSideArc = self:GetAPSSideArc()
-					self.APSRearArc = self:GetAPSRearArc()
-					self.APSShots = math.Clamp(self:GetAPSShots(),0,20)
-					self.APSMinCaliber = self:GetAPSMinCaliber()
+						self.APSEnable = self:GetEnableAPS()
+						self.APSFrontalArc = self:GetAPSFrontalArc()
+						self.APSSideArc = self:GetAPSSideArc()
+						self.APSRearArc = self:GetAPSRearArc()
+						self.APSShots = math.Clamp(self:GetAPSShots(),0,20)
+						self.APSMinCaliber = self:GetAPSMinCaliber()
 
-					if self.APSEnable == true then
-						self.Modern = 1
-					end
+						if self.APSEnable == true then
+							self.Modern = 1
+						end
 
-					self.CanSpawn = true
+						self.CanSpawn = true
 
-					local GunHandlingMult = 0
-					if self.TurretControls[1] then
+						local GunHandlingMult = 0
+						if self.TurretControls[1] then
 
-						local TotalTurretMass = 0 
-						for i=1, #self.TurretControls do
-							if self.TurretControls[i].GunMass ~= nil then
-								TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
+							local TotalTurretMass = 0 
+							for i=1, #self.TurretControls do
+								if self.TurretControls[i].GunMass ~= nil then
+									TotalTurretMass = TotalTurretMass + self.TurretControls[i].GunMass
+								end
+							end
+							self.MainTurret = self.TurretControls[1]
+							local GunPercentage
+							for i=1, #self.TurretControls do
+								if IsValid(self.MainTurret) then 
+									if self.TurretControls[i].GunMass ~= nil and self.MainTurret.GunMass ~= nil then
+										if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
+											self.MainTurret = self.TurretControls[i]
+										end
+										local RotationSpeed = self.TurretControls[i].RotationSpeed
+										local TurretCost = math.log(RotationSpeed*100,100)
+										if self.TurretControls[i].RemoteWeapon == true then
+											TurretCost = TurretCost * 1.5
+										end
+										if self.TurretControls[i]:GetFCS() == true then
+											self.ColdWar = 1
+											TurretCost = TurretCost * 1.5
+										end
+										if self.TurretControls[i]:GetStabilizer() == true then
+											self.ColdWar = 1
+											TurretCost = TurretCost * 1.25
+										elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
+											TurretCost = TurretCost * 1
+										else
+											TurretCost = TurretCost * 0.75
+										end
+										if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
+											TurretCost = TurretCost * 0.5
+										end
+										--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
+										GunHandlingMult = GunHandlingMult + math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)
+									end
+								end
 							end
 						end
-						self.MainTurret = self.TurretControls[1]
-						local GunPercentage
-						for i=1, #self.TurretControls do
-							if IsValid(self.MainTurret) then 
-								if self.TurretControls[i].GunMass ~= nil and self.MainTurret.GunMass ~= nil then
-									if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
-										self.MainTurret = self.TurretControls[i]
+
+						local HitTable = {}
+						local ArmorVal1 = 0
+						local addpos
+						local count = 0
+						local blocks = 0
+						local gunhit = 0
+						local gearhit = 0
+						local HitCrit = 0
+						local SpallLiner = 0
+						local forward
+						local right
+						local up
+						if IsValid(self.Gearbox) then
+							forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
+							right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
+							up = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Up()
+							self.ForwardEnt = self.Gearbox.ForwardEnt
+						elseif IsValid(self.MainTurret) then
+							forward = Angle(0,self.MainTurret:GetAngles().yaw,0):Forward()
+							right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
+							up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
+							self.ForwardEnt = self.MainTurret
+						end
+						self.Forward = forward
+
+						if self.HitBoxMins == nil then self.HitBoxMins = Vector(-1,-1,-1) end
+						if self.HitBoxMaxs == nil then self.HitBoxMaxs = Vector(1,1,1) end
+
+						self.HitBoxMins = self.ForwardEnt:WorldToLocal(self:LocalToWorld(self.HitBoxMins))
+						self.HitBoxMaxs = self.ForwardEnt:WorldToLocal(self:LocalToWorld(self.HitBoxMaxs))
+
+						local temp
+						if self.HitBoxMins.x > self.HitBoxMaxs.x then
+							temp = self.HitBoxMaxs.x
+							self.HitBoxMaxs.x = self.HitBoxMins.x
+							self.HitBoxMins.x = temp
+						end
+						if self.HitBoxMins.y > self.HitBoxMaxs.y then
+							temp = self.HitBoxMaxs.y
+							self.HitBoxMaxs.y = self.HitBoxMins.y
+							self.HitBoxMins.y = temp
+						end
+						if self.HitBoxMins.z > self.HitBoxMaxs.z then
+							temp = self.HitBoxMaxs.z
+							self.HitBoxMaxs.z = self.HitBoxMins.z
+							self.HitBoxMins.z = temp
+						end
+
+						self.BoxSize = self.HitBoxMaxs - self.HitBoxMins
+						self.DakVolume = math.Round(math.abs((self.BoxSize.x*self.BoxSize.y*self.BoxSize.z))*0.002,2)
+
+						self.BestHeight = self.BoxSize.z
+						self.BestWidth = self.BoxSize.y
+						self.BestLength = self.BoxSize.x
+
+						--[[
+						local biggestsize = math.Max(math.abs(localmins.x) + math.abs(localmaxs.x),math.abs(localmins.y) + math.abs(localmaxs.y),math.abs(localmins.z) + math.abs(localmaxs.z))
+						local boxvec = Vector(biggestsize,biggestsize,biggestsize)
+
+						print(boxvec*(right+up))
+						print(boxvec*(-right-up))
+
+						local forwardhull = Vector(math.abs((boxvec*(right+up)).x),math.abs((boxvec*(right+up)).y),math.abs((boxvec*(right+up)).z))
+						local sidehull = Vector(math.abs((boxvec*(forward+up)).x),math.abs((boxvec*(forward+up)).y),math.abs((boxvec*(forward+up)).z))
+						local uphull = Vector(math.abs((boxvec*(right+forward)).x),math.abs((boxvec*(right+forward)).y),math.abs((boxvec*(right+forward)).z))
+
+
+						local FrontPos = DTHullRecurseTrace(self.ForwardEnt:GetPos()+forward*biggestsize, self.ForwardEnt:GetPos()-forward*biggestsize, -forwardhull, forwardhull, player.GetAll(), self)
+						local RearPos = DTHullRecurseTrace(self.ForwardEnt:GetPos()-forward*biggestsize, self.ForwardEnt:GetPos()+forward*biggestsize, -forwardhull, forwardhull, player.GetAll(), self)
+						
+						local LeftPos = DTHullRecurseTrace(self.ForwardEnt:GetPos()+right*biggestsize*2, self.ForwardEnt:GetPos()-right*biggestsize*2, -sidehull, sidehull, player.GetAll(), self)
+						local RightPos = DTHullRecurseTrace(self.ForwardEnt:GetPos()-right*biggestsize*2, self.ForwardEnt:GetPos()+right*biggestsize*2, -sidehull, sidehull, player.GetAll(), self)
+						
+						local TopPos = DTHullRecurseTrace(self.ForwardEnt:GetPos()+up*biggestsize*2, self.ForwardEnt:GetPos()-up*biggestsize*2, -uphull, uphull, player.GetAll(), self)
+						local BottomPos = DTHullRecurseTrace(self.ForwardEnt:GetPos()-up*biggestsize*2, self.ForwardEnt:GetPos()+up*biggestsize*2, -uphull, uphull, player.GetAll(), self)
+						
+						print(self.ForwardEnt:WorldToLocal(FrontPos))
+						print(self.ForwardEnt:WorldToLocal(RearPos))
+						print(self.ForwardEnt:WorldToLocal(LeftPos))
+						print(self.ForwardEnt:WorldToLocal(RightPos))
+						print(self.ForwardEnt:WorldToLocal(TopPos))
+						print(self.ForwardEnt:WorldToLocal(BottomPos))
+						]]
+
+						--setup system to check layers of armor between first impact and crew and determine if a spall liner exists 
+						for i=1, #self.Crew do
+							self.Crew[i].FrontArmorTable = {}
+							self.Crew[i].RearArmorTable = {}
+							self.Crew[i].SideArmorTable = {}
+						end
+						self.CrewFrontalAverages = {}
+						self.CrewRearAverages = {}
+						self.CrewSideAverages = {}
+
+						--FRONT
+						local startpos = self.Base:GetPos()+(up*125)+(right*-125)
+						local basesize = self.Base:OBBMaxs()
+						local distance = math.Max((math.Max(basesize.x, basesize.y, basesize.z)*5),500)
+						local ArmorValTable = {}
+						local SpallLinerCount = 0
+						local hitpos
+						local Armors = {}
+						local Crews = {}
+						for i=1, 25 do
+							for j=1, 25 do
+								addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
+								SpallLiner = 0
+								ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner, Armors, Crews = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos-forward*distance, distance, "AP", 75, player.GetAll(), self)
+								if IsValid(ent) then
+									if ent.Controller == self and ent:GetClass() == "dak_crew" then
+										if HitCrit == 1 then
+											for k=1, #Crews do
+												Crews[k].FrontArmorTable[#Crews[k].FrontArmorTable+1] = Armors[k]
+											end
+											ArmorValTable[#ArmorValTable+1] = ArmorVal1
+											if SpallLiner == 1 then
+												SpallLinerCount = SpallLinerCount + 1
+											end
+										end
 									end
-									local RotationSpeed = self.TurretControls[i].RotationSpeed
-									local TurretCost = math.log(RotationSpeed*100,100)
-									if self.TurretControls[i].RemoteWeapon == true then
-										TurretCost = TurretCost * 1.5
+									HitTable[#HitTable+1] = hitpos
+								end
+							end
+						end
+						for i=1, #self.Crew do
+							table.sort(self.Crew[i].FrontArmorTable)
+							local Ave = 0
+							local AveCount = 0
+							for j=1, #self.Crew[i].FrontArmorTable do
+								if (j>=#self.Crew[i].FrontArmorTable/4 and j<=(#self.Crew[i].FrontArmorTable/4)*3) or #self.Crew[i].FrontArmorTable<4 then
+									Ave = Ave + math.min(self.Crew[i].FrontArmorTable[j],10000)
+									AveCount = AveCount + 1
+								end
+							end
+							if AveCount == 0 then
+								print("front fail")
+								self.CrewFrontalAverages[#self.CrewFrontalAverages+1] = 0
+							else
+								self.CrewFrontalAverages[#self.CrewFrontalAverages+1] = Ave/AveCount
+							end
+						end
+						table.sort(self.CrewFrontalAverages)
+						if #self.CrewFrontalAverages >= 2 then
+							local nancheck1 = not(self.CrewFrontalAverages[#self.CrewFrontalAverages] ~= self.CrewFrontalAverages[#self.CrewFrontalAverages])
+							local nancheck2 = not(self.CrewFrontalAverages[#self.CrewFrontalAverages-1] ~= self.CrewFrontalAverages[#self.CrewFrontalAverages-1])
+							if nancheck1 and nancheck2 then
+								self.FrontalArmor = math.Round((self.CrewFrontalAverages[#self.CrewFrontalAverages] + self.CrewFrontalAverages[#self.CrewFrontalAverages-1])*0.5,2)
+							elseif nancheck1 then
+								self.FrontalArmor = math.Round(self.CrewFrontalAverages[#self.CrewFrontalAverages],2)
+							elseif nancheck2 then
+								self.FrontalArmor = math.Round(self.CrewFrontalAverages[#self.CrewFrontalAverages-1],2)
+							else
+								self.FrontalArmor = 10000
+							end
+						else
+							self.FrontalArmor = 10000
+						end
+						if self.FrontalArmor == 0 then self.FrontalArmor = 10000 end
+						self.FrontalSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
+						if #ArmorValTable == 0 then self.FrontalSpallLinerCoverage = 1 end
+						--has to be done per side
+						--REAR
+						count = 0
+						blocks = 0
+						HitCrit = 0
+						startpos = self.Base:GetPos()+(up*125)+(right*-125)
+						ArmorValTable = {}
+						SpallLinerCount = 0
+						for i=1, 50 do
+							for j=1, 50 do
+								addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
+								SpallLiner = 0
+								ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner, Armors, Crews = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos+forward*distance, distance, "AP", 75, player.GetAll(), self)
+								if IsValid(ent) then
+									if ent.Controller == self and ent:GetClass() == "dak_crew" then
+										if HitCrit == 1 then
+											for k=1, #Crews do
+												Crews[k].RearArmorTable[#Crews[k].RearArmorTable+1] = Armors[k]
+											end
+											ArmorValTable[#ArmorValTable+1] = ArmorVal1
+											if SpallLiner == 1 then
+												SpallLinerCount = SpallLinerCount + 1
+											end
+										end
 									end
-									if self.TurretControls[i]:GetFCS() == true then
-										self.ColdWar = 1
-										TurretCost = TurretCost * 1.5
+									HitTable[#HitTable+1] = hitpos
+								end
+							end
+						end
+						for i=1, #self.Crew do
+							table.sort(self.Crew[i].RearArmorTable)
+							local Ave = 0
+							local AveCount = 0
+							for j=1, #self.Crew[i].RearArmorTable do
+								if (j>=#self.Crew[i].RearArmorTable/4 and j<=(#self.Crew[i].RearArmorTable/4)*3) or #self.Crew[i].RearArmorTable<4 then
+									Ave = Ave + math.min(self.Crew[i].RearArmorTable[j],10000)
+									AveCount = AveCount + 1
+								end
+							end
+							if AveCount == 0 then
+								print("rear fail")
+								self.CrewRearAverages[#self.CrewRearAverages+1] = 0
+							else
+								self.CrewRearAverages[#self.CrewRearAverages+1] = Ave/AveCount
+							end
+						end
+						table.sort(self.CrewRearAverages)
+						if #self.CrewRearAverages >= 2 then
+							local nancheck1 = not(self.CrewRearAverages[#self.CrewRearAverages] ~= self.CrewRearAverages[#self.CrewRearAverages])
+							local nancheck2 = not(self.CrewRearAverages[#self.CrewRearAverages-1] ~= self.CrewRearAverages[#self.CrewRearAverages-1])
+							if nancheck1 and nancheck2 then
+								self.RearArmor = math.Round((self.CrewRearAverages[#self.CrewRearAverages] + self.CrewRearAverages[#self.CrewRearAverages-1])*0.5,2)
+							elseif nancheck1 then
+								self.RearArmor = math.Round(self.CrewRearAverages[#self.CrewRearAverages],2)
+							elseif nancheck2 then
+								self.RearArmor = math.Round(self.CrewRearAverages[#self.CrewRearAverages-1],2)
+							else
+								self.RearArmor = 10000
+							end
+						else
+							self.RearArmor = 10000
+						end
+						if self.RearArmor == 0 then self.RearArmor = 10000 end
+						self.RearSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
+						if #ArmorValTable == 0 then self.RearSpallLinerCoverage = 1 end
+						--LEFT
+						count = 0
+						blocks = 0
+						HitCrit = 0
+						startpos = self.Base:GetPos()+(up*125)+(forward*-125)
+						ArmorValTable = {}
+						SpallLinerCount = 0
+						for i=1, 25 do
+							for j=1, 25 do
+								addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
+								SpallLiner = 0
+								ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner, Armors, Crews = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos-right*distance, distance, "AP", 75, player.GetAll(), self)
+								if IsValid(ent) then
+									if ent.Controller == self and ent:GetClass() == "dak_crew" then
+										if HitCrit == 1 then
+											for k=1, #Crews do
+												Crews[k].SideArmorTable[#Crews[k].SideArmorTable+1] = Armors[k]
+											end
+											ArmorValTable[#ArmorValTable+1] = ArmorVal1
+											if SpallLiner == 1 then
+												SpallLinerCount = SpallLinerCount + 1
+											end
+										end
 									end
-									if self.TurretControls[i]:GetStabilizer() == true then
-										self.ColdWar = 1
-										TurretCost = TurretCost * 1.25
-									elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
-										TurretCost = TurretCost * 1
+									HitTable[#HitTable+1] = hitpos
+								end
+							end
+						end
+						self.LeftSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
+						if #ArmorValTable == 0 then self.LeftSpallLinerCoverage = 1 end
+						--RIGHT
+						count = 0
+						blocks = 0
+						HitCrit = 0
+						startpos = self.Base:GetPos()+(up*125)+(forward*-125)
+						ArmorValTable = {}
+						SpallLinerCount = 0
+						for i=1, 25 do
+							for j=1, 25 do
+								addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
+								SpallLiner = 0
+								ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner, Armors, Crews = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos+right*distance, distance, "AP", 75, player.GetAll(), self)
+								if IsValid(ent) then
+									if ent.Controller == self and ent:GetClass() == "dak_crew" then
+										if HitCrit == 1 then
+											for k=1, #Crews do
+												Crews[k].SideArmorTable[#Crews[k].SideArmorTable+1] = Armors[k]
+											end
+											ArmorValTable[#ArmorValTable+1] = ArmorVal1
+											if SpallLiner == 1 then
+												SpallLinerCount = SpallLinerCount + 1
+											end
+										end
+									end
+									HitTable[#HitTable+1] = hitpos
+								end
+							end
+						end
+						self.RightSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
+						if #ArmorValTable == 0 then self.RightSpallLinerCoverage = 1 end
+						for i=1, #self.Crew do
+							table.sort(self.Crew[i].SideArmorTable)
+							local Ave = 0
+							local AveCount = 0
+							for j=1, #self.Crew[i].SideArmorTable do
+								if (j>=#self.Crew[i].SideArmorTable/4 and j<=(#self.Crew[i].SideArmorTable/4)*3) or #self.Crew[i].SideArmorTable<4 then
+									Ave = Ave + math.min(self.Crew[i].SideArmorTable[j],10000)
+									AveCount = AveCount + 1
+								end
+							end
+							if AveCount == 0 then
+								print("rear fail")
+								self.CrewSideAverages[#self.CrewSideAverages+1] = 0
+							else
+								self.CrewSideAverages[#self.CrewSideAverages+1] = Ave/AveCount
+							end
+						end
+						table.sort(self.CrewSideAverages)
+						if #self.CrewSideAverages >= 2 then
+							local nancheck1 = not(self.CrewSideAverages[#self.CrewSideAverages] ~= self.CrewSideAverages[#self.CrewSideAverages])
+							local nancheck2 = not(self.CrewSideAverages[#self.CrewSideAverages-1] ~= self.CrewSideAverages[#self.CrewSideAverages-1])
+							if nancheck1 and nancheck2 then
+								self.SideArmor = math.Round((self.CrewSideAverages[#self.CrewSideAverages] + self.CrewSideAverages[#self.CrewSideAverages-1])*0.5,2)
+							elseif nancheck1 then
+								self.SideArmor = math.Round(self.CrewSideAverages[#self.CrewSideAverages],2)
+							elseif nancheck2 then
+								self.SideArmor = math.Round(self.CrewSideAverages[#self.CrewSideAverages-1],2)
+							else
+								self.SideArmor = 10000
+							end
+						else
+							self.SideArmor = 10000
+						end
+						if self.SideArmor == 0 then self.SideArmor = 10000 end
+						--self.SideArmor = (self.RightArmor+self.LeftArmor)/2
+						self.SideSpallLinerCoverage = 0.5*(self.RightSpallLinerCoverage + self.LeftSpallLinerCoverage)
+
+						self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
+
+						local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
+
+						self.BestAveArmor = Total
+						armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(self.ArmorSideMult*(1+(0.25*self.SideSpallLinerCoverage)))
+						--local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
+						--print(self.FrontalArmor)
+						--print(self.SideArmor)
+						--print(self.RearArmor)
+						local shellvol = ((100*0.0393701)^2)*(100*0.0393701*13)
+						local shells = 0
+						local ammocosts = 0
+
+						for i = 1, #self.Guns do
+							self.Guns[i].AmmoBoxes = {}
+							for j = 1, #self.Ammoboxes do
+								if not(self.Ammoboxes[j].DakAmmoType == "Flamethrower Fuel") then
+									if self.Guns[i].DakGunType == "Short Cannon" or self.Guns[i].DakGunType == "Short Autoloader" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "S" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Cannon" or self.Guns[i].DakGunType == "Autoloader" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "C" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Long Cannon" or self.Guns[i].DakGunType == "Long Autoloader" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "L" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Howitzer" or self.Guns[i].DakGunType == "Autoloading Howitzer" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "H" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "M" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Mortar" or self.Guns[i].DakGunType == "Autoloading Mortar" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "G" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Smoke Launcher" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "S" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "L" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Flamethrower" then
+										if self.Ammoboxes[j].DakAmmoType == "Flamethrower Fuel" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "MG" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "G" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Grenade Launcher" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "G" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "L" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "HMG" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "H" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][3] == "G" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Autocannon" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "A" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "Recoilless Rifle" or self.Guns[i].DakGunType == "Autoloading Recoilless Rifle" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "R" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "R" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
+									elseif self.Guns[i].DakGunType == "ATGM Launcher" or self.Guns[i].DakGunType == "Dual ATGM Launcher" or self.Guns[i].DakGunType == "Autoloading ATGM Launcher" or self.Guns[i].DakGunType == "Autoloading Dual ATGM Launcher" then
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "L" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "C" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
+										end
 									else
-										TurretCost = TurretCost * 0.75
-									end
-									if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
-										TurretCost = TurretCost * 0.5
-									end
-									--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
-									GunHandlingMult = GunHandlingMult + math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)
-								end
-							end
-						end
-					end
-
-					self.BestHeight = 0
-					self.BestWidth = 0
-					self.BestLength = 0
-					local HitTable = {}
-					local ArmorVal1 = 0
-					local addpos
-					local count = 0
-					local blocks = 0
-					local gunhit = 0
-					local gearhit = 0
-					local HitCrit = 0
-					local SpallLiner = 0
-					local forward
-					local right
-					local up
-					if IsValid(self.Gearbox) then
-						forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
-						right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
-						up = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Up()
-						self.ForwardEnt = self.Gearbox.ForwardEnt
-					elseif IsValid(self.MainTurret) then
-						forward = Angle(0,self.MainTurret:GetAngles().yaw,0):Forward()
-						right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
-						up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
-						self.ForwardEnt = self.MainTurret
-					end
-					self.Forward = forward
-
-					--setup system to check layers of armor between first impact and crew and determine if a spall liner exists 
-
-					--FRONT
-					local startpos = self.Base:GetPos()+(up*125)+(right*-125)
-					local basesize = self.Base:OBBMaxs()
-					local distance = math.Max((math.Max(basesize.x, basesize.y, basesize.z)*5),250)
-					local ArmorValTable = {}
-					local SpallLinerCount = 0
-					local hitpos
-					for i=1, 25 do
-						for j=1, 25 do
-							addpos = (right*10*j)+(up*-10*i)+(up*0.4*j)
-							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+forward*distance, startpos+addpos-forward*distance, distance, "AP", 75, player.GetAll(), self)
-							if IsValid(ent) then
-								if ent.Controller == self then
-									if HitCrit == 1 then
-										ArmorValTable[#ArmorValTable+1] = ArmorVal1
-										if SpallLiner == 1 then
-											SpallLinerCount = SpallLinerCount + 1
+										if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "C" then
+											self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
 										end
 									end
-									HitTable[#HitTable+1] = hitpos
 								end
 							end
 						end
-					end
-					local totalarmor = 0
-					local Ave = 0
-					local AveCount = 0
-					table.sort( ArmorValTable )
-					for i=1, #ArmorValTable do
-						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
-						if (i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3) or #ArmorValTable<4 then
-							Ave = Ave + math.min(ArmorValTable[i],10000)
-							AveCount = AveCount + 1
-						end
-					end
-					self.FrontalArmor = Ave/AveCount
-					self.FrontalSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
-					--has to be done per side
-					--REAR
-					count = 0
-					blocks = 0
-					HitCrit = 0
-					startpos = self.Base:GetPos()+(up*125)+(right*-125)
-					ArmorValTable = {}
-					SpallLinerCount = 0
-					for i=1, 50 do
-						for j=1, 50 do
-							addpos = (right*5*j)+(up*-5*i)+(up*0.2*j)
-							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-forward*distance, startpos+addpos+forward*distance, distance, "AP", 75, player.GetAll(), self)
-							if IsValid(ent) then
-								if ent.Controller == self then
-									if HitCrit == 1 then
-										ArmorValTable[#ArmorValTable+1] = ArmorVal1
-										if SpallLiner == 1 then
-											SpallLinerCount = SpallLinerCount + 1
-										end
+
+						local MaxPen = 0
+						for i = 1, #self.Guns do
+							for j = 1, #self.Guns[i].AmmoBoxes do
+								local boxname = (string.Split( self.Guns[i].AmmoBoxes[j].DakAmmoType, "" ))
+								local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+								local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+								local name2 = boxname[#boxname-5]..boxname[#boxname-4]
+								local name
+								if name6 == "APFSDS" or name6 == "HEATFS" then
+									name = name6
+								elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
+									name = name4
+								elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
+									name = name2
+								end
+								if name == "APFSDS" then
+									if self.Guns[i].BaseDakShellPenetration*7.8*0.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*7.8*0.5 end
+								elseif name == "APDS" then
+									if self.Guns[i].BaseDakShellPenetration*1.67 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.67 end
+								elseif name == "HVAP" then
+									if self.Guns[i].BaseDakShellPenetration*1.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.5 end
+								elseif name == "AP" then
+									if self.Guns[i].BaseDakShellPenetration > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration end
+								elseif name == "APHE" then
+									if self.Guns[i].BaseDakShellPenetration*0.825 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*0.825 end
+								elseif name == "ATGM" then
+									if self.Modern==1 then
+										if self.Guns[i].DakMaxHealth*6.40 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40 end
+									else
+										if self.Guns[i].DakMaxHealth*6.40*0.45 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40*0.45 end
 									end
-									HitTable[#HitTable+1] = hitpos
+								elseif name == "HEATFS" then
+									if self.Modern==1 then
+										if self.Guns[i].DakMaxHealth*5.4 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4 end
+									else
+										if self.Guns[i].DakMaxHealth*5.40*0.658 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.40*0.658 end
+									end
+								elseif name == "HEAT" then
+									if self.ColdWar==1 or self.Modern==1 then
+										if self.Guns[i].DakMaxHealth*5.4*0.431 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4*0.431 end
+									else
+										if self.Guns[i].DakMaxHealth*1.20 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.20 end
+									end
+								elseif name == "HESH" then
+									if self.Guns[i].DakMaxHealth*1.25 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.25 end
+								elseif name == "HE" then
+									if self.Guns[i].DakBaseShellFragPen > MaxPen then MaxPen = self.Guns[i].DakBaseShellFragPen end
+								elseif name == "SM" then
+									if self.Guns[i].DakMaxHealth*0.1 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*0.1 end
 								end
 							end
 						end
-					end
-					Ave = 0
-					AveCount = 0
-					totalarmor = 0
-					table.sort( ArmorValTable )
-					for i=1, #ArmorValTable do
-						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
-						if (i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3) or #ArmorValTable<4 then
-							Ave = Ave + math.min(ArmorValTable[i],10000)
-							AveCount = AveCount + 1
-						end
-					end
-					self.RearArmor = Ave/AveCount
-					self.RearSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
-					--LEFT
-					count = 0
-					blocks = 0
-					HitCrit = 0
-					startpos = self.Base:GetPos()+(up*125)+(forward*-125)
-					ArmorValTable = {}
-					SpallLinerCount = 0
-					for i=1, 25 do
-						for j=1, 25 do
-							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
-							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos+right*distance, startpos+addpos-right*distance, distance, "AP", 75, player.GetAll(), self)
-							if IsValid(ent) then
-								if ent.Controller == self then
-									if HitCrit == 1 then
-										ArmorValTable[#ArmorValTable+1] = ArmorVal1
-										if SpallLiner == 1 then
-											SpallLinerCount = SpallLinerCount + 1
-										end
-									end
-									HitTable[#HitTable+1] = hitpos
-								end
-							end
-						end
-					end
-					Ave = 0
-					AveCount = 0
-					totalarmor = 0
-					table.sort( ArmorValTable )
-					for i=1, #ArmorValTable do
-						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
-						if (i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3) or #ArmorValTable<4 then
-							Ave = Ave + math.min(ArmorValTable[i],10000)
-							AveCount = AveCount + 1
-						end
-					end
-					local LeftArmor = Ave/AveCount
-					self.LeftSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
-					--RIGHT
-					count = 0
-					blocks = 0
-					HitCrit = 0
-					startpos = self.Base:GetPos()+(up*125)+(forward*-125)
-					ArmorValTable = {}
-					SpallLinerCount = 0
-					for i=1, 25 do
-						for j=1, 25 do
-							addpos = (forward*10*j)+(up*-10*i)+(up*0.4*j)
-							SpallLiner = 0
-							ArmorVal1, ent, _, _, gunhit, gearhit, HitCrit, hitpos, SpallLiner = DTGetArmorRecurseNoStop(startpos+addpos-right*distance, startpos+addpos+right*distance, distance, "AP", 75, player.GetAll(), self)
-							if IsValid(ent) then
-								if ent.Controller == self then
-									if HitCrit == 1 then
-										ArmorValTable[#ArmorValTable+1] = ArmorVal1
-										if SpallLiner == 1 then
-											SpallLinerCount = SpallLinerCount + 1
-										end
-									end
-									HitTable[#HitTable+1] = hitpos
-								end
-							end
-						end
-					end
-					Ave = 0
-					AveCount = 0
-					totalarmor = 0
-					table.sort( ArmorValTable )
-					for i=1, #ArmorValTable do
-						totalarmor=totalarmor+math.min(ArmorValTable[i],10000)
-						if (i>=#ArmorValTable/4 and i<=(#ArmorValTable/4)*3) or #ArmorValTable<4 then
-							Ave = Ave + math.min(ArmorValTable[i],10000)
-							AveCount = AveCount + 1
-						end
-					end
-					local RightArmor = Ave/AveCount
-					self.RightSpallLinerCoverage = (SpallLinerCount/#ArmorValTable)
-					self.SideArmor = (RightArmor+LeftArmor)/2
-					self.SideSpallLinerCoverage = 0.5*(self.RightSpallLinerCoverage + self.LeftSpallLinerCoverage)
 
-					self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
 
-					local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
-
-					self.BestAveArmor = Total
-					armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(self.ArmorSideMult*(1+(0.25*self.SideSpallLinerCoverage)))
-					--local armormult = (self.FrontalArmor*0.5)+(self.SideArmor*0.3)+(self.RearArmor*0.2)
-					--print(self.FrontalArmor)
-					--print(self.SideArmor)
-					--print(self.RearArmor)
-					local shellvol = ((100*0.0393701)^2)*(100*0.0393701*13)
-					local shells = 0
-					local ammocosts = 0
-
-					for i = 1, #self.Guns do
-						self.Guns[i].AmmoBoxes = {}
-						for j = 1, #self.Ammoboxes do
-							if not(self.Ammoboxes[j].DakAmmoType == "Flamethrower Fuel") then
-								if self.Guns[i].DakGunType == "Short Cannon" or self.Guns[i].DakGunType == "Short Autoloader" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "S" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Cannon" or self.Guns[i].DakGunType == "Autoloader" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "C" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Long Cannon" or self.Guns[i].DakGunType == "Long Autoloader" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "L" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Howitzer" or self.Guns[i].DakGunType == "Autoloading Howitzer" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "H" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "M" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Mortar" or self.Guns[i].DakGunType == "Autoloading Mortar" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "G" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Smoke Launcher" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "S" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "L" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Flamethrower" then
-									if self.Ammoboxes[j].DakAmmoType == "Flamethrower Fuel" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "MG" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "G" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Grenade Launcher" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "G" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "L" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "HMG" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "H" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "M" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][3] == "G" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Autocannon" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "A" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "C" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "Recoilless Rifle" or self.Guns[i].DakGunType == "Autoloading Recoilless Rifle" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "R" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] == "R" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								elseif self.Guns[i].DakGunType == "ATGM Launcher" or self.Guns[i].DakGunType == "Dual ATGM Launcher" or self.Guns[i].DakGunType == "Autoloading ATGM Launcher" or self.Guns[i].DakGunType == "Autoloading Dual ATGM Launcher" then
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "L" and string.Split( self.Ammoboxes[j].DakName, "m" )[3][2] ~= "C" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								else
-									if string.Split( self.Ammoboxes[j].DakName, "m" )[3][1] == "C" then
-										self.Guns[i].AmmoBoxes[#self.Guns[i].AmmoBoxes+1] = self.Ammoboxes[j]
-									end
-								end
-							end
-						end
-					end
-
-					local MaxPen = 0
-					for i = 1, #self.Guns do
-						for j = 1, #self.Guns[i].AmmoBoxes do
-							local boxname = (string.Split( self.Guns[i].AmmoBoxes[j].DakAmmoType, "" ))
+						for k=1, #self.Ammoboxes do 
+							local boxname = (string.Split( self.Ammoboxes[k].DakAmmoType, "" ))
 							local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
 							local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
 							local name2 = boxname[#boxname-5]..boxname[#boxname-4]
-							local name
+							--check longest to shortest names, with if then ifelse then else
+							local name 
 							if name6 == "APFSDS" or name6 == "HEATFS" then
 								name = name6
 							elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
@@ -746,421 +975,379 @@ function ENT:Think()
 							elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
 								name = name2
 							end
-							if name == "APFSDS" then
-								if self.Guns[i].BaseDakShellPenetration*7.8*0.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*7.8*0.5 end
-							elseif name == "APDS" then
-								if self.Guns[i].BaseDakShellPenetration*1.67 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.67 end
-							elseif name == "HVAP" then
-								if self.Guns[i].BaseDakShellPenetration*1.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.5 end
-							elseif name == "AP" then
-								if self.Guns[i].BaseDakShellPenetration > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration end
-							elseif name == "APHE" then
-								if self.Guns[i].BaseDakShellPenetration*0.825 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*0.825 end
-							elseif name == "ATGM" then
-								if self.Modern==1 then
-									if self.Guns[i].DakMaxHealth*6.40 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40 end
-								else
-									if self.Guns[i].DakMaxHealth*6.40*0.45 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40*0.45 end
-								end
-							elseif name == "HEATFS" then
-								if self.Modern==1 then
-									if self.Guns[i].DakMaxHealth*5.4 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4 end
-								else
-									if self.Guns[i].DakMaxHealth*5.40*0.658 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.40*0.658 end
-								end
-							elseif name == "HEAT" then
-								if self.ColdWar==1 or self.Modern==1 then
-									if self.Guns[i].DakMaxHealth*5.4*0.431 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4*0.431 end
-								else
-									if self.Guns[i].DakMaxHealth*1.20 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.20 end
-								end
+							shells = self.Ammoboxes[k]:GetPhysicsObject():GetVolume()/shellvol
+							local cost = 0
+							if name == "HE" then
+								cost = shells * 0.1
 							elseif name == "HESH" then
-								if self.Guns[i].DakMaxHealth*1.25 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.25 end
-							elseif name == "HE" then
-								if self.Guns[i].DakBaseShellFragPen > MaxPen then MaxPen = self.Guns[i].DakBaseShellFragPen end
-							elseif name == "SM" then
-								if self.Guns[i].DakMaxHealth*0.1 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*0.1 end
+								cost = shells * 0.26
+							elseif name == "AP" or name == "APHE" or name == "HEAT" then
+								if name == "HEAT" and self.ColdWar == 1 then
+									cost = shells * 0.41
+								else
+									cost = shells * 0.25
+								end
+							elseif name == "HVAP" then
+								cost = shells * 0.38
+							elseif name == "APDS" then
+								cost = shells * 0.42
+							elseif name == "HEATFS" or name == "APFSDS" then
+								if name == "HEATFS" and self.ColdWar == 1 and self.Modern == 0 then
+									cost = shells * 0.62
+								else
+									cost = shells * 1
+								end
+							elseif name == "ATGM" then
+								if self.ColdWar == 1 and self.Modern == 0 then
+									cost = shells * 1.0
+								else
+									cost = shells * 1.25
+								end
 							end
+							ammocosts = ammocosts + cost
 						end
-					end
-
-
-					for k=1, #self.Ammoboxes do 
-						local boxname = (string.Split( self.Ammoboxes[k].DakAmmoType, "" ))
-						local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
-						local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
-						local name2 = boxname[#boxname-5]..boxname[#boxname-4]
-						--check longest to shortest names, with if then ifelse then else
-						local name 
-						if name6 == "APFSDS" or name6 == "HEATFS" then
-							name = name6
-						elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
-							name = name4
-						elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
-							name = name2
-						end
-						shells = self.Ammoboxes[k]:GetPhysicsObject():GetVolume()/shellvol
-						local cost = 0
-						if name == "HE" then
-							cost = shells * 0.1
-						elseif name == "HESH" then
-							cost = shells * 0.26
-						elseif name == "AP" or name == "APHE" or name == "HEAT" then
-							if name == "HEAT" and self.ColdWar == 1 then
-								cost = shells * 0.41
+						local speedmult = 1
+						if IsValid(self.Gearbox) then
+							if self.Gearbox.DakHP ~= nil and self.Gearbox.MaxHP ~= nil and self.Gearbox.TotalMass ~= nil and self.Gearbox.HPperTon ~= nil then
+								if self.Gearbox:GetClass() == "dak_tegearboxnew" then
+									local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
+									local t = (self.Gearbox.TotalMass+self.Gearbox:GetPhysicsObject():GetMass())/1000
+									local hpt = hp/t
+									speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 ))
+								else
+									local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
+									local t = self.Gearbox.TotalMass/1000
+									local hpt = hp/t
+									speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,math.log( armormult + 1 , 2 ))
+								end
 							else
-								cost = shells * 0.25
-							end
-						elseif name == "HVAP" then
-							cost = shells * 0.38
-						elseif name == "APDS" then
-							cost = shells * 0.42
-						elseif name == "HEATFS" or name == "APFSDS" then
-							if name == "HEATFS" and self.ColdWar == 1 and self.Modern == 0 then
-								cost = shells * 0.62
-							else
-								cost = shells * 1
-							end
-						elseif name == "ATGM" then
-							if self.ColdWar == 1 and self.Modern == 0 then
-								cost = shells * 1.0
-							else
-								cost = shells * 1.25
-							end
-						end
-						ammocosts = ammocosts + cost
-					end
-					local speedmult = 1
-					if IsValid(self.Gearbox) then
-						if self.Gearbox.DakHP ~= nil and self.Gearbox.MaxHP ~= nil and self.Gearbox.TotalMass ~= nil and self.Gearbox.HPperTon ~= nil then
-							if self.Gearbox:GetClass() == "dak_tegearboxnew" then
-								local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
-								local t = (self.Gearbox.TotalMass+self.Gearbox:GetPhysicsObject():GetMass())/1000
-								local hpt = hp/t
-								speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 ))
-							else
-								local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
-								local t = self.Gearbox.TotalMass/1000
-								local hpt = hp/t
-								speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,math.log( armormult + 1 , 2 ))
+								self.DakOwner:ChatPrint("Please finish setting up the gearbox to get a correct cost for your tank.")
 							end
 						else
-							self.DakOwner:ChatPrint("Please finish setting up the gearbox to get a correct cost for your tank.")
+							speedmult = 0.125
+							self.DakOwner:ChatPrint("No gearbox detected, towed gun assumed.")
+							--self.DakOwner:ChatPrint("Please give your tank a gearbox so that it may calculate its cost properly.")
 						end
-					else
-						speedmult = 0.125
-						self.DakOwner:ChatPrint("No gearbox detected, towed gun assumed.")
-						--self.DakOwner:ChatPrint("Please give your tank a gearbox so that it may calculate its cost properly.")
-					end
-					--local speedmult = math.Clamp((((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05)),0,2)
-					--armormult = armormult+0.1
-					--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
+						--local speedmult = math.Clamp((((math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)/(self.Gearbox.TotalMass/1000))*0.05)),0,2)
+						--armormult = armormult+0.1
+						--armormult = 1.002663 - 1.056967*2.718^(-6.413596*armormult)
 
-					local DPS = 0
-					local TotalDPS = 0
-					local ShotsPerSecond
-					for g=1, #self.Guns do
-						local ShellDamage = self.Guns[g].BaseDakShellDamage
-						if self.Guns[g].DakGunType == "Smoke Launcher" then
-							ShellDamage = self.Guns[g].BaseDakShellDamage/4
-						end
-						if self.Guns[g].DakGunType == "Flamethrower" then
-							ShellDamage = 0.75
-						end
-						if self.Guns[g].DakGunType == "ATGM Launcher" or self.Guns[g].DakGunType == "Dual ATGM Launcher" or self.Guns[g].DakGunType == "Autoloading ATGM Launcher" or self.Guns[g].DakGunType == "Autoloading Dual ATGM Launcher" then
-							ShellDamage = self.Guns[g].BaseDakShellDamage/8
-						end
-
-						--also have an exception here for flamethrower damage per shot
-						if self.Guns[g]:GetClass() == "dak_teautogun" then
-							ShotsPerSecond = 1/((self.Guns[g].DakCooldown * (1/self.Guns[g].FireRateMod))+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
-							DPS = ShellDamage*ShotsPerSecond
-							if self.Guns[g].ReadyRounds == 2 then 
-								DPS = DPS*2 
+						local DPS = 0
+						local TotalDPS = 0
+						local ShotsPerSecond
+						for g=1, #self.Guns do
+							local ShellDamage = self.Guns[g].BaseDakShellDamage
+							if self.Guns[g].DakGunType == "Smoke Launcher" then
+								ShellDamage = self.Guns[g].BaseDakShellDamage/4
 							end
-						end
-						if self.Guns[g]:GetClass() == "dak_tegun" then
-							ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
-							DPS = ShellDamage*ShotsPerSecond
-							if self.Guns[g].ReadyRounds == 2 then 
-								DPS = DPS*2 
+							if self.Guns[g].DakGunType == "Flamethrower" then
+								ShellDamage = 0.75
 							end
-						end
-						if self.Guns[g]:GetClass() == "dak_temachinegun" then
-							self.Guns[g].ShellLengthExact = 6.5
-							ShotsPerSecond = 1/(self.Guns[g].DakCooldown*(1/self.Guns[g].FireRateMod))
-							DPS = ShellDamage*ShotsPerSecond
-							if self.Guns[g].ReadyRounds == 2 then 
-								DPS = DPS*2 
+							if self.Guns[g].DakGunType == "ATGM Launcher" or self.Guns[g].DakGunType == "Dual ATGM Launcher" or self.Guns[g].DakGunType == "Autoloading ATGM Launcher" or self.Guns[g].DakGunType == "Autoloading Dual ATGM Launcher" then
+								ShellDamage = self.Guns[g].BaseDakShellDamage/8
 							end
-						end
-						TotalDPS = TotalDPS + DPS
-					end
-					self.MaxPen = MaxPen
-					local firepowermult = MaxPen/420
-					local altfirepowermult = 0.005*TotalDPS^1
-					--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
-					math.max(0.1,firepowermult)
-					self.PenMult = firepowermult*0.5
-					self.DPSMult = altfirepowermult*0.5
-					firepowermult = (altfirepowermult+firepowermult)*0.5
-					local basepos = self.Base:GetPos()
-					self.BestLength = 0
-					self.BestWidth = 0
-					self.BestHeight = 0
-					for i=1, #HitTable do
-						local diff = basepos-HitTable[i]
-						if math.abs(diff.x) > self.BestWidth then self.BestWidth = math.abs(diff.x) end
-						if math.abs(diff.y) > self.BestLength then self.BestLength = math.abs(diff.y) end
-						if math.abs(diff.z) > self.BestHeight then self.BestHeight = math.abs(diff.z) end
-					end
 
-					self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
-					local biggestsize = math.max(math.min(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
-					local pixels = 100
-					local splits = 10
-					local delay = (pixels/splits)
-					local startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(right*-biggestsize*0.5)+(up*biggestsize*0.5)
-					local curarmor = 0
-					local ent
-					self.frontarmortable = {}
-					--local DebugTime = SysTime()
-					for i=1, pixels do
-						timer.Simple(engine.TickInterval()*delay*i,function()
-							for j=1, pixels do
-								timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
-									if IsValid(self) then
-										if IsValid(self.Gearbox) then
-											forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
-											right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
-											up = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Up()
-											self.ForwardEnt = self.Gearbox.ForwardEnt
-										elseif IsValid(self.MainTurret) then
-											forward = Angle(0,self.MainTurret:GetAngles().yaw,0):Forward()
-											right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
-											up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
-											self.ForwardEnt = self.MainTurret
-										end
-										startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(right*-biggestsize*0.5)+(up*biggestsize*0.5)
-										addpos = (right*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
-										SpallLiner = 0
-
-										local fowardtrace = util.TraceHull( {
-											start = startpos+addpos+forward*distance,
-											endpos = startpos+addpos-forward*distance,
-											maxs = Vector(0,0,0),
-											mins = Vector(0,0,0),
-											filter = player.GetAll()
-										} )
-										local backwardtrace = util.TraceHull( {
-											start = startpos+addpos-forward*distance,
-											endpos = startpos+addpos+forward*distance,
-											maxs = Vector(0,0,0),
-											mins = Vector(0,0,0),
-											filter = player.GetAll()
-										} )
-
-										local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-										curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+forward*distance, startpos+addpos-forward*distance, depth, "AP", 75, player.GetAll(), self)
-										
-										local addval = 0
-
-										if IsValid(ent) then
-											local entclass = ent:GetClass()
-											if entclass == "dak_crew"then
-												addval = 70000
-											end
-											if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
-												addval = 80000
-											end
-											if entclass == "dak_tefuel" then
-												addval = 90000
-											end
-										end
-
-										if self.frontarmortable~=nil then
-											if curarmor~=nil then
-												self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
-											else
-												self.frontarmortable[#self.frontarmortable+1] = 0
-											end
-										end
-									end
-								end)
-							end
-						end)
-					end
-					--print(SysTime()-DebugTime)
-					timer.Simple(engine.TickInterval()*delay*pixels+1,function()
-						if self.frontarmortable~=nil then
-							self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
-						end
-					end)
-					local biggestsize = math.max(math.max(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
-					local startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(forward*-biggestsize*0.5)+(up*biggestsize*0.5)
-					local curarmor = 0
-					self.sidearmortable = {}
-					for i=1, pixels do
-						timer.Simple(engine.TickInterval()*delay*i,function()
-							for j=1, pixels do
-								timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
-									if IsValid(self) then
-										if IsValid(self.Gearbox) then
-											forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
-											right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
-											up = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Up()
-											self.ForwardEnt = self.Gearbox.ForwardEnt
-										elseif IsValid(self.MainTurret) then
-											forward = Angle(0,self.MainTurret:GetAngles().yaw,0):Forward()
-											right = Angle(0,self.MainTurret:GetAngles().yaw,0):Right()
-											up = Angle(0,self.MainTurret:GetAngles().yaw,0):Up()
-											self.ForwardEnt = self.MainTurret
-										end
-										startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(forward*-biggestsize*0.5)+(up*biggestsize*0.5)
-										addpos = (forward*(biggestsize/pixels)*j)+(up*-(biggestsize/pixels)*i)
-										SpallLiner = 0
-
-										local fowardtrace = util.TraceHull( {
-											start = startpos+addpos+right*distance,
-											endpos = startpos+addpos-right*distance,
-											maxs = Vector(0,0,0),
-											mins = Vector(0,0,0),
-											filter = player.GetAll()
-										} )
-										local backwardtrace = util.TraceHull( {
-											start = startpos+addpos-right*distance,
-											endpos = startpos+addpos+right*distance,
-											maxs = Vector(0,0,0),
-											mins = Vector(0,0,0),
-											filter = player.GetAll()
-										} )
-										local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-
-										curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+right*distance, startpos+addpos-right*distance, depth, "AP", 75, player.GetAll(), self)
-										
-										local addval = 0
-
-										if IsValid(ent) then
-											local entclass = ent:GetClass()
-											if entclass == "dak_crew"then
-												addval = 70000
-											end
-											if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
-												addval = 80000
-											end
-											if entclass == "dak_tefuel" then
-												addval = 90000
-											end
-										end
-
-										if self.sidearmortable~=nil then
-											if curarmor~=nil then
-												self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
-											else
-												self.sidearmortable[#self.sidearmortable+1] = 0
-											end
-										end
-									end
-								end)
-							end
-						end)
-					end
-					timer.Simple(engine.TickInterval()*delay*pixels+1,function()
-						if self.sidearmortable~=nil then
-							self.sidearmortable[#self.sidearmortable+1] = self.SideArmor
-						end
-					end)
-					firepowermult = math.max((self.BoxVolume*0.01/250000),firepowermult)
-
-					--print("Highest Armor: "..(armormult*50))
-					--print("Side Armor "..self.SideArmor)
-					--print("Side Armor Mult: "..(self.SideArmor/100))
-					--print("Adjusted Armor: "..((armormult*50)*(self.SideArmor/100)))
-					self.FirepowerMult = math.Round(math.max((self.BoxVolume*0.01/250000),firepowermult),2)
-					self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
-					self.ArmorMult = math.Round(math.max(0.01,armormult),3)
-					self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
-					self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
-					local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(0.05*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
-					self.ArmorMult = self.ArmorMult * ArmorTypeMult
-					self.PreCost = self.ArmorMult*50 + self.FirepowerMult*50
-					--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
-					self.PreCost = self.PreCost*((self.SpeedMult+self.GunHandlingMult)*0.5)
-
-					self.APSCost = 0
-					if self.APSEnable == true then
-						local roundcost = 0
-						if self.APSFrontalArc == true then
-							roundcost = roundcost + 1
-						end
-						if self.APSSideArc == true then
-							roundcost = roundcost + 1
-						end
-						if self.APSRearArc == true then
-							roundcost = roundcost + 1
-						end
-						self.APSCost = self.APSShots*roundcost
-					end
-
-					self.Cost = math.Round(self.PreCost+self.APSCost)
-
-					local curera = "WWII"
-					if self.ColdWar == 1 then curera = "Cold War" end
-					if self.Modern == 1 then curera = "Modern" end
-					self.DakOwner:ChatPrint("Tank Analysis Complete: "..self.Cost.." point "..curera.." tank. Right click tank core with spawner for detailed readout.")
-				end
-
-				if not(self.Dead) and (self.DakFinishedPasting == 1 or self.dupespawned==nil) then
-					if not(self.DakMaxHealth) then
-						self.DakMaxHealth = 10
-					end
-					if table.Count(self.HitBox)==0 then
-						if self.DakHealth>self.DakMaxHealth then
-							self.DakHealth = self.DakMaxHealth
-						end
-					end
-
-					if self.recheckmass == nil then
-						local Mass = 0
-						local ParentMass = 0
-						local SA = 0
-						
-						self.Contraption = {self.Base}
-						local turrets = {}
-
-						for k, v in pairs(self.Base:GetChildren()) do
-							self.Contraption[#self.Contraption+1] = v
-							for k2, v2 in pairs(v:GetChildren()) do
-								self.Contraption[#self.Contraption+1] = v2
-								if v2:GetClass() == "dak_turretcontrol" then
-									turrets[#turrets+1] = v2
+							--also have an exception here for flamethrower damage per shot
+							if self.Guns[g]:GetClass() == "dak_teautogun" then
+								ShotsPerSecond = 1/((self.Guns[g].DakCooldown * (1/self.Guns[g].FireRateMod))+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
+								DPS = ShellDamage*ShotsPerSecond
+								if self.Guns[g].ReadyRounds == 2 then 
+									DPS = DPS*2 
 								end
 							end
+							if self.Guns[g]:GetClass() == "dak_tegun" then
+								ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
+								DPS = ShellDamage*ShotsPerSecond
+								if self.Guns[g].ReadyRounds == 2 then 
+									DPS = DPS*2 
+								end
+							end
+							if self.Guns[g]:GetClass() == "dak_temachinegun" then
+								self.Guns[g].ShellLengthExact = 6.5
+								ShotsPerSecond = 1/(self.Guns[g].DakCooldown*(1/self.Guns[g].FireRateMod))
+								DPS = ShellDamage*ShotsPerSecond
+								if self.Guns[g].ReadyRounds == 2 then 
+									DPS = DPS*2 
+								end
+							end
+							TotalDPS = TotalDPS + DPS
+						end
+						self.MaxPen = MaxPen
+						local firepowermult = MaxPen/420
+						local altfirepowermult = 0.005*TotalDPS^1
+						--if altfirepowermult > firepowermult then firepowermult = altfirepowermult end
+						math.max(0.1,firepowermult)
+						self.PenMult = firepowermult*0.5
+						self.DPSMult = altfirepowermult*0.5
+						firepowermult = (altfirepowermult+firepowermult)*0.5
+						local basepos = self.Base:GetPos()
+
+						self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
+						local biggestsize = math.max(math.min(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
+						local pixels = 50
+						local splits = 50
+						local delay = (pixels/splits)
+						local startpos = self.ForwardEnt:GetPos()+(up*math.abs(self.HitBoxMaxs.z))+(right*math.abs(self.HitBoxMaxs.y))
+						local curarmor = 0
+						local ent
+						local scanforward
+						local scanright
+						local scanup
+						local aspectratio = self.BoxSize.y/self.BoxSize.z
+						self.frontarmortable = {}
+						--local DebugTime = SysTime()
+						local aspectratio = self.BoxSize.y/self.BoxSize.z
+						local minmax = (self.HitBoxMins+self.HitBoxMaxs)
+						for i=1, pixels do
+							timer.Simple(engine.TickInterval()*delay*i,function()
+								for j=1, pixels do
+									timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
+										if IsValid(self) then
+											if IsValid(self.Gearbox) then
+												scanforward = self.Gearbox.ForwardEnt:GetForward()
+												scanright = self.Gearbox.ForwardEnt:GetRight()
+												scanup = self.Gearbox.ForwardEnt:GetUp()
+											elseif IsValid(self.MainTurret) then
+												scanforward = self.MainTurret:GetForward()
+												scanright = self.MainTurret:GetRight()
+												scanup = self.MainTurret:GetUp()
+											end
+											
+											if self.BoxSize.y>self.BoxSize.z then
+												aspectratio = self.BoxSize.y/self.BoxSize.z
+												local xstart = scanright*self.HitBoxMaxs.y*1.1-- - scanright*(self.ForwardEnt:WorldToLocal(self.Base:GetPos())).y
+												local ystart = scanup*self.HitBoxMaxs.z*1.1-- + scanup*(self.ForwardEnt:WorldToLocal(self.Base:GetPos())).z
+												local xcur = (j/pixels*1.1)*scanright*-self.BoxSize.y
+												local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+												startpos = self.Base:GetPos() + xstart + ystart*aspectratio
+												addpos = xcur+ycur*aspectratio
+											else
+												aspectratio = self.BoxSize.z/self.BoxSize.y
+												local xstart = scanright*self.HitBoxMaxs.y*1.1-- - scanright*(self.ForwardEnt:WorldToLocal(self.Base:GetPos())).y
+												local ystart = scanup*self.HitBoxMaxs.z*1.1-- + scanup*(self.ForwardEnt:WorldToLocal(self.Base:GetPos())).z
+												local xcur = (j/pixels*1.1)*scanright*-self.BoxSize.y
+												local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+												startpos = self.Base:GetPos() + xstart*aspectratio + ystart
+												addpos = xcur*aspectratio+ycur
+											end
+
+											SpallLiner = 0
+
+											local fowardtrace = util.TraceHull( {
+												start = startpos+addpos+scanforward*distance,
+												endpos = startpos+addpos-scanforward*distance,
+												maxs = Vector(0,0,0),
+												mins = Vector(0,0,0),
+												filter = player.GetAll()
+											} )
+											local backwardtrace = util.TraceHull( {
+												start = startpos+addpos-scanforward*distance,
+												endpos = startpos+addpos+scanforward*distance,
+												maxs = Vector(0,0,0),
+												mins = Vector(0,0,0),
+												filter = player.GetAll()
+											} )
+
+											local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+											curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+scanforward*distance, startpos+addpos-scanforward*distance, depth, "AP", 75, player.GetAll(), self)
+											
+											local addval = 0
+
+											if IsValid(ent) then
+												local entclass = ent:GetClass()
+												if entclass == "dak_crew"then
+													addval = 70000
+												end
+												if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+													addval = 80000
+												end
+												if entclass == "dak_tefuel" then
+													addval = 90000
+												end
+											end
+
+											if self.frontarmortable~=nil then
+												if curarmor~=nil then
+													self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
+												else
+													self.frontarmortable[#self.frontarmortable+1] = 0
+												end
+											end
+										end
+									end)
+								end
+							end)
+						end
+						--print(SysTime()-DebugTime)
+						timer.Simple(engine.TickInterval()*delay*pixels+1,function()
+							if self.frontarmortable~=nil then
+								self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
+							end
+						end)
+						local biggestsize = math.max(math.max(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
+						local startpos = self.Base:GetPos()+(up*self.BestHeight*0.5)+(forward*-biggestsize*0.5)+(up*biggestsize*0.5)
+						local curarmor = 0
+						self.sidearmortable = {}
+						for i=1, pixels do
+							timer.Simple(engine.TickInterval()*delay*i,function()
+								for j=1, pixels do
+									timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
+										if IsValid(self) then
+											if IsValid(self.Gearbox) then
+												scanforward = self.Gearbox.ForwardEnt:GetForward()
+												scanright = self.Gearbox.ForwardEnt:GetRight()
+												scanup = self.Gearbox.ForwardEnt:GetUp()
+											elseif IsValid(self.MainTurret) then
+												scanforward = self.MainTurret:GetForward()
+												scanright = self.MainTurret:GetRight()
+												scanup = self.MainTurret:GetUp()
+											end
+											
+											if self.BoxSize.x>self.BoxSize.z then
+												aspectratio = self.BoxSize.x/self.BoxSize.z
+												local xstart = scanforward*self.HitBoxMaxs.x*1.1 - scanforward*(self.ForwardEnt:WorldToLocal(self.Base:GetPos())).x
+												local ystart = scanup*self.HitBoxMaxs.z*1.1 + scanup*(self.ForwardEnt:WorldToLocal(self.Base:GetPos())).z
+												local xcur = (j/pixels*1.1)*scanforward*-self.BoxSize.x
+												local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+												startpos = self.Base:GetPos() + xstart + ystart*aspectratio
+												addpos = xcur+ycur*aspectratio
+											else
+												aspectratio = self.BoxSize.z/self.BoxSize.x
+												local xstart = scanforward*self.HitBoxMaxs.x*1.1 - scanforward*(self.ForwardEnt:WorldToLocal(self.Base:GetPos())).x
+												local ystart = scanup*self.HitBoxMaxs.z*1.1 + scanup*(self.ForwardEnt:WorldToLocal(self.Base:GetPos())).z
+												local xcur = (j/pixels*1.1)*scanforward*-self.BoxSize.x
+												local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+												startpos = self.Base:GetPos() + xstart*aspectratio + ystart
+												addpos = xcur*aspectratio+ycur
+											end
+											
+											SpallLiner = 0
+
+											local fowardtrace = util.TraceHull( {
+												start = startpos+addpos-scanright*distance,
+												endpos = startpos+addpos+scanright*distance,
+												maxs = Vector(0,0,0),
+												mins = Vector(0,0,0),
+												filter = player.GetAll()
+											} )
+											local backwardtrace = util.TraceHull( {
+												start = startpos+addpos+scanright*distance,
+												endpos = startpos+addpos-scanright*distance,
+												maxs = Vector(0,0,0),
+												mins = Vector(0,0,0),
+												filter = player.GetAll()
+											} )
+											local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+
+											curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos-scanright*distance, startpos+addpos+scanright*distance, depth, "AP", 75, player.GetAll(), self)
+											
+											local addval = 0
+
+											if IsValid(ent) then
+												local entclass = ent:GetClass()
+												if entclass == "dak_crew"then
+													addval = 70000
+												end
+												if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+													addval = 80000
+												end
+												if entclass == "dak_tefuel" then
+													addval = 90000
+												end
+											end
+
+											if self.sidearmortable~=nil then
+												if curarmor~=nil then
+													self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
+												else
+													self.sidearmortable[#self.sidearmortable+1] = 0
+												end
+											end
+										end
+									end)
+								end
+							end)
+						end
+						timer.Simple(engine.TickInterval()*delay*pixels+1,function()
+							if self.sidearmortable~=nil then
+								self.sidearmortable[#self.sidearmortable+1] = self.SideArmor
+							end
+						end)
+						firepowermult = math.max((self.DakVolume/250000),firepowermult)
+
+						--print("Highest Armor: "..(armormult*50))
+						--print("Side Armor "..self.SideArmor)
+						--print("Side Armor Mult: "..(self.SideArmor/100))
+						--print("Adjusted Armor: "..((armormult*50)*(self.SideArmor/100)))
+						self.FirepowerMult = math.Round(math.max((self.DakVolume/250000),firepowermult),2)
+						self.SpeedMult = math.Round(math.max(0.1,speedmult),2)
+						self.ArmorMult = math.Round(math.max(0.01,armormult),3)
+						self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
+						self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
+						local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(0.05*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
+						self.ArmorMult = self.ArmorMult * ArmorTypeMult
+						self.PreCost = self.ArmorMult*50 + self.FirepowerMult*50
+						--self.PreCost = self.PreCost*(armormult*speedmult*firepowermult*self.GunHandlingMult)
+						self.PreCost = self.PreCost*((self.SpeedMult+self.GunHandlingMult)*0.5)
+
+						self.APSCost = 0
+						if self.APSEnable == true then
+							local roundcost = 0
+							if self.APSFrontalArc == true then
+								roundcost = roundcost + 1
+							end
+							if self.APSSideArc == true then
+								roundcost = roundcost + 1
+							end
+							if self.APSRearArc == true then
+								roundcost = roundcost + 1
+							end
+							self.APSCost = self.APSShots*roundcost
 						end
 
-						local turrets2 = {}
-						for i=1, #turrets do
-							local TurEnts = {}
-							if turrets[i].WiredTurret ~= NULL then
-								self.Contraption[#self.Contraption+1] = turrets[i].WiredTurret
-								TurEnts[#TurEnts+1] = turrets[i].WiredTurret
-								for k, v in pairs(turrets[i].WiredTurret:GetChildren()) do
-									self.Contraption[#self.Contraption+1] = v
-									TurEnts[#TurEnts+1] = v
-									for k2, v2 in pairs(v:GetChildren()) do
-										self.Contraption[#self.Contraption+1] = v2
-										TurEnts[#TurEnts+1] = v2
-										if v2:GetClass() == "dak_turretcontrol" then
-											turrets2[#turrets2+1] = v2
-										end
+						self.Cost = math.Round(self.PreCost+self.APSCost)
+
+						local curera = "WWII"
+						if self.ColdWar == 1 then curera = "Cold War" end
+						if self.Modern == 1 then curera = "Modern" end
+						self.DakOwner:ChatPrint("Tank Analysis Complete: "..self.Cost.." point "..curera.." tank. Right click tank core with spawner for detailed readout.")
+					end
+
+					if not(self.Dead) and (self.DakFinishedPasting == 1 or self.dupespawned==nil) then
+						if not(self.DakMaxHealth) then
+							self.DakMaxHealth = 10
+						end
+						if table.Count(self.HitBox)==0 then
+							if self.DakHealth>self.DakMaxHealth then
+								self.DakHealth = self.DakMaxHealth
+							end
+						end
+
+						if self.recheckmass == nil then
+							local Mass = 0
+							local ParentMass = 0
+							local SA = 0
+							
+							self.Contraption = {self.Base}
+							local turrets = {}
+
+							for k, v in pairs(self.Base:GetChildren()) do
+								self.Contraption[#self.Contraption+1] = v
+								for k2, v2 in pairs(v:GetChildren()) do
+									self.Contraption[#self.Contraption+1] = v2
+									if v2:GetClass() == "dak_turretcontrol" then
+										turrets[#turrets+1] = v2
 									end
 								end
 							end
-							if turrets[i].WiredGun ~= NULL then
-								if turrets[i].WiredGun:GetClass() == "dak_tegun" or turrets[i].WiredGun:GetClass() == "dak_teautogun" or turrets[i].WiredGun:GetClass() == "dak_temachinegun" then
-									self.Contraption[#self.Contraption+1] = turrets[i].WiredGun:GetParent():GetParent()
-									TurEnts[#TurEnts+1] = turrets[i].WiredGun:GetParent():GetParent()
-									for k, v in pairs(turrets[i].WiredGun:GetParent():GetParent():GetChildren()) do
+
+							local turrets2 = {}
+							for i=1, #turrets do
+								local TurEnts = {}
+								if turrets[i].WiredTurret ~= NULL then
+									self.Contraption[#self.Contraption+1] = turrets[i].WiredTurret
+									TurEnts[#TurEnts+1] = turrets[i].WiredTurret
+									for k, v in pairs(turrets[i].WiredTurret:GetChildren()) do
 										self.Contraption[#self.Contraption+1] = v
 										TurEnts[#TurEnts+1] = v
 										for k2, v2 in pairs(v:GetChildren()) do
@@ -1171,1239 +1358,1326 @@ function ENT:Think()
 											end
 										end
 									end
-								else
-									self.DakOwner:ChatPrint(turrets[i].DakName.." #"..turrets[i]:EntIndex().." must have gun wired to a daktank gun.")
 								end
+								if turrets[i].WiredGun ~= NULL then
+									if turrets[i].WiredGun:GetClass() == "dak_tegun" or turrets[i].WiredGun:GetClass() == "dak_teautogun" or turrets[i].WiredGun:GetClass() == "dak_temachinegun" then
+										self.Contraption[#self.Contraption+1] = turrets[i].WiredGun:GetParent():GetParent()
+										TurEnts[#TurEnts+1] = turrets[i].WiredGun:GetParent():GetParent()
+										for k, v in pairs(turrets[i].WiredGun:GetParent():GetParent():GetChildren()) do
+											self.Contraption[#self.Contraption+1] = v
+											TurEnts[#TurEnts+1] = v
+											for k2, v2 in pairs(v:GetChildren()) do
+												self.Contraption[#self.Contraption+1] = v2
+												TurEnts[#TurEnts+1] = v2
+												if v2:GetClass() == "dak_turretcontrol" then
+													turrets2[#turrets2+1] = v2
+												end
+											end
+										end
+									else
+										self.DakOwner:ChatPrint(turrets[i].DakName.." #"..turrets[i]:EntIndex().." must have gun wired to a daktank gun.")
+									end
+								end
+								turrets[i].Extra = TurEnts
 							end
-							turrets[i].Extra = TurEnts
-						end
 
-						local turrets3 = {}
-						for i=1, #turrets2 do
-							local TurEnts = {}
-							if turrets2[i].WiredTurret ~= NULL then
-								self.Contraption[#self.Contraption+1] = turrets2[i].WiredTurret
-								TurEnts[#TurEnts+1] = turrets2[i].WiredTurret
-								for k, v in pairs(turrets2[i].WiredTurret:GetChildren()) do
-									self.Contraption[#self.Contraption+1] = v
-									TurEnts[#TurEnts+1] = v
+							local turrets3 = {}
+							for i=1, #turrets2 do
+								local TurEnts = {}
+								if turrets2[i].WiredTurret ~= NULL then
+									self.Contraption[#self.Contraption+1] = turrets2[i].WiredTurret
+									TurEnts[#TurEnts+1] = turrets2[i].WiredTurret
+									for k, v in pairs(turrets2[i].WiredTurret:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v
+										TurEnts[#TurEnts+1] = v
+										for k2, v2 in pairs(v:GetChildren()) do
+											self.Contraption[#self.Contraption+1] = v2
+											TurEnts[#TurEnts+1] = v2
+											if v2:GetClass() == "dak_turretcontrol" then
+												turrets3[#turrets3+1] = v2
+											end
+										end
+									end
+								end
+								if turrets2[i].WiredGun ~= NULL then
+									self.Contraption[#self.Contraption+1] = turrets2[i].WiredGun:GetParent():GetParent()
+									TurEnts[#TurEnts+1] = turrets2[i].WiredGun:GetParent():GetParent()
+									for k, v in pairs(turrets2[i].WiredGun:GetParent():GetParent():GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v
+										TurEnts[#TurEnts+1] = v
+										for k2, v2 in pairs(v:GetChildren()) do
+											self.Contraption[#self.Contraption+1] = v2
+											TurEnts[#TurEnts+1] = v2
+											if v2:GetClass() == "dak_turretcontrol" then
+												turrets3[#turrets3+1] = v2
+											end
+										end
+									end
+								end
+								turrets2[i].Extra = TurEnts
+							end
+
+							--just gonna stop it right here, if people have turrets on their turrets on their turrets that's fine, but I'm not going a step further
+
+							--local turrets4 = {}
+							for i=1, #turrets3 do
+								local TurEnts = {}
+								if turrets3[i].WiredTurret ~= NULL then
+									self.Contraption[#self.Contraption+1] = turrets3[i].WiredTurret
+									TurEnts[#TurEnts+1] = turrets3[i].WiredTurret
+									for k, v in pairs(turrets3[i].WiredTurret:GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v
+										TurEnts[#TurEnts+1] = v
+										for k2, v2 in pairs(v:GetChildren()) do
+											self.Contraption[#self.Contraption+1] = v2
+											TurEnts[#TurEnts+1] = v2
+											--if v2:GetClass() == "dak_turretcontrol" then
+											--	turrets4[#turrets4+1] = v2
+											--end
+										end
+									end
+								end
+								if turrets3[i].WiredGun ~= NULL then
+									self.Contraption[#self.Contraption+1] = turrets3[i].WiredGun:GetParent():GetParent()
+									TurEnts[#TurEnts+1] = turrets3[i].WiredGun:GetParent():GetParent()
+									for k, v in pairs(turrets3[i].WiredGun:GetParent():GetParent():GetChildren()) do
+										self.Contraption[#self.Contraption+1] = v
+										TurEnts[#TurEnts+1] = v
+										for k2, v2 in pairs(v:GetChildren()) do
+											self.Contraption[#self.Contraption+1] = v2
+											TurEnts[#TurEnts+1] = v2
+											--if v2:GetClass() == "dak_turretcontrol" then
+											--	turrets4[#turrets4+1] = v2
+											--end
+										end
+									end
+								end
+								turrets3[i].Extra = TurEnts
+							end
+
+							table.Add( self.Contraption, GetPhysCons( self.Base ) )
+
+							if table.Count(GetPhysCons( self.Base )) > 0 then
+								for k, v in pairs(GetPhysCons( self.Base )) do
 									for k2, v2 in pairs(v:GetChildren()) do
 										self.Contraption[#self.Contraption+1] = v2
-										TurEnts[#TurEnts+1] = v2
-										if v2:GetClass() == "dak_turretcontrol" then
-											turrets3[#turrets3+1] = v2
+										for k3, v3 in pairs(v2:GetChildren()) do
+											self.Contraption[#self.Contraption+1] = v3
 										end
 									end
 								end
 							end
-							if turrets2[i].WiredGun ~= NULL then
-								self.Contraption[#self.Contraption+1] = turrets2[i].WiredGun:GetParent():GetParent()
-								TurEnts[#TurEnts+1] = turrets2[i].WiredGun:GetParent():GetParent()
-								for k, v in pairs(turrets2[i].WiredGun:GetParent():GetParent():GetChildren()) do
-									self.Contraption[#self.Contraption+1] = v
-									TurEnts[#TurEnts+1] = v
-									for k2, v2 in pairs(v:GetChildren()) do
-										self.Contraption[#self.Contraption+1] = v2
-										TurEnts[#TurEnts+1] = v2
-										if v2:GetClass() == "dak_turretcontrol" then
-											turrets3[#turrets3+1] = v2
+							--PrintTable(self.Contraption)
+
+							local hash = {}
+							local res = {}
+
+							for _,v in ipairs(self.Contraption) do
+						   		if (not hash[v]) then
+						    		res[#res+1] = v
+						       		hash[v] = true
+						   		end
+							end
+							
+							self.Contraption={}
+							self.Ammoboxes={}
+							self.TurretControls={}
+							self.Guns={}
+							self.Crew={}
+							self.Motors={}
+							self.Fuel={}
+							self.Tread={}
+							self.ERA={}
+							self.DETAIL={}
+							self.Seats={}
+							self.Components={}
+							self.GunCount = 0
+							self.MachineGunCount = 0
+
+							self.RHAWeight = 0
+							self.CHAWeight = 0
+							self.HHAWeight = 0
+							self.NERAWeight = 0
+							self.StillbrewWeight = 0
+							self.TextoliteWeight = 0
+							self.ConcreteWeight = 0
+							self.ERAWeight = 0
+
+							local CurrentRes
+							self.Clips = {}
+							for i=1, #res do
+								CurrentRes = res[i]
+								if CurrentRes:IsValid() and CurrentRes:IsSolid() then
+									CurrentRes.DakLegit = 1
+									if IsValid(CurrentRes:GetPhysicsObject()) then
+										CurrentRes.DakLegitMass = CurrentRes:GetPhysicsObject():GetMass()
+									end
+									if CurrentRes:GetParent():IsValid() then
+										--CurrentRes:SetMoveType(MOVETYPE_NONE)
+									end
+									if CurrentRes:GetClass()=="prop_physics" and CurrentRes:GetPhysicsObject():GetMass()<=1 then
+										if table.Count(CurrentRes:GetChildren()) == 0 and CurrentRes:GetParent():IsValid() then
+											self.DETAIL[#self.DETAIL+1]=CurrentRes
+										else
+											self.Contraption[#self.Contraption+1] = CurrentRes
 										end
-									end
-								end
-							end
-							turrets2[i].Extra = TurEnts
-						end
-
-						--just gonna stop it right here, if people have turrets on their turrets on their turrets that's fine, but I'm not going a step further
-
-						--local turrets4 = {}
-						for i=1, #turrets3 do
-							local TurEnts = {}
-							if turrets3[i].WiredTurret ~= NULL then
-								self.Contraption[#self.Contraption+1] = turrets3[i].WiredTurret
-								TurEnts[#TurEnts+1] = turrets3[i].WiredTurret
-								for k, v in pairs(turrets3[i].WiredTurret:GetChildren()) do
-									self.Contraption[#self.Contraption+1] = v
-									TurEnts[#TurEnts+1] = v
-									for k2, v2 in pairs(v:GetChildren()) do
-										self.Contraption[#self.Contraption+1] = v2
-										TurEnts[#TurEnts+1] = v2
-										--if v2:GetClass() == "dak_turretcontrol" then
-										--	turrets4[#turrets4+1] = v2
-										--end
-									end
-								end
-							end
-							if turrets3[i].WiredGun ~= NULL then
-								self.Contraption[#self.Contraption+1] = turrets3[i].WiredGun:GetParent():GetParent()
-								TurEnts[#TurEnts+1] = turrets3[i].WiredGun:GetParent():GetParent()
-								for k, v in pairs(turrets3[i].WiredGun:GetParent():GetParent():GetChildren()) do
-									self.Contraption[#self.Contraption+1] = v
-									TurEnts[#TurEnts+1] = v
-									for k2, v2 in pairs(v:GetChildren()) do
-										self.Contraption[#self.Contraption+1] = v2
-										TurEnts[#TurEnts+1] = v2
-										--if v2:GetClass() == "dak_turretcontrol" then
-										--	turrets4[#turrets4+1] = v2
-										--end
-									end
-								end
-							end
-							turrets3[i].Extra = TurEnts
-						end
-
-						table.Add( self.Contraption, GetPhysCons( self.Base ) )
-
-						if table.Count(GetPhysCons( self.Base )) > 0 then
-							for k, v in pairs(GetPhysCons( self.Base )) do
-								for k2, v2 in pairs(v:GetChildren()) do
-									self.Contraption[#self.Contraption+1] = v2
-									for k3, v3 in pairs(v2:GetChildren()) do
-										self.Contraption[#self.Contraption+1] = v3
-									end
-								end
-							end
-						end
-						--PrintTable(self.Contraption)
-
-						local hash = {}
-						local res = {}
-
-						for _,v in ipairs(self.Contraption) do
-					   		if (not hash[v]) then
-					    		res[#res+1] = v
-					       		hash[v] = true
-					   		end
-						end
-						
-						self.Contraption={}
-						self.Ammoboxes={}
-						self.TurretControls={}
-						self.Guns={}
-						self.Crew={}
-						self.Motors={}
-						self.Fuel={}
-						self.Tread={}
-						self.ERA={}
-						self.DETAIL={}
-						self.Seats={}
-						self.GunCount = 0
-						self.MachineGunCount = 0
-
-						self.RHAWeight = 0
-						self.CHAWeight = 0
-						self.HHAWeight = 0
-						self.NERAWeight = 0
-						self.StillbrewWeight = 0
-						self.TextoliteWeight = 0
-						self.ConcreteWeight = 0
-						self.ERAWeight = 0
-
-						local CurrentRes
-						self.Clips = {}
-						for i=1, #res do
-							CurrentRes = res[i]
-							if CurrentRes:IsValid() and CurrentRes:IsSolid() then
-								if CurrentRes:GetParent():IsValid() then
-									--CurrentRes:SetMoveType(MOVETYPE_NONE)
-								end
-								if CurrentRes:GetClass()=="prop_physics" and CurrentRes:GetPhysicsObject():GetMass()<=1 then
-									if table.Count(CurrentRes:GetChildren()) == 0 and CurrentRes:GetParent():IsValid() then
-										self.DETAIL[#self.DETAIL+1]=CurrentRes
 									else
 										self.Contraption[#self.Contraption+1] = CurrentRes
 									end
-								else
-									self.Contraption[#self.Contraption+1] = CurrentRes
-								end
-								if CurrentRes:GetClass()=="dak_tegearbox" or CurrentRes:GetClass()=="dak_tegearboxnew" then
-									CurrentRes.DakTankCore = self
-									CurrentRes.Controller = self
-									self.Gearbox = CurrentRes
-								end
-								if CurrentRes:GetClass()=="dak_tefuel" then
-									self.Fuel[#self.Fuel+1] = CurrentRes
-								end
-								if CurrentRes:GetClass()=="dak_temotor" then
-									self.Motors[#self.Motors+1] = CurrentRes
-								end
-								if CurrentRes:GetClass() == "dak_teammo" then
-									local boxname = (string.Split( CurrentRes.DakAmmoType, "" ))
-									local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
-									local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
-									local name2 = boxname[#boxname-5]..boxname[#boxname-4]
-									--check longest to shortest names, with if then ifelse then else
-									local name 
-									if name6 == "APFSDS" or name6 == "HEATFS" then
-										name = name6
-									elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
-										name = name4
-									elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
-										name = name2
+									if CurrentRes:GetClass()=="dak_tegearbox" or CurrentRes:GetClass()=="dak_tegearboxnew" then
+										CurrentRes.DakTankCore = self
+										CurrentRes.Controller = self
+										self.Gearbox = CurrentRes
+										self.Components[#self.Components+1] = CurrentRes
 									end
-									if name == "APFSDS" then
-										self.Modern = 1
+									if CurrentRes:GetClass()=="dak_tefuel" then
+										self.Fuel[#self.Fuel+1] = CurrentRes
+										self.Components[#self.Components+1] = CurrentRes
 									end
-									if name == "HEATFS" or name == "ATGM" or name == "HESH" or name == "APDS" then
-										self.ColdWar = 1
+									if CurrentRes:GetClass()=="dak_temotor" then
+										self.Motors[#self.Motors+1] = CurrentRes
+										self.Components[#self.Components+1] = CurrentRes
 									end
-									self.Ammoboxes[#self.Ammoboxes+1] = CurrentRes
-								end
-								if CurrentRes:GetClass()=="dak_tegun" then
-									CurrentRes.DakTankCore = self
-									CurrentRes.Controller = self
-									self.GunCount = self.GunCount + 1
-									self.Guns[#self.Guns+1] = CurrentRes
-								end
-								if CurrentRes:GetClass()=="dak_teautogun" then
-									CurrentRes.DakTankCore = self
-									CurrentRes.Controller = self
-									self.GunCount = self.GunCount + 1
-									self.Guns[#self.Guns+1] = CurrentRes
-								end
-								if CurrentRes:GetClass()=="dak_temachinegun" then
-									CurrentRes.DakTankCore = self
-									CurrentRes.Controller = self
-									self.MachineGunCount = self.MachineGunCount + 1
-									self.Guns[#self.Guns+1] = CurrentRes
-								end
-								if CurrentRes:GetClass()=="dak_turretcontrol" then
-									self.TurretControls[#self.TurretControls+1]=CurrentRes
-									CurrentRes.DakContraption = res
-									CurrentRes.DakCore = self
-									CurrentRes.Controller = self
-								end
-								if CurrentRes:GetClass()=="prop_vehicle_prisoner_pod" then
-									self.Seats[#self.Seats+1]=CurrentRes
-								end
-								if CurrentRes:GetClass()=="dak_crew" then
-									self.Crew[#self.Crew+1]=CurrentRes
-									CurrentRes.Controller = self
-								end
-								if CurrentRes:GetClass()=="prop_physics" then
-									CurrentRes.Controller = self
-									--clip conversion
-									if CurrentRes.ClipData and #CurrentRes.ClipData > 0 then
-										if CurrentRes.ClipData[1].physics ~= true then
-											local Clips = {}
-											local curEnt = CurrentRes
-											DTArmorSanityCheck(CurrentRes)
-											local CurArmor = CurrentRes.DakArmor
-											for j=1, #CurrentRes.ClipData do
-												local num = #self.Clips+1
-												self.Clips[num] = {}
-												self.Clips[num].ent = CurrentRes
-												self.Clips[num].armor = CurArmor
-												self.Clips[num].n = CurrentRes.ClipData[j].n
-												self.Clips[num].d = CurrentRes.ClipData[j].d
-												self.Clips[num].inside = CurrentRes.ClipData[j].inside
-											end
-											ProperClipping.RemoveClips(CurrentRes)
-											CurrentRes.ClipData = {}
+									if CurrentRes:GetClass() == "dak_teammo" then
+										local boxname = (string.Split( CurrentRes.DakAmmoType, "" ))
+										local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+										local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+										local name2 = boxname[#boxname-5]..boxname[#boxname-4]
+										--check longest to shortest names, with if then ifelse then else
+										local name 
+										if name6 == "APFSDS" or name6 == "HEATFS" then
+											name = name6
+										elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
+											name = name4
+										elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
+											name = name2
 										end
-									end
-
-									if CurrentRes.IsComposite == 1 then
-										if CurrentRes.EntityMods==nil then
-											CurrentRes.EntityMods = {}
-											CurrentRes.EntityMods.CompositeType = "NERA"
-											CurrentRes.EntityMods.CompKEMult = 9.2
-											CurrentRes.EntityMods.CompCEMult = 18.4
-											CurrentRes.EntityMods.DakName = "NERA"
+										if name == "APFSDS" then
 											self.Modern = 1
-										else
-											if CurrentRes.EntityMods.CompositeType == nil then
+										end
+										if name == "HEATFS" or name == "ATGM" or name == "HESH" or name == "APDS" then
+											self.ColdWar = 1
+										end
+										self.Ammoboxes[#self.Ammoboxes+1] = CurrentRes
+										self.Components[#self.Components+1] = CurrentRes
+									end
+									if CurrentRes:GetClass()=="dak_tegun" then
+										CurrentRes.DakTankCore = self
+										CurrentRes.Controller = self
+										self.GunCount = self.GunCount + 1
+										self.Guns[#self.Guns+1] = CurrentRes
+									end
+									if CurrentRes:GetClass()=="dak_teautogun" then
+										CurrentRes.DakTankCore = self
+										CurrentRes.Controller = self
+										self.GunCount = self.GunCount + 1
+										self.Guns[#self.Guns+1] = CurrentRes
+									end
+									if CurrentRes:GetClass()=="dak_temachinegun" then
+										CurrentRes.DakTankCore = self
+										CurrentRes.Controller = self
+										self.MachineGunCount = self.MachineGunCount + 1
+										self.Guns[#self.Guns+1] = CurrentRes
+									end
+									if CurrentRes:GetClass()=="dak_turretcontrol" then
+										self.TurretControls[#self.TurretControls+1]=CurrentRes
+										self.Components[#self.Components+1] = CurrentRes
+										CurrentRes.DakContraption = res
+										CurrentRes.DakCore = self
+										CurrentRes.Controller = self
+									end
+									if CurrentRes:GetClass()=="prop_vehicle_prisoner_pod" then
+										self.Seats[#self.Seats+1]=CurrentRes
+									end
+									if CurrentRes:GetClass()=="dak_crew" then
+										self.Crew[#self.Crew+1]=CurrentRes
+										self.Components[#self.Components+1] = CurrentRes
+										CurrentRes.Controller = self
+									end
+									if CurrentRes:GetClass()=="prop_physics" then
+										CurrentRes.Controller = self
+										--print("here")
+										--hugely cursed physical parent stuff
+										--[[
+										if CurrentRes~=self.Base and CurrentRes.DakMovement ~= true and IsValid(CurrentRes:GetParent()) then
+											if IsValid(CurrentRes:GetParent():GetParent()) and CurrentRes:GetParent():GetParent()==self.Base then
+												print(CurrentRes:GetMoveType())
+												print(CurrentRes:GetCollisionGroup())
+												CurrentRes:RemoveEFlags(EFL_NO_THINK_FUNCTION)
+												--CurrentRes:RemoveEFlags(EFL_NO_GAME_PHYSICS_SIMULATION) --
+												--CurrentRes:RemoveSolidFlags(FSOLID_NOT_SOLID) --
+												CurrentRes:SetCollisionGroup(COLLISION_GROUP_WORLD)
+												CurrentRes:GetPhysicsObject():EnableMotion(false)
+												--CurrentRes:PhysicsInitShadow( true, true )
+												CurrentRes:SetSolid( MOVETYPE_VPHYSICS )
+												CurrentRes:SetMoveType( MOVETYPE_VPHYSICS )
+												--CurrentRes:GetPhysicsObject():RecheckCollisionFilter()
+												CurrentRes.Controller = self
+												CurrentRes.BaseLocalOffset = self.Base:WorldToLocal(CurrentRes:GetPos())
+												CurrentRes.DakUpdatePhys = true
+												--CurrentRes:GetPhysicsObject():ClearGameFlag(FVPHYSICS_CONSTRAINT_STATIC) --
+												--CurrentRes:GetPhysicsObject():AddGameFlag(FVPHYSICS_PLAYER_HELD) --
+												CurrentRes:AddEFlags(EFL_SERVER_ONLY)
+												CurrentRes.SolidMod = false
+												CurrentRes:SetCustomCollisionCheck( true )
+											end
+										end
+										if CurrentRes==self.Base then
+											CurrentRes:SetCollisionGroup(COLLISION_GROUP_WORLD)
+											CurrentRes:GetPhysicsObject():RecheckCollisionFilter()
+											CurrentRes:SetCustomCollisionCheck( true )
+										end
+										]]--
+										--clip conversion
+										if CurrentRes.ClipData and #CurrentRes.ClipData > 0 then
+											if CurrentRes.ClipData[1].physics ~= true then
+												local Clips = {}
+												local curEnt = CurrentRes
+												DTArmorSanityCheck(CurrentRes)
+												local CurArmor = CurrentRes.DakArmor
+												for j=1, #CurrentRes.ClipData do
+													local num = #self.Clips+1
+													self.Clips[num] = {}
+													self.Clips[num].ent = CurrentRes
+													self.Clips[num].armor = CurArmor
+													self.Clips[num].n = CurrentRes.ClipData[j].n
+													self.Clips[num].d = CurrentRes.ClipData[j].d
+													self.Clips[num].inside = CurrentRes.ClipData[j].inside
+												end
+												ProperClipping.RemoveClips(CurrentRes)
+												CurrentRes.ClipData = {}
+											end
+										end
+
+										if CurrentRes.IsComposite == 1 then
+											if CurrentRes.EntityMods==nil then
+												CurrentRes.EntityMods = {}
 												CurrentRes.EntityMods.CompositeType = "NERA"
 												CurrentRes.EntityMods.CompKEMult = 9.2
 												CurrentRes.EntityMods.CompCEMult = 18.4
 												CurrentRes.EntityMods.DakName = "NERA"
 												self.Modern = 1
+											else
+												if CurrentRes.EntityMods.CompositeType == nil then
+													CurrentRes.EntityMods.CompositeType = "NERA"
+													CurrentRes.EntityMods.CompKEMult = 9.2
+													CurrentRes.EntityMods.CompCEMult = 18.4
+													CurrentRes.EntityMods.DakName = "NERA"
+													self.Modern = 1
+												end
 											end
 										end
-									end
-									if CurrentRes.EntityMods==nil then
-									else
-										if CurrentRes.EntityMods.CompositeType == nil and CurrentRes.IsComposite == nil then
-											if CurrentRes.EntityMods.ArmorType == nil then
-												self.RHAWeight = self.RHAWeight + CurrentRes:GetPhysicsObject():GetMass()
-											else
-												if CurrentRes.EntityMods.ArmorType == "RHA" then
-													CurrentRes.EntityMods.Density = 7.8125
-													CurrentRes.EntityMods.ArmorMult = 1
-													CurrentRes.EntityMods.Ductility = 1
+										if CurrentRes.EntityMods==nil then
+										else
+											if CurrentRes.EntityMods.CompositeType == nil and CurrentRes.IsComposite == nil then
+												if CurrentRes.EntityMods.ArmorType == nil then
 													self.RHAWeight = self.RHAWeight + CurrentRes:GetPhysicsObject():GetMass()
-												end
-												if CurrentRes.EntityMods.ArmorType == "CHA" then
-													CurrentRes.EntityMods.Density = 7.8125
-													CurrentRes.EntityMods.ArmorMult = 1
-													CurrentRes.EntityMods.Ductility = 1.5
-													self.CHAWeight = self.CHAWeight + CurrentRes:GetPhysicsObject():GetMass()
-												end
-												if CurrentRes.EntityMods.ArmorType == "HHA" then
-													CurrentRes.EntityMods.Density = 7.8125
-													CurrentRes.EntityMods.ArmorMult = 1
-													CurrentRes.EntityMods.Ductility = 1.5
-													self.HHAWeight = self.HHAWeight + CurrentRes:GetPhysicsObject():GetMass()
-												end
-											end
-										else
-											if CurrentRes.EntityMods.CompositeType == "NERA" then
-												self.Modern = 1
-												local Density = 2000
-												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
-												self.NERAWeight = self.NERAWeight + CurrentRes:GetPhysicsObject():GetMass()
-											end
-											if CurrentRes.EntityMods.CompositeType == "Stillbrew" then
-												self.Modern = 1
-												local Density = 5750
-												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
-												self.StillbrewWeight = self.StillbrewWeight + CurrentRes:GetPhysicsObject():GetMass()
-											end
-											if CurrentRes.EntityMods.CompositeType == "Textolite" then
-												self.ColdWar = 1
-												local Density = 1850
-												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
-												self.TextoliteWeight = self.TextoliteWeight + CurrentRes:GetPhysicsObject():GetMass()
-											end
-											if CurrentRes.EntityMods.CompositeType == "Concrete" then
-												local Density = 2400
-												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
-												self.ConcreteWeight = self.ConcreteWeight + CurrentRes:GetPhysicsObject():GetMass()
-											end
-											if CurrentRes.EntityMods.CompositeType == "ERA" then
-												self.ColdWar = 1
-												local Density = 1732
-												CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
-												self.ERAWeight = self.ERAWeight + CurrentRes:GetPhysicsObject():GetMass()
-												self.ERA[#self.ERA+1]=CurrentRes
-											end
-										end
-									end
-								end
-								if CurrentRes:GetPhysicsObject():IsValid() then
-									Mass = Mass + CurrentRes:GetPhysicsObject():GetMass()
-									if IsValid(CurrentRes:GetParent()) then
-										ParentMass = ParentMass + CurrentRes:GetPhysicsObject():GetMass()
-									end
-									if CurrentRes:GetPhysicsObject():GetSurfaceArea() then
-										if CurrentRes:GetPhysicsObject():GetMass()>1 then
-											SA = SA + CurrentRes:GetPhysicsObject():GetSurfaceArea()
-										end
-									else
-										self.Tread[#self.Tread+1]=CurrentRes
-									end
-								end
-							end
-						end
-
-						if self.Clips and #self.Clips > 0 then
-							self.DakOwner:ChatPrint((#self.Clips).." visclips detected, they are now physical clips, please save your vehicle and respawn to finalize.")
-							for i=1,#self.Clips do
-								if self.Clips ~= nil and self.Clips[i] ~= nil then
-									ProperClipping.AddClip(self.Clips[i].ent, self.Clips[i].n:Forward(), self.Clips[i].d, self.Clips[i].inside, true)
-									if self.Clips[i].armor ~= nil then
-										local SA = self.Clips[i].ent:GetPhysicsObject():GetSurfaceArea()
-										local mass = math.ceil(((self.Clips[i].armor/1/(288/SA))/7.8125)*4.6311781,0)
-										self.Clips[i].ent.EntityMods.DakClippedArmor = self.Clips[i].armor
-										if mass > 0 then
-											SetMass( self.DakOwner, self.Clips[i].ent, { Mass = mass } )
-											self.Clips[i].ent:GetPhysicsObject():SetMass(mass)
-										end
-									end
-								end
-							end
-						end
-
-						--PrintTable(self.Contraption)
-						self.CrewCount = #self.Crew
-						WireLib.TriggerOutput(self, "Crew", self.CrewCount)
-						if IsValid(self.Gearbox) then
-							self.Gearbox.TotalMass = Mass
-							self.Gearbox.ParentMass = ParentMass
-							self.Gearbox.PhysicalMass = Mass-ParentMass
-						end
-
-						if IsValid(self.Tread[1]) then
-							if self.Tread[1]:GetPhysicsObject():GetMaterial()~="jeeptire" then
-								for i=1, table.Count(self.Tread) do
-									self.Tread[i]:GetPhysicsObject():SetMaterial("jeeptire")
-								end
-							end
-						end
-						self.TotalMass = Mass
-						self.ParMass = ParentMass
-						self.PhysMass = Mass-ParentMass
-						self.SurfaceArea = SA
-						self.SizeMult = (SA/Mass)*0.18
-					end
-
-					--local debugtime = SysTime()
-					if self.recheckmass == nil or (self.recheckmass >= 0 and self.MassUpdate == 1) then
-						--print("secondary run")
-						local CurrentRes
-						local Mass = 0
-						local ParentMass = 0 
-						local SA = 0
-						for i=1, #self.Contraption do
-							CurrentRes = self.Contraption[i]
-							if CurrentRes ~= NULL and CurrentRes ~= nil and CurrentRes:IsValid() then
-								local physobj = CurrentRes:GetPhysicsObject()
-								--[[
-								if CurrentRes.PhysicsClipped == true then
-									if CurrentRes.DakMassSet ~= true then
-										if CurrentRes.EntityMods.DakClippedArmor ~= nil then
-											local SA = physobj:GetSurfaceArea()
-											local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
-											if mass > 0 then
-												SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
-												physobj:SetMass(mass)
-											end
-											CurrentRes.DakMassSet = true
-										end
-									end
-								end
-								]]--
-								
-
-								if physobj:IsValid() then
-									local physmass = physobj:GetMass()
-									Mass = Mass + physmass
-									if IsValid(CurrentRes:GetParent()) then
-										ParentMass = ParentMass + physmass
-									end
-								end
-							end
-						end
-						if IsValid(self.Gearbox) then
-							self.Gearbox.TotalMass = Mass
-							self.Gearbox.ParentMass = ParentMass
-							self.Gearbox.PhysicalMass = Mass-ParentMass
-						end
-						self.TotalMass = Mass
-						self.ParMass = ParentMass
-						self.PhysMass = Mass-ParentMass
-						self.recheckmass = 0
-						self.MassUpdate = 0
-					end
-					--print("Total: "..(SysTime()-debugtime))
-					self.recheckmass = self.recheckmass+1
-
-					if table.Count(self.HitBox) == 0 then
-						WireLib.TriggerOutput(self, "Health", self.DakHealth)
-						WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
-					end
-					--SETUP HEALTHPOOL
-					if table.Count(self.HitBox) == 0 and self.Contraption and (IsValid(self.Gearbox) or (self.TurretControls~=nil and IsValid(self.TurretControls[1]))) then
-						if #self.Contraption>=1 then
-							self.Remake = 0
-							self.DakPooled = 1
-							self.DakEngine = self
-							self.Controller = self
-							if #self.Contraption>0 then
-								local ContraptionCurrent
-								self.HitBox = {}
-								self.ERA = {}
-								for i=1, #self.Contraption do
-									ContraptionCurrent = self.Contraption[i]
-									if ContraptionCurrent.Controller == nil or ContraptionCurrent.Controller == NULL or ContraptionCurrent.Controller == self then
-										if IsValid(ContraptionCurrent) then
-											if ContraptionCurrent.DakName == nil and (ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA~=1) then
-												if ContraptionCurrent:IsSolid() then
-													self.HitBox[#self.HitBox+1] = ContraptionCurrent
-													ContraptionCurrent.Controller = self
-													ContraptionCurrent.DakOwner = self.DakOwner
-													ContraptionCurrent.DakPooled = 1
+												else
+													if CurrentRes.EntityMods.ArmorType == "RHA" then
+														CurrentRes.EntityMods.Density = 7.8125
+														CurrentRes.EntityMods.ArmorMult = 1
+														CurrentRes.EntityMods.Ductility = 1
+														self.RHAWeight = self.RHAWeight + CurrentRes:GetPhysicsObject():GetMass()
+													end
+													if CurrentRes.EntityMods.ArmorType == "CHA" then
+														CurrentRes.EntityMods.Density = 7.8125
+														CurrentRes.EntityMods.ArmorMult = 1
+														CurrentRes.EntityMods.Ductility = 1.5
+														self.CHAWeight = self.CHAWeight + CurrentRes:GetPhysicsObject():GetMass()
+													end
+													if CurrentRes.EntityMods.ArmorType == "HHA" then
+														CurrentRes.EntityMods.Density = 7.8125
+														CurrentRes.EntityMods.ArmorMult = 1
+														CurrentRes.EntityMods.Ductility = 1.5
+														self.HHAWeight = self.HHAWeight + CurrentRes:GetPhysicsObject():GetMass()
+													end
 												end
 											else
-												if ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA==1 then
-													self.ERA[#self.ERA+1] = ContraptionCurrent
-													ContraptionCurrent.Controller = self
-													ContraptionCurrent.DakOwner = self.DakOwner
-													ContraptionCurrent.DakPooled = 1
-													ContraptionCurrent.DakHealth = 5
-													ContraptionCurrent.DakMaxHealth = 5
+												if CurrentRes.EntityMods.CompositeType == "NERA" then
+													self.Modern = 1
+													local Density = 2000
+													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													self.NERAWeight = self.NERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
-											end
-											ContraptionCurrent.Controller = self
-										end
-									end
-								end
-							end
-							self.HitBoxMass = 0
-							for i=1, table.Count(self.HitBox) do
-								self.HitBoxMass = self.HitBoxMass + self.HitBox[i]:GetPhysicsObject():GetMass()
-							end
-							self.CurrentHealth = self.BoxVolume*0.01
-							self.DakMaxHealth = self.BoxVolume*0.01
-							for i=1, table.Count(self.HitBox) do
-								DakTekTankEditionSetupNewEnt(self.HitBox[i])
-								self.HitBox[i].DakHealth = self.CurrentHealth
-								self.HitBox[i].DakMaxHealth = self.CurrentHealth
-								self.HitBox[i].Controller = self
-								self.HitBox[i].DakOwner = self.DakOwner
-								self.HitBox[i].DakPooled = 1
-							end
-							self.LastRemake = CurTime()
-						end
-					end
-					if table.Count(self.HitBox)~=0 then
-						self.DakActive = 1
-					else
-						self.DakActive = 0
-					end
-					--local debugtime = SysTime()
-					--####################OPTIMIZE ZONE START###################--
-					if self.DakActive == 1 and table.Count(self.HitBox)~=0 and self.CurrentHealth then
-						if table.Count(self.HitBox) > 0 then
-							self.LivingCrew = 0
-							if self.Crew then
-								if table.Count(self.Crew) > 0 then
-									for i = 1, table.Count(self.Crew) do
-										if not(IsValid(self.Crew[i])) then
-											table.remove( self.Crew, i )
-										else
-											if self.Crew[i].DakDead ~= true then
-												self.LivingCrew = self.LivingCrew + 1
-											end
-										end
-									end
-								end
-							end
-							
-							--print("ERA: "..(SysTime()-debugtime))
-							if self.Composites then
-								if table.Count(self.Composites) > 0 then
-									local weightvalcomp
-									for i = 1, table.Count(self.Composites) do
-										if not(IsValid(self.Composites[i])) then
-											table.remove( self.Composites, i )
-										end
-										if self.Composites[i] ~= nil then
-											self.Composites[i].IsComposite = 1
-											local Density = 2000
-											local KE = 9.2
-											if self.Composites[i].EntityMods.CompositeType == "NERA" then
-												self.Modern = 1
-												self.Composites[i].EntityMods.CompKEMult = 9.2
-												self.Composites[i].EntityMods.CompCEMult = 18.4
-												KE = 9.2
-												Density = 2000
-												self.Composites[i].EntityMods.DakName = "NERA"
-											end
-											if self.Composites[i].EntityMods.CompositeType == "Stillbrew" then
-												self.Modern = 1
-												self.Composites[i].EntityMods.CompKEMult = 23
-												self.Composites[i].EntityMods.CompCEMult = 27.6
-												KE = 23
-												Density = 5750
-												self.Composites[i].EntityMods.DakName = "Stillbrew"
-											end
-											if self.Composites[i].EntityMods.CompositeType == "Textolite" then
-												self.ColdWar = 1
-												self.Composites[i].EntityMods.CompKEMult = 10.4
-												self.Composites[i].EntityMods.CompCEMult = 14
-												KE = 10.4
-												Density = 1850
-												self.Composites[i].EntityMods.DakName = "Textolite"
-											end
-											if self.Composites[i].EntityMods.CompositeType == "Concrete" then
-												self.Composites[i].EntityMods.CompKEMult = 2.8
-												self.Composites[i].EntityMods.CompCEMult = 2.8
-												KE = 2.8
-												Density = 2400
-												self.Composites[i].EntityMods.DakName = "Concrete"
-											end
-											if self.Composites[i].EntityMods.CompositeType == "ERA" then
-												self.ColdWar = 1
-												self.Composites[i].EntityMods.CompKEMult = 2.5
-												self.Composites[i].EntityMods.CompCEMult = 88.9
-												KE = 2.5
-												Density = 1732
-												self.Composites[i].EntityMods.DakName = "ERA"
-												self.Composites[i].EntityMods.IsERA = 1
-											end
-											self.Composites[i].IsComposite = 1
-											weightvalcomp = math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density)
-											if self.Composites[i]:GetPhysicsObject():GetMass() ~= weightvalcomp then self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) ) end
-											self.Composites[i].DakArmor = 10*KE
-										end
-									end
-								end
-							end
-							--print("Comps: "..(SysTime()-debugtime))
-							local debugtime = SysTime()
-							if self.ERA then
-								if self.Base:GetPhysicsObject():IsMotionEnabled() == true then
-									self.PhysEnabled = false
-								else
-									self.PhysEnabled = true
-								end
-								if self.PhysEnabled ~= self.LastPhysEnabled and false then
-									if self.PhysEnabled == true then
-										self.ERA = {}
-										for i=1, #self.ERAInfoTable do
-											local cur = self.ERAInfoTable[i]
-											local eraplate = ents.Create("prop_physics")
-											local parentent = ents.GetByIndex( cur.Parent )
-											eraplate:SetModel(cur.Model)
-											eraplate:SetPos(parentent:LocalToWorld(cur.LocalPos))
-											eraplate:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
-											eraplate:SetMaterial(cur.Mat)
-											eraplate:SetColor(cur.Col)
-											eraplate:SetParent(parentent)
-											eraplate.EntityMods = cur.EntityMods
-											eraplate.DakName = "ERA"
-											eraplate.Controller = self
-											eraplate.DakOwner = self.DakOwner
-											eraplate.DakPooled = 1
-											eraplate.DakHealth = 5
-											eraplate.DakMaxHealth = 5
-											eraplate:PhysicsInit(SOLID_VPHYSICS)
-											--eraplate:SetMoveType(MOVETYPE_NONE)
-											eraplate:SetSolid(SOLID_VPHYSICS)
-											eraplate:CPPISetOwner(self.DakOwner)
-											self.ERA[#self.ERA+1] = eraplate
-										end
-										net.Start( "daktankcoreeraremove" )
-										net.WriteEntity( self )
-										net.Broadcast()
-									 	for i = 1, #self.ERAHandlers do
-											self.ERAHandlers[i]:SetMoveType(MOVETYPE_NONE)
-											self.ERAHandlers[i]:PhysicsInit(SOLID_NONE)
-											self.ERAHandlers[i]:Remove()
-										end
-										self.ERAHandlers = {}
-									else
-										self.ERAInfoTable = {}
-										for i = 1, table.Count(self.ERA) do
-											local cur = self.ERA[i]
-											local currentERA = {}
-											currentERA.Parent = cur:GetParent():EntIndex()
-											if not(IsValid(cur:GetParent().ERAHandler)) then
-												cur:GetParent().ERAHandler = ents.Create("prop_physics")
-											 	cur:GetParent().ERAHandler:SetAngles(cur:GetParent():GetForward():Angle())
-											 	cur:GetParent().ERAHandler:SetPos(cur:GetParent():GetPos())
-											 	cur:GetParent().ERAHandler:SetMoveType(MOVETYPE_NONE)
-											 	cur:GetParent().ERAHandler:PhysicsInit(SOLID_NONE)
-											 	cur:GetParent().ERAHandler:SetParent(cur:GetParent())
-											 	cur:GetParent().ERAHandler:SetModel( "models/props_junk/PopCan01a.mdl" )
-											 	cur:GetParent().ERAHandler:DrawShadow(false)
-											 	cur:GetParent().ERAHandler:SetColor( Color(255, 255, 255, 0) )
-											 	cur:GetParent().ERAHandler:SetRenderMode( RENDERMODE_TRANSCOLOR )
-											 	cur:GetParent().ERAHandler:Spawn()
-											 	cur:GetParent().ERAHandler:Activate()
-											 	cur:GetParent().ERAHandler:SetMoveType(MOVETYPE_NONE)
-											 	cur:GetParent().ERAHandler:PhysicsInit(SOLID_NONE)
-											 	ERAHandler:CPPISetOwner(self.DakOwner)
-											 	if self.ERAHandlers == nil then self.ERAHandlers = {} end
-												self.ERAHandlers[#self.ERAHandlers+1] = cur:GetParent().ERAHandler
-											end
-											currentERA.Model = cur:GetModel()
-											currentERA.LocalPos = cur:GetParent():WorldToLocal(cur:GetPos())
-											currentERA.LocalAng = cur:GetParent():WorldToLocalAngles(cur:GetAngles())
-											currentERA.Mat = cur:GetMaterial()
-											currentERA.Col = cur:GetColor()
-											currentERA.Mass = cur:GetPhysicsObject():GetMass()
-											currentERA.EntityMods = cur.EntityMods
-											local a,b = cur:GetPhysicsObject():GetAABB()
-											a:Rotate(cur:GetAngles())
-											b:Rotate(cur:GetAngles())
-											currentERA.mins = a
-											currentERA.maxs = b
-											cur:Remove()
-											self.ERAInfoTable[#self.ERAInfoTable+1] = currentERA
-										end
-										for j = 1, #self.ERAHandlers do
-											local VectorTables = {}
-											local Mass = 0
-											for i = 1, #self.ERAInfoTable do
-												Mass = Mass + self.ERAInfoTable[i].Mass
-												if ents.GetByIndex( self.ERAInfoTable[i].Parent ) == self.ERAHandlers[j]:GetParent() then
-													local addition = self.ERAInfoTable[i].LocalPos
-													local min = self.ERAInfoTable[i].mins + addition
-													local max = self.ERAInfoTable[i].maxs + addition
-													VectorTables[#VectorTables+1] = {
-														Vector( min.y, min.y, min.z ),
-														Vector( min.x, min.y, max.z ),
-														Vector( min.x, max.y, min.z ),
-														Vector( min.x, max.y, max.z ),
-														Vector( max.x, min.y, min.z ),
-														Vector( max.x, min.y, max.z ),
-														Vector( max.x, max.y, min.z ),
-														Vector( max.x, max.y, max.z )
-													}
-													debugoverlay.Box( ents.GetByIndex( self.ERAInfoTable[i].Parent ):LocalToWorld( self.ERAInfoTable[i].LocalPos ), self.ERAInfoTable[i].mins, self.ERAInfoTable[i].maxs, 10, Color( math.random(0,255), math.random(0,255), math.random(0,255) ) )
+												if CurrentRes.EntityMods.CompositeType == "Stillbrew" then
+													self.Modern = 1
+													local Density = 5750
+													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													self.StillbrewWeight = self.StillbrewWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
-											end
-											self.ERAHandlers[j]:PhysicsDestroy()
-											self.ERAHandlers[j]:PhysicsInitMultiConvex(VectorTables)
-											self.ERAHandlers[j]:SetSolid( SOLID_VPHYSICS )
-											--self.ERAHandlers[j]:SetParent()
-											self.ERAHandlers[j]:SetMoveType( MOVETYPE_NONE )
-											self.ERAHandlers[j]:EnableCustomCollisions( true )
-											self.ERAHandlers[j].IsEraHandler = true
-											self.ERAHandlers[j].IsComposite = 1
-											self.ERAHandlers[j].EntityMods = {}
-											self.ERAHandlers[j].EntityMods.CompKEMult = 2.5
-											self.ERAHandlers[j].EntityMods.CompCEMult = 88.9
-											self.ERAHandlers[j].DakArmor = 10*self.ERAHandlers[j].EntityMods.CompKEMult
-											self.ERAHandlers[j].DakHealth = 9999999
-											self.ERAHandlers[j].DakMaxHealth = 9999999
-											self.ERAHandlers[j].EntityMods.IsERA = 1
-											self.ERAHandlers[j].EntityMods.DakName = "ERA HANDLER"
-											self.ERAHandlers[j]:GetPhysicsObject():SetMass(Mass)
-										end
-										for i=1, math.ceil(#self.ERAInfoTable/50) do
-											local tablesegment = {}
-											for j=1+((i-1)*50), 50+((i-1)*50) do
-												tablesegment[#tablesegment+1] = self.ERAInfoTable[j]
-											end
-											net.Start( "daktankcoreera" )
-											net.WriteEntity( self )
-											net.WriteString( util.TableToJSON( tablesegment ) )
-											net.Broadcast()
-										end
-										self.ERA = {}
-									end
-									self.LastPhysEnabled = self.PhysEnabled
-								end
-								if table.Count(self.ERA) > 0 then
-									local effectdata
-									local ExpSounds = {"daktanks/eraexplosion.mp3"}
-									local EntMod 
-									for i = 1, table.Count(self.ERA) do
-										if not(IsValid(self.ERA[i])) then
-											table.remove( self.ERA, i )
-										end
-										if self.ERA[i] ~= nil and self.ERA[i] ~= NULL then
-											EntMod = self.ERA[i].EntityMods
-											if self.ERA[i].IsComposite ~= 1 then self.ERA[i].IsComposite = 1 end
-											if EntMod.CompKEMult ~= 2.5 then EntMod.CompKEMult = 2.5 end
-											if EntMod.CompCEMult ~= 88.9 then EntMod.CompCEMult = 88.9 end
-											if self.ERA[i].DakName ~= "ERA" then self.ERA[i].DakName = "ERA" end
-											if self.ERA[i].IsERA ~= 1 then self.ERA[i].IsERA = 1 end
-											if self.ColdWar ~= 1 then self.ColdWar = 1 end
-											if self.ERA[i].DakHealth <= 0 then
-												effectdata = EffectData()
-												effectdata:SetOrigin(self.ERA[i]:GetPos())
-												effectdata:SetEntity(self)
-												effectdata:SetAttachment(1)
-												effectdata:SetMagnitude(.5)
-												effectdata:SetScale(50)
-												effectdata:SetNormal( Vector(0,0,0) )
-												util.Effect("daktescalingexplosionold", effectdata, true, true)
-												sound.Play( ExpSounds[math.random(1,#ExpSounds)], self.ERA[i]:GetPos(), 100, 100, 1 )
-												self.ERA[i]:DTExplosion(self.ERA[i]:GetPos(),25,50,40,5,self.DakOwner)
-												self.ERA[i]:Remove()
-											end
-										end
-									end
-									local weightval
-									for i = 1, table.Count(self.ERA) do
-										if IsValid(self.ERA[i]) then
-											if self.ERA[i].EntityMods then
-												if self.ERA[i].EntityMods.CompositeType == "ERA" then
+												if CurrentRes.EntityMods.CompositeType == "Textolite" then
 													self.ColdWar = 1
-													self.ERA[i].EntityMods.CompKEMult = 2.5
-													self.ERA[i].EntityMods.CompCEMult = 88.9
-													self.ERA[i].EntityMods.DakName = "ERA"
-													self.ERA[i].EntityMods.IsERA = 1
+													local Density = 1850
+													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													self.TextoliteWeight = self.TextoliteWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
-												local weightval = math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) 
-												if self.ERA[i]:GetPhysicsObject():GetMass() ~= weightval then self.ERA[i]:GetPhysicsObject():SetMass( weightval ) end
-												self.ERA[i].DakArmor = 2.5
-											end
-										end
-									end
-								end
-							end
-							if self.DETAIL then
-								if self.Base:GetPhysicsObject():IsMotionEnabled() == true then
-									self.PhysEnabled = false
-								else
-									self.PhysEnabled = true
-								end
-								if self.PhysEnabled ~= self.LastPhysEnabled then
-									if self.PhysEnabled == true then
-										self.DETAIL = {}
-										for i=1, #self.DetailInfoTable do
-											local cur = self.DetailInfoTable[i]
-											local detailpiece = ents.Create("prop_physics")
-											local parentent = ents.GetByIndex( cur.Parent )
-											detailpiece:SetModel(cur.Model)
-											detailpiece:SetPos(parentent:LocalToWorld(cur.LocalPos))
-											detailpiece:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
-											detailpiece:SetMaterial(cur.Mat)
-											detailpiece:SetBodyGroups(cur.Bodygroups)
-											detailpiece:SetSkin(cur.Skin)
-											for j=1, #cur.SubMaterials do
-												detailpiece:SetSubMaterial( j, cur.SubMaterials[j] )
-											end
-											detailpiece:SetColor(cur.Col)
-											detailpiece:SetParent(parentent)
-											detailpiece.EntityMods = cur.EntityMods
-											--detailpiece.ClipData = cur.ClipData
-											detailpiece:PhysicsInit(SOLID_VPHYSICS)
-											--detailpiece:SetMoveType(MOVETYPE_NONE)
-											detailpiece:SetSolid(SOLID_VPHYSICS)
-											detailpiece:CPPISetOwner(self.DakOwner)
-											if cur.ClipData ~= nil then
-												for j=1, #cur.ClipData do
-													ProperClipping.AddClip(detailpiece, cur.ClipData[j].n:Forward(), cur.ClipData[j].d, cur.ClipData[j].inside, true)
+												if CurrentRes.EntityMods.CompositeType == "Concrete" then
+													local Density = 2400
+													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													self.ConcreteWeight = self.ConcreteWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
-											end
-											self.DETAIL[#self.DETAIL+1] = detailpiece
-										end
-										net.Start( "daktankcoredetailremove" )
-										net.WriteEntity( self )
-										net.Broadcast()
-									else
-										--Crew checking
-										for i = 1, #self.Crew do
-											--get angle and kill if upwards direction is over 45 degrees from upwards compared to baseplate
-											if self.Crew[i]:IsValid() then
-												local crewang = self.ForwardEnt:WorldToLocalAngles(self.Crew[i]:GetAngles())
-												local a = crewang:Up()
-												local b = self.Forward:Angle():Up()
-												local ans = math.acos(a:Dot(b) / (a:Length() * b:Length()))
-												if math.Round(math.deg(ans),2) > 45 then
-													self.Crew[i].DakHealth = 0
-													if self.Crew[i].DakOwner:IsPlayer() then
-														if self.Crew[i].Job == 1 then
-															self.Crew[i].DakOwner:ChatPrint("Gunner Angle Invalid, Ejecting!") 
-														elseif self.Crew[i].Job == 2 then
-															self.Crew[i].DakOwner:ChatPrint("Driver Angle Invalid, Ejecting!") 
-														elseif self.Crew[i].Job == 3 then
-															self.Crew[i].DakOwner:ChatPrint("Loader Angle Invalid, Ejecting!") 
-														else
-															self.Crew[i].DakOwner:ChatPrint("Passenger Angle Invalid, Ejecting!") 
-														end
-													end
-													self.Crew[i]:SetMaterial("models/flesh")
-													self.Crew[i].DakDead = true
-													self.Crew[i]:Remove()
-												end
-											end
-											--kill if clipping other crew
-											if self.Crew[i]:IsValid() then
-												local bounds = self.Crew[i]:GetModelBounds()
-												bounds = math.min(math.abs(bounds.x),math.abs(bounds.y),math.abs(bounds.z))*1.9
-												for j = 1, #self.Crew do
-													if self.Crew[i] ~= self.Crew[j] then
-														if self.Crew[i]:GetPos():Distance(self.Crew[j]:GetPos()) < bounds then
-															self.Crew[i].DakHealth = 0
-															if self.Crew[i].DakOwner:IsPlayer() then
-																if self.Crew[i].Job == 1 then
-																	self.Crew[i].DakOwner:ChatPrint("Gunner Clipping Crew, Ejecting!") 
-																elseif self.Crew[i].Job == 2 then
-																	self.Crew[i].DakOwner:ChatPrint("Driver Clipping Crew, Ejecting!") 
-																elseif self.Crew[i].Job == 3 then
-																	self.Crew[i].DakOwner:ChatPrint("Loader Clipping Crew, Ejecting!") 
-																else
-																	self.Crew[i].DakOwner:ChatPrint("Passenger Clipping Crew, Ejecting!") 
-																end
-															end
-															self.Crew[i]:SetMaterial("models/flesh")
-															self.Crew[i].DakDead = true
-															self.Crew[i]:Remove()
-														end
-													end
+												if CurrentRes.EntityMods.CompositeType == "ERA" then
+													self.ColdWar = 1
+													local Density = 1732
+													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													self.ERAWeight = self.ERAWeight + CurrentRes:GetPhysicsObject():GetMass()
+													self.ERA[#self.ERA+1]=CurrentRes
 												end
 											end
 										end
-										--
-										--Phys hitbox creation
-										--[[
-											print("here")
-											local mins = Vector(-self.BestWidth,-self.BestLength,0)
-											local maxs = Vector(self.BestWidth,self.BestLength,self.BestHeight)
-											print(mins)
-											print(maxs)
-											self.PhysHitBox = ents.Create("prop_physics")
-											self.PhysHitBox:SetPos(self.Base:GetPos())
-											self.PhysHitBox:SetModel("models/props_interiors/pot01a.mdl")
-											self.PhysHitBox:SetAngles(self.Forward:Angle())
-											self.PhysHitBox:Spawn()
-											self.PhysHitBox:SetCollisionBounds( mins, maxs )
-											self.PhysHitBox:SetCustomCollisionCheck( true )
-											self.PhysHitBox:EnableCustomCollisions(true)
-											self.PhysHitBox:PhysicsInitBox( mins, maxs )
-									        self.PhysHitBox:SetSolid( SOLID_VPHYSICS )
-									        self.PhysHitBox:PhysWake()
-									        self.PhysHitBox:GetPhysicsObject():EnableMotion(false)
-									        self.PhysHitBox:GetPhysicsObject():EnableCollisions( true )
-									        self.PhysHitBox:GetPhysicsObject():EnableDrag(false)
-									        self.PhysHitBox:GetPhysicsObject():SetMass(0.01)
-									        self.PhysHitBox:GetPhysicsObject():SetBuoyancyRatio(0)
-									        --self.PhysHitBox:PhysicsInitShadow()
-									        self.PhysHitBox:SetParent(self.Base)
-									        ]]
-										--
-										self.DetailInfoTable = {}
-										for i = 1, table.Count(self.DETAIL) do
-											local cur = self.DETAIL[i]
-											local currentDetail = {}
-											currentDetail.Parent = cur:GetParent():EntIndex()
-											currentDetail.Model = cur:GetModel()
-											currentDetail.LocalPos = cur:GetParent():WorldToLocal(cur:GetPos())
-											currentDetail.LocalAng = cur:GetParent():WorldToLocalAngles(cur:GetAngles())
-											currentDetail.Mat = cur:GetMaterial()
-											currentDetail.Col = cur:GetColor()
-											currentDetail.EntityMods = cur.EntityMods
-											currentDetail.ClipData = cur.ClipData
-											currentDetail.SubMaterials = {}
-											local bodygroupstring = ""
-											if #cur:GetBodyGroups() > 0 then
-												for j=0, #cur:GetBodyGroups() do
-													bodygroupstring = bodygroupstring..cur:GetBodygroup( j )
-												end
-											end
-											currentDetail.Bodygroups = bodygroupstring
-											currentDetail.Skin = cur:GetSkin()
-											for j = 0, 31 do
-												currentDetail.SubMaterials[j] = cur:GetSubMaterial( j )
-											end
-											cur:Remove()
-											self.DetailInfoTable[#self.DetailInfoTable+1] = currentDetail
-										end
-										for i=1, math.ceil(#self.DetailInfoTable/50) do
-											local tablesegment = {}
-											for j=1+((i-1)*50), 50+((i-1)*50) do
-												tablesegment[#tablesegment+1] = self.DetailInfoTable[j]
-											end
-											net.Start( "daktankcoredetail" )
-											net.WriteEntity( self )
-											net.WriteString( util.TableToJSON( tablesegment ) )
-											net.Broadcast()
-										end
-										self.DETAIL = {}
 									end
-									self.LastPhysEnabled = self.PhysEnabled
-								end
-							end
-							--print("Total: "..(SysTime()-debugtime))
-							--print("ERA2: "..(SysTime()-debugtime))
-							self.DamageCycle = 0
-							self.LastDamagedBy = NULL
-							if self.DakHealth < self.CurrentHealth then
-								self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.DakHealth)
-								self.DakLastDamagePos = self.DakLastDamagePos	
-							end
-							self.Remake = 0
-							self.LastCurMass = self.CurMass
-							self.CurMass = 0
-							for i = 1, table.Count(self.HitBox) do
-								if self.HitBox[i].Controller ~= self then
-									self.Remake = 1	
-								end
-								if self.Remake == 1 then
-									if self.HitBox[i].Controller == self then
-										self.HitBox[i].DakPooled = 0
-										self.HitBox[i].Controller = nil
-									end
-								end
-								if self.LastCurMass>0 then
-									if self.HitBox[i].DakHealth then
-										if self.HitBox[i].DakHealth < self.CurrentHealth then
-											if self.HitBox[i].EntityMods.IsERA == 1 then
-												table.RemoveByValue( self.Composites, NULL )
-												table.RemoveByValue( self.HitBox, NULL )
-											end
-											self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.HitBox[i].DakHealth)
-											self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos
-											self.LastDamagedBy = self.HitBox[i].LastDamagedBy
+									if CurrentRes:GetPhysicsObject():IsValid() then
+										Mass = Mass + CurrentRes:GetPhysicsObject():GetMass()
+										if IsValid(CurrentRes:GetParent()) then
+											ParentMass = ParentMass + CurrentRes:GetPhysicsObject():GetMass()
 										end
-									end
-								end
-								if self.Remake == 1 then
-									self.HitBox = {}
-									self.Remake = 0
-									break
-								end
-								if self.HitBox[i]~=NULL then
-									if self.HitBox[i].Controller == self then
-										if self.HitBox[i]:IsSolid() then
-											self.CurMass = self.CurMass + self.HitBox[i]:GetPhysicsObject():GetMass()
+										if CurrentRes:GetPhysicsObject():GetSurfaceArea() then
+											if CurrentRes:GetPhysicsObject():GetMass()>1 then
+												SA = SA + CurrentRes:GetPhysicsObject():GetSurfaceArea()
+											end
+										else
+											self.Tread[#self.Tread+1]=CurrentRes
 										end
 									end
 								end
 							end
-							--print("Hitbox: "..(SysTime()-debugtime))
-							if not(self.CurMass>self.LastCurMass) then
-								if self.DamageCycle>0 then
-									if self.LastRemake+3 > CurTime() then
-										self.DamageCycle = 0
-									end
-									self.CurrentHealth = self.CurrentHealth-self.DamageCycle
-								end
-							end
-							if self.CurrentHealth >= self.DakMaxHealth then
-								self.DakMaxHealth = self.BoxVolume*0.01
-								self.CurrentHealth = self.BoxVolume*0.01
-							end
-							for i = 1, table.Count(self.HitBox) do
-								if self.CurrentHealth >= self.DakMaxHealth then
-									self.HitBox[i].DakMaxHealth = self.BoxVolume*0.01
-								end
-								self.HitBox[i].DakHealth = self.CurrentHealth
-							end
-							self.DakHealth = self.CurrentHealth
-							
-							local curvel = self.Base:GetVelocity()
-							if self.LastVel == nil then
-								self.LastVel = curvel
-							end
-							if curvel:Distance(self.LastVel) > 1000 then
-								for i=1, #self.Crew do
-									self.Crew[i].DakHealth = self.Crew[i].DakHealth - ((curvel:Distance(self.LastVel)-1000)/100)
 
-									if self.Crew[i].DakHealth <= 0 then
-										if self.Crew[i].DakOwner:IsPlayer() then
-											if self.Crew[i].Job == 1 then
-												self.Crew[i].DakOwner:ChatPrint("Gunner Killed!") 
-											elseif self.Crew[i].Job == 2 then
-												self.Crew[i].DakOwner:ChatPrint("Driver Killed!") 
-											elseif self.Crew[i].Job == 3 then
-												self.Crew[i].DakOwner:ChatPrint("Loader Killed!") 
-											else
-												self.Crew[i].DakOwner:ChatPrint("Passenger Killed!") 
+							if self.Clips and #self.Clips > 0 then
+								self.DakOwner:ChatPrint((#self.Clips).." visclips detected, they are now physical clips, please save your vehicle and respawn to finalize.")
+								for i=1,#self.Clips do
+									if self.Clips ~= nil and self.Clips[i] ~= nil then
+										ProperClipping.AddClip(self.Clips[i].ent, self.Clips[i].n:Forward(), self.Clips[i].d, self.Clips[i].inside, true)
+										if self.Clips[i].armor ~= nil then
+											local SA = self.Clips[i].ent:GetPhysicsObject():GetSurfaceArea()
+											local mass = math.ceil(((self.Clips[i].armor/1/(288/SA))/7.8125)*4.6311781,0)
+											self.Clips[i].ent.EntityMods.DakClippedArmor = self.Clips[i].armor
+											if mass > 0 then
+												SetMass( self.DakOwner, self.Clips[i].ent, { Mass = mass } )
+												self.Clips[i].ent:GetPhysicsObject():SetMass(mass)
+												self.Clips[i].ent.DakLegitMass = mass
 											end
 										end
-										self.Crew[i]:SetMaterial("models/flesh")
-										self.Crew[i].DakDead = true
 									end
-
 								end
 							end
-							self.LastVel = curvel
 
+							--PrintTable(self.Contraption)
+							self.CrewCount = #self.Crew
+							WireLib.TriggerOutput(self, "Crew", self.CrewCount)
+							if IsValid(self.Gearbox) then
+								self.Gearbox.TotalMass = Mass
+								self.Gearbox.ParentMass = ParentMass
+								self.Gearbox.PhysicalMass = Mass-ParentMass
+							end
 
+							if IsValid(self.Tread[1]) then
+								if self.Tread[1]:GetPhysicsObject():GetMaterial()~="jeeptire" then
+									for i=1, table.Count(self.Tread) do
+										self.Tread[i]:GetPhysicsObject():SetMaterial("jeeptire")
+									end
+								end
+							end
+							self.TotalMass = Mass
+							self.ParMass = ParentMass
+							self.PhysMass = Mass-ParentMass
+							self.SurfaceArea = SA
+							self.SizeMult = (SA/Mass)*0.18
+						end
+
+						--local debugtime = SysTime()
+						if self.recheckmass == nil or (self.recheckmass >= 0 and self.MassUpdate == 1) then
+							--print("secondary run")
+							local CurrentRes
+							local Mass = 0
+							local ParentMass = 0 
+							local SA = 0
+							for i=1, #self.Contraption do
+								CurrentRes = self.Contraption[i]
+								if CurrentRes ~= NULL and CurrentRes ~= nil and CurrentRes:IsValid() then
+									local physobj = CurrentRes:GetPhysicsObject()
+									--[[
+									if CurrentRes.PhysicsClipped == true then
+										if CurrentRes.DakMassSet ~= true then
+											if CurrentRes.EntityMods.DakClippedArmor ~= nil then
+												local SA = physobj:GetSurfaceArea()
+												local mass = math.ceil(((CurrentRes.EntityMods.DakClippedArmor/1/(288/SA))/7.8125)*4.6311781,0)
+												if mass > 0 then
+													SetMass( self.DakOwner, CurrentRes, { Mass = mass } )
+													physobj:SetMass(mass)
+												end
+												CurrentRes.DakMassSet = true
+											end
+										end
+									end
+									]]--
+									
+
+									if physobj:IsValid() then
+										local physmass = physobj:GetMass()
+										Mass = Mass + physmass
+										if IsValid(CurrentRes:GetParent()) then
+											ParentMass = ParentMass + physmass
+										end
+									end
+								end
+							end
+							if IsValid(self.Gearbox) then
+								self.Gearbox.TotalMass = Mass
+								self.Gearbox.ParentMass = ParentMass
+								self.Gearbox.PhysicalMass = Mass-ParentMass
+							end
+							self.TotalMass = Mass
+							self.ParMass = ParentMass
+							self.PhysMass = Mass-ParentMass
+							self.recheckmass = 0
+							self.MassUpdate = 0
+						end
+						--print("Total: "..(SysTime()-debugtime))
+						self.recheckmass = self.recheckmass+1
+
+						if table.Count(self.HitBox) == 0 then
 							WireLib.TriggerOutput(self, "Health", self.DakHealth)
 							WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
-
-
-					--####################OPTIMIZE ZONE END###################--
-					--print("Total: "..(SysTime()-debugtime))
-							if self.DakHealth then
-								local hasdriver = false
-								for i=1, #self.Seats do
-									if IsValid(self.Seats[i]:GetDriver()) then
-										hasdriver = true
+						end
+						--SETUP HEALTHPOOL
+						if table.Count(self.HitBox) == 0 and self.Contraption and (IsValid(self.Gearbox) or (self.TurretControls~=nil and IsValid(self.TurretControls[1]))) then
+							if #self.Contraption>=1 then
+								self.Remake = 0
+								self.DakPooled = 1
+								self.DakEngine = self
+								self.Controller = self
+								if #self.Contraption>0 then
+									local ContraptionCurrent
+									self.HitBox = {}
+									self.ERA = {}
+									for i=1, #self.Contraption do
+										ContraptionCurrent = self.Contraption[i]
+										if ContraptionCurrent.Controller == nil or ContraptionCurrent.Controller == NULL or ContraptionCurrent.Controller == self then
+											if IsValid(ContraptionCurrent) then
+												if ContraptionCurrent.DakName == nil and (ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA~=1) then
+													if ContraptionCurrent:IsSolid() then
+														self.HitBox[#self.HitBox+1] = ContraptionCurrent
+														ContraptionCurrent.Controller = self
+														ContraptionCurrent.DakOwner = self.DakOwner
+														ContraptionCurrent.DakPooled = 1
+													end
+												else
+													if ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA==1 then
+														self.ERA[#self.ERA+1] = ContraptionCurrent
+														ContraptionCurrent.Controller = self
+														ContraptionCurrent.DakOwner = self.DakOwner
+														ContraptionCurrent.DakPooled = 1
+														ContraptionCurrent.DakHealth = 5
+														ContraptionCurrent.DakMaxHealth = 5
+													end
+												end
+												ContraptionCurrent.Controller = self
+											end
+										end
 									end
 								end
-								if (self.DakHealth <= 0 or #self.Crew < 2 or self.LivingCrew <= math.max(#self.Crew-3,1) or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self.Base:GetPhysicsObject():IsMotionEnabled() or (gmod.GetGamemode().Name=="DakTank" and hasdriver and not(self.Base:GetPhysicsObject():IsMotionEnabled())) then
-									local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
-									self.RemoveTurretList = {}
-									if math.random(1,100) <= self:GetTurretPop() then
-										for j=1, #self.TurretControls do
-											if IsValid(self.TurretControls[j]) then
-												table.RemoveByValue( self.Contraption, self.TurretControls[j].TurretBase )
-												if IsValid(self.TurretControls[j].TurretBase) then
-													self.TurretControls[j].TurretBase:SetMaterial("models/props_buildings/plasterwall021a")
-													self.TurretControls[j].TurretBase:SetColor(Color(100,100,100,255))
-													self.TurretControls[j].TurretBase:SetCollisionGroup( COLLISION_GROUP_WORLD )
-													--self.TurretControls[j].TurretBase:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
-													sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.TurretControls[j].TurretBase:GetPos(), 100, 100, 0.25 )
-													if math.random(0,9) == 0 then
-														self.TurretControls[j].TurretBase:Ignite(25,1)
-													end
-													if IsValid(self) then
-														if IsValid(self:GetParent()) then
-															if IsValid(self.Base) then
-																constraint.RemoveAll( self.Base )
-															end
-														end
-													end
-													for l=1, #self.TurretControls[j].Turret do
-														if self.TurretControls[j].Turret[l] ~= self.TurretControls[j].TurretBase and self.TurretControls[j].Turret[l] ~= self.TurretControls[j].turretaimer then
-															if IsValid(self.TurretControls[j].Turret[l]) then
-																table.RemoveByValue( self.Contraption, self.TurretControls[j].Turret[l] )
-																self.TurretControls[j].Turret[l]:SetParent( self.TurretControls[j].TurretBase, -1 )
-																self.TurretControls[j].Turret[l]:SetMoveType( MOVETYPE_NONE )
-																self.TurretControls[j].Turret[l]:SetMaterial("models/props_buildings/plasterwall021a")
-																self.TurretControls[j].Turret[l]:SetColor(Color(100,100,100,255))
-																self.TurretControls[j].Turret[l]:SetCollisionGroup( COLLISION_GROUP_WORLD )
-																if self.TurretControls[j].Turret[l]:GetModel() == "models/daktanks/machinegun100mm.mdl" then
-																	self.TurretControls[j].Turret[l]:Remove()
-																end
-																--self.TurretControls[j].Turret[l]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
-																sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.TurretControls[j].Turret[l]:GetPos(), 100, 100, 0.25 )
-																if self.TurretControls[j].Turret[l]:IsVehicle() then
-																	if IsValid(self.TurretControls[j].Turret[l]:GetDriver()) then
-																		self.TurretControls[j].Turret[l]:GetDriver():SetNoDraw( false )
-																		self.TurretControls[j].Turret[l]:GetDriver():TakeDamage( 1000000, self.LastDamagedBy, self )
-																		--self.TurretControls[j].Turret[l]:GetDriver():Kill()
-																	end
-																	self.TurretControls[j].Turret[l]:Remove()
-																end
-																if math.random(0,9) == 0 then
-																	self.TurretControls[j].Turret[l]:Ignite(25,1)
-																end
-																if self.TurretControls[j].Turret[l]:GetClass() == "dak_teammo" then
-																	if math.random(0,1) == 0 then
-																		self.TurretControls[j].Turret[l]:Ignite(25,1)
-																	end
-																end
-															end
-														end
-													end
-
-													TurretPhys = ents.Create("prop_physics")
-												 	TurretPhys:SetAngles(self.TurretControls[j].turretaimer:GetAngles())
-												 	TurretPhys:SetPos(self.TurretControls[j].turretaimer:GetPos())
-												 	TurretPhys:SetModel( self.TurretControls[j].TurretBase:GetModel() )
-												 	TurretPhys:SetParent(TurretPhys)
-												 	TurretPhys:DrawShadow(false)
-												 	TurretPhys:SetColor( Color(255, 255, 255, 0) )
-												 	TurretPhys:SetRenderMode( RENDERMODE_TRANSCOLOR )
-												 	TurretPhys.DakIsTread = true
-												 	TurretPhys:Spawn()
-												 	TurretPhys:Activate()
-												 	--TurretPhys:SetMoveType(MOVETYPE_VPHYSICS)
-												 	--TurretPhys:PhysicsInit(SOLID_VPHYSICS)
-
-												 	self.TurretControls[j].turretaimer:SetParent(TurretPhys)
-
-													TurretPhys:SetAngles(self.TurretControls[j].turretaimer:GetAngles() + Angle(math.Rand(-15,15),math.Rand(-15,15),math.Rand(-15,15)))
-													TurretPhys:GetPhysicsObject():SetMass(self.TurretControls[j].GunMass)
-													TurretPhys:GetPhysicsObject():ApplyForceCenter(TurretPhys:GetUp()*2500*self:GetTurretPopForceMult()*TurretPhys:GetPhysicsObject():GetMass())
-													TurretPhys:GetPhysicsObject():AddAngleVelocity(VectorRand()*500*self:GetTurretPopForceMult())
-													self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].TurretBase
-													self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].turretaimer
-													self.RemoveTurretList[#self.RemoveTurretList+1] = TurretPhys
+								self.HitBoxMass = 0
+								for i=1, table.Count(self.HitBox) do
+									self.HitBoxMass = self.HitBoxMass + self.HitBox[i]:GetPhysicsObject():GetMass()
+								end
+								self.CurrentHealth = self.DakVolume
+								self.DakMaxHealth = self.DakVolume
+								for i=1, table.Count(self.HitBox) do
+									DakTekTankEditionSetupNewEnt(self.HitBox[i])
+									self.HitBox[i].DakHealth = self.CurrentHealth
+									self.HitBox[i].DakMaxHealth = self.CurrentHealth
+									self.HitBox[i].Controller = self
+									self.HitBox[i].DakOwner = self.DakOwner
+									self.HitBox[i].DakPooled = 1
+								end
+								self.LastRemake = CurTime()
+							end
+						end
+						if table.Count(self.HitBox)~=0 then
+							self.DakActive = 1
+						else
+							self.DakActive = 0
+						end
+						--local debugtime = SysTime()
+						--####################OPTIMIZE ZONE START###################--
+						if self.DakActive == 1 and table.Count(self.HitBox)~=0 and self.CurrentHealth then
+							if table.Count(self.HitBox) > 0 then
+								self.LivingCrew = 0
+								if self.Crew then
+									if table.Count(self.Crew) > 0 then
+										for i = 1, table.Count(self.Crew) do
+											if not(IsValid(self.Crew[i])) then
+												table.remove( self.Crew, i )
+											else
+												if self.Crew[i].DakDead ~= true then
+													self.LivingCrew = self.LivingCrew + 1
 												end
 											end
 										end
 									end
+								end
+								
+								--print("ERA: "..(SysTime()-debugtime))
+								if self.Composites then
+									if table.Count(self.Composites) > 0 then
+										local weightvalcomp
+										for i = 1, table.Count(self.Composites) do
+											if not(IsValid(self.Composites[i])) then
+												table.remove( self.Composites, i )
+											end
+											if self.Composites[i] ~= nil then
+												self.Composites[i].IsComposite = 1
+												local Density = 2000
+												local KE = 9.2
+												if self.Composites[i].EntityMods.CompositeType == "NERA" then
+													self.Modern = 1
+													self.Composites[i].EntityMods.CompKEMult = 9.2
+													self.Composites[i].EntityMods.CompCEMult = 18.4
+													KE = 9.2
+													Density = 2000
+													self.Composites[i].EntityMods.DakName = "NERA"
+												end
+												if self.Composites[i].EntityMods.CompositeType == "Stillbrew" then
+													self.Modern = 1
+													self.Composites[i].EntityMods.CompKEMult = 23
+													self.Composites[i].EntityMods.CompCEMult = 27.6
+													KE = 23
+													Density = 5750
+													self.Composites[i].EntityMods.DakName = "Stillbrew"
+												end
+												if self.Composites[i].EntityMods.CompositeType == "Textolite" then
+													self.ColdWar = 1
+													self.Composites[i].EntityMods.CompKEMult = 10.4
+													self.Composites[i].EntityMods.CompCEMult = 14
+													KE = 10.4
+													Density = 1850
+													self.Composites[i].EntityMods.DakName = "Textolite"
+												end
+												if self.Composites[i].EntityMods.CompositeType == "Concrete" then
+													self.Composites[i].EntityMods.CompKEMult = 2.8
+													self.Composites[i].EntityMods.CompCEMult = 2.8
+													KE = 2.8
+													Density = 2400
+													self.Composites[i].EntityMods.DakName = "Concrete"
+												end
+												if self.Composites[i].EntityMods.CompositeType == "ERA" then
+													self.ColdWar = 1
+													self.Composites[i].EntityMods.CompKEMult = 2.5
+													self.Composites[i].EntityMods.CompCEMult = 88.9
+													KE = 2.5
+													Density = 1732
+													self.Composites[i].EntityMods.DakName = "ERA"
+													self.Composites[i].EntityMods.IsERA = 1
+												end
+												self.Composites[i].IsComposite = 1
+												weightvalcomp = math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density)
+												if self.Composites[i]:GetPhysicsObject():GetMass() ~= weightvalcomp then self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) ) end
+												self.Composites[i].DakArmor = 10*KE
+											end
+										end
+									end
+								end
+								--print("Comps: "..(SysTime()-debugtime))
+								local debugtime = SysTime()
+								if self.ERA then
+									if self.Base:GetPhysicsObject():IsMotionEnabled() == true then
+										self.PhysEnabled = false
+									else
+										self.PhysEnabled = true
+									end
+									if self.PhysEnabled ~= self.LastPhysEnabled and false then
+										if self.PhysEnabled == true then
+											self.ERA = {}
+											for i=1, #self.ERAInfoTable do
+												local cur = self.ERAInfoTable[i]
+												local eraplate = ents.Create("prop_physics")
+												local parentent = ents.GetByIndex( cur.Parent )
+												eraplate:SetModel(cur.Model)
+												eraplate:SetPos(parentent:LocalToWorld(cur.LocalPos))
+												eraplate:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
+												eraplate:SetMaterial(cur.Mat)
+												eraplate:SetColor(cur.Col)
+												eraplate:SetParent(parentent)
+												eraplate.EntityMods = cur.EntityMods
+												eraplate.DakName = "ERA"
+												eraplate.Controller = self
+												eraplate.DakOwner = self.DakOwner
+												eraplate.DakPooled = 1
+												eraplate.DakHealth = 5
+												eraplate.DakMaxHealth = 5
+												eraplate:PhysicsInit(SOLID_VPHYSICS)
+												--eraplate:SetMoveType(MOVETYPE_NONE)
+												eraplate:SetSolid(SOLID_VPHYSICS)
+												eraplate:CPPISetOwner(self.DakOwner)
+												self.ERA[#self.ERA+1] = eraplate
+											end
+											net.Start( "daktankcoreeraremove" )
+											net.WriteEntity( self )
+											net.Broadcast()
+										 	for i = 1, #self.ERAHandlers do
+												self.ERAHandlers[i]:SetMoveType(MOVETYPE_NONE)
+												self.ERAHandlers[i]:PhysicsInit(SOLID_NONE)
+												self.ERAHandlers[i]:Remove()
+											end
+											self.ERAHandlers = {}
+										else
+											self.ERAInfoTable = {}
+											for i = 1, table.Count(self.ERA) do
+												local cur = self.ERA[i]
+												local currentERA = {}
+												currentERA.Parent = cur:GetParent():EntIndex()
+												if not(IsValid(cur:GetParent().ERAHandler)) then
+													cur:GetParent().ERAHandler = ents.Create("prop_physics")
+												 	cur:GetParent().ERAHandler:SetAngles(cur:GetParent():GetForward():Angle())
+												 	cur:GetParent().ERAHandler:SetPos(cur:GetParent():GetPos())
+												 	cur:GetParent().ERAHandler:SetMoveType(MOVETYPE_NONE)
+												 	cur:GetParent().ERAHandler:PhysicsInit(SOLID_NONE)
+												 	cur:GetParent().ERAHandler:SetParent(cur:GetParent())
+												 	cur:GetParent().ERAHandler:SetModel( "models/props_junk/PopCan01a.mdl" )
+												 	cur:GetParent().ERAHandler:DrawShadow(false)
+												 	cur:GetParent().ERAHandler:SetColor( Color(255, 255, 255, 0) )
+												 	cur:GetParent().ERAHandler:SetRenderMode( RENDERMODE_TRANSCOLOR )
+												 	cur:GetParent().ERAHandler:Spawn()
+												 	cur:GetParent().ERAHandler:Activate()
+												 	cur:GetParent().ERAHandler:SetMoveType(MOVETYPE_NONE)
+												 	cur:GetParent().ERAHandler:PhysicsInit(SOLID_NONE)
+												 	ERAHandler:CPPISetOwner(self.DakOwner)
+												 	if self.ERAHandlers == nil then self.ERAHandlers = {} end
+													self.ERAHandlers[#self.ERAHandlers+1] = cur:GetParent().ERAHandler
+												end
+												currentERA.Model = cur:GetModel()
+												currentERA.LocalPos = cur:GetParent():WorldToLocal(cur:GetPos())
+												currentERA.LocalAng = cur:GetParent():WorldToLocalAngles(cur:GetAngles())
+												currentERA.Mat = cur:GetMaterial()
+												currentERA.Col = cur:GetColor()
+												currentERA.Mass = cur:GetPhysicsObject():GetMass()
+												currentERA.EntityMods = cur.EntityMods
+												local a,b = cur:GetPhysicsObject():GetAABB()
+												a:Rotate(cur:GetAngles())
+												b:Rotate(cur:GetAngles())
+												currentERA.mins = a
+												currentERA.maxs = b
+												cur:Remove()
+												self.ERAInfoTable[#self.ERAInfoTable+1] = currentERA
+											end
+											for j = 1, #self.ERAHandlers do
+												local VectorTables = {}
+												local Mass = 0
+												for i = 1, #self.ERAInfoTable do
+													Mass = Mass + self.ERAInfoTable[i].Mass
+													if ents.GetByIndex( self.ERAInfoTable[i].Parent ) == self.ERAHandlers[j]:GetParent() then
+														local addition = self.ERAInfoTable[i].LocalPos
+														local min = self.ERAInfoTable[i].mins + addition
+														local max = self.ERAInfoTable[i].maxs + addition
+														VectorTables[#VectorTables+1] = {
+															Vector( min.y, min.y, min.z ),
+															Vector( min.x, min.y, max.z ),
+															Vector( min.x, max.y, min.z ),
+															Vector( min.x, max.y, max.z ),
+															Vector( max.x, min.y, min.z ),
+															Vector( max.x, min.y, max.z ),
+															Vector( max.x, max.y, min.z ),
+															Vector( max.x, max.y, max.z )
+														}
+														debugoverlay.Box( ents.GetByIndex( self.ERAInfoTable[i].Parent ):LocalToWorld( self.ERAInfoTable[i].LocalPos ), self.ERAInfoTable[i].mins, self.ERAInfoTable[i].maxs, 10, Color( math.random(0,255), math.random(0,255), math.random(0,255) ) )
+													end
+												end
+												self.ERAHandlers[j]:PhysicsDestroy()
+												self.ERAHandlers[j]:PhysicsInitMultiConvex(VectorTables)
+												self.ERAHandlers[j]:SetSolid( SOLID_VPHYSICS )
+												--self.ERAHandlers[j]:SetParent()
+												self.ERAHandlers[j]:SetMoveType( MOVETYPE_NONE )
+												self.ERAHandlers[j]:EnableCustomCollisions( true )
+												self.ERAHandlers[j].IsEraHandler = true
+												self.ERAHandlers[j].IsComposite = 1
+												self.ERAHandlers[j].EntityMods = {}
+												self.ERAHandlers[j].EntityMods.CompKEMult = 2.5
+												self.ERAHandlers[j].EntityMods.CompCEMult = 88.9
+												self.ERAHandlers[j].DakArmor = 10*self.ERAHandlers[j].EntityMods.CompKEMult
+												self.ERAHandlers[j].DakHealth = 9999999
+												self.ERAHandlers[j].DakMaxHealth = 9999999
+												self.ERAHandlers[j].EntityMods.IsERA = 1
+												self.ERAHandlers[j].EntityMods.DakName = "ERA HANDLER"
+												self.ERAHandlers[j]:GetPhysicsObject():SetMass(Mass)
+											end
+											for i=1, math.ceil(#self.ERAInfoTable/50) do
+												local tablesegment = {}
+												for j=1+((i-1)*50), 50+((i-1)*50) do
+													tablesegment[#tablesegment+1] = self.ERAInfoTable[j]
+												end
+												net.Start( "daktankcoreera" )
+												net.WriteEntity( self )
+												net.WriteString( util.TableToJSON( tablesegment ) )
+												net.Broadcast()
+											end
+											self.ERA = {}
+										end
+										self.LastPhysEnabled = self.PhysEnabled
+									end
+									if table.Count(self.ERA) > 0 then
+										local effectdata
+										local ExpSounds = {"daktanks/eraexplosion.mp3"}
+										local EntMod 
+										for i = 1, table.Count(self.ERA) do
+											if not(IsValid(self.ERA[i])) then
+												table.remove( self.ERA, i )
+											end
+											if self.ERA[i] ~= nil and self.ERA[i] ~= NULL then
+												EntMod = self.ERA[i].EntityMods
+												if self.ERA[i].IsComposite ~= 1 then self.ERA[i].IsComposite = 1 end
+												if EntMod.CompKEMult ~= 2.5 then EntMod.CompKEMult = 2.5 end
+												if EntMod.CompCEMult ~= 88.9 then EntMod.CompCEMult = 88.9 end
+												if self.ERA[i].DakName ~= "ERA" then self.ERA[i].DakName = "ERA" end
+												if self.ERA[i].IsERA ~= 1 then self.ERA[i].IsERA = 1 end
+												if self.ColdWar ~= 1 then self.ColdWar = 1 end
+												if self.ERA[i].DakHealth <= 0 then
+													effectdata = EffectData()
+													effectdata:SetOrigin(self.ERA[i]:GetPos())
+													effectdata:SetEntity(self)
+													effectdata:SetAttachment(1)
+													effectdata:SetMagnitude(.5)
+													effectdata:SetScale(50)
+													effectdata:SetNormal( Vector(0,0,0) )
+													util.Effect("daktescalingexplosionold", effectdata, true, true)
+													sound.Play( ExpSounds[math.random(1,#ExpSounds)], self.ERA[i]:GetPos(), 100, 100, 1 )
+													self.ERA[i]:DTExplosion(self.ERA[i]:GetPos(),25,50,40,5,self.DakOwner)
+													self.ERA[i]:Remove()
+												end
+											end
+										end
+										local weightval
+										for i = 1, table.Count(self.ERA) do
+											if IsValid(self.ERA[i]) then
+												if self.ERA[i].EntityMods then
+													if self.ERA[i].EntityMods.CompositeType == "ERA" then
+														self.ColdWar = 1
+														self.ERA[i].EntityMods.CompKEMult = 2.5
+														self.ERA[i].EntityMods.CompCEMult = 88.9
+														self.ERA[i].EntityMods.DakName = "ERA"
+														self.ERA[i].EntityMods.IsERA = 1
+													end
+													local weightval = math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) 
+													if self.ERA[i]:GetPhysicsObject():GetMass() ~= weightval then self.ERA[i]:GetPhysicsObject():SetMass( weightval ) end
+													self.ERA[i].DakArmor = 2.5
+												end
+											end
+										end
+									end
+								end
+								if self.DETAIL then
+									if self.Base:GetPhysicsObject():IsMotionEnabled() == true then
+										self.PhysEnabled = false
+									else
+										self.PhysEnabled = true
+									end
+									if self.PhysEnabled ~= self.LastPhysEnabled then
+										if self.PhysEnabled == true then
+											self.DETAIL = {}
+											for i=1, #self.DetailInfoTable do
+												local cur = self.DetailInfoTable[i]
+												local detailpiece = ents.Create("prop_physics")
+												local parentent = ents.GetByIndex( cur.Parent )
+												detailpiece:SetModel(cur.Model)
+												detailpiece:SetPos(parentent:LocalToWorld(cur.LocalPos))
+												detailpiece:SetAngles(parentent:LocalToWorldAngles(cur.LocalAng))
+												detailpiece:SetMaterial(cur.Mat)
+												detailpiece:SetBodyGroups(cur.Bodygroups)
+												detailpiece:SetSkin(cur.Skin)
+												for j=1, #cur.SubMaterials do
+													detailpiece:SetSubMaterial( j, cur.SubMaterials[j] )
+												end
+												detailpiece:SetColor(cur.Col)
+												detailpiece:SetParent(parentent)
+												detailpiece.EntityMods = cur.EntityMods
+												--detailpiece.ClipData = cur.ClipData
+												detailpiece:PhysicsInit(SOLID_VPHYSICS)
+												--detailpiece:SetMoveType(MOVETYPE_NONE)
+												detailpiece:SetSolid(SOLID_VPHYSICS)
+												detailpiece:CPPISetOwner(self.DakOwner)
+												if cur.ClipData ~= nil then
+													for j=1, #cur.ClipData do
+														ProperClipping.AddClip(detailpiece, cur.ClipData[j].n:Forward(), cur.ClipData[j].d, cur.ClipData[j].inside, true)
+													end
+												end
+												self.DETAIL[#self.DETAIL+1] = detailpiece
+											end
+											net.Start( "daktankcoredetailremove" )
+											net.WriteEntity( self )
+											net.Broadcast()
+										else
+											--Crew checking
+											for i = 1, #self.Crew do
+												--get angle and kill if upwards direction is over 45 degrees from upwards compared to baseplate
+												if self.Crew[i]:IsValid() then
+													local crewang = self.ForwardEnt:WorldToLocalAngles(self.Crew[i]:GetAngles())
+													local a = crewang:Up()
+													local b = self.Forward:Angle():Up()
+													local ans = math.acos(a:Dot(b) / (a:Length() * b:Length()))
+													if math.Round(math.deg(ans),2) > 45 then
+														self.Crew[i].DakHealth = 0
+														if self.Crew[i].DakOwner:IsPlayer() then
+															if self.Crew[i].Job == 1 then
+																self.Crew[i].DakOwner:ChatPrint("Gunner Angle Invalid, Ejecting!") 
+															elseif self.Crew[i].Job == 2 then
+																self.Crew[i].DakOwner:ChatPrint("Driver Angle Invalid, Ejecting!") 
+															elseif self.Crew[i].Job == 3 then
+																self.Crew[i].DakOwner:ChatPrint("Loader Angle Invalid, Ejecting!") 
+															else
+																self.Crew[i].DakOwner:ChatPrint("Passenger Angle Invalid, Ejecting!") 
+															end
+														end
+														self.Crew[i]:SetMaterial("models/flesh")
+														self.Crew[i].DakDead = true
+														self.Crew[i]:Remove()
+													end
+												end
+												--kill if clipping other crew
+												if self.Crew[i]:IsValid() then
+													local bounds = self.Crew[i]:GetModelBounds()
+													bounds = math.min(math.abs(bounds.x),math.abs(bounds.y),math.abs(bounds.z))*1.9
+													for j = 1, #self.Crew do
+														if self.Crew[i] ~= self.Crew[j] then
+															if self.Crew[i]:GetPos():Distance(self.Crew[j]:GetPos()) < bounds then
+																self.Crew[i].DakHealth = 0
+																if self.Crew[i].DakOwner:IsPlayer() then
+																	if self.Crew[i].Job == 1 then
+																		self.Crew[i].DakOwner:ChatPrint("Gunner Clipping Crew, Ejecting!") 
+																	elseif self.Crew[i].Job == 2 then
+																		self.Crew[i].DakOwner:ChatPrint("Driver Clipping Crew, Ejecting!") 
+																	elseif self.Crew[i].Job == 3 then
+																		self.Crew[i].DakOwner:ChatPrint("Loader Clipping Crew, Ejecting!") 
+																	else
+																		self.Crew[i].DakOwner:ChatPrint("Passenger Clipping Crew, Ejecting!") 
+																	end
+																end
+																self.Crew[i]:SetMaterial("models/flesh")
+																self.Crew[i].DakDead = true
+																self.Crew[i]:Remove()
+															end
+														end
+													end
+												end
+											end
+											--
+											self.DetailInfoTable = {}
+											for i = 1, table.Count(self.DETAIL) do
+												local cur = self.DETAIL[i]
+												if IsValid(cur) then
+													local currentDetail = {}
+													local curparent = cur
+												
+													if IsValid(cur:GetParent()) then 
+														curparent = cur:GetParent() 
+														if IsValid(cur:GetParent():GetParent()) then curparent = cur:GetParent():GetParent() end
+													end
+												
+													currentDetail.Parent = curparent:EntIndex()
+													currentDetail.Model = cur:GetModel()
+													currentDetail.LocalPos = curparent:WorldToLocal(cur:GetPos())
+													currentDetail.LocalAng = curparent:WorldToLocalAngles(cur:GetAngles())
+													currentDetail.Mat = cur:GetMaterial()
+													currentDetail.Col = cur:GetColor()
+													currentDetail.EntityMods = cur.EntityMods
+													currentDetail.ClipData = cur.ClipData
+													currentDetail.SubMaterials = {}
+													local bodygroupstring = ""
+													if #cur:GetBodyGroups() > 0 then
+														for j=0, #cur:GetBodyGroups() do
+															bodygroupstring = bodygroupstring..cur:GetBodygroup( j )
+														end
+													end
+													currentDetail.Bodygroups = bodygroupstring
+													currentDetail.Skin = cur:GetSkin()
+													for j = 0, 31 do
+														currentDetail.SubMaterials[j] = cur:GetSubMaterial( j )
+													end
+													cur:Remove()
+													self.DetailInfoTable[#self.DetailInfoTable+1] = currentDetail
+												end
+											end
+											for i=1, math.ceil(#self.DetailInfoTable/50) do
+												local tablesegment = {}
+												for j=1+((i-1)*50), 50+((i-1)*50) do
+													tablesegment[#tablesegment+1] = self.DetailInfoTable[j]
+												end
+												net.Start( "daktankcoredetail" )
+												net.WriteEntity( self )
+												net.WriteString( util.TableToJSON( tablesegment ) )
+												net.Broadcast()
+											end
+											self.DETAIL = {}
+										end
+										self.LastPhysEnabled = self.PhysEnabled
+									end
+								end
+								--print("Total: "..(SysTime()-debugtime))
+								--print("ERA2: "..(SysTime()-debugtime))
+								self.DamageCycle = 0
+								self.LastDamagedBy = NULL
+								if self.DakHealth < self.CurrentHealth then
+									self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.DakHealth)
+									self.DakLastDamagePos = self.DakLastDamagePos	
+								end
+								self.Remake = 0
+								self.LastCurMass = self.CurMass
+								self.CurMass = 0
+								for i = 1, table.Count(self.HitBox) do
+									if self.HitBox[i].Controller ~= self then
+										self.Remake = 1	
+									end
+									if self.Remake == 1 then
+										if self.HitBox[i].Controller == self then
+											self.HitBox[i].DakPooled = 0
+											self.HitBox[i].Controller = nil
+											self.HitBox[i].DakLegit = nil
+										end
+									end
+									if self.LastCurMass>0 then
+										if self.HitBox[i].DakHealth then
+											if self.HitBox[i].DakHealth < self.CurrentHealth then
+												if self.HitBox[i].EntityMods.IsERA == 1 then
+													table.RemoveByValue( self.Composites, NULL )
+													table.RemoveByValue( self.HitBox, NULL )
+												end
+												self.DamageCycle = self.DamageCycle+(self.CurrentHealth-self.HitBox[i].DakHealth)
+												self.DakLastDamagePos = self.HitBox[i].DakLastDamagePos
+												self.LastDamagedBy = self.HitBox[i].LastDamagedBy
+											end
+										end
+									end
+									if self.Remake == 1 then
+										self.HitBox = {}
+										self.Remake = 0
+										break
+									end
+									if self.HitBox[i]~=NULL then
+										if self.HitBox[i].Controller == self then
+											if self.HitBox[i]:IsSolid() then
+												self.CurMass = self.CurMass + self.HitBox[i]:GetPhysicsObject():GetMass()
+											end
+										end
+									end
+								end
+								--print("Hitbox: "..(SysTime()-debugtime))
+								if not(self.CurMass>self.LastCurMass) then
+									if self.DamageCycle>0 then
+										if self.LastRemake+3 > CurTime() then
+											self.DamageCycle = 0
+										end
+										self.CurrentHealth = self.CurrentHealth-self.DamageCycle
+									end
+								end
+								if self.CurrentHealth >= self.DakMaxHealth then
+									self.DakMaxHealth = self.DakVolume
+									self.CurrentHealth = self.DakVolume
+								end
+								for i = 1, #self.Components do
+									DakKillNotSolid(self.Components[i])
+								end
+								for i = 1, table.Count(self.HitBox) do
+									--hugely cursed physical parent stuff
+									--[[
+									--print("here")
+									--self.HitBox[i]:RemoveSolidFlags(FSOLID_NOT_SOLID)
+									--self.HitBox[i]:SetCollisionGroup(COLLISION_GROUP_NONE)
+									if self.HitBox[i]:GetClass() == "prop_physics" then
+										if self.HitBox[i]~=self.Base and self.HitBox[i].DakMovement ~= true and IsValid(self.HitBox[i]:GetParent()) then
+											--self.HitBox[i]:GetPhysicsObject():EnableMotion( true )
+											--self.HitBox[i]:GetPhysicsObject():SetPos( self.HitBox[i]:GetPos(), true )
+											--self.HitBox[i]:GetPhysicsObject():SetAngles( self.HitBox[i]:GetAngles() )
+											--self.HitBox[i]:RemoveSolidFlags(FSOLID_NOT_SOLID)
+											--self.HitBox[i]:SetCollisionGroup(COLLISION_GROUP_NONE)
+											--self.HitBox[i]:SetMoveType( MOVETYPE_VPHYSICS )
+										end
+										if self.HitBox[i].DakMovement == true then
+											--self.HitBox[i]:RemoveSolidFlags(FSOLID_NOT_SOLID)
+											--self.HitBox[i]:SetCollisionGroup(COLLISION_GROUP_NONE)
+										end
+									end
+									]]--
+									if self.CurrentHealth >= self.DakMaxHealth then
+										self.HitBox[i].DakMaxHealth = self.DakVolume
+									end
+									self.HitBox[i].DakHealth = self.CurrentHealth
+								end
+								self.DakHealth = self.CurrentHealth
+								
+								local curvel = self.Base:GetVelocity()
+								if self.LastVel == nil then
+									self.LastVel = curvel
+								end
+								if curvel:Distance(self.LastVel) > 1000 then
+									for i=1, #self.Crew do
+										self.Crew[i].DakHealth = self.Crew[i].DakHealth - ((curvel:Distance(self.LastVel)-1000)/100)
 
-									for i=1, #self.Contraption do
-										if IsValid(self.Contraption[i]) then
-											if self.Contraption[i]:GetModel() == "models/daktanks/machinegun100mm.mdl" then
-												self.Contraption[i]:Remove()
-											else
-												if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
-													self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
-													if self.Contraption[i] ~= self.Base and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self and self.Contraption[i].turretaimer ~= true then
-														if math.random(1,6)>1 then
-															if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_tegearboxnew" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or self.Contraption[i]:GetClass() == "gmod_wire_expression2" then
+										if self.Crew[i].DakHealth <= 0 then
+											if self.Crew[i].DakOwner:IsPlayer() then
+												if self.Crew[i].Job == 1 then
+													self.Crew[i].DakOwner:ChatPrint("Gunner Killed!") 
+												elseif self.Crew[i].Job == 2 then
+													self.Crew[i].DakOwner:ChatPrint("Driver Killed!") 
+												elseif self.Crew[i].Job == 3 then
+													self.Crew[i].DakOwner:ChatPrint("Loader Killed!") 
+												else
+													self.Crew[i].DakOwner:ChatPrint("Passenger Killed!") 
+												end
+											end
+											self.Crew[i]:SetMaterial("models/flesh")
+											self.Crew[i].DakDead = true
+										end
+
+									end
+								end
+								self.LastVel = curvel
+
+
+								WireLib.TriggerOutput(self, "Health", self.DakHealth)
+								WireLib.TriggerOutput(self, "HealthPercent", (self.DakHealth/self.DakMaxHealth)*100)
+
+
+						--####################OPTIMIZE ZONE END###################--
+						--print("Total: "..(SysTime()-debugtime))
+								if self.DakHealth then
+									local hasdriver = false
+									for i=1, #self.Seats do
+										if IsValid(self.Seats[i]:GetDriver()) then
+											hasdriver = true
+										end
+									end
+									if (self.DakHealth <= 0 or #self.Crew < 2 or self.LivingCrew <= math.max(#self.Crew-3,1) or (gmod.GetGamemode().Name=="DakTank" and self.LegalUnfreeze ~= true)) and self.Base:GetPhysicsObject():IsMotionEnabled() or (gmod.GetGamemode().Name=="DakTank" and hasdriver and not(self.Base:GetPhysicsObject():IsMotionEnabled())) then
+										local DeathSounds = {"daktanks/closeexp1.mp3","daktanks/closeexp2.mp3","daktanks/closeexp3.mp3"}
+										self.RemoveTurretList = {}
+										if math.random(1,100) <= self:GetTurretPop() then
+											for j=1, #self.TurretControls do
+												if IsValid(self.TurretControls[j]) then
+													table.RemoveByValue( self.Contraption, self.TurretControls[j].TurretBase )
+													if IsValid(self.TurretControls[j].TurretBase) then
+														self.TurretControls[j].TurretBase:SetMaterial("models/props_buildings/plasterwall021a")
+														self.TurretControls[j].TurretBase:SetColor(Color(100,100,100,255))
+														--self.TurretControls[j]:SetCustomCollisionCheck( false )
+														self.TurretControls[j].TurretBase:SetCollisionGroup( COLLISION_GROUP_WORLD )
+														--self.TurretControls[j].TurretBase:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+														sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.TurretControls[j].TurretBase:GetPos(), 100, 100, 0.25 )
+														if math.random(0,9) == 0 then
+															self.TurretControls[j].TurretBase:Ignite(25,1)
+														end
+														if IsValid(self) then
+															if IsValid(self:GetParent()) then
+																if IsValid(self.Base) then
+																	constraint.RemoveAll( self.Base )
+																end
+															end
+														end
+														for l=1, #self.TurretControls[j].Turret do
+															if self.TurretControls[j].Turret[l] ~= self.TurretControls[j].TurretBase and self.TurretControls[j].Turret[l] ~= self.TurretControls[j].turretaimer then
+																if IsValid(self.TurretControls[j].Turret[l]) then
+																	table.RemoveByValue( self.Contraption, self.TurretControls[j].Turret[l] )
+																	self.TurretControls[j].Turret[l]:SetParent( self.TurretControls[j].TurretBase, -1 )
+																	self.TurretControls[j].Turret[l]:SetMoveType( MOVETYPE_NONE )
+																	self.TurretControls[j].Turret[l]:SetMaterial("models/props_buildings/plasterwall021a")
+																	self.TurretControls[j].Turret[l]:SetColor(Color(100,100,100,255))
+																	--self.TurretControls[j].Turret[l]:SetCustomCollisionCheck( false )
+																	self.TurretControls[j].Turret[l]:SetCollisionGroup( COLLISION_GROUP_WORLD )
+																	if self.TurretControls[j].Turret[l]:GetModel() == "models/daktanks/machinegun100mm.mdl" then
+																		self.TurretControls[j].Turret[l]:Remove()
+																	end
+																	--self.TurretControls[j].Turret[l]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+																	sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.TurretControls[j].Turret[l]:GetPos(), 100, 100, 0.25 )
+																	if self.TurretControls[j].Turret[l]:IsVehicle() then
+																		if IsValid(self.TurretControls[j].Turret[l]:GetDriver()) then
+																			self.TurretControls[j].Turret[l]:GetDriver():SetNoDraw( false )
+																			self.TurretControls[j].Turret[l]:GetDriver():TakeDamage( 1000000, self.LastDamagedBy, self )
+																			--self.TurretControls[j].Turret[l]:GetDriver():Kill()
+																		end
+																		self.TurretControls[j].Turret[l]:Remove()
+																	end
+																	if math.random(0,9) == 0 then
+																		self.TurretControls[j].Turret[l]:Ignite(25,1)
+																	end
+																	if self.TurretControls[j].Turret[l]:GetClass() == "dak_teammo" then
+																		if math.random(0,1) == 0 then
+																			self.TurretControls[j].Turret[l]:Ignite(25,1)
+																		end
+																	end
+																end
+															end
+														end
+
+														TurretPhys = ents.Create("prop_physics")
+													 	TurretPhys:SetAngles(self.TurretControls[j].turretaimer:GetAngles())
+													 	TurretPhys:SetPos(self.TurretControls[j].turretaimer:GetPos())
+													 	TurretPhys:SetModel( self.TurretControls[j].TurretBase:GetModel() )
+													 	TurretPhys:SetParent(TurretPhys)
+													 	TurretPhys:DrawShadow(false)
+													 	TurretPhys:SetColor( Color(255, 255, 255, 0) )
+													 	TurretPhys:SetRenderMode( RENDERMODE_TRANSCOLOR )
+													 	TurretPhys.DakIsTread = true
+													 	TurretPhys:Spawn()
+													 	TurretPhys:Activate()
+													 	--TurretPhys:SetMoveType(MOVETYPE_VPHYSICS)
+													 	--TurretPhys:PhysicsInit(SOLID_VPHYSICS)
+
+													 	self.TurretControls[j].turretaimer:SetParent(TurretPhys)
+
+														TurretPhys:SetAngles(self.TurretControls[j].turretaimer:GetAngles() + Angle(math.Rand(-15,15),math.Rand(-15,15),math.Rand(-15,15)))
+														TurretPhys:GetPhysicsObject():SetMass(self.TurretControls[j].GunMass)
+														TurretPhys:GetPhysicsObject():ApplyForceCenter(TurretPhys:GetUp()*2500*self:GetTurretPopForceMult()*TurretPhys:GetPhysicsObject():GetMass())
+														TurretPhys:GetPhysicsObject():AddAngleVelocity(VectorRand()*500*self:GetTurretPopForceMult())
+														self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].TurretBase
+														self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].turretaimer
+														self.RemoveTurretList[#self.RemoveTurretList+1] = TurretPhys
+													end
+												end
+											end
+										end
+
+										for i=1, #self.Contraption do
+											if IsValid(self.Contraption[i]) then
+												if self.Contraption[i]:GetModel() == "models/daktanks/machinegun100mm.mdl" then
+													self.Contraption[i]:Remove()
+												else
+													if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then
+														self.Contraption[i].DakLastDamagePos = self.DakLastDamagePos
+														if self.Contraption[i] ~= self.Base and self.Contraption[i] ~= self:GetParent() and self.Contraption[i] ~= self and self.Contraption[i].turretaimer ~= true then
+															if math.random(1,6)>1 then
+																if self.Contraption[i]:GetClass() == "dak_tegearbox" or self.Contraption[i]:GetClass() == "dak_tegearboxnew" or self.Contraption[i]:GetClass() == "dak_turretcontrol" or self.Contraption[i]:GetClass() == "gmod_wire_expression2" then
+																	self.salvage = ents.Create( "dak_tesalvage" )
+																	if ( !IsValid( self.salvage ) ) then return end
+																	if self.Contraption[i]:GetClass() == "dak_crew" then
+																		if self.Contraption[i].DakHealth <= 0 then
+																			for i=1, 15 do
+																				util.Decal( "Blood", self.Contraption[i]:GetPos(), self.Contraption[i]:GetPos()+(VectorRand()*500), self.Contraption[i])
+																			end
+																		end
+																	end
+
+																	self.salvage.DakModel = self.Contraption[i]:GetModel()
+																	self.salvage:SetPos( self.Contraption[i]:GetPos())
+																	self.salvage:SetAngles( self.Contraption[i]:GetAngles())
+																	self.salvage:SetModelScale(self.Contraption[i]:GetModelScale())
+																	self.salvage:Spawn()
+																	self.Contraption[i]:Remove()
+																else
+																	constraint.RemoveAll( self.Contraption[i] )
+																	self.Contraption[i]:SetParent( self:GetParent(), -1 )
+																	self.Contraption[i]:SetMoveType( MOVETYPE_NONE )
+																	self.Contraption[i]:SetMaterial("models/props_buildings/plasterwall021a")
+																	self.Contraption[i]:SetColor(Color(100,100,100,255))
+																	--self.Contraption[i]:SetCustomCollisionCheck( false )
+																	self.Contraption[i]:SetCollisionGroup( COLLISION_GROUP_WORLD )
+																	--self.Contraption[i]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
+																	sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.Contraption[i]:GetPos(), 100, 100, 0.25 )
+																	if math.random(0,9) == 0 then
+																		self.Contraption[i]:Ignite(25,1)
+																	end
+																	if self.Contraption[i]:GetClass() == "dak_teammo" then
+																		if math.random(0,1) == 0 then
+																			self.Contraption[i]:Ignite(25,1)
+																		end
+																	end
+																end
+															else
 																self.salvage = ents.Create( "dak_tesalvage" )
 																if ( !IsValid( self.salvage ) ) then return end
+																self.salvage.launch = 1
 																if self.Contraption[i]:GetClass() == "dak_crew" then
 																	if self.Contraption[i].DakHealth <= 0 then
-																		for i=1, 15 do
+																		for j=1, 15 do
 																			util.Decal( "Blood", self.Contraption[i]:GetPos(), self.Contraption[i]:GetPos()+(VectorRand()*500), self.Contraption[i])
 																		end
 																	end
 																end
-
 																self.salvage.DakModel = self.Contraption[i]:GetModel()
 																self.salvage:SetPos( self.Contraption[i]:GetPos())
 																self.salvage:SetAngles( self.Contraption[i]:GetAngles())
 																self.salvage:SetModelScale(self.Contraption[i]:GetModelScale())
 																self.salvage:Spawn()
 																self.Contraption[i]:Remove()
-															else
-																constraint.RemoveAll( self.Contraption[i] )
-																self.Contraption[i]:SetParent( self:GetParent(), -1 )
-																self.Contraption[i]:SetMoveType( MOVETYPE_NONE )
-																self.Contraption[i]:SetMaterial("models/props_buildings/plasterwall021a")
-																self.Contraption[i]:SetColor(Color(100,100,100,255))
-																self.Contraption[i]:SetCollisionGroup( COLLISION_GROUP_WORLD )
-																--self.Contraption[i]:EmitSound( DeathSounds[math.random(1,#DeathSounds)], 100, 100, 0.25, 3)
-																sound.Play( DeathSounds[math.random(1,#DeathSounds)], self.Contraption[i]:GetPos(), 100, 100, 0.25 )
-																if math.random(0,9) == 0 then
-																	self.Contraption[i]:Ignite(25,1)
-																end
-																if self.Contraption[i]:GetClass() == "dak_teammo" then
-																	if math.random(0,1) == 0 then
-																		self.Contraption[i]:Ignite(25,1)
-																	end
-																end
 															end
-														else
-															self.salvage = ents.Create( "dak_tesalvage" )
-															if ( !IsValid( self.salvage ) ) then return end
-															self.salvage.launch = 1
-															if self.Contraption[i]:GetClass() == "dak_crew" then
-																if self.Contraption[i].DakHealth <= 0 then
-																	for j=1, 15 do
-																		util.Decal( "Blood", self.Contraption[i]:GetPos(), self.Contraption[i]:GetPos()+(VectorRand()*500), self.Contraption[i])
-																	end
+															if self.Contraption[i]:IsVehicle() then
+																if IsValid(self.Contraption[i]:GetDriver()) then
+																	self.Contraption[i]:GetDriver():SetNoDraw( false )
+																	self.Contraption[i]:GetDriver():TakeDamage( 1000000, self.LastDamagedBy, self )
+																	--self.Contraption[i]:GetDriver():Kill()
 																end
+																self.Contraption[i]:Remove()
 															end
-															self.salvage.DakModel = self.Contraption[i]:GetModel()
-															self.salvage:SetPos( self.Contraption[i]:GetPos())
-															self.salvage:SetAngles( self.Contraption[i]:GetAngles())
-															self.salvage:SetModelScale(self.Contraption[i]:GetModelScale())
-															self.salvage:Spawn()
-															self.Contraption[i]:Remove()
-														end
-														if self.Contraption[i]:IsVehicle() then
-															if IsValid(self.Contraption[i]:GetDriver()) then
-																self.Contraption[i]:GetDriver():SetNoDraw( false )
-																self.Contraption[i]:GetDriver():TakeDamage( 1000000, self.LastDamagedBy, self )
-																--self.Contraption[i]:GetDriver():Kill()
-															end
-															self.Contraption[i]:Remove()
 														end
 													end
 												end
 											end
 										end
+										self.Dead=1
+										self.DeathTime=CurTime()
+										net.Start( "daktankcoredie" )
+										net.WriteEntity( self )
+										net.Broadcast()
+										local effectdata = EffectData()
+										effectdata:SetOrigin(self.Base:GetPos())
+										effectdata:SetEntity(self)
+										effectdata:SetAttachment(1)
+										effectdata:SetMagnitude(.5)
+										effectdata:SetNormal( Vector(0,0,-1) )
+										effectdata:SetScale(math.Clamp(self.DakMaxHealth*0.04,100,500))
+										util.Effect("daktescalingexplosionold", effectdata)
 									end
-									self.Dead=1
-									self.DeathTime=CurTime()
-									net.Start( "daktankcoredie" )
-									net.WriteEntity( self )
-									net.Broadcast()
-									local effectdata = EffectData()
-									effectdata:SetOrigin(self.Base:GetPos())
-									effectdata:SetEntity(self)
-									effectdata:SetAttachment(1)
-									effectdata:SetMagnitude(.5)
-									effectdata:SetNormal( Vector(0,0,-1) )
-									effectdata:SetScale(math.Clamp(self.DakMaxHealth*0.04,100,500))
-									util.Effect("daktescalingexplosionold", effectdata)
+								else
+									self:Remove()
 								end
-							else
-								self:Remove()
-							end
 
+							end
+						end
+					else
+						if self.DeathTime then
+							if self.DeathTime+30<CurTime() then
+								self.AutoRemoved = true
+								for j=1, #self.RemoveTurretList do
+									if IsValid(self.RemoveTurretList[j]) then
+										self.RemoveTurretList[j]:Remove()
+									end
+								end
+								if IsValid(self) then
+									self:Remove()
+								end
+								if IsValid(self:GetParent():Remove()) then
+									self:GetParent():Remove()
+								end
+								if IsValid(self.Base:Remove()) then
+									self.Base:Remove()
+								end
+							end
 						end
 					end
 				else
-					if self.DeathTime then
-						if self.DeathTime+30<CurTime() then
-							self.AutoRemoved = true
-							for j=1, #self.RemoveTurretList do
-								if IsValid(self.RemoveTurretList[j]) then
-									self.RemoveTurretList[j]:Remove()
-								end
-							end
-							if IsValid(self) then
-								self:Remove()
-							end
-							if IsValid(self:GetParent():Remove()) then
-								self:GetParent():Remove()
-							end
-							if IsValid(self.Base:Remove()) then
-								self.Base:Remove()
-							end
-						end
+					if self.SpawnTime+30 < CurTime() then
+						self.DakOwner:PrintMessage( HUD_PRINTTALK, "Tank Core Error: Gate that tank core is parented to is not parented, please parent it to the baseplate." )
 					end
 				end
 			else
 				if self.SpawnTime+30 < CurTime() then
-					self.DakOwner:PrintMessage( HUD_PRINTTALK, "Tank Core Error: Gate that tank core is parented to is not parented, please parent it to the baseplate." )
+					self.DakOwner:PrintMessage( HUD_PRINTTALK, "Tank Core Error: Tank core is not parented to anything, please parent it to a gate." )
 				end
 			end
-		else
-			if self.SpawnTime+30 < CurTime() then
-				self.DakOwner:PrintMessage( HUD_PRINTTALK, "Tank Core Error: Tank core is not parented to anything, please parent it to a gate." )
-			end
+		end
+		self.SlowThinkTime = CurTime()
+	end
+	--do collisions
+	if self.HitBoxMins ~= nil and self.HitBoxMaxs ~= nil then
+	local smallest = math.min(math.abs(self.HitBoxMins.x),math.abs(self.HitBoxMins.y),math.abs(self.HitBoxMaxs.x),math.abs(self.HitBoxMaxs.y))
+		if IsValid(self.Base) and IsValid(self.ForwardEnt) then
+			local collisionstrace = util.TraceHull( {
+				start = self.ForwardEnt:GetPos(),
+				endpos = self.ForwardEnt:GetPos()+(self.Base:GetPhysicsObject():GetVelocity()*0.2),
+				
+				mins = Vector(-smallest,-smallest,self.HitBoxMins.z),
+				maxs = Vector(smallest,smallest,self.HitBoxMaxs.z),
+				mask = MASK_SOLID,
+				filter = self.Contraption
+			} )
+			DakTankCollisions(collisionstrace.Entity, self.Base, collisionstrace.HitPos)
 		end
 	end
-	self:NextThink(CurTime()+1)
+	self:NextThink(CurTime()+0.1)
     return true
 end
 
@@ -2551,13 +2825,48 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		end
 		]]--
 
-
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
 		self.DakMass = Ent.EntityMods.DakTek.DakMass
 		Ent.EntityMods.DakTek = nil
 	end
+
+	local mins
+	local maxs
+	local minx = {}
+	local miny = {}
+	local minz = {}
+	local maxx = {}
+	local maxy = {}
+	local maxz = {}
+	for k, v in pairs( CreatedEntities ) do
+		if v:GetClass() == "prop_physics" then
+			if v:GetPhysicsObject() and v:GetPhysicsObject():GetSurfaceArea()~=nil and v:GetPhysicsObject():GetMass()>1 then --get surface area checks if not made spherical to avoid getting wheels in here
+				mins = self:WorldToLocal(v:LocalToWorld(v:OBBMins()))
+				maxs = self:WorldToLocal(v:LocalToWorld(v:OBBMaxs()))
+				minx[#minx+1] = mins.x
+				miny[#miny+1] = mins.y
+				minz[#minz+1] = mins.z
+				maxx[#maxx+1] = maxs.x
+				maxy[#maxy+1] = maxs.y
+				maxz[#maxz+1] = maxs.z
+			end
+		end
+	end
+	table.sort(minx)
+	table.sort(miny)
+	table.sort(minz)
+	table.sort(maxx)
+	table.sort(maxy)
+	table.sort(maxz)
+	self.HitBoxMins = Vector(minx[1],miny[1],minz[1])
+	self.HitBoxMaxs = Vector(maxx[#maxx],maxy[#maxy],maxz[#maxz])
+
+	--print(self.HitBoxMins)
+	--print(self.HitBoxMaxs)
+	--print(self.HitBoxMaxs - self.HitBoxMins)
+
 	self.PreCostTimerFirst = CurTime()
 	self.DakOwner = Player
 	self.BaseClass.PostEntityPaste( self, Player, Ent, CreatedEntities )
@@ -2579,6 +2888,7 @@ function ENT:OnRemove()
 		for i = 1, table.Count(self.HitBox) do
 			self.HitBox[i].DakPooled = 0
 			self.HitBox[i].DakController = nil
+			self.HitBox[i].DakLegit = nil
 		end
 	end
 	if gmod.GetGamemode().Name=="DakTank" then

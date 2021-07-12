@@ -51,7 +51,9 @@ net.Receive( "daktankcoredetail", function()
 					ProperClipping.AddVisualClip(Detailplate, cur.ClipData[j].n:Forward(), cur.ClipData[j].d, cur.ClipData[j].inside, false)
 				end
 			end
-			core.Detail[#core.Detail+1] = Detailplate
+			if core.Detail ~= nil then
+				core.Detail[#core.Detail+1] = Detailplate
+			end
 		end
 	end
 end )

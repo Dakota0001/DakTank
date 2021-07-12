@@ -363,6 +363,7 @@ function ENT:Think()
 				end
 			end
 		end
+		if not(self:IsSolid()) then self.DakSpeed = 0 end
 
 		if self.DakHealth > self.DakMaxHealth then
 			self.DakHealth = self.DakMaxHealth

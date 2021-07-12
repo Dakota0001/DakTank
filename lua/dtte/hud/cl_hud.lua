@@ -123,7 +123,7 @@ local function DrawReadout()
 			mode = GetConVar( "DakTankInfoScannerMode" ):GetInt()
 		end
 
-		local pixels = 100
+		local pixels = 50
 		local curpixel = 0
 		local pixelsize = 200 / pixels
 
@@ -281,11 +281,14 @@ net.Receive("daktankhud", function()
 end)
 net.Receive("daktankhud3", function()
 	FrontArmor = util.JSONToTable(net.ReadString())
-
-	if CanDraw and #FrontArmor == 0 then
+	if FrontArmor==nil then
 		StopDrawing()
 	else
-		StartDrawing()
+		if CanDraw and #FrontArmor == 0 then
+			StopDrawing()
+		else
+			StartDrawing()
+		end
 	end
 end)
 net.Receive("daktankhud2", function()

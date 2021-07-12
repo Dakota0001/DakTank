@@ -165,10 +165,10 @@ function ENT:Think()
 			self:SetMaterial("models/props_buildings/plasterwall021a")
 			self:SetColor(Color(100,100,100,255))
 			self.DakDead = true
-			self.DakGun.Loaded = 0
+			if IsValid(self.DakGun) then self.DakGun.Loaded = 0 end
 		end
 	else
-		self.DakGun.Loaded = 0
+		if IsValid(self.DakGun) then self.DakGun.Loaded = 0 end
 		self.DakHealth = 0
 	end
 
@@ -179,7 +179,7 @@ function ENT:Think()
 			self:SetMaterial("models/props_buildings/plasterwall021a")
 			self:SetColor(Color(100,100,100,255))
 			self.DakDead = true
-			self.DakGun.Loaded = 0
+			if IsValid(self.DakGun) then self.DakGun.Loaded = 0 end
 		end
 	end
 
