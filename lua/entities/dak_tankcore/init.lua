@@ -218,7 +218,6 @@ end)
 --cause self to delete self if not properly unfrozen
 
 --have tank just keep rolling with gearbox on death (they aren't being added to contraption, find all axised to baseplate)
-
 local PhysObj = FindMetaTable("PhysObj")
 local O_Mass = PhysObj.SetMass
 function PhysObj:SetMass(Mass)
@@ -1697,29 +1696,34 @@ function ENT:Think()
 													self.Modern = 1
 													local Density = 2000
 													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													CurrentRes.DakLegitMass = CurrentRes:GetPhysicsObject():GetMass()
 													self.NERAWeight = self.NERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 												if CurrentRes.EntityMods.CompositeType == "Stillbrew" then
 													self.Modern = 1
 													local Density = 5750
 													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													CurrentRes.DakLegitMass = CurrentRes:GetPhysicsObject():GetMass()
 													self.StillbrewWeight = self.StillbrewWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 												if CurrentRes.EntityMods.CompositeType == "Textolite" then
 													self.ColdWar = 1
 													local Density = 1850
 													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													CurrentRes.DakLegitMass = CurrentRes:GetPhysicsObject():GetMass()
 													self.TextoliteWeight = self.TextoliteWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 												if CurrentRes.EntityMods.CompositeType == "Concrete" then
 													local Density = 2400
 													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													CurrentRes.DakLegitMass = CurrentRes:GetPhysicsObject():GetMass()
 													self.ConcreteWeight = self.ConcreteWeight + CurrentRes:GetPhysicsObject():GetMass()
 												end
 												if CurrentRes.EntityMods.CompositeType == "ERA" then
 													self.ColdWar = 1
 													local Density = 1732
 													CurrentRes:GetPhysicsObject():SetMass(math.Round(CurrentRes:GetPhysicsObject():GetVolume()/61023.7*Density))
+													CurrentRes.DakLegitMass = CurrentRes:GetPhysicsObject():GetMass()
 													self.ERAWeight = self.ERAWeight + CurrentRes:GetPhysicsObject():GetMass()
 													self.ERA[#self.ERA+1]=CurrentRes
 												end
@@ -1971,7 +1975,10 @@ function ENT:Think()
 												end
 												self.Composites[i].IsComposite = 1
 												weightvalcomp = math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density)
-												if self.Composites[i]:GetPhysicsObject():GetMass() ~= weightvalcomp then self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) ) end
+												if self.Composites[i]:GetPhysicsObject():GetMass() ~= weightvalcomp then 
+													self.Composites[i]:GetPhysicsObject():SetMass( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) )
+													self.Composites[i].DakLegitMass = ( math.Round(self.Composites[i]:GetPhysicsObject():GetVolume()/61023.7*Density) ) 
+												end
 												self.Composites[i].DakArmor = 10*KE
 											end
 										end
@@ -2099,6 +2106,7 @@ function ENT:Think()
 												self.ERAHandlers[j].EntityMods.IsERA = 1
 												self.ERAHandlers[j].EntityMods.DakName = "ERA HANDLER"
 												self.ERAHandlers[j]:GetPhysicsObject():SetMass(Mass)
+												self.ERAHandlers[j].DakLegitMass = Mass
 											end
 											for i=1, math.ceil(#self.ERAInfoTable/50) do
 												local tablesegment = {}
@@ -2157,7 +2165,10 @@ function ENT:Think()
 														self.ERA[i].EntityMods.IsERA = 1
 													end
 													local weightval = math.Round(self.ERA[i]:GetPhysicsObject():GetVolume()/61023.7*1732) 
-													if self.ERA[i]:GetPhysicsObject():GetMass() ~= weightval then self.ERA[i]:GetPhysicsObject():SetMass( weightval ) end
+													if self.ERA[i]:GetPhysicsObject():GetMass() ~= weightval then 
+														self.ERA[i]:GetPhysicsObject():SetMass( weightval ) 
+														self.ERA[i].DakLegitMass = weightval 
+													end
 													self.ERA[i].DakArmor = 2.5
 												end
 											end
@@ -2521,6 +2532,7 @@ function ENT:Think()
 
 														TurretPhys:SetAngles(self.TurretControls[j].turretaimer:GetAngles() + Angle(math.Rand(-15,15),math.Rand(-15,15),math.Rand(-15,15)))
 														TurretPhys:GetPhysicsObject():SetMass(self.TurretControls[j].GunMass)
+														TurretPhys.DakLegitMass = self.TurretControls[j].GunMass
 														TurretPhys:GetPhysicsObject():ApplyForceCenter(TurretPhys:GetUp()*2500*self:GetTurretPopForceMult()*TurretPhys:GetPhysicsObject():GetMass())
 														TurretPhys:GetPhysicsObject():AddAngleVelocity(VectorRand()*500*self:GetTurretPopForceMult())
 														self.RemoveTurretList[#self.RemoveTurretList+1] = self.TurretControls[j].TurretBase
