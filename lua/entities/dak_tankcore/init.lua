@@ -152,12 +152,13 @@ hook.Add("AdvDupe_FinishPasting", "daktank_tankcore_check", function(dupe)
 		local ent = ents[id]
 		if IsValid(ent) then
 			if ent:GetClass() == "dak_tankcore" then
-				timer.Simple(engine.TickInterval() + 1,function()
+				timer.Simple(engine.TickInterval() + 2,function()
 					ent.DakFinishedPasting = 1
 				end)
 			end
 			--also do guns while we're here
 			if ent:GetClass() == "dak_tegun" or ent:GetClass() == "dak_teautogun" or ent:GetClass() == "dak_temachinegun" then
+				ent.SlowThinkTime = 0
 				local ScalingGun = 0
 				if ent.DakModel == "models/daktanks/mortar100mm2.mdl" then ScalingGun = 1 end
 				if ent.DakModel == "models/daktanks/grenadelauncher100mm.mdl" then ScalingGun = 1 end
@@ -1048,8 +1049,14 @@ function ENT:Think()
 
 							--also have an exception here for flamethrower damage per shot
 							if self.Guns[g]:GetClass() == "dak_teautogun" then
-								ShotsPerSecond = 1/((self.Guns[g].DakCooldown * (1/self.Guns[g].FireRateMod))+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
+								self.Guns[g].FirstLoad = true
+								if self.Guns[g].BaseMagazine~=nil then
+									ShotsPerSecond = 1/((self.Guns[g].DakCooldown * (1/self.Guns[g].FireRateMod))+((1/self.Guns[g].BaseMagazine)*self.Guns[g].DakReloadTime))
+								else
+									ShotsPerSecond = 1/((self.Guns[g].DakCooldown * (1/self.Guns[g].FireRateMod))+((1/self.Guns[g].DakMagazine)*self.Guns[g].DakReloadTime))
+								end
 								DPS = ShellDamage*ShotsPerSecond
+
 								if self.Guns[g].ReadyRounds == 2 then 
 									DPS = DPS*2 
 								end
@@ -2853,7 +2860,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	local maxy = {}
 	local maxz = {}
 	for k, v in pairs( CreatedEntities ) do
-		if v:GetClass() == "prop_physics" then
+		if IsValid(v) and v:GetClass() == "prop_physics" then
 			if v:GetPhysicsObject() and v:GetPhysicsObject():GetSurfaceArea()~=nil and v:GetPhysicsObject():GetMass()>1 then --get surface area checks if not made spherical to avoid getting wheels in here
 				mins = self:WorldToLocal(v:LocalToWorld(v:OBBMins()))
 				maxs = self:WorldToLocal(v:LocalToWorld(v:OBBMaxs()))

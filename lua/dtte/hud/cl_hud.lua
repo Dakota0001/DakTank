@@ -191,7 +191,7 @@ local function DrawReadout()
 			end
 			surface.SetDrawColor(255, 0, 0, 200)
 			for i=1, (10000-#FrontArmor)*0.1 do
-				surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * math.random(1,100)), y * 0.2 + yadd - 250 + (1 * pixelsize * math.random(1,100)), pixelsize, pixelsize)
+				surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * math.random(1,pixels)), y * 0.2 + yadd - 250 + (1 * pixelsize * math.random(1,pixels)), pixelsize, pixelsize)
 			end
 			draw.DrawText("Scanning...", "DakTankHudFont1", x * 0.05 + 475, y * 0.2 + yadd - 250, Color(0, 255, 0, 255), TEXT_ALIGN_LEFT)
 		end
@@ -261,7 +261,7 @@ local function DrawReadout()
 			end
 			surface.SetDrawColor(255, 0, 0, 200)
 			for i=1, (10000-#SideArmor)*0.1 do
-				surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * math.random(1,100)), y * 0.2 + yadd + (1 * pixelsize * math.random(1,100)), pixelsize, pixelsize)
+				surface.DrawRect(x * 0.05 + 475 + 200 - (1 * pixelsize * math.random(1,pixels)), y * 0.2 + yadd + (1 * pixelsize * math.random(1,pixels)), pixelsize, pixelsize)
 			end
 			draw.DrawText("Scanning...", "DakTankHudFont1", x * 0.05 + 475, y * 0.2 + yadd, Color(0, 255, 0, 255), TEXT_ALIGN_LEFT)
 		end

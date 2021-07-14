@@ -129,7 +129,7 @@ function ENT:Think()
 				end
 			end
 		end
-		if CurTime()>=self.SlowThinkTime+1 then
+		if CurTime()>=self.SlowThinkTime+1 or self.FirstLoad==nil then
 			if self.DakGunType == "Autoloader" then
 				self.DakName = self.DakCaliber.."mm Autoloader"
 				self.DakMaxHealth = self.DakCaliber
@@ -613,6 +613,7 @@ function ENT:Think()
 				self.BaseDakShellVelocity = self.BasicVelocity*27/50
 				self.DakPellets = 10
 
+				self.BaseMagazine = math.Round(800/self.DakCaliber)
 				self.DakMagazine = math.Round(800/self.DakCaliber)
 				self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
 
@@ -687,6 +688,7 @@ function ENT:Think()
 				self.DakShellTrail = "dakteballistictracer"
 				self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 				self.DakPellets = 10
+				self.BaseMagazine = math.Round(800/self.DakCaliber)
 				self.DakMagazine = math.Round(800/self.DakCaliber)
 				self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
 
@@ -773,6 +775,7 @@ function ENT:Think()
 				self.DakShellTrail = "dakteballistictracer"
 				self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 				self.DakPellets = 10
+				self.BaseMagazine = math.Round(600/self.DakCaliber)
 				self.DakMagazine = math.Round(600/self.DakCaliber)
 				self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
 
@@ -1120,7 +1123,7 @@ function ENT:Think()
 			self.DakArmor = 3.90625*(self:GetPhysicsObject():GetMass()/4.6311781)*(288/self:GetPhysicsObject():GetSurfaceArea()) - self.DakBurnStacks*0.25
 			self.SlowThinkTime = CurTime()
 		end
-		if CurTime()>=self.MidThinkTime+0.33 and self.BaseDakShellDamage ~= nil then
+		if (CurTime()>=self.MidThinkTime+0.33 or self.FirstLoad==nil) and self.BaseDakShellDamage ~= nil then
 			self:DakTEAutoAmmoCheck()
 
 			WireLib.TriggerOutput(self, "MagazineRounds", self.DakMagazine - self.DakShotsCounter)
@@ -1149,7 +1152,7 @@ function ENT:Think()
 			self.MidThinkTime = CurTime()
 		end
 	else
-		if CurTime()>=self.SlowThinkTime+1 then
+		if CurTime()>=self.SlowThinkTime+1 or self.FirstLoad==nil then
 			if self.DakGunType == "Autoloader" then
 				self.DakName = self.DakCaliber.."mm Autoloader"
 				self.DakMaxHealth = self.DakCaliber
@@ -1633,6 +1636,7 @@ function ENT:Think()
 				self.BaseDakShellVelocity = self.BasicVelocity*27/50
 				self.DakPellets = 10
 
+				self.BaseMagazine = math.Round(800/self.DakCaliber)
 				self.DakMagazine = math.Round(800/self.DakCaliber)
 				self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
 
@@ -1707,6 +1711,7 @@ function ENT:Think()
 				self.DakShellTrail = "dakteballistictracer"
 				self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 				self.DakPellets = 10
+				self.BaseMagazine = math.Round(800/self.DakCaliber)
 				self.DakMagazine = math.Round(800/self.DakCaliber)
 				self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
 
@@ -1793,6 +1798,7 @@ function ENT:Think()
 				self.DakShellTrail = "dakteballistictracer"
 				self.BaseDakShellVelocity = self.BasicVelocity*self.ShellLengthMult
 				self.DakPellets = 10
+				self.BaseMagazine = math.Round(600/self.DakCaliber)
 				self.DakMagazine = math.Round(600/self.DakCaliber)
 				self.DakReloadTime = math.sqrt(self.BaseDakShellMass)*0.5*self.DakMagazine
 
