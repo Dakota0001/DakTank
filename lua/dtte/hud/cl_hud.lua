@@ -123,7 +123,7 @@ local function DrawReadout()
 			mode = GetConVar( "DakTankInfoScannerMode" ):GetInt()
 		end
 
-		local pixels = 50
+		local pixels = 40
 		local curpixel = 0
 		local pixelsize = 200 / pixels
 

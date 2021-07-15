@@ -326,9 +326,7 @@ function DTHullTrace(Start, End, Mins, Maxs, Filter, Core)
 	local Ent = SimpleTrace.Entity
 	local Pos = SimpleTrace.HitPos
 	if Ent:IsValid() then
-		print(Ent)
-		Ent:SetColor(Color(255,0,0,255))
-		if not(CheckClip(Ent,Pos)) and ((Ent:GetPhysicsObject():IsValid() and Ent:GetPhysicsObject():GetMass()>1)) and Ent:GetClass()=="prop_physics" and Ent.Controller == Core.Controller then
+		if Ent:GetClass()=="dak_crew" and Ent.Controller == Core.Controller then
 			Stop = 1
 		end
 	end
@@ -337,20 +335,51 @@ end
 
 function DTHullRecurseTrace(Start, End, Mins, Maxs, Filter, Core)
 	local Ent, Pos, Stop = DTHullTrace(Start, End, Mins, Maxs, Filter, Core)
+	local EntTable = {}
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
 	local newEnt = Ent
-	local LastPos = Pos
-	if Stop == 1 then
-		return LastPos
+	local ThickestEnt
+	local ThickestPos
+	if Ent:GetClass() == "prop_physics" then
+		if (Ent:GetPhysicsObject():IsValid() and Ent:GetPhysicsObject():GetMass()>1 and Ent:GetPhysicsObject():GetMass() == Ent.DakLegitMass and Ent.DakLegit==1) then
+			ThickestEnt = Ent
+			ThickestPos = Pos
+			EntTable[#EntTable+1] = Ent
+		end
 	end
-	while Stop == 0 and Recurse<25 do
+	local LastPos = Pos
+	--record thickest armor platebefore impact
+	if Stop == 1 then
+		--print(ThickestEnt)
+		--ThickestEnt:SetColor(Color(0,255,0,255))
+		return ThickestPos, ThickestEnt
+	end
+	while Stop == 0 and Recurse<1000 do
 		local newEnt, LastPos, Stop = DTHullTrace(Start, End, Mins, Maxs, NewFilter, Core)
+		if newEnt:GetClass() == "prop_physics" then
+			if (newEnt:GetPhysicsObject():IsValid() and newEnt:GetPhysicsObject():GetMass()>1 and newEnt:GetPhysicsObject():GetMass() == newEnt.DakLegitMass and newEnt.DakLegit==1) then
+				if ThickestEnt == nil then
+					ThickestEnt = newEnt
+					ThickestPos = LastPos
+					EntTable[#EntTable+1] = newEnt
+				else
+					if newEnt.DakArmor > ThickestEnt.DakArmor then
+						ThickestEnt = newEnt
+						ThickestPos = LastPos
+						EntTable[#EntTable+1] = newEnt
+					end
+				end
+			end
+		end
 		NewFilter[#NewFilter+1] = newEnt
 		Recurse = Recurse + 1
 		if Stop == 1 then
-			return LastPos
+			--print(Recurse)
+			--print(ThickestEnt)
+			--ThickestEnt:SetColor(Color(255,0,0,255))
+			return ThickestPos, ThickestEnt
 		end
 	end
 end
@@ -632,12 +661,16 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 	local Fails = HeatFailed
 	local Rico = 0
 	local Thickest = Armor
+	local ThickestPos
+	if IsValid(Ent) and (Ent:GetClass() == "prop_physics" or Ent:GetClass() == "dak_crew") then
+		ThickestPos = FirstPenPos
+	end
 	local SpallLiner = 0 
 	local SpallLinerOnCrit = 0
 	local LinerThickness = 0
 	local CritEnt = NULL
 
-	while Go == 1 and Recurse<25 do
+	while Go == 1 and Recurse<50 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
 		local newValid = false
 		local newEntClass
@@ -660,6 +693,9 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 			end
 			if newArmor >= Thickest then 
 				Thickest = newArmor
+				if newEntClass == "prop_physics" and HitCrew == 0 then
+					ThickestPos = LastPenPos
+				end
 				SpallLiner = 0
 				LinerThickness = 0
 			else
@@ -708,7 +744,7 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 		else
 			Go = 0
 		end
-		if Recurse >= 25 then
+		if Recurse >= 50 then
 			return math.huge, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
 		end
 		if Go == 0 then
@@ -723,7 +759,7 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 				if Fails > 0 then Rico = 1 end
 			end
 			if HitCrew == 1 then
-				return CrewArmor, LastCrew, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit, CrewArmors, CrewHits
+				return CrewArmor, LastCrew, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit, CrewArmors, CrewHits, ThickestPos
 			else
 				return Armor, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
 			end

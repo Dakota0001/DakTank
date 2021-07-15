@@ -100,7 +100,7 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 									weight = math.Round(TurretsSorted[i].GunMass/1000,2)
 								end
 								if TurretsSorted[i].RotationSpeed ~= nil then
-									speed = math.Round((TurretsSorted[i].RotationSpeed*1/engine.TickInterval()),2)
+									speed = math.Round((TurretsSorted[i].RotationSpeed/(1/66.6)),2)
 								end
 								InfoTable2[info2count] = "-Turret "..i..", "..motors.." motors, "..weight.." tons, "..speed.." deg/s"
 							end
@@ -232,13 +232,21 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 
 							timer.Simple(0.1,function()
 								net.Start( "daktankhud3" )
-								net.WriteString( util.TableToJSON( Target.frontarmortable ) )
+								if Target.frontarmortable then
+									net.WriteString( util.TableToJSON( Target.frontarmortable ) )
+								else
+									net.WriteString( util.TableToJSON( {} ) )
+								end
 								net.Send( CurPlayer )
 							end)
 
 							timer.Simple(0.2,function()
 								net.Start( "daktankhud2" )
-								net.WriteString( util.TableToJSON( Target.sidearmortable ) )
+								if Target.sidearmortable then
+									net.WriteString( util.TableToJSON( Target.sidearmortable ) )
+								else
+									net.WriteString( util.TableToJSON( {} ) )
+								end
 								net.Send( CurPlayer )
 							end)
 

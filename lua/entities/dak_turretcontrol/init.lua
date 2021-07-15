@@ -156,7 +156,7 @@ function ENT:Initialize()
 	self.DakArmor = 10
 	--local phys = self:GetPhysicsObject()
 	self.timer = CurTime()
-
+	self.CoreRemoteMult = 1
 	
 
 	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]", "Lock", "CamTrace2 [RANGER]", "Active2" })
@@ -356,64 +356,81 @@ function ENT:Think()
 							if self.DakCrew.DakDead == true then
 								self.RotationSpeed = 0
 							end
-							if not(self.Controller.ColdWar == nil and self.Controller.Modern == nil) then
-								if not(self.Controller.ColdWar == 1 or self.Controller.Modern == 1) then
-									if IsValid(self.TurretBase) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
-										if self.DakCrew:IsValid() then
-											if self.DakCrew:GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent():IsValid() then
-													if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
-														self.RotationSpeed = 0
-														if self.GunnerErrorMessageSent2 == nil then
-															self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in turret, remote weapon systems are cold war and modern only.")
-															self.GunnerErrorMessageSent2 = true
-														end
+							if not(self.Controller.ColdWar == 1 or self.Controller.Modern == 1) then
+								--check for both gun itself and pivot point
+								if self.RemoteWeapon == true then
+									self.RotationSpeed = 0
+									if self.FloatGunErrorMessageSent == nil then
+										self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." Gun not within turret, remote weapon systems are cold war and modern only.")
+										self.FloatGunErrorMessageSent = true
+									end
+								end
+								if IsValid(self.TurretBase) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
+									if self.DakCrew:IsValid() then
+										if self.DakCrew:GetParent():IsValid() then
+											if self.DakCrew:GetParent():GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
+													self.RotationSpeed = 0
+													if self.GunnerErrorMessageSent2 == nil then
+														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in turret, remote weapon systems are cold war and modern only.")
+														self.GunnerErrorMessageSent2 = true
 													end
 												end
 											end
 										end
 									end
-									if not(IsValid(self.TurretBase)) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
-										if self.DakCrew:IsValid() then
-											if self.DakCrew:GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent():IsValid() then
-													if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
-														self.RotationSpeed = 0
-														if self.GunnerErrorMessageSent3 == nil then
-															self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in hull, remote weapon systems are cold war and modern only.")
-															self.GunnerErrorMessageSent3 = true
-														end
+								end
+								if not(IsValid(self.TurretBase)) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
+									if self.DakCrew:IsValid() then
+										if self.DakCrew:GetParent():IsValid() then
+											if self.DakCrew:GetParent():GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
+													self.RotationSpeed = 0
+													if self.GunnerErrorMessageSent3 == nil then
+														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." gunner not in hull, remote weapon systems are cold war and modern only.")
+														self.GunnerErrorMessageSent3 = true
 													end
 												end
 											end
 										end
 									end
-								else
-									if IsValid(self.TurretBase) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
-										if self.DakCrew:IsValid() then
-											if self.DakCrew:GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent():IsValid() then
-													if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
-														if self.GunnerErrorMessageSent2 == nil then
-															self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
-															self.GunnerErrorMessageSent2 = true
-															self.RemoteWeapon = true
-														end
+								end
+							else
+								--check for both gun itself and pivot point
+								if self.RemoteWeapon == true then
+									self.RotationSpeed = self.RotationSpeed*self.CoreRemoteMult
+									if self.nonWWIIRemoteGunErrorMessageSent == nil then
+										self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
+										self.nonWWIIRemoteGunErrorMessageSent = true
+										self.RemoteWeapon = true
+									end
+								end
+								if IsValid(self.TurretBase) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
+									if self.DakCrew:IsValid() then
+										if self.DakCrew:GetParent():IsValid() then
+											if self.DakCrew:GetParent():GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent() ~= self.TurretBase and self.DakCrew:GetParent():GetParent() ~= self.DakGun then
+													self.RotationSpeed = self.RotationSpeed*self.CoreRemoteMult
+													if self.nonWWIIRemoteGunErrorMessageSent == nil then
+														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
+														self.nonWWIIRemoteGunErrorMessageSent = true
+														self.RemoteWeapon = true
 													end
 												end
 											end
 										end
 									end
-									if not(IsValid(self.TurretBase)) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
-										if self.DakCrew:IsValid() then
-											if self.DakCrew:GetParent():IsValid() then
-												if self.DakCrew:GetParent():GetParent():IsValid() then
-													if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
-														if self.GunnerErrorMessageSent3 == nil then
-															self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
-															self.GunnerErrorMessageSent3 = true
-															self.RemoteWeapon = true
-														end
+								end
+								if not(IsValid(self.TurretBase)) and (math.Clamp(self:GetYawMin(),0,360)+math.Clamp(self:GetYawMax(),0,360)>90) then
+									if self.DakCrew:IsValid() then
+										if self.DakCrew:GetParent():IsValid() then
+											if self.DakCrew:GetParent():GetParent():IsValid() then
+												if self.DakCrew:GetParent():GetParent() == self:GetParent():GetParent() or self.DakCrew:GetParent():GetParent() == self.DakGun then
+													self.RotationSpeed = self.RotationSpeed*self.CoreRemoteMult
+													if self.nonWWIIRemoteGunErrorMessageSent == nil then
+														self.DakOwner:ChatPrint(self.DakName.." #"..self:EntIndex().." remote weapon system detected, 50% cost increase added to gun handling multiplier for this turret.")
+														self.nonWWIIRemoteGunErrorMessageSent = true
+														self.RemoteWeapon = true
 													end
 												end
 											end

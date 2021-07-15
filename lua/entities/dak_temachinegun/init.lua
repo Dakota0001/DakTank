@@ -221,6 +221,7 @@ function ENT:Think()
 				self.DakMaxHealth = 10
 				self.DakArmor = 50
 				self.DakMass = 50
+				self.DakCaliber = 100 --keep this here for scaling purposes
 
 				self.DakAP = "Flamethrower Fuel"
 
@@ -383,6 +384,7 @@ function ENT:Think()
 				self.DakMaxHealth = 10
 				self.DakArmor = 50
 				self.DakMass = 50
+				self.DakCaliber = 100 --keep this here for scaling purposes
 
 				self.DakAP = "Flamethrower Fuel"
 
