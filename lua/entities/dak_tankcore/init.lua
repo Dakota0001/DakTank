@@ -1254,7 +1254,7 @@ function ENT:Think()
 												local RotationSpeed = self.TurretControls[i].RotationSpeed
 												if InCrewBounds==false and InVehicleBounds==false then
 													self.TurretControls[i].RemoteWeapon = true
-													RotationSpeed = self.TurretControls[i].RotationSpeed*math.Min((100/WeaponMass),1)
+													--RotationSpeed = self.TurretControls[i].RotationSpeed*math.Min((100/WeaponMass),1)
 												end
 												if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
 													self.MainTurret = self.TurretControls[i]
