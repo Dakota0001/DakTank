@@ -488,7 +488,12 @@ function ENT:Think()
 						local right
 						local up
 						do --Get orientation and forward entity
-							
+							self.MainTurret = self.TurretControls[1]
+							for i=1, #self.TurretControls do
+								if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
+									self.MainTurret = self.TurretControls[i]
+								end
+							end
 							if IsValid(self.Gearbox) then
 								forward = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Forward()
 								right = Angle(0,self.Gearbox.ForwardEnt:GetAngles().yaw,0):Right()
