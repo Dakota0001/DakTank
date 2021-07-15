@@ -488,8 +488,8 @@ function ENT:Think()
 						local right
 						local up
 						do --Get orientation and forward entity
-							self.MainTurret = self.TurretControls[1]
 							for i=1, #self.TurretControls do
+								self.MainTurret = self.TurretControls[1]
 								if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
 									self.MainTurret = self.TurretControls[i]
 								end
@@ -1560,19 +1560,21 @@ function ENT:Think()
 								end
 								if turrets[i].WiredGun ~= NULL then
 									if turrets[i].WiredGun:GetClass() == "dak_tegun" or turrets[i].WiredGun:GetClass() == "dak_teautogun" or turrets[i].WiredGun:GetClass() == "dak_temachinegun" then
-										self.Contraption[#self.Contraption+1] = turrets[i].WiredGun:GetParent():GetParent()
-										TurEnts[#TurEnts+1] = turrets[i].WiredGun:GetParent():GetParent()
-										for k, v in pairs(turrets[i].WiredGun:GetParent():GetParent():GetChildren()) do
-											self.Contraption[#self.Contraption+1] = v
-											TurEnts[#TurEnts+1] = v
-											for k2, v2 in pairs(v:GetChildren()) do
-												self.Contraption[#self.Contraption+1] = v2
-												TurEnts[#TurEnts+1] = v2
-												if v2:GetClass() == "dak_turretcontrol" then
-													turrets2[#turrets2+1] = v2
+										--if IsValid(turrets[i].WiredGun) and IsValid(turrets[i].WiredGun:GetParent()) and IsValid(turrets[i].WiredGun:GetParent():GetParent()) then 
+											self.Contraption[#self.Contraption+1] = turrets[i].WiredGun:GetParent():GetParent() 
+											TurEnts[#TurEnts+1] = turrets[i].WiredGun:GetParent():GetParent()
+											for k, v in pairs(turrets[i].WiredGun:GetParent():GetParent():GetChildren()) do
+												self.Contraption[#self.Contraption+1] = v
+												TurEnts[#TurEnts+1] = v
+												for k2, v2 in pairs(v:GetChildren()) do
+													self.Contraption[#self.Contraption+1] = v2
+													TurEnts[#TurEnts+1] = v2
+													if v2:GetClass() == "dak_turretcontrol" then
+														turrets2[#turrets2+1] = v2
+													end
 												end
 											end
-										end
+										--end
 									else
 										self.DakOwner:ChatPrint(turrets[i].DakName.." #"..turrets[i]:EntIndex().." must have gun wired to a daktank gun.")
 									end
@@ -2058,7 +2060,7 @@ function ENT:Think()
 										ContraptionCurrent = self.Contraption[i]
 										if ContraptionCurrent.Controller == nil or ContraptionCurrent.Controller == NULL or ContraptionCurrent.Controller == self then
 											if IsValid(ContraptionCurrent) then
-												if ContraptionCurrent.DakName == nil and (ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA~=1) then
+												if (ContraptionCurrent.DakName=="Armor" and ContraptionCurrent:GetClass()=="prop_physics") or (ContraptionCurrent.DakName == nil and (ContraptionCurrent.EntityMods and ContraptionCurrent.EntityMods.IsERA~=1)) then
 													if ContraptionCurrent:IsSolid() then
 														self.HitBox[#self.HitBox+1] = ContraptionCurrent
 														ContraptionCurrent.Controller = self
@@ -2419,7 +2421,7 @@ function ENT:Think()
 											--Crew checking
 											for i = 1, #self.Crew do
 												--get angle and kill if upwards direction is over 45 degrees from upwards compared to baseplate
-												if self.Crew[i]:IsValid() then
+												if self.Crew[i]:IsValid() and IsValid(self.ForwardEnt) then
 													local crewang = self.ForwardEnt:WorldToLocalAngles(self.Crew[i]:GetAngles())
 													local a = crewang:Up()
 													local b = self.Forward:Angle():Up()

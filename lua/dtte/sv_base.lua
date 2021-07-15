@@ -27,6 +27,15 @@ function Dak_clampVector(vec)
 end
 local Dak_clampVector = Dak_clampVector
 
+--New check for if in map bounds since modifying original vector is a big nono
+function InMapCheck(vec)
+	if vec.x>bmin and vec.x<bmax and vec.y>bmin and vec.y<bmax and vec.z>bmin and vec.z<bmax then --shells above z max still cause errors so they won't be included for artillery purposes at this time
+		return true
+	else
+		return false
+	end
+end
+
 function DakKillNotSolid(ent)
 	if IsValid(ent.Controller) then
 		if IsValid(ent.Controller.Base) and ent.Controller.Base:GetPhysicsObject():IsMotionEnabled() and (not(ent:IsSolid()) or ent.ClipData ~= nil ) and (ent.Controller.DakHealth > 0 or #ent.Controller.Crew < 2 or ent.Controller.LivingCrew <= math.max(#ent.Controller.Crew-3,1)) then
@@ -348,7 +357,8 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 					trace.mins = Vector(-ShellList[i].DakCaliber*0.02,-ShellList[i].DakCaliber*0.02,-ShellList[i].DakCaliber*0.02)
 					trace.maxs = Vector(ShellList[i].DakCaliber*0.02,ShellList[i].DakCaliber*0.02,ShellList[i].DakCaliber*0.02)
 
-					if not Dak_clampVector(trace.start) or not Dak_clampVector(trace.endpos) then
+					--if not Dak_clampVector(trace.start) or not Dak_clampVector(trace.endpos) then
+					if not(InMapCheck(trace.start) and InMapCheck(trace.endpos)) then
 						ShellList[i].RemoveNow = 1
 					end
 
@@ -366,7 +376,6 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 								util.Effect(ShellList[i].DakTrail, effectdata, true, true)
 							end
 						end
-
 						if ShellTrace.Hit then
 							if not(ShellTrace.HitSky and (ShellTrace.HitNormal == Vector(0,0,-1))) then
 								--check if aps is near if shellvel is low enough and shell type is right

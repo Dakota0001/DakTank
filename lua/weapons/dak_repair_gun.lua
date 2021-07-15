@@ -28,7 +28,7 @@ SWEP.Instructions = "laser torch used for field repairs, heals gearbox, motors, 
 
 SWEP.Category = "DakTank"
  
-SWEP.Spawnable = false
+SWEP.Spawnable = true
 SWEP.AdminOnly = true
  
 SWEP.ViewModel  = "models/weapons/v_irifle.mdl"
