@@ -488,10 +488,12 @@ function ENT:Think()
 						local right
 						local up
 						do --Get orientation and forward entity
-							for i=1, #self.TurretControls do
+							if IsValid(self.TurretControls[1]) then
 								self.MainTurret = self.TurretControls[1]
-								if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
-									self.MainTurret = self.TurretControls[i]
+								for i=1, #self.TurretControls do
+									if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
+										self.MainTurret = self.TurretControls[i]
+									end
 								end
 							end
 							if IsValid(self.Gearbox) then
@@ -1249,8 +1251,10 @@ function ENT:Think()
 												local InCrewBounds = InRange(GunMins.x, CrewMins.x, CrewMaxs.x) and InRange(GunMins.y, CrewMins.y, CrewMaxs.y) and InRange(GunMins.z, CrewMins.z, CrewMaxs.z)
 												local InVehicleBounds = InRange(GunMins.x, CrewMins.x, CrewMaxs.x) and InRange(GunMins.y, CrewMins.y, CrewMaxs.y) and InRange(GunMaxs.z, CrewMins.z, CrewMaxs.z)
 
+												local RotationSpeed = self.TurretControls[i].RotationSpeed
 												if InCrewBounds==false and InVehicleBounds==false then
 													self.TurretControls[i].RemoteWeapon = true
+													RotationSpeed = self.TurretControls[i].RotationSpeed*math.Min((100/WeaponMass),1)
 												end
 												if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
 													self.MainTurret = self.TurretControls[i]
@@ -1259,7 +1263,6 @@ function ENT:Think()
 												--print(RotationSpeed)
 												--print(WeaponMass)
 
-												local RotationSpeed = self.TurretControls[i].RotationSpeed*math.Min((100/WeaponMass),1)
 												local TurretCost = math.log(RotationSpeed*100,100)--(RotationSpeed/20)
 												if self.TurretControls[i].RemoteWeapon == true then
 													self.TurretControls[i].CoreRemoteMult = math.Min((100/WeaponMass),1)
