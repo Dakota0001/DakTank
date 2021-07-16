@@ -390,6 +390,12 @@ local NameTable1 = {
 	"Suicidal ",
 	"Giga ",
 	"Double ",
+	"Fetus ",
+	"Epic ",
+	"Great ",
+	"Blazing ",
+	"Cast Iron ",
+	"Cool ",
 	"",
 }
 local NameTable2 = {
@@ -544,6 +550,21 @@ local NameTable2 = {
 	"Offering",
 	"Dude",
 	"Lord",
+	"Golem",
+	"Launcher",
+	"Owen",
+	"Butcher",
+	"Rat",
+	"Viper",
+	"Abyss",
+	"Jackal",
+	"Brute",
+	"Heart",
+	"Toll",
+	"Tax",
+	"Monger",
+	"Hawk",
+	"Eagle",
 }
 local NameTable3 = {
 	"",
@@ -580,6 +601,14 @@ local NameTable3 = {
 	" Mk. III",
 	" Mk. IV",
 	" Mk. V",
+	"_64",
+	"_83",
+	"_91",
+	"_97",
+	"_99",
+	"_01",
+	"_05",
+	"_11",
 }
 
 function ENT:Initialize()
