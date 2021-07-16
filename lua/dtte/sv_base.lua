@@ -298,8 +298,7 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 						roll = 0--math.Clamp(LocalAng.roll,-10,10)
 					end
 
-
-					ShellList[i].DakVelocity = (ShellList[i].DakVelocity:GetNormalized():Angle() + Angle(pitch,yaw,roll)):Forward() * math.Clamp((12600/2*ShellList[i].LifeTime) - (7875/20*ShellList[i].LifeTime), 4725, 12600)
+					ShellList[i].DakVelocity = (ShellList[i].DakVelocity:GetNormalized():Angle() + Angle(pitch,yaw,roll)):Forward() * ShellList[i].Propellant*math.Clamp((12600/2*ShellList[i].LifeTime) - (7875/20*ShellList[i].LifeTime), 4725, 12600)
 
 					if ShellList[i].LifeTime == 0 then
 						trace.start = ShellList[i].SimPos

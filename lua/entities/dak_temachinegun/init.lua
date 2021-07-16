@@ -517,6 +517,7 @@ function ENT:DakTEFire()
 				Shell.DakTrail = self.DakShellTrail
 				Shell.DakVelocity = ((self.DakShellVelocity * math.Rand( 0.95, 1.05 ) * Propellant) * (shootAngles + Angle(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1)) ):Forward()) + initvel
 				Shell.DakBaseVelocity = self.DakShellVelocity * Propellant
+				Shell.Propellant = Propellant
 				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )
 				Shell.DakMass = self.DakShellMass
 				Shell.DakIsPellet = false
