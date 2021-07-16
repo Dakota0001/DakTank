@@ -575,6 +575,11 @@ local NameTable3 = {
 	"'s Manifesto",
 	" The Hedgehog",
 	" Creature",
+	" Mk. I",
+	" Mk. II",
+	" Mk. III",
+	" Mk. IV",
+	" Mk. V",
 }
 
 function ENT:Initialize()
