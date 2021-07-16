@@ -135,7 +135,7 @@ function ENT:Think()
 	if self:GetPhysicsObject():GetMass() ~= self.DakMass then self:GetPhysicsObject():SetMass(self.DakMass) end
 
 	if self.DakDead ~= true then
-		if self.DakHealth<(self.DakMaxHealth*0.9) and self.DakIsExplosive then
+		if self.DakHealth<(self.DakMaxHealth*0.5) and self.DakIsExplosive then
 			self:Ignite( 60, 0 )
 		end
 		if self:IsOnFire() and self.DakDead ~= true then

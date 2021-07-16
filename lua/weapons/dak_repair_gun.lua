@@ -29,7 +29,7 @@ SWEP.Instructions = "laser torch used for field repairs, heals gearbox, motors, 
 SWEP.Category = "DakTank"
  
 SWEP.Spawnable = true
-SWEP.AdminOnly = true
+SWEP.AdminOnly = false
  
 SWEP.ViewModel  = "models/weapons/v_irifle.mdl"
 SWEP.WorldModel = "models/weapons/w_irifle.mdl"
@@ -181,6 +181,7 @@ function SWEP:PrimaryAttack()
 							end
 							if heal == 0 then
 								for i=1, #self.LastEnt.Controller.Fuel do
+									self.LastEnt.Controller.Fuel[i]:Extinguish()
 									if heal == 0 and self.LastEnt.Controller.Fuel[i].DakHealth < self.LastEnt.Controller.Fuel[i].DakMaxHealth*0.5 then
 										self.LastEnt.Controller.Fuel[i].DakHealth = math.Min(self.LastEnt.Controller.Fuel[i].DakHealth + math.ceil(self.LastEnt.Controller.Fuel[i].DakMaxHealth*0.05),self.LastEnt.Controller.Fuel[i].DakMaxHealth)
 										heal = 1

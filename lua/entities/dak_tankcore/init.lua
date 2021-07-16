@@ -281,6 +281,7 @@ function DakTankCollisions(ent1, ent2, pos)
 end
 
 local NameTable1 = {
+	"Worm ",
 	"Kinetic ",
 	"Super ",
 	"Ultra ",
@@ -378,9 +379,21 @@ local NameTable1 = {
 	"Rolling ",
 	"Baby ",
 	"Infant ",
+	"Vengeful ",
+	"Screaming ",
+	"Burning ",
+	"Burnt ",
+	"Weeping ",
+	"Wailing ",
+	"Final ",
+	"Armored ",
+	"Suicidal ",
+	"Giga ",
+	"Double ",
 	"",
 }
 local NameTable2 = {
+	"Drinker",
 	"Annihilator",
 	"Reaver",
 	"Render",
@@ -511,6 +524,26 @@ local NameTable2 = {
 	"Daddy",
 	"Torment",
 	"Miasma",
+	"Vengence",
+	"Deceiver",
+	"Deserter",
+	"Eater",
+	"Ripper",
+	"Hellfire",
+	"Brimstone",
+	"Scream",
+	"Hail",
+	"Spewer",
+	"Harvester",
+	"Reaper",
+	"Core",
+	"Peacekeeper",
+	"Peacemaker",
+	"Obstruction",
+	"Shredder",
+	"Offering",
+	"Dude",
+	"Lord",
 }
 local NameTable3 = {
 	"",
@@ -1525,7 +1558,7 @@ function ENT:Think()
 												--debugoverlay.BoxAngles( self.ForwardEnt:GetPos(), AimerMins, AimerMaxs, self.ForwardEnt:GetAngles(), 30, Color( 150, 250, 150, 100 ) )
 												--debugoverlay.BoxAngles( self.ForwardEnt:GetPos(), GunMins, GunMaxs, self.ForwardEnt:GetAngles(), 30, Color( 150, 250, 150, 100 ) )
 
-												local InCrewBounds = InRange(GunMins.x, CrewMins.x, CrewMaxs.x) and InRange(GunMins.y, CrewMins.y, CrewMaxs.y) and InRange(GunMins.z, CrewMins.z, CrewMaxs.z)
+												local InCrewBounds = InRange(GunMins.z, CrewMins.z, CrewMaxs.z)
 												local InVehicleBounds = InRange(GunMins.x, CrewMins.x, CrewMaxs.x) and InRange(GunMins.y, CrewMins.y, CrewMaxs.y) and InRange(GunMaxs.z, CrewMins.z, CrewMaxs.z)
 
 												local RotationSpeed = self.TurretControls[i].RotationSpeed
