@@ -834,9 +834,13 @@ function ENT:Think()
 						do --Get orientation and forward entity
 							if IsValid(self.TurretControls[1]) then
 								self.MainTurret = self.TurretControls[1]
-								for i=1, #self.TurretControls do
-									if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
-										self.MainTurret = self.TurretControls[i]
+								if #self.TurretControls > 1 and self.MainTurret.GunMass~=nil then
+									for i=1, #self.TurretControls do
+										if self.TurretControls[i].GunMass~=nil then
+											if self.TurretControls[i].GunMass > self.MainTurret.GunMass then
+												self.MainTurret = self.TurretControls[i]
+											end
+										end
 									end
 								end
 							end
@@ -1907,7 +1911,7 @@ function ENT:Think()
 								end
 								if turrets[i].WiredGun ~= NULL then
 									if turrets[i].WiredGun:GetClass() == "dak_tegun" or turrets[i].WiredGun:GetClass() == "dak_teautogun" or turrets[i].WiredGun:GetClass() == "dak_temachinegun" then
-										--if IsValid(turrets[i].WiredGun) and IsValid(turrets[i].WiredGun:GetParent()) and IsValid(turrets[i].WiredGun:GetParent():GetParent()) then 
+										if IsValid(turrets[i].WiredGun) and IsValid(turrets[i].WiredGun:GetParent()) and IsValid(turrets[i].WiredGun:GetParent():GetParent()) then 
 											self.Contraption[#self.Contraption+1] = turrets[i].WiredGun:GetParent():GetParent() 
 											TurEnts[#TurEnts+1] = turrets[i].WiredGun:GetParent():GetParent()
 											for k, v in pairs(turrets[i].WiredGun:GetParent():GetParent():GetChildren()) do
@@ -1921,7 +1925,7 @@ function ENT:Think()
 													end
 												end
 											end
-										--end
+										end
 									else
 										self.DakOwner:ChatPrint(turrets[i].DakName.." #"..turrets[i]:EntIndex().." must have gun wired to a daktank gun.")
 									end
