@@ -415,6 +415,7 @@ local NameTable1 = {
 	"Ford ",
 	"Dodge ",
 	"Lunar ",
+	"Brutal ",
 	"",
 }
 local NameTable2 = {
@@ -611,6 +612,9 @@ local NameTable2 = {
 	"Force",
 	"Mustang",
 	"Charger",
+	"Raptor",
+	"Predator",
+	"Surge",
 }
 local NameTable3 = {
 	"",
@@ -655,6 +659,7 @@ local NameTable3 = {
 	"_01",
 	"_05",
 	"_11",
+	" F-150",
 }
 
 function ENT:Initialize()
