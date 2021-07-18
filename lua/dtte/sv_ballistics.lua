@@ -996,13 +996,13 @@ function DTCompositesTrace( Ent, StartPos, Dir, Filter )
 end
 
 function DTCheckClip(Ent, HitPos)
+	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
 	if not(Ent.DakLegit==1) then return true end
 	if Ent.DakLegit==1 and IsValid(Ent:GetPhysicsObject()) then
 		if Ent:GetPhysicsObject():GetMass() ~= Ent.DakLegitMass then
 			return true
 		end
 	end
-	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
 	local HitClip = false
 	local normal
 	local origin
@@ -3483,7 +3483,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 					DakTekTankEditionSetupNewEnt(Targets[i])
 				end
 				if not(Targets[i].DakHealth == nil) then
-					if Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1 then
+					if (Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1) and not(Targets[i]:IsPlayer() or Targets[i]:IsNPC() or Targets[i]:GetClass() == "dak_bot" or Targets[i]:GetClass() == "dak_gamemode_bot") then
 						if IsValid(Targets[i]:GetPhysicsObject()) then
 							if Targets[i]:GetPhysicsObject():GetMass()<=1 then
 								Shell.IgnoreList[#Shell.IgnoreList+1] = Targets[i]
