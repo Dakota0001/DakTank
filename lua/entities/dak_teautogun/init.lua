@@ -72,6 +72,7 @@ function ENT:Initialize()
 	self.DakBurnStacks = 0
 	self.BasicVelocity = 29527.6
 	self.AutoSwapStacks = 0
+	self.lastfired = 0
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
@@ -155,11 +156,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -247,11 +244,7 @@ function ENT:Think()
 				self.ShellLengthMult = (70/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*9))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -338,11 +331,7 @@ function ENT:Think()
 				self.ShellLengthMult = (40/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -429,11 +418,7 @@ function ENT:Think()
 				self.ShellLengthMult = (30/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*4))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -515,11 +500,7 @@ function ENT:Think()
 				self.ShellLengthMult = (15/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*2.75))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -853,11 +834,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -922,11 +899,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -994,11 +967,7 @@ function ENT:Think()
 				self.ShellLengthMult = (25/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1141,12 +1110,12 @@ function ENT:Think()
 						WireLib.TriggerOutput(self, "Cooldown", math.huge)
 						WireLib.TriggerOutput(self, "CooldownPercent", 100)
 					else
-						WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
+						WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,10000))
 						WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
 					end
 				end
 			else
-				WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.DakLastReload+self.DakReloadTime)-CurTime(),0,100))
+				WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.DakLastReload+self.DakReloadTime)-CurTime(),0,10000))
 				WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.DakLastReload+self.DakReloadTime)-CurTime(),0,100)/self.DakReloadTime))
 			end
 			self.MidThinkTime = CurTime()
@@ -1178,11 +1147,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1270,11 +1235,7 @@ function ENT:Think()
 				self.ShellLengthMult = (70/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*9))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1361,11 +1322,7 @@ function ENT:Think()
 				self.ShellLengthMult = (40/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1452,11 +1409,7 @@ function ENT:Think()
 				self.ShellLengthMult = (30/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*4))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1538,11 +1491,7 @@ function ENT:Think()
 				self.ShellLengthMult = (15/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*2.75))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1876,11 +1825,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1945,11 +1890,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -2017,11 +1958,7 @@ function ENT:Think()
 				self.ShellLengthMult = (25/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					if self.DakMagazine == 1 then
-						self.DakCooldown = 0.3*self.BaseDakShellMass
-					else
-						self.DakCooldown = 0.15*self.BaseDakShellMass
-					end
+					self.DakCooldown = 0.15*self.BaseDakShellMass
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -2083,12 +2020,14 @@ function ENT:Think()
 		end
 	end
 
-	if CurTime() > (self.timer + self.DakCooldown) then
-		self.ShellLoaded = 1
-	end
-	if self.ReadyRounds == 2 then
-		if CurTime() > (self.timer2 + self.DakCooldown) then
-			self.ShellLoaded2 = 1
+	if self.DakIsReloading==0 then
+		if CurTime() > (self.timer + self.DakCooldown) then
+			self.ShellLoaded = 1
+		end
+		if self.ReadyRounds == 2 then
+			if CurTime() > (self.timer2 + self.DakCooldown) then
+				self.ShellLoaded2 = 1
+			end
 		end
 	end
 
@@ -2361,12 +2300,15 @@ function ENT:DakTEAutoFire()
 					end
 				end
 				--FIREBULLETHERE
+				self.lastfired = 0
 				if self.ShellLoaded == 1 then
 					self.ShellLoaded = 0
 					self.timer = CurTime()
+					self.lastfired = 1
 				else
 					self.ShellLoaded2 = 0
 					self.timer2 = CurTime()
+					self.lastfired = 2
 				end
 				self.LastFireTime = CurTime()
 				local shootOrigin = self:GetPos()
@@ -2486,13 +2428,29 @@ function ENT:DakTEAutoFire()
 							self:EmitSound( "daktanks/dakreloadfinish.mp3", 60, 100, 1, 6)
 						end
 					end)
-					timer.Create( "ReloadTimer"..self:EntIndex()..CurTime(), self.DakReloadTime, 1, function()
-						if IsValid(self) then
-							if self.DakIsReloading == 1 then
-								self.DakIsReloading = 0
+					if self.lastfired == 2 then
+						timer.Create( "ReloadTimer"..self:EntIndex()..CurTime(), self.DakReloadTime, 1, function()
+							if IsValid(self) then
+								if self.DakIsReloading == 1 then
+									self.LastFireTime = CurTime()
+									self.timer2 = CurTime()
+									self.ShellLoaded2 = 0
+									self.DakIsReloading = 0
+								end
 							end
-						end
-					end)
+						end)
+					else
+						timer.Create( "ReloadTimer"..self:EntIndex()..CurTime(), self.DakReloadTime, 1, function()
+							if IsValid(self) then
+								if self.DakIsReloading == 1 then
+									self.LastFireTime = CurTime()
+									self.timer = CurTime()
+									self.ShellLoaded = 0
+									self.DakIsReloading = 0
+								end
+							end
+						end)
+					end
 				end
 
 				local effectdata = EffectData()
@@ -2820,6 +2778,7 @@ function ENT:DakTEAutoGunReload()
 			if IsValid(self) then
 				if self.DakIsReloading == 1 then
 					self.DakIsReloading = 0
+					self.LastFireTime = CurTime()
 				end
 			end
 		end)

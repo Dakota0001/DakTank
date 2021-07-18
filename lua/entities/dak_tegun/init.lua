@@ -775,7 +775,7 @@ function ENT:Think()
 				WireLib.TriggerOutput(self, "Cooldown", 0)
 				WireLib.TriggerOutput(self, "CooldownPercent", 0)
 			else
-				WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
+				WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,10000))
 				WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
 			end
 			WireLib.TriggerOutput(self, "MaxCooldown",self.DakCooldown)

@@ -265,7 +265,7 @@ function ENT:Think()
 		if CurTime()>=self.MidThinkTime+0.33 and self.BaseDakShellDamage ~= nil then
 			self:DakTEAmmoCheck()
 
-			WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100))
+			WireLib.TriggerOutput(self, "Cooldown", math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,10000))
 			WireLib.TriggerOutput(self, "CooldownPercent", 100*(math.Clamp((self.LastFireTime+self.DakCooldown)-CurTime(),0,100)/self.DakCooldown))
 			WireLib.TriggerOutput(self, "MaxCooldown",self.DakCooldown)
 			self.MidThinkTime = CurTime()
