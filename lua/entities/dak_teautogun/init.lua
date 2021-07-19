@@ -73,6 +73,8 @@ function ENT:Initialize()
 	self.BasicVelocity = 29527.6
 	self.AutoSwapStacks = 0
 	self.lastfired = 0
+	self.Refiring = false
+	self.DoubleFire = false
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
@@ -217,6 +219,9 @@ function ENT:Think()
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
 					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
+					end
 				end
 			end
 			if self.DakGunType == "Long Autoloader" then
@@ -303,6 +308,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 			end
@@ -392,6 +400,9 @@ function ENT:Think()
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
 					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
+					end
 				end
 			end
 			if self.DakGunType == "Autoloading Howitzer" then
@@ -475,6 +486,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 			end
@@ -560,6 +574,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 			end
@@ -872,6 +889,9 @@ function ENT:Think()
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
 					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
+					end
 				end
 			end
 			if self.DakGunType == "Autoloading Dual ATGM Launcher" then
@@ -936,6 +956,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 				self.ReadyRounds = 2
@@ -1018,6 +1041,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 			end
@@ -1208,6 +1234,9 @@ function ENT:Think()
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
 					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
+					end
 				end
 			end
 			if self.DakGunType == "Long Autoloader" then
@@ -1294,6 +1323,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 			end
@@ -1383,6 +1415,9 @@ function ENT:Think()
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
 					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
+					end
 				end
 			end
 			if self.DakGunType == "Autoloading Howitzer" then
@@ -1466,6 +1501,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 			end
@@ -1551,6 +1589,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 			end
@@ -1863,6 +1904,9 @@ function ENT:Think()
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
 					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
+					end
 				end
 			end
 			if self.DakGunType == "Autoloading Dual ATGM Launcher" then
@@ -1927,6 +1971,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 				self.ReadyRounds = 2
@@ -2009,6 +2056,9 @@ function ENT:Think()
 				if self.DakTankCore then
 					if self.DakTankCore.Modern == 1 or self.DakTankCore.ColdWar == 1 then
 						self.Loaded = 1
+					end
+					if self.DakTankCore.Modern == 1 then
+						self.DakCooldown = self.DakCooldown*0.75
 					end
 				end
 			end
@@ -2266,7 +2316,7 @@ function ENT:DakTEAutoAmmoCheck()
 end
 util.AddNetworkString( "daktankshotfired" )
 function ENT:DakTEAutoFire()
-	if self.Firing and self.DakIsReloading==0 and self.Loaded==1 and self.DakDead ~= true then
+	if self.Firing and ((self.DakIsReloading==0 and self.Loaded==1) or self.DoubleFire == true) and self.DakDead ~= true then
 		if IsValid(self.DakTankCore) then
 			self.AmmoCount = 0 
 			if not(self.SortedAmmo == nil) then
@@ -2288,7 +2338,7 @@ function ENT:DakTEAutoFire()
 			end
 		end
 		if self.AmmoCount > 0 then
-			if self.ShellLoaded == 1 or self.ShellLoaded2 == 1 then
+			if (self.ShellLoaded == 1 or self.ShellLoaded2 == 1) then
 				--AMMO CHECK HERE
 				for i = 1, #self.SortedAmmo do
 					if IsValid(self.SortedAmmo[i][1]) then
@@ -2793,13 +2843,39 @@ function ENT:TriggerInput(iname, value)
 			if value>0 then
 				self:DakTEAutoFire()
 				self.Firing = value > 0
-				timer.Create( "RefireTimer"..self:EntIndex(), self.DakCooldown/10, 1, function()
+				if self.Refiring then
+					local ShotsFiredSinceLastCall = math.floor((CurTime()-self.LastFireTime)/self.DakCooldown)
+					if ShotsFiredSinceLastCall>0 then
+						for i=1, ShotsFiredSinceLastCall do
+							self.DoubleFire = true
+							self.ShellLoaded = 1
+							self:DakTEAutoFire()
+						end
+					else
+						self.DoubleFire = false
+					end
+				end
+				local timerduration = self.DakCooldown
+				if self.ReadyRounds == 2 then
+					timerduration = timerduration * 0.5
+				end
+				timer.Create( "RefireTimer"..self:EntIndex(), timerduration, 1, function()
 					if IsValid(self) then
+						self.Refiring = true
+						self.DoubleFire = true
+						if self.timer < self.timer2 then
+							self.ShellLoaded = 1
+						else
+							self.ShellLoaded2 = 1
+						end
 						self:TriggerInput("Fire", value)
+						--self:DakTEAutoFire()
 					end
 				end)
 			else
 				timer.Remove( "RefireTimer"..self:EntIndex() )
+				self.Refiring = false
+				self.DoubleFire = false
 			end
 		end
 		if (iname == "SwapAmmo") then

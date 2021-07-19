@@ -54,6 +54,7 @@ function ENT:Initialize()
  	self.CurrentAmmoType = 1
  	self.DakBurnStacks = 0
  	self.BasicVelocity = 29527.6
+ 	self.truefire = false
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
@@ -486,7 +487,7 @@ function ENT:DakTEFire()
 			end
 		end
 		if self.AmmoCount > 0 then
-			if CurTime() > (self.timer + self.DakCooldown) then
+			if CurTime() > (self.timer + self.DakCooldown) or self.truefire then
 				--AMMO CHECK HERE
 				for i = 1, #self.DakTankCore.Ammoboxes do
 					if IsValid(self.DakTankCore.Ammoboxes[i]) then
@@ -650,14 +651,27 @@ function ENT:TriggerInput(iname, value)
 			if value>0 then
 				self:DakTEFire()
 				self.Firing = value > 0
-				timer.Create( "RefireTimer"..self:EntIndex(), self.DakCooldown/10, 1, function()
+				if self.Refiring then
+					local ShotsFiredSinceLastCall = math.floor((CurTime()-self.LastFireTime)/self.DakCooldown)
+					if ShotsFiredSinceLastCall>0 then
+						for i=1, ShotsFiredSinceLastCall do
+							self.truefire = true
+							self:DakTEFire()
+						end
+					end
+				end
+				timer.Create( "RefireTimer"..self:EntIndex(), self.DakCooldown, 1, function()
 					if IsValid(self) then
+						self.Refiring = true
+						self.truefire = true
 						self:TriggerInput("Fire", value)
+						--self:DakTEFire()
 					end
 				end)
 			else
 				timer.Remove( "RefireTimer"..self:EntIndex() )
-
+				self.Refiring = false
+				self.truefire = false
 				if self.FlameFiring == 1 then
 					self.FlameFiring = 0
 					self:StopSound( "daktanks/flamethrower_start.wav" )

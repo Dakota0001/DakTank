@@ -416,6 +416,10 @@ local NameTable1 = {
 	"Dodge ",
 	"Lunar ",
 	"Brutal ",
+	"Sonic ",
+	"Mecha ",
+	"Desert ",
+	"Dick Cheney's ",
 	"",
 }
 local NameTable2 = {
@@ -615,6 +619,11 @@ local NameTable2 = {
 	"Raptor",
 	"Predator",
 	"Surge",
+	"Incinerator",
+	"Fox",
+	"Wolf",
+	"Tyrant",
+	"Delima",
 }
 local NameTable3 = {
 	"",
