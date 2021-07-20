@@ -420,6 +420,17 @@ local NameTable1 = {
 	"Mecha ",
 	"Desert ",
 	"Dick Cheney's ",
+	"Unholy ",
+	"Master ",
+	"Spicy ",
+	"Silent ",
+	"Warp ",
+	"Warped ",
+	"Warpfire ",
+	"Doom ",
+	"Murder ",
+	"Ball ",
+	"Blade ",
 	"",
 }
 local NameTable2 = {
@@ -624,6 +635,18 @@ local NameTable2 = {
 	"Wolf",
 	"Tyrant",
 	"Delima",
+	"Master",
+	"Blaster",
+	"Razor",
+	"Retribution",
+	"Wind",
+	"Guardian",
+	"Paladin",
+	"Gatekeeper",
+	"Ogre",
+	"Cycle",
+	"Breaker",
+	"Heresy",
 }
 local NameTable3 = {
 	"",
@@ -669,6 +692,7 @@ local NameTable3 = {
 	"_05",
 	"_11",
 	" F-150",
+	" Infinite",
 }
 
 function ENT:Initialize()
