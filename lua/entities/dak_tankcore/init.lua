@@ -679,6 +679,7 @@ local NameTable2 = {
 	"Walker",
 	"Bringer",
 	"Intervention",
+	"Behemoth",
 }
 local NameTable3 = {
 	"",
@@ -1712,8 +1713,8 @@ function ENT:Think()
 												--debugoverlay.BoxAngles( self.ForwardEnt:GetPos(), AimerMins, AimerMaxs, self.ForwardEnt:GetAngles(), 30, Color( 150, 250, 150, 100 ) )
 												--debugoverlay.BoxAngles( self.ForwardEnt:GetPos(), GunMins, GunMaxs, self.ForwardEnt:GetAngles(), 30, Color( 150, 250, 150, 100 ) )
 
-												local InCrewBounds = InRange(GunMins.z, CrewMins.z, CrewMaxs.z)
-												local InVehicleBounds = InRange(GunMins.x, CrewMins.x, CrewMaxs.x) and InRange(GunMins.y, CrewMins.y, CrewMaxs.y) and InRange(GunMaxs.z, CrewMins.z, CrewMaxs.z)
+												local InCrewBounds = InRange(math.Min(GunMins.z,GunMaxs.z), CrewMins.z, CrewMaxs.z)
+												local InVehicleBounds = InRange(GunMins.x, VehicleMins.x, VehicleMaxs.x) and InRange(GunMins.y, VehicleMins.y, VehicleMaxs.y) and InRange(GunMaxs.y, VehicleMins.y, VehicleMaxs.y) and InRange(math.Max(GunMins.z,GunMaxs.z), VehicleMins.z, VehicleMaxs.z)
 
 												local RotationSpeed = self.TurretControls[i].RotationSpeed
 												if InCrewBounds==false and InVehicleBounds==false then
