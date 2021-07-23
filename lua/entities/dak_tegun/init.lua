@@ -1437,8 +1437,8 @@ function ENT:DakTEAmmoCheck()
 		self.DakAmmoType = self.DakHVAP
 		self.DakShellAmmoType = "HVAP"
 		self.DakShellExplosive = false
-		self.DakShellDamage = self.BaseDakShellDamage/8
-		self.DakShellMass = self.BaseDakShellMass/8
+		self.DakShellDamage = self.BaseDakShellDamage/4
+		self.DakShellMass = self.BaseDakShellMass/4
 		self.DakShellPenetration = self.BaseDakShellPenetration*1.5
 		self.DakShellVelocity = self.BaseDakShellVelocity*4/3
 		self.DakPenLossPerMeter = 0.001
@@ -1886,8 +1886,8 @@ function ENT:DakTEGunAmmoSwap()
 		self.DakAmmoType = self.DakHVAP
 		self.DakShellAmmoType = "HVAP"
 		self.DakShellExplosive = false
-		self.DakShellDamage = self.BaseDakShellDamage/8
-		self.DakShellMass = self.BaseDakShellMass/8
+		self.DakShellDamage = self.BaseDakShellDamage/4
+		self.DakShellMass = self.BaseDakShellMass/4
 		self.DakShellPenetration = self.BaseDakShellPenetration*1.5
 		self.DakShellVelocity = self.BaseDakShellVelocity*4/3
 		self.DakPenLossPerMeter = 0.001

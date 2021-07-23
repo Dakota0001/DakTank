@@ -624,8 +624,10 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 	local CrewArmor = 0
 	local LastCrew
 	local HitCrit = 0
+	local CritEnt = NULL
 	local CrewArmors = {}
 	local CrewHits = {}
+	local ThickestPos = FirstPenPos
 	if IsValid(Ent) and Ent.Controller == core then
 		if Ent:GetClass() == "dak_crew" or Ent:GetClass() == "dak_teammo" or Ent:GetClass() == "dak_teautoloadingmodule" then
 			if Ent:GetClass() == "dak_teammo" then
@@ -647,6 +649,9 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 				CrewArmor = Armor
 				CrewArmors[#CrewArmors+1] = Armor
 				CrewHits[#CrewHits+1] = Ent
+				ThickestPos = FirstPenPos
+				CritEnt = Ent
+				HitCrit = 1
 			end
 		end
 	end
@@ -661,14 +666,12 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 	local Fails = HeatFailed
 	local Rico = 0
 	local Thickest = Armor
-	local ThickestPos
 	if IsValid(Ent) and (Ent:GetClass() == "prop_physics" or Ent:GetClass() == "dak_crew") then
 		ThickestPos = FirstPenPos
 	end
 	local SpallLiner = 0 
 	local SpallLinerOnCrit = 0
 	local LinerThickness = 0
-	local CritEnt = NULL
 
 	while Go == 1 and Recurse<50 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
@@ -745,7 +748,7 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 			Go = 0
 		end
 		if Recurse >= 50 then
-			return math.huge, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
+			return math.huge, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit, CrewArmors, CrewHits, ThickestPos
 		end
 		if Go == 0 then
 			if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
@@ -761,7 +764,7 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 			if HitCrew == 1 then
 				return CrewArmor, LastCrew, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit, CrewArmors, CrewHits, ThickestPos
 			else
-				return Armor, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
+				return Armor, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit, CrewArmors, CrewHits, ThickestPos
 			end
 		end
 		
