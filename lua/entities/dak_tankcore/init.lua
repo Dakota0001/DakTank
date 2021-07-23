@@ -1643,7 +1643,7 @@ function ENT:Think()
 										ShellDamage = 0.75
 									end
 									if self.Guns[g].DakGunType == "ATGM Launcher" or self.Guns[g].DakGunType == "Dual ATGM Launcher" or self.Guns[g].DakGunType == "Autoloading ATGM Launcher" or self.Guns[g].DakGunType == "Autoloading Dual ATGM Launcher" then
-										ShellDamage = self.Guns[g].BaseDakShellDamage/8
+										ShellDamage = self.Guns[g].BaseDakShellDamage/4
 									end
 
 									--also have an exception here for flamethrower damage per shot

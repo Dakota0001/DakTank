@@ -42,8 +42,7 @@ function EFFECT:Init( data )
 			particle:SetBounce(0)
 		end
 	end
-
-	for i = 1, math.Clamp(math.Round((self.Caliber/0.0393701)/10,0),1,20) do
+	for i = 1, math.Clamp(math.Round(self.Caliber,0),1,20) do
 		local particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
 		if particle == nil then particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
@@ -52,7 +51,7 @@ function EFFECT:Init( data )
 			particle:SetVelocity(Vector(math.Rand(-5,5),math.Rand(-5,5),math.Rand(-5,5)))
 			particle:SetLifeTime(0) 
 			particle:SetDieTime(2.0) 
-			particle:SetStartAlpha(25)
+			particle:SetStartAlpha(15)
 			particle:SetEndAlpha(0)
 			particle:SetStartSize(2*math.Clamp(math.Round((self.Caliber/0.0393701)/10,0),1,20))
 			particle:SetEndSize(10*math.Clamp(math.Round((self.Caliber/0.0393701)/10,0),1,20))
@@ -60,7 +59,7 @@ function EFFECT:Init( data )
 			particle:SetAngleVelocity( Angle(0,0,0) ) 
 			particle:SetRoll(math.Rand( 0, 360 ))
 			local CVal = math.random(150,200)
-			particle:SetColor(CVal,CVal,CVal,math.random(25,25))
+			particle:SetColor(CVal,CVal,CVal,math.random(15,15))
 			particle:SetGravity( Vector(0,0,math.random(5,25)) ) 
 			particle:SetAirResistance(20) 
 			particle:SetCollide(true)

@@ -923,6 +923,7 @@ function ENT:Think()
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
+				self.DakCooldown = self.DakCooldown*2
 				self.DakShellSplashDamage = self.DakCaliber*5
 				self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 				--self.DakShellExplosive = false
@@ -1938,6 +1939,7 @@ function ENT:Think()
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
+				self.DakCooldown = self.DakCooldown*2
 				self.DakShellSplashDamage = self.DakCaliber*5
 				self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
 				--self.DakShellExplosive = false
@@ -2511,7 +2513,11 @@ function ENT:DakTEAutoFire()
 				effectdata:SetOrigin( self:GetPos()+self:GetForward()*length )
 				effectdata:SetAngles( self:GetAngles() )
 				effectdata:SetEntity(self.muzzle)
-				effectdata:SetScale( self.DakMaxHealth*0.25 )
+				if self.DakGunType == "Autoloading Dual ATGM Launcher" or self.DakGunType == "Autoloading ATGM Launcher" then
+					effectdata:SetScale( self.DakMaxHealth*0.05 )
+				else
+					effectdata:SetScale( self.DakMaxHealth*0.25 )
+				end
 				util.Effect( self.DakFireEffect, effectdata, true, true )
 				--self:EmitSound( self.DakFireSound1, 100, self.DakFirePitch, 1, 6)
 				if self.DakAmmoType == self.DakATGM or self.recoilless == true then

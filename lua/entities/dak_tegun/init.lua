@@ -583,7 +583,7 @@ function ENT:Think()
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*self.CooldownWeightMod
 				--print((math.pi*((75*0.001*0.5)^2)*(75*0.001*6.5))*7700)
 				--print((math.pi*((200*0.001*0.5)^2)*(200*0.001*6.5))*7700)
-				self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
+				self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier*2
 				self.ShellLengthMult = (50/50)
 				self.ShellLengthExact = 6.5
 				self.DakShellSplashDamage = self.DakCaliber*5
@@ -1251,7 +1251,7 @@ function ENT:Think()
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*self.CooldownWeightMod
 				--print((math.pi*((75*0.001*0.5)^2)*(75*0.001*6.5))*7700)
 				--print((math.pi*((200*0.001*0.5)^2)*(200*0.001*6.5))*7700)
-				self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
+				self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier*2
 				self.ShellLengthMult = (50/50)
 				self.ShellLengthExact = 6.5
 				self.DakShellSplashDamage = self.DakCaliber*5
@@ -1764,8 +1764,12 @@ function ENT:DakTEFire()
 				effectdata:SetOrigin( self:GetPos()+self:GetForward()*length )
 				effectdata:SetAngles( self:GetAngles() )
 				effectdata:SetEntity(self.muzzle)
-				effectdata:SetScale( self.DakMaxHealth*0.25 )
-				util.Effect( self.DakFireEffect, effectdata, true, true)
+				if self.DakGunType == "Dual ATGM Launcher" or self.DakGunType == "ATGM Launcher" then
+					effectdata:SetScale( self.DakMaxHealth*0.05 )
+				else
+					effectdata:SetScale( self.DakMaxHealth*0.25 )
+				end
+				util.Effect( self.DakFireEffect, effectdata, true, true )
 				--self:EmitSound( self.DakFireSound1, 100, self.DakFirePitch, 1, 6)
 				if self.DakAmmoType == self.DakATGM or self.recoilless == true then
 					if(self:IsValid()) then
