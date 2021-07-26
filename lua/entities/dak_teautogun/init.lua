@@ -2318,7 +2318,7 @@ function ENT:DakTEAutoAmmoCheck()
 end
 util.AddNetworkString( "daktankshotfired" )
 function ENT:DakTEAutoFire()
-	if self.Firing and ((self.DakIsReloading==0 and self.Loaded==1) or self.DoubleFire == true) and self.DakDead ~= true then
+	if self.Firing and self.DakIsReloading==0 and (self.Loaded==1 or self.DoubleFire == true) and self.DakDead ~= true then
 		if IsValid(self.DakTankCore) then
 			self.AmmoCount = 0 
 			if not(self.SortedAmmo == nil) then
