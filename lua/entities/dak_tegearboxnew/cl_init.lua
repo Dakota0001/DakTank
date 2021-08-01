@@ -393,6 +393,17 @@ local function setup_modelinfo(self, vehicleMode, dak_wheels_info)
 			scale2 = scale1*Vector(0.5, 1, 1)
 			rotate = Angle(0, 90, 0)
 
+		elseif obb.x > obb.z and obb.y > obb.z then
+			if hbb then
+				obb.x = hbb.x
+				obb.y = hbb.y
+				obb.z = hbb.z
+			end
+
+			scale1 = Vector(info.radius*2/obb.x, info.radius*2/obb.y, info.width/obb.z)
+			scale2 = scale1*Vector(1, 1, 0.5)
+			rotate = Angle(0, 0, -90)
+
 		else
 			scale1 = Vector(info.radius*2/obb.x, info.width/obb.y, info.radius*2/obb.z)
 			scale2 = scale1*Vector(1, 0.5, 1)
