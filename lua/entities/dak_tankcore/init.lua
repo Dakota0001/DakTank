@@ -451,6 +451,9 @@ local NameTable1 = {
 	"Howling ",
 	"Divine ",
 	"Crying ",
+	"Intense ",
+	"Intensified ",
+	"Brave ",
 	"",
 }
 local NameTable2 = {
@@ -680,6 +683,8 @@ local NameTable2 = {
 	"Bringer",
 	"Intervention",
 	"Behemoth",
+	"Fool",
+	"Coward",
 }
 local NameTable3 = {
 	"",
