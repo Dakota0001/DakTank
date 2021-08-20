@@ -2892,7 +2892,7 @@ function ENT:Think()
 												self.DETAIL[#self.DETAIL+1] = detailpiece
 											end
 											net.Start( "daktankcoredetailremove" )
-											net.WriteEntity( self )
+											net.WriteFloat( self:EntIndex() )
 											net.Broadcast()
 										else
 											--Crew checking
@@ -2991,7 +2991,7 @@ function ENT:Think()
 													tablesegment[#tablesegment+1] = self.DetailInfoTable[j]
 												end
 												net.Start( "daktankcoredetail" )
-												net.WriteEntity( self )
+												net.WriteFloat( self:EntIndex() )
 												net.WriteString( util.TableToJSON( tablesegment ) )
 												net.Broadcast()
 											end
@@ -3301,7 +3301,7 @@ function ENT:Think()
 										self.Dead=1
 										self.DeathTime=CurTime()
 										net.Start( "daktankcoredie" )
-										net.WriteEntity( self )
+										net.WriteFloat( self:EntIndex() )
 										net.Broadcast()
 										local effectdata = EffectData()
 										effectdata:SetOrigin(self.Base:GetPos())
