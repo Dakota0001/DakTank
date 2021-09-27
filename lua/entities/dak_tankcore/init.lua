@@ -1500,52 +1500,54 @@ function ENT:Think()
 							local MaxPen = 0
 							for i = 1, #self.Guns do
 								for j = 1, #self.Guns[i].AmmoBoxes do
-									local boxname = (string.Split( self.Guns[i].AmmoBoxes[j].DakAmmoType, "" ))
-									local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
-									local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
-									local name2 = boxname[#boxname-5]..boxname[#boxname-4]
-									local name
-									if name6 == "APFSDS" or name6 == "HEATFS" then
-										name = name6
-									elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
-										name = name4
-									elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
-										name = name2
-									end
-									if name == "APFSDS" then
-										if self.Guns[i].BaseDakShellPenetration*7.8*0.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*7.8*0.5 end
-									elseif name == "APDS" then
-										if self.Guns[i].BaseDakShellPenetration*1.67 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.67 end
-									elseif name == "HVAP" then
-										if self.Guns[i].BaseDakShellPenetration*1.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.5 end
-									elseif name == "AP" then
-										if self.Guns[i].BaseDakShellPenetration > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration end
-									elseif name == "APHE" then
-										if self.Guns[i].BaseDakShellPenetration*0.825 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*0.825 end
-									elseif name == "ATGM" then
-										if self.Modern==1 then
-											if self.Guns[i].DakMaxHealth*6.40 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40 end
-										else
-											if self.Guns[i].DakMaxHealth*6.40*0.45 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40*0.45 end
+									if self.Guns[i].DakCaliber == self.Guns[i].AmmoBoxes[j].DakCaliber then
+										local boxname = (string.Split( self.Guns[i].AmmoBoxes[j].DakAmmoType, "" ))
+										local name6 = boxname[#boxname-9]..boxname[#boxname-8]..boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+										local name4 = boxname[#boxname-7]..boxname[#boxname-6]..boxname[#boxname-5]..boxname[#boxname-4]
+										local name2 = boxname[#boxname-5]..boxname[#boxname-4]
+										local name
+										if name6 == "APFSDS" or name6 == "HEATFS" then
+											name = name6
+										elseif name4 == "HVAP" or name4 == "APDS" or name4 == "HEAT" or name4 == "HESH" or name4 == "ATGM" or name4 == "APHE" then
+											name = name4
+										elseif name2 == "AP" or name2 == "HE" or name2 == "SM" then
+											name = name2
 										end
-									elseif name == "HEATFS" then
-										if self.Modern==1 then
-											if self.Guns[i].DakMaxHealth*5.4 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4 end
-										else
-											if self.Guns[i].DakMaxHealth*5.40*0.658 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.40*0.658 end
+										if name == "APFSDS" then
+											if self.Guns[i].BaseDakShellPenetration*7.8*0.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*7.8*0.5 end
+										elseif name == "APDS" then
+											if self.Guns[i].BaseDakShellPenetration*1.67 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.67 end
+										elseif name == "HVAP" then
+											if self.Guns[i].BaseDakShellPenetration*1.5 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*1.5 end
+										elseif name == "AP" then
+											if self.Guns[i].BaseDakShellPenetration > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration end
+										elseif name == "APHE" then
+											if self.Guns[i].BaseDakShellPenetration*0.825 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*0.825 end
+										elseif name == "ATGM" then
+											if self.Modern==1 then
+												if self.Guns[i].DakMaxHealth*6.40 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40 end
+											else
+												if self.Guns[i].DakMaxHealth*6.40*0.45 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40*0.45 end
+											end
+										elseif name == "HEATFS" then
+											if self.Modern==1 then
+												if self.Guns[i].DakMaxHealth*5.4 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4 end
+											else
+												if self.Guns[i].DakMaxHealth*5.40*0.658 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.40*0.658 end
+											end
+										elseif name == "HEAT" then
+											if self.ColdWar==1 or self.Modern==1 then
+												if self.Guns[i].DakMaxHealth*5.4*0.431 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4*0.431 end
+											else
+												if self.Guns[i].DakMaxHealth*1.20 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.20 end
+											end
+										elseif name == "HESH" then
+											if self.Guns[i].DakMaxHealth*1.25 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.25 end
+										elseif name == "HE" then
+											if self.Guns[i].DakBaseShellFragPen > MaxPen then MaxPen = self.Guns[i].DakBaseShellFragPen end
+										elseif name == "SM" then
+											if self.Guns[i].DakMaxHealth*0.1 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*0.1 end
 										end
-									elseif name == "HEAT" then
-										if self.ColdWar==1 or self.Modern==1 then
-											if self.Guns[i].DakMaxHealth*5.4*0.431 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*5.4*0.431 end
-										else
-											if self.Guns[i].DakMaxHealth*1.20 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.20 end
-										end
-									elseif name == "HESH" then
-										if self.Guns[i].DakMaxHealth*1.25 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*1.25 end
-									elseif name == "HE" then
-										if self.Guns[i].DakBaseShellFragPen > MaxPen then MaxPen = self.Guns[i].DakBaseShellFragPen end
-									elseif name == "SM" then
-										if self.Guns[i].DakMaxHealth*0.1 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*0.1 end
 									end
 								end
 							end
