@@ -36,6 +36,16 @@ function InMapCheck(vec)
 	end
 end
 
+function DakKill(core,reason)
+	core.DakHealth = 0
+	if reason != "" then
+	    for i, ply in ipairs( player.GetAll() ) do
+			ply:ChatPrint( core.Controller.DakOwner:GetName().."'s vehicle exploded " .. reason )
+		end
+	end
+end
+
+
 function DakKillNotSolid(ent)
 	if IsValid(ent.Controller) then
 		if IsValid(ent.Controller.Base) and ent.Controller.Base:GetPhysicsObject():IsMotionEnabled() and (not(ent:IsSolid()) or ent.ClipData ~= nil ) and (ent.Controller.DakHealth > 0 or #ent.Controller.Crew < 2 or ent.Controller.LivingCrew <= math.max(#ent.Controller.Crew-3,1)) then
