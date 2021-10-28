@@ -9,9 +9,6 @@ function EFFECT:Init( data )
 		Attach = HitEnt:WorldToLocal( Pos )
 	end
 
-
-
-
 	if dustsize > 0 then
 		local pregroundtrace = {}
 			pregroundtrace.start = Pos
@@ -45,103 +42,105 @@ function EFFECT:Init( data )
 			end
 		end
 	end
-	for i = 1,5 do
-		local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
-		if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos) end
-		if (particle) then
-			particle:SetVelocity(Vector(0,0,0))
-			particle:SetLifeTime(0) 
-			particle:SetDieTime(10) 
-			particle:SetStartAlpha(250)
-			particle:SetEndAlpha(0)
-			particle:SetStartSize(size*8*0.0393701) 
-			particle:SetEndSize(size*8*0.0393701)
-			particle:SetAngles( Angle(0,0,0) )
-			particle:SetAngleVelocity( Angle(0,0,0) ) 
-			particle:SetRoll(math.Rand( 0, 360 ))
-			local CVal = math.random(255,255)
-			particle:SetColor(CVal,CVal,CVal,math.random(150,150))
-			particle:SetGravity( Vector(0,0,0) ) 
-			particle:SetAirResistance(0)  
-			particle:SetCollide(false)
-			particle:SetBounce(0)
-			particle:SetNextThink( CurTime() )
-			particle:SetThinkFunction( function( pa )
-				if pa~=NULL then
-					if HitEnt~=NULL and Attach~=nil then
+	if HitEnt~=NULL then
+		for i = 1,5 do
+			local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
+			if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos) end
+			if (particle) then
+				particle:SetVelocity(Vector(0,0,0))
+				particle:SetLifeTime(0) 
+				particle:SetDieTime(10) 
+				particle:SetStartAlpha(250)
+				particle:SetEndAlpha(0)
+				particle:SetStartSize(size*8*0.0393701) 
+				particle:SetEndSize(size*8*0.0393701)
+				particle:SetAngles( Angle(0,0,0) )
+				particle:SetAngleVelocity( Angle(0,0,0) ) 
+				particle:SetRoll(math.Rand( 0, 360 ))
+				local CVal = math.random(255,255)
+				particle:SetColor(CVal,CVal,CVal,math.random(150,150))
+				particle:SetGravity( Vector(0,0,0) ) 
+				particle:SetAirResistance(0)  
+				particle:SetCollide(false)
+				particle:SetBounce(0)
+				particle:SetNextThink( CurTime() )
+				particle:SetThinkFunction( function( pa )
+					if pa~=NULL then
 						if HitEnt~=NULL and Attach~=nil then
-							pa:SetPos( HitEnt:LocalToWorld(Attach) )
+							if HitEnt~=NULL and Attach~=nil then
+								pa:SetPos( HitEnt:LocalToWorld(Attach) )
+							end
+							pa:SetNextThink( CurTime() )
 						end
-						pa:SetNextThink( CurTime() )
 					end
-				end
-			end )
+				end )
+			end
 		end
-	end
-	for i = 1,5 do
-		local particle = emitter:Add( "effects/fire_cloud2.vtf", Pos)
-		if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", Pos) end
-		if (particle) then
-			particle:SetVelocity(Vector(0,0,0))
-			particle:SetLifeTime(0) 
-			particle:SetDieTime(10) 
-			particle:SetStartAlpha(250)
-			particle:SetEndAlpha(0)
-			particle:SetStartSize(size*8*0.0393701) 
-			particle:SetEndSize(size*8*0.0393701)
-			particle:SetAngles( Angle(0,0,0) )
-			particle:SetAngleVelocity( Angle(0,0,0) ) 
-			particle:SetRoll(math.Rand( 0, 360 ))
-			local CVal = math.random(255,255)
-			particle:SetColor(CVal,CVal,CVal,math.random(150,150))
-			particle:SetGravity( Vector(0,0,0) ) 
-			particle:SetAirResistance(0)  
-			particle:SetCollide(false)
-			particle:SetBounce(0)
-			particle:SetNextThink( CurTime() )
-			particle:SetThinkFunction( function( pa )
-				if pa~=NULL then
-					if HitEnt~=NULL and Attach~=nil then
+		for i = 1,5 do
+			local particle = emitter:Add( "effects/fire_cloud2.vtf", Pos)
+			if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", Pos) end
+			if (particle) then
+				particle:SetVelocity(Vector(0,0,0))
+				particle:SetLifeTime(0) 
+				particle:SetDieTime(10) 
+				particle:SetStartAlpha(250)
+				particle:SetEndAlpha(0)
+				particle:SetStartSize(size*8*0.0393701) 
+				particle:SetEndSize(size*8*0.0393701)
+				particle:SetAngles( Angle(0,0,0) )
+				particle:SetAngleVelocity( Angle(0,0,0) ) 
+				particle:SetRoll(math.Rand( 0, 360 ))
+				local CVal = math.random(255,255)
+				particle:SetColor(CVal,CVal,CVal,math.random(150,150))
+				particle:SetGravity( Vector(0,0,0) ) 
+				particle:SetAirResistance(0)  
+				particle:SetCollide(false)
+				particle:SetBounce(0)
+				particle:SetNextThink( CurTime() )
+				particle:SetThinkFunction( function( pa )
+					if pa~=NULL then
 						if HitEnt~=NULL and Attach~=nil then
-							pa:SetPos( HitEnt:LocalToWorld(Attach) )
+							if HitEnt~=NULL and Attach~=nil then
+								pa:SetPos( HitEnt:LocalToWorld(Attach) )
+							end
+							pa:SetNextThink( CurTime() )
 						end
-						pa:SetNextThink( CurTime() )
 					end
-				end
-			end )
+				end )
+			end
 		end
-	end
-	for i = 1,2 do
-		local particle = emitter:Add( "dak/smokey", Pos)
-		if particle == nil then particle = emitter:Add( "dak/smokey", Pos) end
-		if (particle) then
-			particle:SetVelocity(Vector(0,0,0))
-			particle:SetLifeTime(0) 
-			particle:SetDieTime(15) 
-			particle:SetStartAlpha(255)
-			particle:SetEndAlpha(255)
-			particle:SetStartSize(size*4*0.0393701) 
-			particle:SetEndSize(size*4*0.0393701)
-			particle:SetAngles( Angle(0,0,0) )
-			particle:SetAngleVelocity( Angle(0,0,0) ) 
-			particle:SetRoll(math.Rand( 0, 360 ))
-			local CVal = math.random(0,0)
-			particle:SetColor(CVal,CVal,CVal,math.random(255,255))
-			particle:SetGravity( Vector(0,0,0) ) 
-			particle:SetAirResistance(0)  
-			particle:SetCollide(false)
-			particle:SetBounce(0)
-			particle:SetNextThink( CurTime() )
-			particle:SetThinkFunction( function( pa )
-				if pa~=NULL then
-					if HitEnt~=NULL and Attach~=nil then
+		for i = 1,2 do
+			local particle = emitter:Add( "dak/smokey", Pos)
+			if particle == nil then particle = emitter:Add( "dak/smokey", Pos) end
+			if (particle) then
+				particle:SetVelocity(Vector(0,0,0))
+				particle:SetLifeTime(0) 
+				particle:SetDieTime(15) 
+				particle:SetStartAlpha(255)
+				particle:SetEndAlpha(255)
+				particle:SetStartSize(size*4*0.0393701) 
+				particle:SetEndSize(size*4*0.0393701)
+				particle:SetAngles( Angle(0,0,0) )
+				particle:SetAngleVelocity( Angle(0,0,0) ) 
+				particle:SetRoll(math.Rand( 0, 360 ))
+				local CVal = math.random(0,0)
+				particle:SetColor(CVal,CVal,CVal,math.random(255,255))
+				particle:SetGravity( Vector(0,0,0) ) 
+				particle:SetAirResistance(0)  
+				particle:SetCollide(false)
+				particle:SetBounce(0)
+				particle:SetNextThink( CurTime() )
+				particle:SetThinkFunction( function( pa )
+					if pa~=NULL then
 						if HitEnt~=NULL and Attach~=nil then
-							pa:SetPos( HitEnt:LocalToWorld(Attach) )
+							if HitEnt~=NULL and Attach~=nil then
+								pa:SetPos( HitEnt:LocalToWorld(Attach) )
+							end
+							pa:SetNextThink( CurTime() )
 						end
-						pa:SetNextThink( CurTime() )
 					end
-				end
-			end )
+				end )
+			end
 		end
 	end
 
