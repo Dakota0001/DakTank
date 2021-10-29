@@ -267,14 +267,18 @@ function DTArmorSanityCheck(Ent)
 	end
 end
 
-function DTSimpleTrace(Start, End, Caliber, Filter, Gun)
+function DTSimpleTrace(Start, End, Caliber, Filter, Gun, ignoreworld)
 	local trace = {}
 		trace.start = Start
 		trace.endpos = End 
 		trace.filter = Filter
 		trace.mins = Vector(-Caliber*0.02,-Caliber*0.02,-Caliber*0.02)
 		trace.maxs = Vector(Caliber*0.02,Caliber*0.02,Caliber*0.02)
-		trace.ignoreworld = true
+		if ignoreworld == false then
+			trace.ignoreworld = false
+		else
+			trace.ignoreworld = true
+		end
 	local SimpleTrace = util.TraceHull( trace )
 	local Stop = 1
 	local Ent = SimpleTrace.Entity
@@ -287,8 +291,8 @@ function DTSimpleTrace(Start, End, Caliber, Filter, Gun)
 	return Ent, Pos, Stop
 end
 
-function DTSimpleRecurseTrace(Start, End, Caliber, Filter, Gun)
-	local Ent, Pos, Stop = DTSimpleTrace(Start, End, Caliber, Filter, Gun)
+function DTSimpleRecurseTrace(Start, End, Caliber, Filter, Gun, ignoreworld)
+	local Ent, Pos, Stop = DTSimpleTrace(Start, End, Caliber, Filter, Gun, ignoreworld)
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
@@ -302,7 +306,7 @@ function DTSimpleRecurseTrace(Start, End, Caliber, Filter, Gun)
 		return Distance
 	end
 	while Stop == 0 and Recurse<25 do
-		local newEnt, LastPos, Stop = DTSimpleTrace(Start, End, Caliber, NewFilter, Gun)
+		local newEnt, LastPos, Stop = DTSimpleTrace(Start, End, Caliber, NewFilter, Gun, ignoreworld)
 		NewFilter[#NewFilter+1] = newEnt
 		Recurse = Recurse + 1
 		if Stop == 1 then
