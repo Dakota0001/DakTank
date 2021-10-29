@@ -2450,8 +2450,7 @@ function ENT:Think()
 							end
 
 							--PrintTable(self.Contraption)
-							self.CrewCount = #self.Crew
-							WireLib.TriggerOutput(self, "Crew", self.CrewCount)
+							
 							if IsValid(self.Gearbox) then
 								self.Gearbox.TotalMass = Mass
 								self.Gearbox.ParentMass = ParentMass
@@ -2604,6 +2603,7 @@ function ENT:Think()
 										end
 									end
 								end
+								WireLib.TriggerOutput(self, "Crew", self.LivingCrew)
 								
 								--print("ERA: "..(SysTime()-debugtime))
 								if self.Composites then

@@ -284,7 +284,7 @@ function DTSimpleTrace(Start, End, Caliber, Filter, Gun, ignoreworld)
 	local Ent = SimpleTrace.Entity
 	local Pos = SimpleTrace.HitPos
 	if Ent:IsValid() then
-		if DTCheckClip(Ent,Pos) or (Ent:GetPhysicsObject():IsValid() and Ent:GetPhysicsObject():GetMass()<=1) or Ent:IsVehicle() or Ent:GetClass() == "dak_crew" or Ent:GetClass() == "dak_teammo" or Ent.Controller ~= Gun.Controller then
+		if not(Ent:IsWorld()) and (DTCheckClip(Ent,Pos) or (Ent:GetPhysicsObject():IsValid() and Ent:GetPhysicsObject():GetMass()<=1) or Ent:IsVehicle() or Ent:GetClass() == "dak_crew" or Ent:GetClass() == "dak_teammo" or Ent.Controller ~= Gun.Controller) then
 			Stop = 0
 		end
 	end
