@@ -1373,9 +1373,10 @@ function ENT:Think()
 
 						do --Calculate armor multipliers
 							self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
+							self.ArmorRearMult = math.max(self.RearArmor/250,0.1)
 							local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
 							self.BestAveArmor = Total
-							armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(self.ArmorSideMult*(1+(0.25*self.SideSpallLinerCoverage)))
+							armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(((self.ArmorSideMult+self.ArmorSideMult+self.ArmorRearMult)/3)*(1+(0.25*((self.SideSpallLinerCoverage+self.SideSpallLinerCoverage+self.RearSpallLinerCoverage)/3))))
 							self.ArmorMult = math.Round(math.max(0.01,armormult),3)
 							self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
 							local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(0.05*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
@@ -2450,8 +2451,7 @@ function ENT:Think()
 							end
 
 							--PrintTable(self.Contraption)
-							self.CrewCount = #self.Crew
-							WireLib.TriggerOutput(self, "Crew", self.CrewCount)
+							
 							if IsValid(self.Gearbox) then
 								self.Gearbox.TotalMass = Mass
 								self.Gearbox.ParentMass = ParentMass
@@ -2604,6 +2604,7 @@ function ENT:Think()
 										end
 									end
 								end
+								WireLib.TriggerOutput(self, "Crew", self.LivingCrew)
 								
 								--print("ERA: "..(SysTime()-debugtime))
 								if self.Composites then

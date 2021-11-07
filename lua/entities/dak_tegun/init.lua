@@ -733,11 +733,11 @@ function ENT:Think()
 				local breechoffset
 				breechoffset, _ = self:GetModelBounds()
 				breechoffset = math.abs(breechoffset.x*(self.DakCaliber/100)) * -1
-				local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetForward()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self)
-				local LeftDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetRight()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self)
-				local RightDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)+(self:GetRight()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self)
-				local UpDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)+(self:GetUp()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self)
-				local DownDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetUp()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self)
+				local BackDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetForward()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self, false)
+				local LeftDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetRight()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self, false)
+				local RightDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)+(self:GetRight()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self, false)
+				local UpDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)+(self:GetUp()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self, false)
+				local DownDist = DTSimpleRecurseTrace((self:GetPos()+self:GetForward()*breechoffset) , (self:GetPos()+self:GetForward()*breechoffset)-(self:GetUp()*1000), self.DakCaliber*0.5, {self, self:GetParent(), self:GetParent():GetParent()}, self, false)
 				local ShellSize = (self.ShellLengthMult*10*self.DakCaliber*0.0393701)
 				if self.ReloadMult == nil then
 					local quickmult = ( math.min((BackDist/ShellSize),2) + math.min((LeftDist/ShellSize),2) + math.min((RightDist/ShellSize),2) + math.min((UpDist/ShellSize),2) + math.min((DownDist/ShellSize),2) )*0.2
