@@ -23,46 +23,40 @@ end
 function FireBurn(Pos, owner, gun)
 	local Radius = 250
 	sound.Play( "daktanks/flamerimpact.mp3", Pos, 100, 100*math.Rand(0.6,0.8), 1 )
-	local Targets = ents.FindInSphere( Pos, Radius )
-	if table.Count(Targets) > 0 then
-		if table.Count(Targets) > 0 then
-			for i = 1, #Targets do
-				if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-					if Targets[i].Controller.ColdWar ~= 1 and Targets[i].Controller.Modern ~= 1 then
-						if not(Targets[i]:IsOnFire()) then
-							Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
-						end
-						Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+0.1
-					end
-				end
-				if Targets[i]:IsPlayer() then
-					if not Targets[i]:InVehicle() then
 
-						local Pain = DamageInfo()
-						Pain:SetDamageForce( Vector(0,0,0) )
-						Pain:SetDamage( 1 )
-						if owner and Shell and Shell.DakGun then
-							Pain:SetAttacker( owner )
-							Pain:SetInflictor( gun )
-						else
-							Pain:SetAttacker( game.GetWorld() )
-							Pain:SetInflictor( game.GetWorld() )
-						end
-						Pain:SetReportedPosition( Pos )
-						Pain:SetDamagePosition( Targets[i]:GetPos() )
-						Pain:SetDamageType(DMG_BURN)
-						Targets[i]:TakeDamageInfo( Pain )
+	for _, Target in ipairs(ents.FindInSphere( Pos, Radius )) do
+		if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" then
+			if Target.Controller.ColdWar ~= 1 and Target.Controller.Modern ~= 1 then
+				if not Target:IsOnFire() then
+					Target:Ignite(10*(1-(Target:GetPos():Distance(Pos)/Radius)),1)
+				end
+				Target.DakBurnStacks = Target.DakBurnStacks+0.1
+			end
+		elseif Target:IsPlayer() then
+			if not Target:InVehicle() then
 
-						if not(Targets[i]:IsOnFire()) then
-							Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
-						end
-					end
+				local Pain = DamageInfo()
+				Pain:SetDamageForce( Vector(0,0,0) )
+				Pain:SetDamage( 1 )
+				if owner and Shell and Shell.DakGun then -- TODO: Pretty sure this is not intended. Shell is global and FireBurn is called at arbitrary times through a timer... meaning Shell is probably random data
+					Pain:SetAttacker( owner )
+					Pain:SetInflictor( gun )
+				else
+					Pain:SetAttacker( game.GetWorld() )
+					Pain:SetInflictor( game.GetWorld() )
 				end
-				if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-					if not(Targets[i]:IsOnFire()) then
-						Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
-					end
+				Pain:SetReportedPosition( Pos )
+				Pain:SetDamagePosition( Target:GetPos() )
+				Pain:SetDamageType(DMG_BURN)
+				Target:TakeDamageInfo( Pain )
+
+				if not Target:IsOnFire() then
+					Target:Ignite(10*(1-(Target:GetPos():Distance(Pos)/Radius)),1)
 				end
+			end
+		elseif Target:IsNPC() or Target.Base == "base_nextbot" then
+			if not Target:IsOnFire() then
+				Target:Ignite(10*(1-(Target:GetPos():Distance(Pos)/Radius)),1)
 			end
 		end
 	end
