@@ -3589,6 +3589,9 @@ function ENT:OnRemove()
 			self.HitBox[i].DakLegit = nil
 		end
 	end
+	if self.Dead == nil or self.Dead == 0 then
+		hook.Run("DakTank_TankDespawned",self)
+	end
 	if gmod.GetGamemode().Name=="DakTank" then
 		if self.LastDamagedBy:IsValid() and self.AutoRemoved~=true then
 			if self.LastDamagedBy:Team() ~= self.DakOwner:Team() then
