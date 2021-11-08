@@ -3305,6 +3305,7 @@ function ENT:Think()
 											end
 										end
 										self.Dead=1
+										hook.Run("DakTank_TankKilled",self,self.LastDamagedBy)
 										self.DeathTime=CurTime()
 										net.Start( "daktankcoredie" )
 										net.WriteFloat( self:EntIndex() )
@@ -3587,6 +3588,9 @@ function ENT:OnRemove()
 			self.HitBox[i].DakController = nil
 			self.HitBox[i].DakLegit = nil
 		end
+	end
+	if self.Dead == nil or self.Dead == 0 then
+		hook.Run("DakTank_TankDespawned",self)
 	end
 	if gmod.GetGamemode().Name=="DakTank" then
 		if self.LastDamagedBy:IsValid() and self.AutoRemoved~=true then
