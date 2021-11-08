@@ -3305,6 +3305,7 @@ function ENT:Think()
 											end
 										end
 										self.Dead=1
+										hook.Run("DakTank_TankKilled",self,self.LastDamagedBy)
 										self.DeathTime=CurTime()
 										net.Start( "daktankcoredie" )
 										net.WriteFloat( self:EntIndex() )
