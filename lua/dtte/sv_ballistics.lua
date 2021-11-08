@@ -15,71 +15,97 @@ local function DTCheckClip(Ent, HitPos)
 end
 --this function seemingly only works with that one broken visclip twisted suggested I use once
 ]]--
-local entity = FindMetaTable( "Entity" )
 
-DakTank = {}
-DakTank.PersistFireLast = 0
-DakTank.PersistFireLastDelay = math.random(0.25,0.5)
-function PersistFire(Pos, owner, gun)
-	timer.Create( "DTPersistFire"..(Pos.x)..CurTime(), 0.5, 20, function() FireBurn(Pos, owner, gun) end )
-	if CurTime() - DakTank.PersistFireLast > DakTank.PersistFireLastDelay then
-		DakTank.PersistFireLast = CurTime()
-		DakTank.PersistFireLastDelay = math.random(0.25,0.5)
-		sound.Play( "daktanks/flamerimpact.mp3", Pos, 100, 100*math.Rand(0.6,0.8), 1 )
-	end
-end
+do -- DTTE.SpawnFire
+	local fireDuration        = 10 -- How long the fire lasts in seconds
+	local fireDamageInterval  = 2 -- How often to check for targets to ignite every second
+	local fireRadius          = 250 -- Fire AoE
+	local fireSoundInterval   = {0.25, 0.5} -- Random range, in seconds, for the fire sound to play
+	local fireSound           = "daktanks/flamerimpact.mp3"
+	local fireNearestNeighbor = 100 -- How near a fire can be to another fire
+	local fireIgniteTimeMult  = 10 -- Multiplier for how long a target is ignited based on distance
 
-function FireBurn(Pos, owner, gun)
-	local Radius = 250
-	if CurTime() - DakTank.PersistFireLast > DakTank.PersistFireLastDelay then
-		DakTank.PersistFireLast = CurTime()
-		DakTank.PersistFireLastDelay = math.random(0.25,0.5)
-		sound.Play( "daktanks/flamerimpact.mp3", Pos, 100, 100*math.Rand(0.6,0.8), 1 )
-	end
-	local Targets = ents.FindInSphere( Pos, Radius )
-	if table.Count(Targets) > 0 then
-		if table.Count(Targets) > 0 then
-			for i = 1, #Targets do
-				if Targets[i]:GetClass() == "dak_tegearbox" or Targets[i]:GetClass() == "dak_tegearboxnew" then
-					if Targets[i].Controller.ColdWar ~= 1 and Targets[i].Controller.Modern ~= 1 then
-						if not(Targets[i]:IsOnFire()) then
-							Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
-						end
-						Targets[i].DakBurnStacks = Targets[i].DakBurnStacks+0.1
-					end
-				end
-				if Targets[i]:IsPlayer() then
-					if not Targets[i]:InVehicle() then
+	-- TODO: add line of sight checks to this function
+	local function fireBurn(fire)
+		for _, target in ipairs(ents.FindInSphere(fire.pos, fireRadius)) do
+			if not target:IsOnFire() then
+				if target:IsPlayer() or target:IsNPC() or target.Base == "base_nextbot" and not target:InVehicle() then -- TODO: Ensure nextbots have InVehicle
 
-						local Pain = DamageInfo()
-						Pain:SetDamageForce( Vector(0,0,0) )
-						Pain:SetDamage( 1 )
-						if owner and Shell and Shell.DakGun then
-							Pain:SetAttacker( owner )
-							Pain:SetInflictor( gun )
-						else
-							Pain:SetAttacker( game.GetWorld() )
-							Pain:SetInflictor( game.GetWorld() )
-						end
-						Pain:SetReportedPosition( Pos )
-						Pain:SetDamagePosition( Targets[i]:GetPos() )
-						Pain:SetDamageType(DMG_BURN)
-						Targets[i]:TakeDamageInfo( Pain )
+					target:TakeDamageInfo(fire.dmgInfo)
+					target:Ignite(target:GetPos():Distance(fire.pos) / fireRadius * fireIgniteTimeMult)
 
-						if not(Targets[i]:IsOnFire()) then
-							Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
-						end
-					end
-				end
-				if Targets[i]:IsNPC() or Targets[i].Base == "base_nextbot" then
-					if not(Targets[i]:IsOnFire()) then
-						Targets[i]:Ignite(10*(1-(Targets[i]:GetPos():Distance(Pos)/Radius)),1)
-					end
+				elseif target:GetClass() == "dak_tegearbox" or target:GetClass() == "dak_tegearboxnew"
+					and target.Controller.ColdWar ~= 1 and target.Controller.Modern ~= 1 then
+
+					target:Ignite(target:GetPos():Distance(fire.pos) / fireRadius * fireIgniteTimeMult)
+					target.DakBurnStacks = target.DakBurnStacks + 1
 				end
 			end
 		end
 	end
+
+	local function fireSound(fire)
+		sound.Play("daktanks/flamerimpact.mp3", fire.pos, 100, 100 * math.Rand(0.6, 0.8), 1)
+		if CurTime() > fire.timeLimit then
+			timer.Remove("dtteFireSound " .. fire.id)
+		else
+			timer.Adjust("dtteFireSound " .. fire.id, math.Rand(fireSoundInterval[1], fireSoundInterval[2]))
+		end
+	end
+
+	local function roundVector(vec, gridSize)
+		vec.x = math.Round(vec.x / gridSize) * gridSize
+		vec.y = math.Round(vec.y / gridSize) * gridSize
+		vec.z = math.Round(vec.z / gridSize) * gridSize
+
+		return vec
+	end
+
+	function DTTE.SpawnFire(pos, attacker, inflictor)
+		local dmgInfo = DamageInfo()
+			dmgInfo:SetAttacker(attacker or game.GetWorld())
+			dmgInfo:SetInflictor(inflictor or game.GetWorld())
+			dmgInfo:SetReportedPosition(pos)
+			dmgInfo:SetDamagePosition(pos)
+			dmgInfo:SetDamageType(DMG_BURN)
+			dmgInfo:SetDamage(1)
+
+		local effect = EffectData()
+			effect:SetOrigin(pos)
+			effect:SetEntity(dmgInfo:GetInflictor())
+			effect:SetAttachment(1)
+			effect:SetMagnitude(.5)
+			effect:SetScale(1)
+		util.Effect("dakteflameimpact", effect, true, true)
+
+		local fireGrid = roundVector(pos, fireNearestNeighbor)
+		local fire     = {
+				pos             = pos,
+				id              = string.format("[%s, %s, %s]", fireGrid.x, fireGrid.y, fireGrid.z),
+				dmgInfo         = dmgInfo,
+				soundLastPlayed = -math.huge,
+				burn            = fireBurn,
+				playSound       = fireSound,
+				timeLimit       = CurTime() + fireDuration
+			}
+
+		fire:burn()
+		fire:playSound()
+
+		timer.Create("dtteFire " .. fire.id, 1 / fireDamageInterval, fireDuration * fireDamageInterval, function()
+			fire:burn()
+		end)
+
+		timer.Create("dtteFireSound " .. fire.id, math.Rand(fireSoundInterval[1], fireSoundInterval[2]), 0, function()
+			fire:playSound()
+		end)
+
+		debugoverlay.Cross(fire.pos, fireRadius, fireDuration, Color(255, 100, 0), true)
+		debugoverlay.Sphere(fire.pos, fireRadius, fireDuration, Color(255, 100, 0, 1), true)
+	end
 end
+
+local entity = FindMetaTable( "Entity" )
 
 function entity:DTShellApplyForce(HitPos,Normal,Shell)
 	if IsValid(self:GetParent()) then
@@ -1067,14 +1093,7 @@ function DTShellAirBurst(HitPos,Shell,Normal)
 		else
 			local effectdata = EffectData()
 			if Shell.DakIsFlame == 1 then
-				effectdata:SetOrigin(HitPos)
-				effectdata:SetEntity(Shell.DakGun)
-				effectdata:SetAttachment(1)
-				effectdata:SetMagnitude(.5)
-				effectdata:SetScale(1)
-				util.Effect("dakteflameimpact", effectdata, true, true)
-				PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-				--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+				DTTE.SpawnFire(HitPos, Shell.DakGun.DakOwner, Shell.DakGun)
 			else
 				effectdata:SetOrigin(HitPos)
 				effectdata:SetEntity(Shell.DakGun)
@@ -1467,14 +1486,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					--print( math.deg(math.acos(Normal:Dot( -Vel:GetNormalized() ))) ) -- hit angle
 					local effectdata = EffectData()
 					if Shell.DakIsFlame == 1 then
-						effectdata:SetOrigin(HitPos)
-						effectdata:SetEntity(Shell.DakGun)
-						effectdata:SetAttachment(1)
-						effectdata:SetMagnitude(.5)
-						effectdata:SetScale(1)
-						util.Effect("dakteflameimpact", effectdata, true, true)
-						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-						--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+						DTTE.SpawnFire(HitPos, Shell.DakGun.DakOwner, Shell.DakGun)
 					else
 						Shell.Filter[#Shell.Filter+1] = HitEnt
 						if Shell.DakDamage >= 0 then
@@ -1707,14 +1719,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				else
 					local effectdata = EffectData()
 					if Shell.DakIsFlame == 1 then
-						effectdata:SetOrigin(HitPos)
-						effectdata:SetEntity(Shell.DakGun)
-						effectdata:SetAttachment(1)
-						effectdata:SetMagnitude(.5)
-						effectdata:SetScale(1)
-						util.Effect("dakteflameimpact", effectdata, true, true)
-						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-						--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+						DTTE.SpawnFire(HitPos, Shell.DakGun.DakOwner, Shell.DakGun)
 					else
 						effectdata:SetOrigin(HitPos)
 						effectdata:SetEntity(Shell.DakGun)
@@ -1856,14 +1861,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				else
 					local effectdata = EffectData()
 					if Shell.DakIsFlame == 1 then
-						effectdata:SetOrigin(HitPos)
-						effectdata:SetEntity(Shell.DakGun)
-						effectdata:SetAttachment(1)
-						effectdata:SetMagnitude(.5)
-						effectdata:SetScale(1)
-						util.Effect("dakteflameimpact", effectdata, true, true)
-						PersistFire(HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-						--sound.Play( "daktanks/flamerimpact.mp3", HitPos, 100, 100, 1 )
+						DTTE.SpawnFire(HitPos, Shell.DakGun.DakOwner, Shell.DakGun)
 					else
 						effectdata:SetOrigin(HitPos)
 						effectdata:SetEntity(Shell.DakGun)
@@ -2314,14 +2312,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 						local effectdata = EffectData()
 						if Shell.DakIsFlame == 1 then
-							effectdata:SetOrigin(ContShellTrace.HitPos)
-							effectdata:SetEntity(Shell.DakGun)
-							effectdata:SetAttachment(1)
-							effectdata:SetMagnitude(.5)
-							effectdata:SetScale(1)
-							util.Effect("dakteflameimpact", effectdata, true, true)
-							PersistFire(ContShellTrace.HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
+							DTTE.SpawnFire(ContShellTrace.HitPos, Shell.DakGun.DakOwner, Shell.DakGun)
 						else
 							Shell.Filter[#Shell.Filter+1] = HitEnt
 							if Shell.DakDamage >= 0 then
@@ -2537,14 +2528,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					else
 						local effectdata = EffectData()
 						if Shell.DakIsFlame == 1 then
-							effectdata:SetOrigin(ContShellTrace.HitPos)
-							effectdata:SetEntity(Shell.DakGun)
-							effectdata:SetAttachment(1)
-							effectdata:SetMagnitude(.5)
-							effectdata:SetScale(1)
-							util.Effect("dakteflameimpact", effectdata, true, true)
-							PersistFire(ContShellTrace.HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
+							DTTE.SpawnFire(ContShellTrace.HitPos, Shell.DakGun.DakOwner, Shell.DakGun)
 						else
 							effectdata:SetOrigin(ContShellTrace.HitPos)
 							effectdata:SetEntity(Shell.DakGun)
@@ -2676,15 +2660,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					else
 						local effectdata = EffectData()
 						if Shell.DakIsFlame == 1 then
-							effectdata:SetOrigin(ContShellTrace.HitPos)
-							effectdata:SetEntity(Shell.DakGun)
-							effectdata:SetAttachment(1)
-							effectdata:SetMagnitude(.5)
-							effectdata:SetScale(1)
-							util.Effect("dakteflameimpact", effectdata, true, true)
-							local Targets = ents.FindInSphere( ContShellTrace.HitPos, 150 )
-							PersistFire(ContShellTrace.HitPos,Shell.DakGun.DakOwner,Shell.DakGun)
-							--sound.Play( "daktanks/flamerimpact.mp3", ContShellTrace.HitPos, 100, 100, 1 )
+							DTTE.SpawnFire(ContShellTrace.HitPos, Shell.DakGun.DakOwner, Shell.DakGun)
 						else
 							effectdata:SetOrigin(ContShellTrace.HitPos)
 							effectdata:SetEntity(Shell.DakGun)
