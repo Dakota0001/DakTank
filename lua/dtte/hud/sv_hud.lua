@@ -34,15 +34,16 @@ hook.Add( "Think", "DakTankInfoScannerFunction", function()
 							InfoTable1[4] = Target.Cost.." point "..Era.." "..math.Round(Target.TotalMass*0.001,2).." ton tank."
 							InfoTable1[5] = "-Average Frontal Armor: "..(math.Round(Target.BestAveArmor,2)).."mm"
 							InfoTable1[6] = "-Average Side Armor: "..(math.Round(Target.SideArmor,2)).."mm"
-							InfoTable1[7] = "-Hull Integrity: "..(math.Round(Target.DakMaxHealth,2)).." health"
-							InfoTable1[8] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
+							InfoTable1[7] = "-Average Rear Armor: "..(math.Round(Target.RearArmor,2)).."mm"
+							InfoTable1[8] = "-Hull Integrity: "..(math.Round(Target.DakMaxHealth,2)).." health"
+							InfoTable1[9] = "-Best Round Pen: "..math.Round(Target.MaxPen,2).."mm"
 							if Target.Gearbox ~= nil and Target.Gearbox.DakHP ~= nil then
-								InfoTable1[9] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
+								InfoTable1[10] = "-HP/T: "..math.Round(math.Clamp(Target.Gearbox.DakHP,0,Target.Gearbox.MaxHP)/(Target.Gearbox.TotalMass/1000),2).."."
 							else
-								InfoTable1[9] = "-HP/T: 0."
+								InfoTable1[10] = "-HP/T: 0."
 							end
 							
-							InfoTable1[10] = "-Crew Count: "..(#Target.Crew)
+							InfoTable1[11] = "-Crew Count: "..(#Target.Crew)
 
 							local info2count = 1
 							InfoTable2[info2count] = ""
