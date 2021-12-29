@@ -501,10 +501,10 @@ e2function number entity:daktankGetCrewCount()
 	if not IsValid(this) then return 0 end
 
 	if this:GetClass() == "dak_tankcore" then
-		if this.CrewCount == nil then
+		if this.LivingCrew == nil then
 			return 0
 		else
-			return this.CrewCount
+			return this.LivingCrew
 		end
 	end
 	return 0
