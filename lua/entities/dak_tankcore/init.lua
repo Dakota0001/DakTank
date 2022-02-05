@@ -257,11 +257,11 @@ function DakTankCollisions(ent1, ent2, pos)
 				ent2.Controller.Base:GetPhysicsObject():ApplyForceCenter(ent2.Controller.PhysMass * -vec:GetNormalized() * colspeed * force2 * 2, pos)
 			end
 			if colspeed*0.09144 >= 10 then
-				if ent1:CPPIGetOwner():HasGodMode()==false and not(ent1:CPPIGetOwner():IsWorld()) then
-					ent1.Controller.DakHealth = ent1.Controller.DakHealth - (5*colspeed*0.09144*(ent2.Controller.TotalMass/ent1.Controller.TotalMass))
+				if ent1:CPPIGetOwner() ~= nil and ent1:CPPIGetOwner():HasGodMode()==false and not(ent1:CPPIGetOwner():IsWorld()) then
+				    ent1.Controller.DakHealth = ent1.Controller.DakHealth - (5*colspeed*0.09144*(ent2.Controller.TotalMass/ent1.Controller.TotalMass))
 				end
-				if ent2:CPPIGetOwner():HasGodMode()==false and not(ent2:CPPIGetOwner():IsWorld()) then
-					ent2.Controller.DakHealth = ent2.Controller.DakHealth - (5*colspeed*0.09144*(ent1.Controller.TotalMass/ent2.Controller.TotalMass))
+				if ent2:CPPIGetOwner() ~= nil and ent2:CPPIGetOwner():HasGodMode()==false and not(ent2:CPPIGetOwner():IsWorld()) then
+				    ent2.Controller.DakHealth = ent2.Controller.DakHealth - (5*colspeed*0.09144*(ent1.Controller.TotalMass/ent2.Controller.TotalMass))
 				end
 			
 				ent1:EmitSound( "physics/metal/metal_large_debris2.wav" )
