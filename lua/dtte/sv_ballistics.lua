@@ -232,9 +232,9 @@ function DTWorldPen(Start,Dir,Pen,Filter,Caliber)
 end
 
 function CanDamage(Ent)
-	if IsValid(Ent.SPPOwner) then
-		if Ent.SPPOwner:IsPlayer() then
-			if Ent.SPPOwner:HasGodMode()==true then
+	if IsValid(Ent:CPPIGetOwner()) then
+		if Ent:CPPIGetOwner():IsPlayer() then
+			if Ent:CPPIGetOwner():HasGodMode()==true then
 				return false
 			end
 		end
@@ -479,7 +479,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 			if ShellType == "APDS" then
 				TDRatio = HitEnt.DakArmor/(Caliber*1.75)
 			end
-			if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+			if HitEnt.IsComposite == 1 or (HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 				EffArmor = DTCompositesTrace( HitEnt, ShellSimTrace.HitPos, ShellSimTrace.Normal, Filter )
 				if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 				if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end
@@ -1220,7 +1220,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				local TDRatio = 0
 				local PenRatio = 0
 				local CompArmor
-				if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+				if HitEnt.IsComposite == 1 or (HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 					CompArmor = DTCompositesTrace( HitEnt, HitPos, Shell.DakVelocity:GetNormalized(), Shell.Filter )
 					if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 					if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end
@@ -1306,7 +1306,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 				end
 				if HitAng >= 70 and HitEnt.DakArmor>=Shell.DakCaliber*0.85 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Shattered = 1 end
 				if HitAng >= 80 and HitEnt.DakArmor>=Shell.DakCaliber*0.85 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Shattered = 1 Failed = 1 end
-				if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+				if HitEnt.IsComposite == 1 or (HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 					if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 					if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end
 					if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end
@@ -1410,7 +1410,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					end
 				else
 					if Shell.DakShellType == "HESH" then
-						if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+						if HitEnt.IsComposite == 1 or (HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 							if Shell.DakCaliber*1.25 > CompArmor and HitAng < 80 then
 								Shell.Filter[#Shell.Filter+1] = HitEnt
 								Shell.HeatPen = true
@@ -1435,7 +1435,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						end
 					end
 					if Shell.DakShellType == "HE" then
-						if HitEnt.IsComposite == 1 or(HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+						if HitEnt.IsComposite == 1 or(HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 							if Shell.DakFragPen*10 > CompArmor and HitAng < 70 then
 								Shell.Filter[#Shell.Filter+1] = HitEnt
 								Shell.HeatPen = true
@@ -2044,7 +2044,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					local TDRatio = 0
 					local PenRatio = 0
 					local CompArmor
-					if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+					if HitEnt.IsComposite == 1 or (HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 						CompArmor = DTCompositesTrace( HitEnt, ContShellTrace.HitPos, Shell.DakVelocity:GetNormalized(), Shell.Filter )
 						if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 						if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end
@@ -2131,7 +2131,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 					end
 					if HitNonHitable and HitAng >= 70 and HitEnt.DakArmor>=Shell.DakCaliber*0.85 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Shattered = 1 end
 					if HitNonHitable and HitAng >= 80 and HitEnt.DakArmor>=Shell.DakCaliber*0.85 and (Shell.DakShellType == "APFSDS" or Shell.DakShellType == "APDS") then Shattered = 1 Failed = 1 end
-					if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+					if HitEnt.IsComposite == 1 or (HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 						if HitEnt.EntityMods == nil then HitEnt.EntityMods = {} end
 						if HitEnt.EntityMods.CompKEMult == nil then HitEnt.EntityMods.CompKEMult = 9.2 end
 						if HitEnt.EntityMods.CompCEMult == nil then HitEnt.EntityMods.CompCEMult = 18.4 end
@@ -2238,7 +2238,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						end
 					else
 						if Shell.DakShellType == "HESH" then
-							if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+							if HitEnt.IsComposite == 1 or (HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 								if Shell.DakCaliber*1.25 > CompArmor and HitAng < 80 then
 									Shell.Filter[#Shell.Filter+1] = HitEnt
 									Shell.HeatPen = true
@@ -2263,7 +2263,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							end
 						end
 						if Shell.DakShellType == "HE" then
-							if HitEnt.IsComposite == 1 or (HitEnt.SPPOwner ~= nil and HitEnt.SPPOwner:IsWorld()) then
+							if HitEnt.IsComposite == 1 or (HitEnt:CPPIGetOwner() ~= nil and HitEnt:CPPIGetOwner():IsWorld()) then
 								if Shell.DakFragPen*10 > CompArmor and HitAng < 70 then
 									Shell.Filter[#Shell.Filter+1] = HitEnt
 									Shell.HeatPen = true
@@ -2785,7 +2785,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 						end
 					end
 					local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity:CPPIGetOwner() ~= nil and ExpTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -2961,7 +2961,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 						end
 					end
 					local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity:CPPIGetOwner() ~= nil and ExpTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -3135,7 +3135,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 					end
 				end
 				local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-				if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+				if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity:CPPIGetOwner() ~= nil and ExpTrace.Entity:CPPIGetOwner():IsWorld()) then
 					if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 					if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end
 					if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -3349,7 +3349,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 							end
 						end
 						local EffArmor = (DTGetArmor(ExpTrace.Entity, Shell.DakShellType, 2)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-						if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+						if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity:CPPIGetOwner() ~= nil and ExpTrace.Entity:CPPIGetOwner():IsWorld()) then
 							if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 							if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end
 							if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -3579,8 +3579,8 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 			local CurTarget = Shell.DakDamageList[i]
 			local HPPerc = 0
 			if IsValid(CurTarget) then
-				if IsValid(CurTarget.SPPOwner) and CurTarget.SPPOwner:IsPlayer() then
-					if CurTarget.SPPOwner:IsWorld() then
+				if IsValid(CurTarget:CPPIGetOwner()) and CurTarget:CPPIGetOwner():IsPlayer() then
+					if CurTarget:CPPIGetOwner():IsWorld() then
 						if CurTarget.DakIsTread==nil then
 							if CurTarget:GetPos():Distance(Pos) > Radius/2 then
 								if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
@@ -3611,7 +3611,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 							--table.insert(Shell.RemoveList,CurTarget)
 						end
 					else
-						if CurTarget.SPPOwner:HasGodMode()==false and not(CurTarget.SPPOwner:IsWorld()) then
+						if CurTarget:CPPIGetOwner():HasGodMode()==false and not(CurTarget:CPPIGetOwner():IsWorld()) then
 							if CurTarget.DakIsTread==nil then
 								if CurTarget:GetPos():Distance(Pos) > Radius/2 then
 									if CurTarget:GetClass() == "dak_tegun" or CurTarget:GetClass() == "dak_temachinegun" or CurTarget:GetClass() == "dak_teautogun" then
@@ -3873,7 +3873,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 						end
 					end
 					local EffArmor = (DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(SpallTrace.HitNormal:Dot(Direction)))
-					if SpallTrace.Entity.IsComposite == 1 or (SpallTrace.Entity.SPPOwner ~= nil and SpallTrace.Entity.SPPOwner:IsWorld()) then
+					if SpallTrace.Entity.IsComposite == 1 or (SpallTrace.Entity:CPPIGetOwner() ~= nil and SpallTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if SpallTrace.Entity.EntityMods == nil then SpallTrace.Entity.EntityMods = {} end
 						if SpallTrace.Entity.EntityMods.CompKEMult == nil then SpallTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if SpallTrace.Entity.EntityMods.CompCEMult == nil then SpallTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -4066,7 +4066,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 						end
 					end
 					local EffArmor = (DTGetArmor(SpallTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(SpallTrace.HitNormal:Dot(Direction)))
-					if SpallTrace.Entity.IsComposite == 1 or (SpallTrace.Entity.SPPOwner ~= nil and SpallTrace.Entity.SPPOwner:IsWorld()) then
+					if SpallTrace.Entity.IsComposite == 1 or (SpallTrace.Entity:CPPIGetOwner() ~= nil and SpallTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if SpallTrace.Entity.EntityMods == nil then SpallTrace.Entity.EntityMods = {} end
 						if SpallTrace.Entity.EntityMods.CompKEMult == nil then SpallTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if SpallTrace.Entity.EntityMods.CompCEMult == nil then SpallTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -4278,7 +4278,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						end
 					end
 					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
-					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity.SPPOwner ~= nil and HEATTrace.Entity.SPPOwner:IsWorld()) then
+					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity:CPPIGetOwner() ~= nil and HEATTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if HEATTrace.Entity.EntityMods == nil then HEATTrace.Entity.EntityMods = {} end
 						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -4478,7 +4478,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						end
 					end
 					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
-					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity.SPPOwner ~= nil and HEATTrace.Entity.SPPOwner:IsWorld()) then
+					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity:CPPIGetOwner() ~= nil and HEATTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if HEATTrace.Entity.EntityMods == nil then HEATTrace.Entity.EntityMods = {} end
 						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -4694,7 +4694,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 						end
 					end
 					local EffArmor = (DTGetArmor(HEATTrace.Entity, Shell.DakShellType, Shell.DakCaliber)/math.abs(HEATTraceLine.HitNormal:Dot(Direction)))
-					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity.SPPOwner ~= nil and HEATTrace.Entity.SPPOwner:IsWorld()) then
+					if HEATTrace.Entity.IsComposite == 1 or (HEATTrace.Entity:CPPIGetOwner() ~= nil and HEATTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if HEATTrace.Entity.EntityMods == nil then HEATTrace.Entity.EntityMods = {} end
 						if HEATTrace.Entity.EntityMods.CompKEMult == nil then HEATTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if HEATTrace.Entity.EntityMods.CompCEMult == nil then HEATTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -4847,7 +4847,7 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity:CPPIGetOwner() ~= nil and ExpTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
@@ -5031,7 +5031,7 @@ function entity:ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Dir
 					ExpTrace.Entity.DakLastDamagePos = ExpTrace.HitPos
 
 					local EffArmor = (DTGetArmor(ExpTrace.Entity, "HE", Caliber)/math.abs(ExpTraceLine.HitNormal:Dot(Direction)))
-					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity.SPPOwner ~= nil and ExpTrace.Entity.SPPOwner:IsWorld()) then
+					if ExpTrace.Entity.IsComposite == 1 or (ExpTrace.Entity:CPPIGetOwner() ~= nil and ExpTrace.Entity:CPPIGetOwner():IsWorld()) then
 						if ExpTrace.Entity.EntityMods == nil then ExpTrace.Entity.EntityMods = {} end
 						if ExpTrace.Entity.EntityMods.CompKEMult == nil then ExpTrace.Entity.EntityMods.CompKEMult = 9.2 end
 						if ExpTrace.Entity.EntityMods.CompCEMult == nil then ExpTrace.Entity.EntityMods.CompCEMult = 18.4 end
