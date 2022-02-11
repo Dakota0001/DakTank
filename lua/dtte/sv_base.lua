@@ -446,6 +446,8 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 										DTShellAirBurst(ExpPos,ShellList[i],trace.endpos-trace.start)
 									end
 								else
+									local cal = ShellList[i].DakCaliber
+									util.ScreenShake( ShellTrace.HitPos, cal, 2.5, 0.2, cal*50 )
 									if ShellList[i].IsGuided then
 										DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 									else
