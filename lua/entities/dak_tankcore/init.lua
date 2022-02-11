@@ -46,6 +46,40 @@ concommand.Add("daktank_unmake", function()
 	end
 end)
 
+function Average(Table)
+	local Ave = 0
+	for i=1, #Table do
+		Ave = Ave + Table[i]
+	end
+	return Ave/#Table
+end
+
+function AverageNoOutliers(Table)
+	local Ave = 0
+	local count = 0
+	for i=1, #Table do
+		if i > #Table*0.25 and i < #Table*0.75 then
+			Ave = Ave + Table[i]
+			count = count + 1
+		end
+	end
+	return Ave/count
+end
+
+
+function SplitTableByNegPos(Table)
+	local neg = {}
+	local pos = {}
+	for i=1, #Table do
+		if Table[i] > 0 then 
+			pos[#pos+1] = Table[i]
+		else
+			neg[#neg+1] = Table[i]
+		end
+	end
+	return pos, neg
+end
+
 function InRange(x, min, max) --how is this not standard???
 	return (x>min and x<max) or (x<min and x>max)
 end
@@ -1371,18 +1405,6 @@ function ENT:Think()
 							self.SideSpallLinerCoverage = 0.5*(self.RightSpallLinerCoverage + self.LeftSpallLinerCoverage)
 						end
 
-						do --Calculate armor multipliers
-							self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
-							self.ArmorRearMult = math.max(self.RearArmor/250,0.1)
-							local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
-							self.BestAveArmor = Total
-							armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(((self.ArmorSideMult+self.ArmorSideMult+self.ArmorRearMult)/3)*(1+(0.25*((self.SideSpallLinerCoverage+self.SideSpallLinerCoverage+self.RearSpallLinerCoverage)/3))))
-							self.ArmorMult = math.Round(math.max(0.01,armormult),3)
-							self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
-							local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(0.05*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
-							self.ArmorMult = self.ArmorMult * ArmorTypeMult
-						end
-
 						do --Get main armor bounds of vehicle
 							local xs = {}
 							local ys = {}
@@ -1398,10 +1420,20 @@ function ENT:Think()
 							table.sort(xs)
 							table.sort(ys)
 							table.sort(zs)
+							
+							local PosX, NegX = SplitTableByNegPos(xs)
+							local PosY, NegY = SplitTableByNegPos(ys)
+							local PosZ, NegZ = SplitTableByNegPos(zs)
+
+
+							
 							self.RealMins = Vector(xs[1],ys[1],zs[1])
 							self.RealMaxs = Vector(xs[#xs],ys[#ys],zs[#zs])
 							--debugoverlay.BoxAngles( self.ForwardEnt:GetPos(), self.RealMins, self.RealMaxs, self.ForwardEnt:GetAngles(), 30, Color( 150, 150, 255, 100 ) )
-							self.DakVolume = math.Round(math.abs(((self.RealMaxs - self.RealMins).x*(self.RealMaxs - self.RealMins).y*(self.RealMaxs - self.RealMins).z))*0.005,2)
+							local XAve = math.abs(AverageNoOutliers(PosX) - AverageNoOutliers(NegX))
+							local YAve = math.abs(AverageNoOutliers(PosY) - AverageNoOutliers(NegY))
+							local ZAve = math.abs(AverageNoOutliers(PosZ) - AverageNoOutliers(NegZ))
+							self.DakVolume = math.Round(XAve*YAve*ZAve*0.03125,2) --0.03125 is just an arbitrary balance number, was 0.005 but new averaging system called for new number
 						end
 
 						do --Get crew bounds
@@ -1608,6 +1640,317 @@ function ENT:Think()
 							]]
 						end
 
+						do --Scan for armor display
+							self.RawFrontalTable = {}
+							self.RawSideTable = {}
+							self.RawRearTable = {}
+
+
+							local basepos = self.Base:GetPos()
+							self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
+							local biggestsize = math.max(math.min(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
+							local pixels = 40
+							local splits = 40
+							local delay = (pixels/splits)
+							local startpos
+							local curarmor = 0
+							local ent
+							local scanforward
+							local scanright
+							local scanup
+							local aspectratio = self.BoxSize.y/self.BoxSize.z
+							self.frontarmortable = {}
+							local DebugTime = SysTime()
+							local aspectratio = self.BoxSize.y/self.BoxSize.z
+							local minmax = (self.HitBoxMins+self.HitBoxMaxs)
+							local addpos
+							local distance = self.MaxSize*2
+							--FRONT
+							for i=1, pixels do
+								--timer.Simple(engine.TickInterval()*delay*i,function()
+									for j=1, pixels do
+										--timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
+											if IsValid(self) then
+												if IsValid(self.Gearbox) then
+													scanforward = self.Gearbox.ForwardEnt:GetForward()
+													scanright = self.Gearbox.ForwardEnt:GetRight()
+													scanup = self.Gearbox.ForwardEnt:GetUp()
+												elseif IsValid(self.MainTurret) then
+													scanforward = self.MainTurret:GetForward()
+													scanright = self.MainTurret:GetRight()
+													scanup = self.MainTurret:GetUp()
+												end
+												
+												if self.BoxSize.y>self.BoxSize.z then
+													aspectratio = self.BoxSize.y/self.BoxSize.z
+													local xstart = -scanright*self.HitBoxMaxs.y*1.1-- - scanright*(self.ForwardEnt:WorldToLocal(basepos)).y
+													local ystart = scanup*self.HitBoxMaxs.z*1.1-- + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
+													local xcur = (j/pixels*1.1)*-scanright*-self.BoxSize.y
+													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+													startpos = basepos + xstart + ystart*aspectratio
+													addpos = xcur+ycur*aspectratio
+												else
+													aspectratio = self.BoxSize.z/self.BoxSize.y
+													local xstart = -scanright*self.HitBoxMaxs.y*1.1-- - scanright*(self.ForwardEnt:WorldToLocal(basepos)).y
+													local ystart = scanup*self.HitBoxMaxs.z*1.1-- + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
+													local xcur = (j/pixels*1.1)*-scanright*-self.BoxSize.y
+													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+													startpos = basepos + xstart*aspectratio + ystart
+													addpos = xcur*aspectratio+ycur
+												end
+
+												SpallLiner = 0
+
+												local fowardtrace = util.TraceHull( {
+													start = startpos+addpos+scanforward*distance,
+													endpos = startpos+addpos-scanforward*distance,
+													maxs = Vector(0,0,0),
+													mins = Vector(0,0,0),
+													filter = player.GetAll()
+												} )
+												local backwardtrace = util.TraceHull( {
+													start = startpos+addpos-scanforward*distance,
+													endpos = startpos+addpos+scanforward*distance,
+													maxs = Vector(0,0,0),
+													mins = Vector(0,0,0),
+													filter = player.GetAll()
+												} )
+
+												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+scanforward*distance, startpos+addpos-scanforward*distance, depth, "AP", 75, player.GetAll(), self)
+												
+												local addval = 0
+
+												if IsValid(ent) then
+													local entclass = ent:GetClass()
+													if entclass == "dak_crew"then
+														addval = 70000
+													end
+													if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+														addval = 80000
+													end
+													if entclass == "dak_tefuel" then
+														addval = 90000
+													end
+												end
+
+												if self.frontarmortable~=nil then
+													if curarmor~=nil then
+														self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
+														self.RawFrontalTable[#self.RawFrontalTable+1] = math.Round(curarmor)
+													else
+														self.frontarmortable[#self.frontarmortable+1] = 0
+													end
+												end
+											end
+										--end)
+									end
+								--end)
+							end
+							--print(SysTime()-DebugTime)
+							timer.Simple(1,function() --timer.Simple(engine.TickInterval()*delay*pixels+1,function()
+								if self.frontarmortable~=nil then
+									self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
+								end
+							end)
+							--SIDE
+							self.sidearmortable = {}
+							for i=1, pixels do
+								--timer.Simple(engine.TickInterval()*delay*i,function()
+									for j=1, pixels do
+										--timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
+											if IsValid(self) then
+												if IsValid(self.Gearbox) then
+													scanforward = self.Gearbox.ForwardEnt:GetForward()
+													scanright = self.Gearbox.ForwardEnt:GetRight()
+													scanup = self.Gearbox.ForwardEnt:GetUp()
+												elseif IsValid(self.MainTurret) then
+													scanforward = self.MainTurret:GetForward()
+													scanright = self.MainTurret:GetRight()
+													scanup = self.MainTurret:GetUp()
+												end
+												
+												if self.BoxSize.x>self.BoxSize.z then
+													aspectratio = self.BoxSize.x/self.BoxSize.z
+													local xstart = scanforward*self.HitBoxMaxs.x*1.1 - scanforward*(self.ForwardEnt:WorldToLocal(basepos)).x
+													local ystart = scanup*self.HitBoxMaxs.z*1.1 + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
+													local xcur = (j/pixels*1.1)*scanforward*-self.BoxSize.x
+													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+													startpos = basepos + xstart + ystart*aspectratio
+													addpos = xcur+ycur*aspectratio
+												else
+													aspectratio = self.BoxSize.z/self.BoxSize.x
+													local xstart = scanforward*self.HitBoxMaxs.x*1.1 - scanforward*(self.ForwardEnt:WorldToLocal(basepos)).x
+													local ystart = scanup*self.HitBoxMaxs.z*1.1 + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
+													local xcur = (j/pixels*1.1)*scanforward*-self.BoxSize.x
+													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+													startpos = basepos + xstart*aspectratio + ystart
+													addpos = xcur*aspectratio+ycur
+												end
+												
+												SpallLiner = 0
+
+												local fowardtrace = util.TraceHull( {
+													start = startpos+addpos-scanright*distance,
+													endpos = startpos+addpos+scanright*distance,
+													maxs = Vector(0,0,0),
+													mins = Vector(0,0,0),
+													filter = player.GetAll()
+												} )
+												local backwardtrace = util.TraceHull( {
+													start = startpos+addpos+scanright*distance,
+													endpos = startpos+addpos-scanright*distance,
+													maxs = Vector(0,0,0),
+													mins = Vector(0,0,0),
+													filter = player.GetAll()
+												} )
+												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos-scanright*distance, startpos+addpos+scanright*distance, depth, "AP", 75, player.GetAll(), self)
+												
+												local addval = 0
+
+												if IsValid(ent) then
+													local entclass = ent:GetClass()
+													if entclass == "dak_crew"then
+														addval = 70000
+													end
+													if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+														addval = 80000
+													end
+													if entclass == "dak_tefuel" then
+														addval = 90000
+													end
+												end
+
+												if self.sidearmortable~=nil then
+													if curarmor~=nil then
+														self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
+														self.RawSideTable[#self.RawSideTable+1] = math.Round(curarmor)
+													else
+														self.sidearmortable[#self.sidearmortable+1] = 0
+													end
+												end
+											end
+										--end)
+									end
+								--end)
+							end
+							timer.Simple(1,function() --timer.Simple(engine.TickInterval()*delay*pixels+1,function()
+								if self.sidearmortable~=nil then
+									self.sidearmortable[#self.sidearmortable+1] = self.SideArmor
+								end
+							end)
+							--print(SysTime()-DebugTime)
+
+							--Rear
+							self.reararmortable = {}
+							for i=1, pixels do
+								--timer.Simple(engine.TickInterval()*delay*i,function()
+									for j=1, pixels do
+										--timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
+											if IsValid(self) then
+												if IsValid(self.Gearbox) then
+													scanforward = self.Gearbox.ForwardEnt:GetForward()
+													scanright = self.Gearbox.ForwardEnt:GetRight()
+													scanup = self.Gearbox.ForwardEnt:GetUp()
+												elseif IsValid(self.MainTurret) then
+													scanforward = self.MainTurret:GetForward()
+													scanright = self.MainTurret:GetRight()
+													scanup = self.MainTurret:GetUp()
+												end
+												
+												if self.BoxSize.y>self.BoxSize.z then
+													aspectratio = self.BoxSize.y/self.BoxSize.z
+													local xstart = -scanright*self.HitBoxMaxs.y*1.1-- - scanright*(self.ForwardEnt:WorldToLocal(basepos)).y
+													local ystart = scanup*self.HitBoxMaxs.z*1.1-- + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
+													local xcur = (j/pixels*1.1)*-scanright*-self.BoxSize.y
+													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+													startpos = basepos + xstart + ystart*aspectratio
+													addpos = xcur+ycur*aspectratio
+												else
+													aspectratio = self.BoxSize.z/self.BoxSize.y
+													local xstart = -scanright*self.HitBoxMaxs.y*1.1-- - scanright*(self.ForwardEnt:WorldToLocal(basepos)).y
+													local ystart = scanup*self.HitBoxMaxs.z*1.1-- + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
+													local xcur = (j/pixels*1.1)*-scanright*-self.BoxSize.y
+													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
+													startpos = basepos + xstart*aspectratio + ystart
+													addpos = xcur*aspectratio+ycur
+												end
+
+												SpallLiner = 0
+
+												local fowardtrace = util.TraceHull( {
+													start = startpos+addpos-scanforward*distance,
+													endpos = startpos+addpos+scanforward*distance,
+													maxs = Vector(0,0,0),
+													mins = Vector(0,0,0),
+													filter = player.GetAll()
+												} )
+												local backwardtrace = util.TraceHull( {
+													start = startpos+addpos+scanforward*distance,
+													endpos = startpos+addpos-scanforward*distance,
+													maxs = Vector(0,0,0),
+													mins = Vector(0,0,0),
+													filter = player.GetAll()
+												} )
+
+												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+scanforward*distance, startpos+addpos-scanforward*distance, depth, "AP", 75, player.GetAll(), self)
+												
+												local addval = 0
+
+												if IsValid(ent) then
+													local entclass = ent:GetClass()
+													if entclass == "dak_crew"then
+														addval = 70000
+													end
+													if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
+														addval = 80000
+													end
+													if entclass == "dak_tefuel" then
+														addval = 90000
+													end
+												end
+
+												if self.reararmortable~=nil then
+													if curarmor~=nil then
+														self.reararmortable[#self.reararmortable+1] = math.Round(curarmor) + addval
+														self.RawRearTable[#self.RawRearTable+1] = math.Round(curarmor)
+													else
+														self.reararmortable[#self.reararmortable+1] = 0
+													end
+												end
+											end
+										--end)
+									end
+								--end)
+							end
+							--print(SysTime()-DebugTime)
+							timer.Simple(1,function() --timer.Simple(engine.TickInterval()*delay*pixels+1,function()
+								if self.reararmortable~=nil then
+									self.reararmortable[#self.reararmortable+1] = self.RearArmor
+								end
+							end)
+						end
+
+						do --Calculate armor multipliers
+							self.FrontalArmor = math.max(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
+							self.SideArmor = math.max(AverageNoOutliers(self.RawSideTable),self.SideArmor)
+							self.RearArmor = math.max(AverageNoOutliers(self.RawRearTable),self.RearArmor)
+
+							self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
+							self.ArmorRearMult = math.max(self.RearArmor/250,0.1)
+
+							local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
+							self.BestAveArmor = Total
+							armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(((self.ArmorSideMult+self.ArmorSideMult+self.ArmorRearMult)/3)*(1+(0.25*((self.SideSpallLinerCoverage+self.SideSpallLinerCoverage+self.RearSpallLinerCoverage)/3))))
+							self.ArmorMult = math.Round(math.max(0.01,armormult),3)
+							self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
+							local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(0.05*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
+							self.ArmorMult = self.ArmorMult * ArmorTypeMult
+						end
+
 						do --Calculate flanking multiplier
 							local speedmult = 1
 							if IsValid(self.Gearbox) then
@@ -1797,202 +2140,7 @@ function ENT:Think()
 							end
 						end)
 
-						do --Scan for armor display
-							local basepos = self.Base:GetPos()
-							self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
-							local biggestsize = math.max(math.min(self.BestLength, self.BestWidth)*1.1,self.BestHeight*0.5*1.1)*2
-							local pixels = 40
-							local splits = 40
-							local delay = (pixels/splits)
-							local startpos
-							local curarmor = 0
-							local ent
-							local scanforward
-							local scanright
-							local scanup
-							local aspectratio = self.BoxSize.y/self.BoxSize.z
-							self.frontarmortable = {}
-							local DebugTime = SysTime()
-							local aspectratio = self.BoxSize.y/self.BoxSize.z
-							local minmax = (self.HitBoxMins+self.HitBoxMaxs)
-							local addpos
-							local distance = self.MaxSize*2
-							--FRONT
-							for i=1, pixels do
-								--timer.Simple(engine.TickInterval()*delay*i,function()
-									for j=1, pixels do
-										--timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
-											if IsValid(self) then
-												if IsValid(self.Gearbox) then
-													scanforward = self.Gearbox.ForwardEnt:GetForward()
-													scanright = self.Gearbox.ForwardEnt:GetRight()
-													scanup = self.Gearbox.ForwardEnt:GetUp()
-												elseif IsValid(self.MainTurret) then
-													scanforward = self.MainTurret:GetForward()
-													scanright = self.MainTurret:GetRight()
-													scanup = self.MainTurret:GetUp()
-												end
-												
-												if self.BoxSize.y>self.BoxSize.z then
-													aspectratio = self.BoxSize.y/self.BoxSize.z
-													local xstart = -scanright*self.HitBoxMaxs.y*1.1-- - scanright*(self.ForwardEnt:WorldToLocal(basepos)).y
-													local ystart = scanup*self.HitBoxMaxs.z*1.1-- + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
-													local xcur = (j/pixels*1.1)*-scanright*-self.BoxSize.y
-													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
-													startpos = basepos + xstart + ystart*aspectratio
-													addpos = xcur+ycur*aspectratio
-												else
-													aspectratio = self.BoxSize.z/self.BoxSize.y
-													local xstart = -scanright*self.HitBoxMaxs.y*1.1-- - scanright*(self.ForwardEnt:WorldToLocal(basepos)).y
-													local ystart = scanup*self.HitBoxMaxs.z*1.1-- + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
-													local xcur = (j/pixels*1.1)*-scanright*-self.BoxSize.y
-													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
-													startpos = basepos + xstart*aspectratio + ystart
-													addpos = xcur*aspectratio+ycur
-												end
-
-												SpallLiner = 0
-
-												local fowardtrace = util.TraceHull( {
-													start = startpos+addpos+scanforward*distance,
-													endpos = startpos+addpos-scanforward*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
-												local backwardtrace = util.TraceHull( {
-													start = startpos+addpos-scanforward*distance,
-													endpos = startpos+addpos+scanforward*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
-
-												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+scanforward*distance, startpos+addpos-scanforward*distance, depth, "AP", 75, player.GetAll(), self)
-												
-												local addval = 0
-
-												if IsValid(ent) then
-													local entclass = ent:GetClass()
-													if entclass == "dak_crew"then
-														addval = 70000
-													end
-													if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
-														addval = 80000
-													end
-													if entclass == "dak_tefuel" then
-														addval = 90000
-													end
-												end
-
-												if self.frontarmortable~=nil then
-													if curarmor~=nil then
-														self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
-													else
-														self.frontarmortable[#self.frontarmortable+1] = 0
-													end
-												end
-											end
-										--end)
-									end
-								--end)
-							end
-							--print(SysTime()-DebugTime)
-							timer.Simple(1,function() --timer.Simple(engine.TickInterval()*delay*pixels+1,function()
-								if self.frontarmortable~=nil then
-									self.frontarmortable[#self.frontarmortable+1] = self.FrontalArmor
-								end
-							end)
-							--SIDE
-							self.sidearmortable = {}
-							for i=1, pixels do
-								--timer.Simple(engine.TickInterval()*delay*i,function()
-									for j=1, pixels do
-										--timer.Simple(engine.TickInterval()*(math.ceil(j/splits)-1),function()
-											if IsValid(self) then
-												if IsValid(self.Gearbox) then
-													scanforward = self.Gearbox.ForwardEnt:GetForward()
-													scanright = self.Gearbox.ForwardEnt:GetRight()
-													scanup = self.Gearbox.ForwardEnt:GetUp()
-												elseif IsValid(self.MainTurret) then
-													scanforward = self.MainTurret:GetForward()
-													scanright = self.MainTurret:GetRight()
-													scanup = self.MainTurret:GetUp()
-												end
-												
-												if self.BoxSize.x>self.BoxSize.z then
-													aspectratio = self.BoxSize.x/self.BoxSize.z
-													local xstart = scanforward*self.HitBoxMaxs.x*1.1 - scanforward*(self.ForwardEnt:WorldToLocal(basepos)).x
-													local ystart = scanup*self.HitBoxMaxs.z*1.1 + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
-													local xcur = (j/pixels*1.1)*scanforward*-self.BoxSize.x
-													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
-													startpos = basepos + xstart + ystart*aspectratio
-													addpos = xcur+ycur*aspectratio
-												else
-													aspectratio = self.BoxSize.z/self.BoxSize.x
-													local xstart = scanforward*self.HitBoxMaxs.x*1.1 - scanforward*(self.ForwardEnt:WorldToLocal(basepos)).x
-													local ystart = scanup*self.HitBoxMaxs.z*1.1 + scanup*(self.ForwardEnt:WorldToLocal(basepos)).z
-													local xcur = (j/pixels*1.1)*scanforward*-self.BoxSize.x
-													local ycur = (i/pixels*1.1)*scanup*-self.BoxSize.z
-													startpos = basepos + xstart*aspectratio + ystart
-													addpos = xcur*aspectratio+ycur
-												end
-												
-												SpallLiner = 0
-
-												local fowardtrace = util.TraceHull( {
-													start = startpos+addpos-scanright*distance,
-													endpos = startpos+addpos+scanright*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
-												local backwardtrace = util.TraceHull( {
-													start = startpos+addpos+scanright*distance,
-													endpos = startpos+addpos-scanright*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
-												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos-scanright*distance, startpos+addpos+scanright*distance, depth, "AP", 75, player.GetAll(), self)
-												
-												local addval = 0
-
-												if IsValid(ent) then
-													local entclass = ent:GetClass()
-													if entclass == "dak_crew"then
-														addval = 70000
-													end
-													if entclass == "dak_teammo" or entclass == "dak_teautoloadingmodule" then
-														addval = 80000
-													end
-													if entclass == "dak_tefuel" then
-														addval = 90000
-													end
-												end
-
-												if self.sidearmortable~=nil then
-													if curarmor~=nil then
-														self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
-													else
-														self.sidearmortable[#self.sidearmortable+1] = 0
-													end
-												end
-											end
-										--end)
-									end
-								--end)
-							end
-							timer.Simple(1,function() --timer.Simple(engine.TickInterval()*delay*pixels+1,function()
-								if self.sidearmortable~=nil then
-									self.sidearmortable[#self.sidearmortable+1] = self.SideArmor
-								end
-							end)
-							--print(SysTime()-DebugTime)
-						end
+						
 					end
 
 					if not(self.Dead) and (self.DakFinishedPasting == 1 or self.dupespawned==nil) then
