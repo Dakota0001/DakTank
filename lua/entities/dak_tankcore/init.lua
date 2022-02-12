@@ -1900,7 +1900,7 @@ function ENT:Think()
 												} )
 
 												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+scanforward*distance, startpos+addpos-scanforward*distance, depth, "AP", 75, player.GetAll(), self)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos-scanforward*distance, startpos+addpos+scanforward*distance, depth, "AP", 75, player.GetAll(), self)
 												
 												local addval = 0
 
@@ -1948,6 +1948,7 @@ function ENT:Think()
 							--print(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
 							--print(AverageNoOutliers(self.RawSideTable),self.SideArmor)
 							--print(AverageNoOutliers(self.RawRearTable),self.RearArmor)
+
 
 							self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
 							self.ArmorRearMult = math.max(self.RearArmor/250,0.1)
