@@ -1737,7 +1737,9 @@ function ENT:Think()
 												if self.frontarmortable~=nil then
 													if curarmor~=nil then
 														self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
-														self.RawFrontalTable[#self.RawFrontalTable+1] = math.Round(curarmor)
+														if curarmor~=0 then
+															self.RawFrontalTable[#self.RawFrontalTable+1] = math.Round(curarmor)
+														end
 													else
 														self.frontarmortable[#self.frontarmortable+1] = 0
 													end
@@ -1826,7 +1828,9 @@ function ENT:Think()
 												if self.sidearmortable~=nil then
 													if curarmor~=nil then
 														self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
-														self.RawSideTable[#self.RawSideTable+1] = math.Round(curarmor)
+														if curarmor~=0 then
+															self.RawSideTable[#self.RawSideTable+1] = math.Round(curarmor)
+														end
 													else
 														self.sidearmortable[#self.sidearmortable+1] = 0
 													end
@@ -1916,7 +1920,9 @@ function ENT:Think()
 												if self.reararmortable~=nil then
 													if curarmor~=nil then
 														self.reararmortable[#self.reararmortable+1] = math.Round(curarmor) + addval
-														self.RawRearTable[#self.RawRearTable+1] = math.Round(curarmor)
+														if curarmor~=0 then
+															self.RawRearTable[#self.RawRearTable+1] = math.Round(curarmor)
+														end
 													else
 														self.reararmortable[#self.reararmortable+1] = 0
 													end
@@ -1938,6 +1944,10 @@ function ENT:Think()
 							self.FrontalArmor = math.max(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
 							self.SideArmor = math.max(AverageNoOutliers(self.RawSideTable),self.SideArmor)
 							self.RearArmor = math.max(AverageNoOutliers(self.RawRearTable),self.RearArmor)
+
+							--print(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
+							--print(AverageNoOutliers(self.RawSideTable),self.SideArmor)
+							--print(AverageNoOutliers(self.RawRearTable),self.RearArmor)
 
 							self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
 							self.ArmorRearMult = math.max(self.RearArmor/250,0.1)
