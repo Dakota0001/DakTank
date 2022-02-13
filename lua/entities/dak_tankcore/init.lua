@@ -1941,14 +1941,19 @@ function ENT:Think()
 						end
 
 						do --Calculate armor multipliers
-							self.FrontalArmor = math.max(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
-							self.SideArmor = math.max(AverageNoOutliers(self.RawSideTable),self.SideArmor)
-							self.RearArmor = math.max(AverageNoOutliers(self.RawRearTable),self.RearArmor)
+							table.sort( self.RawFrontalTable )
+							table.sort( self.RawSideTable )
+							table.sort( self.RawRearTable )
 
 							--print(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
 							--print(AverageNoOutliers(self.RawSideTable),self.SideArmor)
 							--print(AverageNoOutliers(self.RawRearTable),self.RearArmor)
 
+							--PrintTable(self.RawSideTable)
+
+							self.FrontalArmor = math.max(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
+							self.SideArmor = math.max(AverageNoOutliers(self.RawSideTable),self.SideArmor)
+							self.RearArmor = math.max(AverageNoOutliers(self.RawRearTable),self.RearArmor)
 
 							self.ArmorSideMult = math.max(self.SideArmor/250,0.1)
 							self.ArmorRearMult = math.max(self.RearArmor/250,0.1)
