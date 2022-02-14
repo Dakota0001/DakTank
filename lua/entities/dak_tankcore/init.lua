@@ -1710,7 +1710,7 @@ function ENT:Think()
 												end
 												local TraceStart = ForwardHit
 												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, true)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, true, false)
 												
 												local addval = 0
 
@@ -1794,7 +1794,7 @@ function ENT:Think()
 												end
 												local TraceStart = ForwardHit
 												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, false, false)
 
 												local addval = 0
 
@@ -1879,7 +1879,7 @@ function ENT:Think()
 												end
 												local TraceStart = ForwardHit
 												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, false, true)
 
 												local addval = 0
 
@@ -1924,9 +1924,9 @@ function ENT:Think()
 							table.sort( self.RawSideTable )
 							table.sort( self.RawRearTable )
 
-							--print(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
-							--print(AverageNoOutliers(self.RawSideTable),self.SideArmor)
-							--print(AverageNoOutliers(self.RawRearTable),self.RearArmor)
+							print(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
+							print(AverageNoOutliers(self.RawSideTable),self.SideArmor)
+							print(AverageNoOutliers(self.RawRearTable),self.RearArmor)
 
 							--PrintTable(self.RawRearTable)
 

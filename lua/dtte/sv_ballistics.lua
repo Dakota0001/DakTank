@@ -866,9 +866,12 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 	end
 end
 
-function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter, core, mark)
+function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter, core, mark, respectmark)
 	if tonumber(Caliber) == nil then return 0, NULL, 0, 0, 0, 0, 0, Vector(0,0,0) end
 	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
+	if IsValid(Ent) and Ent.Marked == true and respectmark==true then
+		Armor = 0
+	end
 	if mark == true and IsValid(Ent) and Ent.Controller == core and Ent:GetClass() == "prop_physics" then Ent.Marked = true end
 	if IsValid(Ent) and (Ent:GetClass() == "dak_tegearbox" or Ent:GetClass() == "dak_tegearboxnew" or Ent:GetClass() == "dak_temotor") then
 		Armor = Armor * 0.25
@@ -879,9 +882,6 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 		CritEnt = Ent
 	end
 	if IsValid(Ent) and Ent.Controller ~= core then
-		Armor = 0
-	end
-	if IsValid(Ent) and Ent.Marked == true then
 		Armor = 0
 	end
 	local Recurse = 1
@@ -902,10 +902,10 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
-		if mark == true and IsValid(newEnt) and newEnt.Controller == core and newEnt:GetClass() == "prop_physics" then newEnt.Marked = true end
-		if IsValid(newEnt) and newEnt.Marked == true then
+		if IsValid(newEnt) and newEnt.Marked == true and respectmark==true then
 			newArmor = 0
 		end
+		if mark == true and IsValid(newEnt) and newEnt.Controller == core and newEnt:GetClass() == "prop_physics" then newEnt.Marked = true end
 		local newValid = false
 		local newEntClass
 		if newEnt:IsValid() then
