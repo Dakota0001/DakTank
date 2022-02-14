@@ -343,6 +343,68 @@ function DTSimpleRecurseTrace(Start, End, Caliber, Filter, Gun, ignoreworld)
 	end
 end
 
+function DTFilterTrace(Start, End, Filter, Core)
+	local trace = {}
+		trace.start = Start
+		trace.endpos = End
+		trace.filter = Filter
+		trace.mins = Vector(-0.01,-0.01,-0.01)
+		trace.maxs = Vector(0.01,0.01,0.01)
+		trace.ignoreworld = true
+	local SimpleTrace = util.TraceHull( trace )
+	local Stop = 0
+	local Ent = SimpleTrace.Entity
+	local Pos = SimpleTrace.HitPos
+	if Ent:IsValid() then
+		if Ent.Controller == Core.Controller and not(Ent:GetClass() == "dak_temachinegun" or Ent:GetClass() == "dak_teautogun" or Ent:GetClass() == "dak_tegun") then
+			Stop = 1
+		end
+	else
+		Pos = Start
+		Stop = 1
+	end
+	return Ent, Pos, Stop
+end
+
+function DTFilterRecurseTrace(Start, End, Filter, Core)
+	local Ent, Pos, Stop = DTFilterTrace(Start, End, Filter, Core)
+	local EntTable = {}
+	local Recurse = 1
+	local NewFilter = Filter
+	NewFilter[#NewFilter+1] = Ent
+	local newEnt = Ent
+	local LastPos = Pos
+	if Ent:IsValid() then
+		if Ent.Controller == Core.Controller and not(Ent:GetClass() == "dak_temachinegun" or Ent:GetClass() == "dak_teautogun" or Ent:GetClass() == "dak_tegun") then
+			Stop = 1
+		else
+			LastPos = Start
+		end
+	else
+		LastPos = Start
+	end
+	if Stop == 1 then
+		return LastPos
+	end
+	while Stop == 0 and Recurse<1000 do
+		local newEnt, LastPos, Stop = DTFilterTrace(Start, End, NewFilter, Core)
+		if newEnt:IsValid() then
+			if newEnt.Controller == Core.Controller and not(newEnt:GetClass() == "dak_temachinegun" or newEnt:GetClass() == "dak_teautogun" or newEnt:GetClass() == "dak_tegun") then
+				Stop = 1
+			else
+				LastPos = Start
+			end
+		else
+			LastPos = Start
+		end
+		NewFilter[#NewFilter+1] = newEnt
+		Recurse = Recurse + 1
+		if Stop == 1 then
+			return LastPos
+		end
+	end
+end
+
 function DTHullTrace(Start, End, Mins, Maxs, Filter, Core)
 	local trace = {}
 		trace.start = Start
@@ -804,9 +866,10 @@ function DTGetArmorRecurseNoStop(Start, End, Distance, ShellType, Caliber, Filte
 	end
 end
 
-function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter, core)
+function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter, core, mark)
 	if tonumber(Caliber) == nil then return 0, NULL, 0, 0, 0, 0, 0, Vector(0,0,0) end
 	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
+	if mark == true and IsValid(Ent) and Ent.Controller == core and Ent:GetClass() == "prop_physics" then Ent.Marked = true end
 	if IsValid(Ent) and (Ent:GetClass() == "dak_tegearbox" or Ent:GetClass() == "dak_tegearboxnew" or Ent:GetClass() == "dak_temotor") then
 		Armor = Armor * 0.25
 	end
@@ -816,6 +879,9 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 		CritEnt = Ent
 	end
 	if IsValid(Ent) and Ent.Controller ~= core then
+		Armor = 0
+	end
+	if IsValid(Ent) and Ent.Marked == true then
 		Armor = 0
 	end
 	local Recurse = 1
@@ -836,6 +902,10 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
+		if mark == true and IsValid(newEnt) and newEnt.Controller == core and newEnt:GetClass() == "prop_physics" then newEnt.Marked = true end
+		if IsValid(newEnt) and newEnt.Marked == true then
+			newArmor = 0
+		end
 		local newValid = false
 		local newEntClass
 		if newEnt:IsValid() then

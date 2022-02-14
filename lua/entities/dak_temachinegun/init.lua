@@ -176,7 +176,7 @@ function ENT:Think()
 				self.DakCooldown = 30
 				self.DakMaxHealth = self.DakCaliber
 				self.DakArmor = self.DakCaliber*5
-				self.DakMass = math.Round(5+(2*math.Round(((((self.DakCaliber*0.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*3))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*3)))*0.001*7.8125)/1000)))
+				self.DakMass = math.Round(1+(0.1*math.Round(((((self.DakCaliber*0.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*3))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*3)))*0.001*7.8125)/1000)))
 
 				self.DakSM = math.Round(self.DakCaliber,2).."mmSLSMAmmo"
 
@@ -339,7 +339,7 @@ function ENT:Think()
 				self.DakCooldown = 30
 				self.DakMaxHealth = self.DakCaliber
 				self.DakArmor = self.DakCaliber*5
-				self.DakMass = math.Round(5+(2*math.Round(((((self.DakCaliber*0.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*3))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*3)))*0.001*7.8125)/1000)))
+				self.DakMass = math.Round(1+(0.1*math.Round(((((self.DakCaliber*0.5)*(self.DakCaliber*3)*(self.DakCaliber*3))+(math.pi*(self.DakCaliber^2)*(self.DakCaliber*3))-(math.pi*((self.DakCaliber/2)^2)*(self.DakCaliber*3)))*0.001*7.8125)/1000)))
 
 				self.DakSM = math.Round(self.DakCaliber,2).."mmSLSMAmmo"
 

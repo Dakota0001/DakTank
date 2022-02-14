@@ -1701,23 +1701,16 @@ function ENT:Think()
 
 												SpallLiner = 0
 
-												local fowardtrace = util.TraceHull( {
-													start = startpos+addpos+scanforward*distance,
-													endpos = startpos+addpos-scanforward*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
-												local backwardtrace = util.TraceHull( {
-													start = startpos+addpos-scanforward*distance,
-													endpos = startpos+addpos+scanforward*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
+												local ForwardHit = DTFilterRecurseTrace(startpos+addpos+scanforward*distance, startpos+addpos-scanforward*distance, player.GetAll(), self)
+												local BackwardHit = DTFilterRecurseTrace(startpos+addpos-scanforward*distance, startpos+addpos+scanforward*distance, player.GetAll(), self)
 
-												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos+scanforward*distance, startpos+addpos-scanforward*distance, depth, "AP", 75, player.GetAll(), self)
+												local depth = math.Max(ForwardHit:Distance(BackwardHit) * 0.5,50)
+												if ForwardHit == startpos+addpos+scanforward*distance or BackwardHit == startpos+addpos-scanforward*distance then
+													depth = 0
+												end
+												local TraceStart = ForwardHit
+												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, true)
 												
 												local addval = 0
 
@@ -1737,7 +1730,7 @@ function ENT:Think()
 												if self.frontarmortable~=nil then
 													if curarmor~=nil then
 														self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
-														if curarmor~=0 then
+														if curarmor~=0 and depth~=0 then
 															self.RawFrontalTable[#self.RawFrontalTable+1] = math.Round(curarmor)
 														end
 													else
@@ -1792,24 +1785,17 @@ function ENT:Think()
 												
 												SpallLiner = 0
 
-												local fowardtrace = util.TraceHull( {
-													start = startpos+addpos-scanright*distance,
-													endpos = startpos+addpos+scanright*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
-												local backwardtrace = util.TraceHull( {
-													start = startpos+addpos+scanright*distance,
-													endpos = startpos+addpos-scanright*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
-												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
+												local ForwardHit = DTFilterRecurseTrace(startpos+addpos-scanright*distance, startpos+addpos+scanright*distance, player.GetAll(), self)
+												local BackwardHit = DTFilterRecurseTrace(startpos+addpos+scanright*distance, startpos+addpos-scanright*distance, player.GetAll(), self)
 
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos-scanright*distance, startpos+addpos+scanright*distance, depth, "AP", 75, player.GetAll(), self)
-												
+												local depth = math.Max(ForwardHit:Distance(BackwardHit) * 0.5,50)
+												if ForwardHit == startpos+addpos-scanright*distance or BackwardHit == startpos+addpos+scanright*distance then
+													depth = 0
+												end
+												local TraceStart = ForwardHit
+												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self)
+
 												local addval = 0
 
 												if IsValid(ent) then
@@ -1828,7 +1814,7 @@ function ENT:Think()
 												if self.sidearmortable~=nil then
 													if curarmor~=nil then
 														self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
-														if curarmor~=0 then
+														if curarmor~=0 and depth~=0 then
 															self.RawSideTable[#self.RawSideTable+1] = math.Round(curarmor)
 														end
 													else
@@ -1884,24 +1870,17 @@ function ENT:Think()
 
 												SpallLiner = 0
 
-												local fowardtrace = util.TraceHull( {
-													start = startpos+addpos-scanforward*distance,
-													endpos = startpos+addpos+scanforward*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
-												local backwardtrace = util.TraceHull( {
-													start = startpos+addpos+scanforward*distance,
-													endpos = startpos+addpos-scanforward*distance,
-													maxs = Vector(0,0,0),
-													mins = Vector(0,0,0),
-													filter = player.GetAll()
-												} )
+												local ForwardHit = DTFilterRecurseTrace(startpos+addpos-scanforward*distance, startpos+addpos+scanforward*distance, player.GetAll(), self)
+												local BackwardHit = DTFilterRecurseTrace(startpos+addpos+scanforward*distance, startpos+addpos-scanforward*distance, player.GetAll(), self)
 
-												local depth = math.Max(fowardtrace.HitPos:Distance(backwardtrace.HitPos) * 0.5,50)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(startpos+addpos-scanforward*distance, startpos+addpos+scanforward*distance, depth, "AP", 75, player.GetAll(), self)
-												
+												local depth = math.Max(ForwardHit:Distance(BackwardHit) * 0.5,50)
+												if ForwardHit == startpos+addpos-scanforward*distance or BackwardHit == startpos+addpos+scanforward*distance then
+													depth = 0
+												end
+												local TraceStart = ForwardHit
+												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
+												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self)
+
 												local addval = 0
 
 												if IsValid(ent) then
@@ -1920,7 +1899,7 @@ function ENT:Think()
 												if self.reararmortable~=nil then
 													if curarmor~=nil then
 														self.reararmortable[#self.reararmortable+1] = math.Round(curarmor) + addval
-														if curarmor~=0 then
+														if curarmor~=0 and depth~=0 then
 															self.RawRearTable[#self.RawRearTable+1] = math.Round(curarmor)
 														end
 													else
@@ -1949,7 +1928,7 @@ function ENT:Think()
 							--print(AverageNoOutliers(self.RawSideTable),self.SideArmor)
 							--print(AverageNoOutliers(self.RawRearTable),self.RearArmor)
 
-							--PrintTable(self.RawSideTable)
+							--PrintTable(self.RawRearTable)
 
 							self.FrontalArmor = math.max(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
 							self.SideArmor = math.max(AverageNoOutliers(self.RawSideTable),self.SideArmor)
