@@ -64,6 +64,7 @@ function AverageNoOutliers(Table)
 			count = count + 1
 		end
 	end
+	if count == 0 then return 0 end
 	return Ave/count
 end
 
@@ -1406,37 +1407,6 @@ function ENT:Think()
 							self.SideSpallLinerCoverage = 0.5*(self.RightSpallLinerCoverage + self.LeftSpallLinerCoverage)
 						end
 
-						do --Get main armor bounds of vehicle
-							local xs = {}
-							local ys = {}
-							local zs = {}
-							local localbound
-							for i=1, #self.RealBounds do
-								--debugoverlay.Cross( self.RealBounds[i], 5, 25, Color( 0, 255, 0 ), true )
-								localbound = self.ForwardEnt:WorldToLocal(self.RealBounds[i])
-								xs[#xs+1] = localbound.x
-								ys[#ys+1] = localbound.y
-								zs[#zs+1] = localbound.z
-							end
-							table.sort(xs)
-							table.sort(ys)
-							table.sort(zs)
-							
-							local PosX, NegX = SplitTableByNegPos(xs)
-							local PosY, NegY = SplitTableByNegPos(ys)
-							local PosZ, NegZ = SplitTableByNegPos(zs)
-
-
-							
-							self.RealMins = Vector(xs[1],ys[1],zs[1])
-							self.RealMaxs = Vector(xs[#xs],ys[#ys],zs[#zs])
-							--debugoverlay.BoxAngles( self.ForwardEnt:GetPos(), self.RealMins, self.RealMaxs, self.ForwardEnt:GetAngles(), 30, Color( 150, 150, 255, 100 ) )
-							local XAve = math.abs(AverageNoOutliers(PosX) - AverageNoOutliers(NegX))
-							local YAve = math.abs(AverageNoOutliers(PosY) - AverageNoOutliers(NegY))
-							local ZAve = math.abs(AverageNoOutliers(PosZ) - AverageNoOutliers(NegZ))
-							self.DakVolume = math.Round(XAve*YAve*ZAve*0.03125,2) --0.03125 is just an arbitrary balance number, was 0.005 but new averaging system called for new number
-						end
-
 						do --Get crew bounds
 							local CrewMeshs = {}
 							for i=1, #self.Crew do
@@ -1646,6 +1616,9 @@ function ENT:Think()
 							self.RawSideTable = {}
 							self.RawRearTable = {}
 
+							self.FrontalPosTable = {}
+							self.SidePosTable = {}
+							self.RearPosTable = {}
 
 							local basepos = self.Base:GetPos()
 							self.BoxVolume = self.BestLength*self.BestWidth*self.BestHeight
@@ -1655,6 +1628,7 @@ function ENT:Think()
 							local delay = (pixels/splits)
 							local startpos
 							local curarmor = 0
+							local thickestpos
 							local ent
 							local scanforward
 							local scanright
@@ -1711,7 +1685,7 @@ function ENT:Think()
 												end
 												local TraceStart = ForwardHit
 												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, true, false)
+												curarmor, ent, _, _, _, _, _, _, _, thickestpos = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, true, false)
 												
 												local addval = 0
 
@@ -1733,6 +1707,7 @@ function ENT:Think()
 														self.frontarmortable[#self.frontarmortable+1] = math.Round(curarmor) + addval
 														if curarmor~=0 and depth~=0 then
 															self.RawFrontalTable[#self.RawFrontalTable+1] = math.Round(curarmor)
+															self.FrontalPosTable[#self.FrontalPosTable+1] = thickestpos
 														end
 													else
 														self.frontarmortable[#self.frontarmortable+1] = 0
@@ -1795,7 +1770,7 @@ function ENT:Think()
 												end
 												local TraceStart = ForwardHit
 												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, false, false)
+												curarmor, ent, _, _, _, _, _, _, _, thickestpos = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, false, false)
 
 												local addval = 0
 
@@ -1817,6 +1792,7 @@ function ENT:Think()
 														self.sidearmortable[#self.sidearmortable+1] = math.Round(curarmor) + addval
 														if curarmor~=0 and depth~=0 then
 															self.RawSideTable[#self.RawSideTable+1] = math.Round(curarmor)
+															self.SidePosTable[#self.SidePosTable+1] = thickestpos
 														end
 													else
 														self.sidearmortable[#self.sidearmortable+1] = 0
@@ -1880,7 +1856,7 @@ function ENT:Think()
 												end
 												local TraceStart = ForwardHit
 												local TraceEnd = ForwardHit + ((BackwardHit-ForwardHit)*0.5)
-												curarmor, ent, _, _, _, _, _, _, _ = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, false, true)
+												curarmor, ent, _, _, _, _, _, _, _, thickestpos = DTGetArmorRecurseDisplay(TraceStart, TraceEnd, depth, "AP", 75, player.GetAll(), self, false, true)
 
 												local addval = 0
 
@@ -1902,6 +1878,7 @@ function ENT:Think()
 														self.reararmortable[#self.reararmortable+1] = math.Round(curarmor) + addval
 														if curarmor~=0 and depth~=0 then
 															self.RawRearTable[#self.RawRearTable+1] = math.Round(curarmor)
+															self.RearPosTable[#self.RearPosTable+1] = thickestpos
 														end
 													else
 														self.reararmortable[#self.reararmortable+1] = 0
@@ -1918,6 +1895,64 @@ function ENT:Think()
 									self.reararmortable[#self.reararmortable+1] = self.RearArmor
 								end
 							end)
+						end
+
+						do --Get main armor bounds of vehicle
+							self.ZPosTable = {}
+							for i=1, #self.Crew do
+								for j=1, #self.Crew[i].TopBounds do
+									self.ZPosTable[#self.ZPosTable+1] = self.Crew[i].TopBounds[j]
+								end
+								for j=1, #self.Crew[i].BottomBounds do
+									self.ZPosTable[#self.ZPosTable+1] = self.Crew[i].BottomBounds[j]
+								end
+							end
+
+							local xs = {}
+							local ys = {}
+							local zs = {}
+							local localbound
+							for i=1, #self.FrontalPosTable do
+								--debugoverlay.Cross( self.RealBounds[i], 5, 25, Color( 0, 255, 0 ), true )
+								localbound = self.ForwardEnt:WorldToLocal(self.FrontalPosTable[i])
+								xs[#xs+1] = localbound.x
+							end
+							for i=1, #self.RearPosTable do
+								--debugoverlay.Cross( self.RealBounds[i], 5, 25, Color( 0, 255, 0 ), true )
+								localbound = self.ForwardEnt:WorldToLocal(self.RearPosTable[i])
+								xs[#xs+1] = localbound.x
+							end
+							for i=1, #self.SidePosTable do
+								--debugoverlay.Cross( self.RealBounds[i], 5, 25, Color( 0, 255, 0 ), true )
+								localbound = self.ForwardEnt:WorldToLocal(self.SidePosTable[i])
+								ys[#ys+1] = localbound.y
+							end
+							for i=1, #self.ZPosTable do
+								--debugoverlay.Cross( self.RealBounds[i], 5, 25, Color( 0, 255, 0 ), true )
+								localbound = self.ForwardEnt:WorldToLocal(self.ZPosTable[i])
+								zs[#zs+1] = localbound.z
+							end
+
+							--[[
+							for i=1, #self.RealBounds do
+								--debugoverlay.Cross( self.RealBounds[i], 5, 25, Color( 0, 255, 0 ), true )
+								localbound = self.ForwardEnt:WorldToLocal(self.RealBounds[i])
+								xs[#xs+1] = localbound.x
+								ys[#ys+1] = localbound.y
+								zs[#zs+1] = localbound.z
+							end
+							]]--
+							table.sort(xs)
+							table.sort(ys)
+							table.sort(zs)
+							
+							self.RealMins = Vector(xs[1],ys[1],zs[1])
+							self.RealMaxs = Vector(xs[#xs],ys[#ys],zs[#zs])
+							--debugoverlay.BoxAngles( self.ForwardEnt:GetPos(), self.RealMins, self.RealMaxs, self.ForwardEnt:GetAngles(), 30, Color( 150, 150, 255, 100 ) )
+							local XAve = math.abs(xs[1] - xs[#xs])
+							local YAve = math.abs(ys[1] - ys[#ys])
+							local ZAve = math.abs(zs[1] - zs[#zs])
+							self.DakVolume = math.Round(XAve*YAve*ZAve*0.005,2) --0.03125 is just an arbitrary balance number, was 0.005 but new averaging system called for new number
 						end
 
 						do --Calculate armor multipliers

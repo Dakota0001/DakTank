@@ -899,6 +899,10 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 	local SpallLiner = 0
 	local SpallLinerOnCrit = 0
 	local LinerThickness = 0
+	local ThickestPos = FirstPenPos
+	if IsValid(Ent) and Ent:GetClass() == "prop_physics" then
+		ThickestPos = FirstPenPos
+	end
 
 	while Go == 1 and Recurse<25 do
 		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, core)
@@ -929,6 +933,9 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 				end
 			end
 			if newArmor >= Thickest then
+				if IsValid(newEnt) and newEnt:GetClass() == "prop_physics" then
+					ThickestPos = FirstPenPos
+				end
 				Thickest = newArmor
 				SpallLiner = 0
 				LinerThickness = 0
@@ -978,7 +985,7 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 			Go = 0
 		end
 		if Recurse >= 25 then
-			return math.huge, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
+			return math.huge, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit, ThickestPos
 		end
 		if Go == 0 then
 			if ShellType == "HEAT" or ShellType == "HEATFS" or ShellType == "ATGM" then
@@ -991,7 +998,7 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 			if ShellType == "APDS" or ShellType == "APFSDS" then
 				if Fails > 0 then Rico = 1 end
 			end
-			return Armor, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit
+			return Armor, CritEnt, Shatters, Rico, HitGun, HitGear, HitCrit, FirstPenPos, SpallLinerOnCrit, ThickestPos
 		end
 
 		NewFilter[#NewFilter+1] = newEnt
