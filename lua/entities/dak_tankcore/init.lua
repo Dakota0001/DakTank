@@ -55,6 +55,7 @@ function Average(Table)
 end
 
 function AverageNoOutliers(Table)
+	if #Table == 0 then return 0 end
 	local Ave = 0
 	local count = 0
 	for i=1, #Table do
@@ -1924,9 +1925,9 @@ function ENT:Think()
 							table.sort( self.RawSideTable )
 							table.sort( self.RawRearTable )
 
-							print(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
-							print(AverageNoOutliers(self.RawSideTable),self.SideArmor)
-							print(AverageNoOutliers(self.RawRearTable),self.RearArmor)
+							--print(AverageNoOutliers(self.RawFrontalTable),self.FrontalArmor)
+							--print(AverageNoOutliers(self.RawSideTable),self.SideArmor)
+							--print(AverageNoOutliers(self.RawRearTable),self.RearArmor)
 
 							--PrintTable(self.RawRearTable)
 
