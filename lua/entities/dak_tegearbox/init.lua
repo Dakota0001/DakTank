@@ -22,7 +22,7 @@ function ENT:Initialize()
 	self.DakHealth = self.DakMaxHealth
 	self.DakSpeed = 2
 	--local phys = self:GetPhysicsObject()
-	
+
 	self.Inputs = Wire_CreateInputs(self, { "Forward", "Reverse", "Left", "Right", "Brakes", "Activate", "LeftDriveWheel [ENTITY]" , "RightDriveWheel [ENTITY]", "CarTurning", "ForwardFacingEntity [ENTITY]" })
 	self.Soundtime = CurTime()
  	self.Perc = 0
@@ -218,7 +218,7 @@ function ENT:Think()
 		self.DakHealth = self.DakMaxHealth
 	end
 
-	if IsValid(self.DakTankCore) and IsValid(self.DakTankCore.Motors[1]) then 
+	if IsValid(self.DakTankCore) and IsValid(self.DakTankCore.Motors[1]) then
 		local GearRatio = math.Clamp(self:GetGearRatio(),50,100)*0.01
 		self.DakSpeed = 0
 		self.DakFuel = 0
@@ -308,6 +308,7 @@ function ENT:Think()
 	 		if self.InertiaSet == nil then
 		 		if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
 		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/6000) )
+					self:GetParent():GetParent():GetPhysicsObject():SetMass(self:GetParent():GetParent():GetPhysicsObject():GetMass())
 			 		self.InertiaSet = 1
 			 	end
 		 	end
@@ -409,9 +410,9 @@ function ENT:Think()
 			        		end
 		        			self.TopSpeed = self.TopSpeed/3
 						end
-							
+
 						local ForwardVal = self.ForwardEnt:GetForward():Distance(self.phy:GetVelocity():GetNormalized()) --if it is below one you are going forward, if it is above one you are reversing
-						if self.Speed < self.TopSpeed and math.abs(LPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) and math.abs(RPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) then			
+						if self.Speed < self.TopSpeed and math.abs(LPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) and math.abs(RPhys:GetAngleVelocity().y/6) < math.Clamp(1250*(self.Speed*1.5/self.TopSpeed),500,1000) then
 							self.RBoost = 1
 						 	self.LBoost = 1
 						 		local Lmult = 1
@@ -425,7 +426,7 @@ function ENT:Think()
 							end
 
 							if (self.MoveRight==0 and self.MoveLeft==0) or self.CarTurning==1 then
-								
+
 								if self.Speed > 0 then
 									if self.Perc>=0 then
 										if self.LastYaw-self.base:GetAngles().yaw > 0.1 then
@@ -502,7 +503,7 @@ function ENT:Think()
 
 							local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 							local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
-							
+
 							--(self.DakHP/(4.8*math.pi)/(self.RightDriveWheel:OBBMaxs().z/12))/2.20462 = KG = how much it moves in a minute
 							local GearBoost = 0
 							self.CurTopSpeed = 0
@@ -578,13 +579,13 @@ function ENT:Think()
 								end
 							end
 							--print(GearBoost)
-							
+
 							if self.Gear == nil then self.Gear = 1 end
 							if self.Speed > 0 and self.Speed < G1Speed and not(self.Gear == 1) then
-								self.Gear = 1 
+								self.Gear = 1
 							end
 							if self.Speed > G1Speed and self.Speed < G2Speed and not(self.Gear == 2) then
-								self.Gear = 2 
+								self.Gear = 2
 							end
 							if self.Speed > G2Speed and self.Speed < G3Speed and not(self.Gear == 3) then
 								self.Gear = 3
@@ -613,7 +614,7 @@ function ENT:Think()
 								end
 							end
 							self.LastGear = self.Gear
-							
+
 							if self.LastMoving == nil then self.LastMoving = 0 end
 							if self.MoveForward>0 or self.MoveReverse>0 or self.MoveLeft>0 or self.MoveRight>0 then
 								self.LastMoving = 1
@@ -692,7 +693,7 @@ function ENT:Think()
 						]]--
 						if math.abs(LPhys:GetAngleVelocity().y/6) < 1500 and math.abs(RPhys:GetAngleVelocity().y/6) < 1500 then
 							if self.CarTurning==0 then
-								local TorqueBoost = 0.15*self.HPperTon 
+								local TorqueBoost = 0.15*self.HPperTon
 								local LeftVel = math.Clamp( (3000/(math.abs(LPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 								local RightVel = math.Clamp( (3000/(math.abs(RPhys:GetAngleVelocity().y)/6))-0.99,1,5 )
 								if self.MoveLeft>0 or self.MoveRight>0 then
@@ -721,7 +722,7 @@ function ENT:Think()
 								self.MoveLeftOld = self.MoveLeft
 								if self.Speed > 10 then
 									if self.MoveLeft>0 and self.MoveRight==0 then
-										if self.MoveReverse>0 then 
+										if self.MoveReverse>0 then
 											if self.RightBrakesEnabled == 0 then
 												constraint.Weld( self.RightDriveWheel, self.base, 0, 0, 0, false, false )
 												self.RightBrakesEnabled = 1
@@ -740,7 +741,7 @@ function ENT:Think()
 										end
 									end
 									if self.MoveRight>0 and self.MoveLeft==0 then
-										if self.MoveReverse>0 then 
+										if self.MoveReverse>0 then
 											if self.LeftBrakesEnabled == 0 then
 												constraint.Weld( self.LeftDriveWheel, self.base, 0, 0, 0, false, false )
 												self.LeftBrakesEnabled = 1
@@ -870,8 +871,8 @@ function ENT:Think()
 		        	self.LastYaw = self.base:GetAngles().yaw
 		        end
 
-		        if #self.Prev>=5 then 
-		        	table.remove( self.Prev, 1 ) 
+		        if #self.Prev>=5 then
+		        	table.remove( self.Prev, 1 )
 		        end
 		        self.NewPos = self:GetPos()
 		        self.Dist = self.NewPos:Distance(self.PrevPos)
@@ -879,7 +880,7 @@ function ENT:Think()
 
 		        table.insert(self.Prev,1, ( (self.Dist/(CurTime()-self.Time))/(84480/1609) ) )
 		        self.Time = CurTime()
-		        if #self.Prev>=5 then 
+		        if #self.Prev>=5 then
 		        	self.Speed = ((self.Prev[1]+self.Prev[2]+self.Prev[3]+self.Prev[4]+self.Prev[5])/5)*3.6*5
 		        else
 		        	self.Speed = 0
@@ -943,7 +944,7 @@ function ENT:PreEntityCopy()
 
 	//Wire dupe info
 	self.BaseClass.PreEntityCopy( self )
-	
+
 end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
