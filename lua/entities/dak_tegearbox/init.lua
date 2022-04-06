@@ -308,6 +308,7 @@ function ENT:Think()
 	 		if self.InertiaSet == nil then
 		 		if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
 		 			self:GetParent():GetParent():GetPhysicsObject():SetInertia( self:GetParent():GetParent():GetPhysicsObject():GetInertia()*(self.TotalMass/6000) )
+					self:GetParent():GetParent():GetPhysicsObject():SetMass(self:GetParent():GetParent():GetPhysicsObject():GetMass())
 			 		self.InertiaSet = 1
 			 	end
 		 	end
