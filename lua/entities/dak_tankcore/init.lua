@@ -808,6 +808,7 @@ function ENT:Initialize()
 	self.Modern = nil
 	self.ColdWar = nil
 	self.BoxSize = Vector(10000,10000,10000)
+	self.BoxCenter = Vector(0,0,0)
 	self.DakVolume = 1000000
 	self.PenMult = 0
 	self.DPSMult = 0
@@ -1041,6 +1042,7 @@ function ENT:Think()
 							end
 						
 							self.BoxSize = self.HitBoxMaxs - self.HitBoxMins
+							self.BoxCenter = 0.5*(self.HitBoxMaxs + self.HitBoxMins)
 							self.DakVolume = math.Round(math.abs((self.BoxSize.x*self.BoxSize.y*self.BoxSize.z))*0.005,2)
 
 							self.BestLength = self.BoxSize.x

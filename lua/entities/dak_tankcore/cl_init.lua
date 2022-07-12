@@ -5,7 +5,7 @@ function ENT:Draw()
 	self:DrawModel()
 
 end
-
+--[[
 net.Receive( "daktankcoreera", function()
 	local core = net.ReadEntity()
 	if core~=nil then
@@ -27,7 +27,7 @@ net.Receive( "daktankcoreera", function()
 		end
 	end
 end )
-
+]]
 net.Receive( "daktankcoredetail", function()
 	local core = net.ReadFloat()
 	if core~=nil then
@@ -67,7 +67,7 @@ net.Receive( "daktankcoredetail", function()
 end )
 
 --Core is null on client that is not in the view portal it was created in and so will not work properly, try getting it by index instead since readentity isn't working
-
+--[[
 net.Receive( "daktankcoreeraremove", function()
 	local core = net.ReadEntity()
 	if core~=nil then
@@ -80,6 +80,7 @@ net.Receive( "daktankcoreeraremove", function()
 		end
 	end
 end)
+]]
 
 net.Receive( "daktankcoredetailremove", function()
 	local core = net.ReadFloat()
@@ -108,6 +109,7 @@ net.Receive( "daktankcoredie", function()
 				end
 			end
 		end
+		--[[
 		if core.ERA ~= nil then
 			if #core.ERA > 0 then
 				for i=1, #core.ERA do
@@ -118,11 +120,13 @@ net.Receive( "daktankcoredie", function()
 				end
 			end
 		end
+		]]
 	end
 end)
 
 function ENT:OnRemove()
 	if self~=nil then
+		--[[
 		if self.ERA ~= nil then
 			if #self.ERA > 0 then
 				for i=1, #self.ERA do
@@ -130,6 +134,7 @@ function ENT:OnRemove()
 				end
 			end
 		end
+		]]
 		if LocalPlayer()[tostring( self:EntIndex() )] ~= nil and LocalPlayer()[tostring( self:EntIndex() )].Detail ~= nil then
 			if #LocalPlayer()[tostring( self:EntIndex() )].Detail > 0 then
 				for i=1, #LocalPlayer()[tostring( self:EntIndex() )].Detail do
