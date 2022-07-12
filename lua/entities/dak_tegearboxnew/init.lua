@@ -411,6 +411,7 @@ function ENT:Think()
 					local oldinertia = self:GetParent():GetParent():GetPhysicsObject():GetInertia()
 					local multiplier = 1--(self.TotalMass/6000)
 					self:GetParent():GetParent():GetPhysicsObject():SetInertia(Vector(oldinertia.x*multiplier, oldinertia.y*multiplier, oldinertia.z))
+					self:GetParent():GetParent():GetPhysicsObject():SetMass(self:GetParent():GetParent():GetPhysicsObject():GetMass())
 					self.InertiaSet = 1
 				end
 			end
