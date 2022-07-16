@@ -159,7 +159,7 @@ function ENT:Initialize()
 	self.CoreRemoteMult = 1
 	
 
-	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]", "Lock", "CamTrace2 [RANGER]", "Active2" })
+	self.Inputs = Wire_CreateInputs(self, { "Active", "Gun [ENTITY]", "Turret [ENTITY]", "CamTrace [RANGER]", "Lock", "CamTrace2 [RANGER]", "Active2", "AirBurst" })
 	self.Soundtime = CurTime()
  	self.SparkTime = CurTime()
  	self.ErrorTime = CurTime()
@@ -499,6 +499,14 @@ function ENT:Think()
 
 									if self.DakCamTrace then
 											if self.FCS==true and not(self.CustomFCS==true) then
+												local AirBurst = self.Inputs.AirBurst.Value
+												local AddZ = 0
+												if AirBurst ~= 0 then 
+													AddZ = self:GetAirburstHeight() * 39.3701
+													GunEnt.FuzeOverride = true
+												else
+													GunEnt.FuzeOverride = false
+												end
 												local traceFCS = {}
 													traceFCS.start = self.DakCamTrace.StartPos
 													traceFCS.endpos = self.DakCamTrace.StartPos + self.DakCamTrace.Normal*9999999999
@@ -537,10 +545,10 @@ function ENT:Think()
 												local GunPos=GunEnt:GetPos()
 												self.TarVel = Vector(0,0,0)
 												if self.Tar and self.Tar:IsValid() then
-													TarPos0 = self.Tar:GetPos() + (self.CamTarPos-self.Tar:GetPos())
+													TarPos0 = self.Tar:GetPos() + (self.CamTarPos-self.Tar:GetPos()) + Vector(0,0,AddZ)
 													self.TarVel = self.Tar:GetVelocity()
 												else
-													TarPos0 = PreCamTrace.HitPos
+													TarPos0 = PreCamTrace.HitPos + Vector(0,0,AddZ)
 												end
 												local basefound = false
 												local base = self.Tar
@@ -578,6 +586,9 @@ function ENT:Think()
 												    Ang = math.atan(-(VelValue^2 - math.sqrt(Disc))/(G*X))*57.29577951
 												    TravelTime = X/(VelValue*math.cos(Ang*0.017453293))
 												    VelLossFull = VelLoss * TravelTime 
+												end
+												if AirBurst ~= 0 then 
+													GunEnt.FuzeOverrideDelay = TravelTime
 												end
 												--print(SelfVel)
 												--print(TravelTime)

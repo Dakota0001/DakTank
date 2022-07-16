@@ -30,4 +30,5 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Float", 	13, "RearDepression", 	{ KeyName = "reardepression", 	Edit = {category = "Advanced", title = "Rear Depression", type = "Float", 		order = 20, min = 0, max = 90 } } )
 	self:NetworkVar( "Float", 	14, "IdleElevation", 	{ KeyName = "idleelevation", 	Edit = {category = "Advanced", title = "Idle Elevation", type = "Float", 		order = 21, min = -90, max = 90 } } )
 	self:NetworkVar( "Float", 	15, "IdleYaw", 	{ KeyName = "idleyaw", 	Edit = {category = "Advanced", title = "Idle Yaw", type = "Float", 		order = 22, min = -180, max = 180 } } )
+	self:NetworkVar( "Float", 	16, "AirburstHeight", 	{ KeyName = "airburstheight", 	Edit = {category = "Advanced", title = "Airburst Height (m)", type = "Float", 		order = 23, min = 0, max = 250 } } )
 end

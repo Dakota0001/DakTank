@@ -769,6 +769,89 @@ local NameTable3 = {
 	" Infinite",
 }
 
+local AmNameExtras = {
+	"IP",
+	"HA",
+	"HC",
+	"D",
+	" AIM",
+	" FEP",
+	"KVT",
+	"M",
+	" SEP",
+	"S",
+	" SEPv2",
+	" SEPv3",
+	"T",
+	" SEPv4",
+	" TTS",
+	" SLEP",
+	" USMC",
+	" AOS",
+	" ERA",
+	" RISE",
+	"E1",
+	"E2",
+	" AGS",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	""
+}
+local AmNameNames = {
+	"Locust",
+	"Chaffee",
+	"Lee",
+	"Sherman",
+	"Stuart",
+	"Scott",
+	"Zippo",
+	"Pershing",
+	"Hellcat",
+	"GMC",
+	"Walker Bulldog",
+	"Patton",
+	"Sheridan",
+	"Starship",
+	"Ontos",
+	"Abrams",
+	"Jackson",
+	"Washington",
+	"Adams",
+	"Jefferson",
+	"Madison",
+	"Monroe",
+	"Pierce",
+	"Lincoln",
+	"Johnson",
+	"Grant",
+	"Roosevelt",
+	"Wilson",
+	"Hoover",
+	"Truman",
+	"Eisenhower",
+	"Kennedy",
+	"Ford",
+	"Carter",
+	"Bush",
+	"Stryker",
+	"Wolfhound",
+	"Greyhound",
+	"Bradley",
+	"Linebacker",
+	"Fox",
+	"Hawk",
+	"Cobra",
+	"Wolverine",
+	"Crusader",
+	"Paladin"
+}
 function ENT:Initialize()
 	self:SetModel( "models/bull/gates/logic.mdl" )
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -824,7 +907,34 @@ function ENT:Initialize()
 	--end
 
 	if self:GetTankName() == "" or self.TankName == nil then
-		self:SetTankName(NameTable1[math.random(1,#NameTable1)]..NameTable2[math.random(1,#NameTable2)]..NameTable3[math.random(1,#NameTable3)])
+		if self:GetAmerican() == true then
+			local basedesignation = "M"..tostring(math.random(1,119))
+			local variantdesignation
+			if math.random(0,1) == 1 then
+				variantdesignation = ""
+			else
+				variantdesignation = "A"..tostring(math.random(1,5))
+			end
+			local hasname = true
+			if math.random(0,4) == 4 then
+				hasname = false
+			end
+			local powerlevel = math.random(1,10)
+			local powerrating = ""
+			if powerlevel >= 8 then
+				powerrating = "Super "
+			end
+			if powerlevel == 10 then
+				powerrating = "Super Duper "
+			end
+			if hasname == true then
+				self:SetTankName(basedesignation..variantdesignation..AmNameExtras[math.random(1,#AmNameExtras)].." "..powerrating..AmNameNames[math.random(1,#AmNameNames)])
+			else
+				self:SetTankName(powerrating..basedesignation..variantdesignation..AmNameExtras[math.random(1,#AmNameExtras)])
+			end
+		else
+			self:SetTankName(NameTable1[math.random(1,#NameTable1)]..NameTable2[math.random(1,#NameTable2)]..NameTable3[math.random(1,#NameTable3)])
+		end
 	end
 
 	self.Forward = self:GetForward()
@@ -937,7 +1047,34 @@ end
 function ENT:Think()
 	if CurTime()-1 >= self.SlowThinkTime then
 		if self:GetTankName() == "" then
-			self:SetTankName(NameTable1[math.random(1,#NameTable1)]..NameTable2[math.random(1,#NameTable2)]..NameTable3[math.random(1,#NameTable3)])
+			if self:GetAmerican() == true then
+				local basedesignation = "M"..tostring(math.random(1,119))
+				local variantdesignation
+				if math.random(0,1) == 1 then
+					variantdesignation = ""
+				else
+					variantdesignation = "A"..tostring(math.random(1,5))
+				end
+				local hasname = true
+				if math.random(0,4) == 4 then
+					hasname = false
+				end
+				local powerlevel = math.random(1,10)
+				local powerrating = ""
+				if powerlevel >= 8 then
+					powerrating = "Super "
+				end
+				if powerlevel == 10 then
+					powerrating = "Super Duper "
+				end
+				if hasname == true then
+					self:SetTankName(basedesignation..variantdesignation..AmNameExtras[math.random(1,#AmNameExtras)].." "..powerrating..AmNameNames[math.random(1,#AmNameNames)])
+				else
+					self:SetTankName(powerrating..basedesignation..variantdesignation..AmNameExtras[math.random(1,#AmNameExtras)])
+				end
+			else
+				self:SetTankName(NameTable1[math.random(1,#NameTable1)]..NameTable2[math.random(1,#NameTable2)]..NameTable3[math.random(1,#NameTable3)])
+			end
 		end
 		local systime = SysTime()
 		if IsValid(self) and self.Off~=true then

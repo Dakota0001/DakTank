@@ -2430,7 +2430,11 @@ function ENT:DakTEAutoFire()
 				if self.DakName == "Flamethrower" then
 					Shell.DakIsFlame = 1
 				end
-				Shell.FuzeDelay = self.FuzeDelay
+				if self.FuzeOverride == true then
+					Shell.FuzeDelay = self.FuzeOverrideDelay
+				else
+					Shell.FuzeDelay = self.FuzeDelay
+				end
 				if self.DakAmmoType == self.DakATGM then
 					Shell.IsGuided = true
 					Shell.DakTrail = "daktemissiletracer"

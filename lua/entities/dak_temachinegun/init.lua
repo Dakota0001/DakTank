@@ -561,7 +561,11 @@ function ENT:DakTEFire()
 				if self.DakName == "Flamethrower" then
 					Shell.DakIsFlame = 1
 				end
-				Shell.FuzeDelay = self.FuzeDelay
+				if self.FuzeOverride == true then
+					Shell.FuzeDelay = self.FuzeOverrideDelay
+				else
+					Shell.FuzeDelay = self.FuzeDelay
+				end
 				DakTankShellList[#DakTankShellList+1] = Shell
 
 				local FiringSound = {self.DakFireSound1,self.DakFireSound2,self.DakFireSound3}
