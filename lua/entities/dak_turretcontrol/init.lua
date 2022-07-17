@@ -288,7 +288,7 @@ function ENT:Think()
 						self.DakGun.DakMovement = true
 						self.TurretBase.DakMovement = true
 						local Mass = 0
-
+						self.Guns = {}
 						for i=1, #res do
 							if res[i]:IsSolid() then
 								if res[i]:GetClass() == "dak_tegun" or res[i]:GetClass() == "dak_teautogun" or res[i]:GetClass() == "dak_temachinegun" then
@@ -301,6 +301,7 @@ function ENT:Think()
 								if res[i]:GetClass() == "dak_tegun" or res[i]:GetClass() == "dak_teautogun" or res[i]:GetClass() == "dak_temachinegun" then
 									res[i].TurretController = self
 									res[i].TurretBase = DakTurret
+									self.Guns[#self.Guns+1] = res[i]
 								end
 							end
 						end
@@ -503,9 +504,13 @@ function ENT:Think()
 												local AddZ = 0
 												if AirBurst ~= 0 then 
 													AddZ = self:GetAirburstHeight() * 39.3701
-													GunEnt.FuzeOverride = true
+													for i=1, #self.Guns do
+														self.Guns[i].FuzeOverride = true
+													end
 												else
-													GunEnt.FuzeOverride = false
+													for i=1, #self.Guns do
+														self.Guns[i].FuzeOverride = false
+													end
 												end
 												local traceFCS = {}
 													traceFCS.start = self.DakCamTrace.StartPos
@@ -588,7 +593,9 @@ function ENT:Think()
 												    VelLossFull = VelLoss * TravelTime 
 												end
 												if AirBurst ~= 0 then 
-													GunEnt.FuzeOverrideDelay = TravelTime
+													for i=1, #self.Guns do
+														self.Guns[i].FuzeOverrideDelay = TravelTime
+													end
 												end
 												--print(SelfVel)
 												--print(TravelTime)
