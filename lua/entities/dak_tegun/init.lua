@@ -2045,8 +2045,8 @@ function ENT:TriggerInput(iname, value)
 		self.Held = value
 		if (iname == "Fire") then
 			if value>0 then
-				self:DakTEFire()
 				self.Firing = value > 0
+				self:DakTEFire()
 				timer.Create( "RefireTimer"..self:EntIndex(), self.DakCooldown/10, 1, function()
 					if IsValid(self) then
 						self:TriggerInput("Fire", value)

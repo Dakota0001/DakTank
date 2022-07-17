@@ -653,8 +653,8 @@ function ENT:TriggerInput(iname, value)
 		self.Held = value
 		if (iname == "Fire") then
 			if value>0 then
-				self:DakTEFire()
 				self.Firing = value > 0
+				self:DakTEFire()
 				if self.Refiring then
 					local ShotsFiredSinceLastCall = math.floor((CurTime()-self.LastFireTime)/self.DakCooldown)
 					if ShotsFiredSinceLastCall>0 then

@@ -476,7 +476,7 @@ function DTHullRecurseTrace(Start, End, Mins, Maxs, Filter, Core)
 	end
 end
 
-function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
+function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core, nochecklegit)
 	if tonumber(Caliber) == nil then return 0, NULL, Vector(0,0,0), 0, 0, 0 end
 	local trace = {}
 		trace.start = Start
@@ -505,7 +505,7 @@ function DTGetEffArmor(Start, End, ShellType, Caliber, Filter, core)
 	end
 	if (HitEnt:IsValid() and HitEnt:GetPhysicsObject():IsValid() and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) and not(HitEnt.Base == "base_nextbot") and (HitEnt.DakHealth~=nil and not(HitEnt.DakHealth <= 0))) then
 		local physobj = HitEnt:GetPhysicsObject()
-		if not((DTCheckClip(HitEnt,ShellSimTrace.HitPos)) or (physobj:GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
+		if not((DTCheckClip(HitEnt,ShellSimTrace.HitPos,nochecklegit)) or (physobj:GetMass()<=1 and not(HitEnt:IsVehicle()) and not(HitEnt.IsDakTekFutureTech==1)) or HitEnt.DakName=="Damaged Component") then
 			local HitEntClass = HitEnt:GetClass()
 			local SA = physobj:GetSurfaceArea()
 			if HitEnt.DakArmor == nil or HitEnt.DakBurnStacks == nil then
@@ -616,7 +616,7 @@ end
 
 function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	if tonumber(Caliber) == nil then return 0, NULL, 0, 0, 0 end
-	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter)
+	local Armor, Ent, FirstPenPos, HeatShattered, HeatFailed, HitGun, HitGear = DTGetEffArmor(Start, End, ShellType, Caliber, Filter, nil, true)
 	local Recurse = 1
 	local NewFilter = Filter
 	NewFilter[#NewFilter+1] = Ent
@@ -633,7 +633,7 @@ function DTGetArmorRecurse(Start, End, ShellType, Caliber, Filter)
 	local LinerThickness = 0
 
 	while Go == 1 and Recurse<25 do
-		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter)
+		local newArmor, newEnt, LastPenPos, Shattered, Failed, newHitGun, newHitGear = DTGetEffArmor(Start, End, ShellType, Caliber, NewFilter, nil, true)
 		local newValid = false
 		local newEntClass
 		if newEnt:IsValid() then
@@ -1007,7 +1007,7 @@ function DTGetArmorRecurseDisplay(Start, End, depth, ShellType, Caliber, Filter,
 	end
 end
 
-function DTGetStandoffMult(Start, End, Caliber, Filter, ShellType)
+function DTGetStandoffMult(Start, End, Caliber, Filter, ShellType,nochecklegit)
 	if tonumber(Caliber) == nil then return 0 end
 	local Recurse = 1
 	local NewFilter = Filter
@@ -1022,7 +1022,7 @@ function DTGetStandoffMult(Start, End, Caliber, Filter, ShellType)
 		local ShellSimTrace = util.TraceLine( trace )
 		if IsValid(ShellSimTrace.Entity) then
 			if ShellSimTrace.Entity:GetPhysicsObject() then
-				if ShellSimTrace.Entity:GetPhysicsObject():GetMass()>1 and not((DTCheckClip(ShellSimTrace.Entity,ShellSimTrace.HitPos))) then
+				if ShellSimTrace.Entity:GetPhysicsObject():GetMass()>1 and not((DTCheckClip(ShellSimTrace.Entity,ShellSimTrace.HitPos,nochecklegit))) then
 					if FirstArmor==nil then
 						FirstArmor = ShellSimTrace.HitPos
 					else
@@ -1105,12 +1105,14 @@ function DTCompositesTrace( Ent, StartPos, Dir, Filter )
     return 0
 end
 
-function DTCheckClip(Ent, HitPos)
+function DTCheckClip(Ent, HitPos, nochecklegit)
 	if not (Ent:GetClass() == "prop_physics") or (Ent.ClipData == nil) then return false end
-	if not(Ent.DakLegit==1) then return true end
-	if Ent.DakLegit==1 and IsValid(Ent:GetPhysicsObject()) then
-		if Ent:GetPhysicsObject():GetMass() ~= Ent.DakLegitMass then
-			return true
+	if nochecklegit~=true then
+		if not(Ent.DakLegit==1) then return true end
+		if (Ent.DakLegit==1) and IsValid(Ent:GetPhysicsObject()) then
+			if Ent:GetPhysicsObject():GetMass() ~= Ent.DakLegitMass then
+				return true
+			end
 		end
 	end
 	local HitClip = false
