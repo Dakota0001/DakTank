@@ -43,14 +43,15 @@ function DakKillNotSolid(ent)
 				if IsValid(ent.Controller.DakOwner) then
 					for i, ply in ipairs( player.GetAll() ) do
 						if not(ent:IsSolid()) then
-							ply:ChatPrint( ent.Controller.DakOwner:GetName().."'s vehicle exploded due to not soliding components" )
+							ply:ChatPrint( ent.Controller.DakOwner:GetName().."'s vehicle has not solid components, solidifying..." )
+							ent:SetSolid(SOLID_VPHYSICS)
 						elseif ent.ClipData ~= nil and ent:GetClass() ~= "dak_teammo" then
 							ply:ChatPrint( ent.Controller.DakOwner:GetName().."'s vehicle exploded due to clipping components" )
 						end
 					end
 				end
 				if not(ent:IsSolid()) then
-					ent.Controller.DakHealth = -1
+					--ent.Controller.DakHealth = -1
 				end
 				if ent:GetClass() ~= "dak_teammo" then
 					ent.Controller.DakHealth = -1

@@ -1180,6 +1180,7 @@ function ENT:Think()
 						
 							self.BoxSize = self.HitBoxMaxs - self.HitBoxMins
 							self.BoxCenter = 0.5*(self.HitBoxMaxs + self.HitBoxMins)
+							--print("Spawn Box Size: "..tostring(self.BoxSize))
 							self.DakVolume = math.Round(math.abs((self.BoxSize.x*self.BoxSize.y*self.BoxSize.z))*0.005,2)
 
 							self.BestLength = self.BoxSize.x
@@ -1667,6 +1668,7 @@ function ENT:Think()
 										elseif name == "APHE" then
 											if self.Guns[i].BaseDakShellPenetration*0.825 > MaxPen then MaxPen = self.Guns[i].BaseDakShellPenetration*0.825 end
 										elseif name == "ATGM" then
+											self.Guns[i].HasATGM = true
 											if self.Modern==1 then
 												if self.Guns[i].DakMaxHealth*6.40 > MaxPen then MaxPen = self.Guns[i].DakMaxHealth*6.40 end
 											else
@@ -2088,9 +2090,17 @@ function ENT:Think()
 							self.RealMins = Vector(xs[1],ys[1],zs[1])
 							self.RealMaxs = Vector(xs[#xs],ys[#ys],zs[#zs])
 							--debugoverlay.BoxAngles( self.ForwardEnt:GetPos(), self.RealMins, self.RealMaxs, self.ForwardEnt:GetAngles(), 30, Color( 150, 150, 255, 100 ) )
+								
+							local YHalfAve = AverageNoOutliers(ys)
+
+
 							local XAve = math.abs(xs[1] - xs[#xs])
-							local YAve = math.abs(ys[1] - ys[#ys])
+							local YAve = math.abs(YHalfAve*2)
 							local ZAve = math.abs(zs[1] - zs[#zs])
+							--PrintTable(xs)
+							--PrintTable(ys)
+							--PrintTable(zs)
+							--print("Armor Box Size: "..tostring(self.RealMaxs-self.RealMins))
 							self.DakVolume = math.Round(XAve*YAve*ZAve*0.005,2) --0.03125 is just an arbitrary balance number, was 0.005 but new averaging system called for new number
 						end
 
@@ -2206,6 +2216,7 @@ function ENT:Think()
 
 							do --Calculate gun handling multiplier
 								local GunHandlingMult = 0
+								local MinHandling = 0.1
 								if self.TurretControls[1] then
 									local TotalTurretMass = 0 
 									for i=1, #self.TurretControls do
@@ -2219,9 +2230,17 @@ function ENT:Think()
 										if IsValid(self.MainTurret) then 
 											if self.TurretControls[i].GunMass ~= nil and self.MainTurret.GunMass ~= nil then
 												local WeaponMass = 0
+												local ATGMs = 0
+												local Total = 0
 												for j=1, #self.Guns do
 													if self.Guns[j]:GetParent():GetParent() == self.TurretControls[i].DakGun then
 														WeaponMass=WeaponMass+self.Guns[j].DakMass
+													end
+													if self.Guns[j]:GetParent():GetParent() == self.TurretControls[i].DakGun then
+														if self.Guns[j].HasATGM == true then
+															ATGMs=ATGMs+1 --ATGM CHECK
+														end
+														Total=Total+1
 													end
 												end
 												local VehicleMaxs = self.RealMaxs
@@ -2273,17 +2292,29 @@ function ENT:Think()
 												if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
 													TurretCost = TurretCost * 0.5
 												end
-												--print(TurretCost*(self.TurretControls[i].GunMass/TotalTurretMass))
-												GunHandlingMult = GunHandlingMult + math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)
+												--ATGM gun handling mult should be 0.9, so factor that into the turret's cost
+												GunHandlingMult = GunHandlingMult + (((Total-ATGMs)/Total)*(math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)) + (ATGMs/Total)*0.9)
+											else
+												GunHandlingMult = 0.9 --most likely used on atgm carriers, given cost of full stab, FCS, limited rotation turret, which would be 0.9375 mult, but i'll round down to 0.9 to not be petty
+											end
+										end
+									end
+									for i=1, #self.Guns do
+										if self.Guns[i].TurretController == nil and self.Guns[i].HasATGM == true then
+											--ATGM parented to vehicle somewhere not controlled by a turret controller, set min gun handling higher
+											if TotalTurretMass > 500 then
+												MinHandling = math.max((GunHandlingMult + 0.9)*0.5,GunHandlingMult) --if there's a relevant turret then split the difference
+											else
+												MinHandling = 0.9
 											end
 										end
 									end
 								end
-								self.GunHandlingMult = math.Round(math.max(0.1,GunHandlingMult),2)
+								self.GunHandlingMult = math.Round(math.max(MinHandling,GunHandlingMult),2)
 							end
 
 							do --Get firepower costs
-								local firepowermult = self.MaxPen/420
+								local firepowermult = self.MaxPen/1680
 								local altfirepowermult = 0.005*self.TotalDPS^1
 								math.max(0.1,firepowermult)
 								self.PenMult = firepowermult*0.5
@@ -3201,6 +3232,7 @@ function ENT:Think()
 													detailpiece:SetSubMaterial( j, cur.SubMaterials[j] )
 												end
 												detailpiece:SetColor(cur.Col)
+												detailpiece:SetRenderMode(cur.RenderMode)
 												detailpiece:SetParent(parentent)
 												detailpiece.EntityMods = cur.EntityMods
 												--detailpiece.ClipData = cur.ClipData
@@ -3291,6 +3323,7 @@ function ENT:Think()
 													currentDetail.LocalAng = curparent:WorldToLocalAngles(cur:GetAngles())
 													currentDetail.Mat = cur:GetMaterial()
 													currentDetail.Col = cur:GetColor()
+													currentDetail.RenderMode = cur:GetRenderMode()
 													currentDetail.EntityMods = cur.EntityMods
 													currentDetail.ClipData = cur.ClipData
 													currentDetail.SubMaterials = {}

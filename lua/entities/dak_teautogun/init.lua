@@ -2825,6 +2825,10 @@ end
 
 function ENT:DakTEAutoGunReload()
 	if self.DakShotsCounter > 1 then
+		if self.IsAutoLoader == 1 and self.HasMag == 1 then
+			self.DakReloadTime = self.DakReloadTime * (self.DakShotsCounter/self.DakMagazine) --set reload based off how full it is if autoloader
+			WireLib.TriggerOutput(self, "ReloadTime",self.DakReloadTime)
+		end
 		self.DakIsReloading = 1
 		self.DakShotsCounter = 0
 		self.DakLastReload = CurTime()
@@ -2939,12 +2943,11 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
-		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
+		self.DakHealth = self.DakMaxHealth
 		self.DakModel = Ent.EntityMods.DakTek.DakModel
 		self.DakCaliber = Ent.EntityMods.DakTek.DakCaliber
 		self:SetNWFloat("Caliber",self.DakCaliber)
 		self.DakGunType = Ent.EntityMods.DakTek.DakGunType
-		self.DakHealth = self.DakMaxHealth
 		if Ent.EntityMods.DakTek.DakFireSound and Ent.EntityMods.DakTek.DakFireSound1 == "" then
 			self.DakFireSound1 = Ent.EntityMods.DakTek.DakFireSound
 			self.DakFireSound2 = Ent.EntityMods.DakTek.DakFireSound

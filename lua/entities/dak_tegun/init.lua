@@ -2102,12 +2102,11 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
-		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
+		self.DakHealth = self.DakMaxHealth
 		self.DakModel = Ent.EntityMods.DakTek.DakModel
 		self.DakCaliber = Ent.EntityMods.DakTek.DakCaliber
 		self:SetNWFloat("Caliber",self.DakCaliber)
 		self.DakGunType = Ent.EntityMods.DakTek.DakGunType
-		self.DakHealth = self.DakMaxHealth
 		if Ent.EntityMods.DakTek.DakFireSound and Ent.EntityMods.DakTek.DakFireSound1 == "" then
 			self.DakFireSound1 = Ent.EntityMods.DakTek.DakFireSound
 			self.DakFireSound2 = Ent.EntityMods.DakTek.DakFireSound

@@ -50,6 +50,7 @@ net.Receive( "daktankcoredetail", function()
 			for j=0, 31 do
 				Detailplate:SetSubMaterial( j, cur.SubMaterials[j] )
 			end
+			Detailplate:SetRenderMode(cur.RenderMode)
 			Detailplate:SetColor(cur.Col)
 			Detailplate:SetParent(parentent)
 			Detailplate:SetMoveType(MOVETYPE_NONE)

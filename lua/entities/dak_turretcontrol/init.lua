@@ -792,11 +792,11 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		end
 		self.DakArmor = 0
 		self.DakName = Ent.EntityMods.DakTek.DakName
-		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
 		if Ent.EntityMods.DakTek.DakMaxHealth == nil then
 			self.DakMaxHealth = 10 
 		end
+		self.DakHealth = self.DakMaxHealth
 		self.DakMass = Ent.EntityMods.DakTek.DakMass
 		self.DakOwner = Player
 		Ent.EntityMods.DakTek = nil

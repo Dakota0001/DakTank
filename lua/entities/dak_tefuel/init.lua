@@ -224,7 +224,7 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakIsExplosive = Ent.EntityMods.DakTek.DakIsExplosive
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
-		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
+		self.DakHealth = self.DakMaxHealth
 		self.DakOwner = Player
 
 		Ent.EntityMods.DakTekLink = nil

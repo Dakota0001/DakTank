@@ -212,9 +212,8 @@ function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakIsExplosive = Ent.EntityMods.DakTek.DakIsExplosive
 		self.DakMaxHealth = Ent.EntityMods.DakTek.DakMaxHealth
-		self.DakHealth = Ent.EntityMods.DakTek.DakHealth
-		self.DakOwner = Player
 		self.DakHealth = self.DakMaxHealth
+		self.DakOwner = Player
 		self:SetColor(Ent.EntityMods.DakTek.DakColor)
 		self:SetSubMaterial( 0, Ent.EntityMods.DakTek.DakMat0 )
 		self:SetSubMaterial( 1, Ent.EntityMods.DakTek.DakMat1 )
