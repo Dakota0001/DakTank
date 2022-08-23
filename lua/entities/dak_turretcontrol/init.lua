@@ -499,7 +499,7 @@ function ENT:Think()
 						        	end
 
 									if self.DakCamTrace then
-											if self.FCS==true and not(self.CustomFCS==true) then
+											if self.FCS==true and not(self.CustomFCS==true) and not(GunEnt.DakShellAmmoType=="HEATFS" and GunEnt.DakShellPenetration == GunEnt.DakMaxHealth*6.40) then --atgm has 6.40 maxhealth for pen and HEATFS ammo type
 												local AirBurst = self.Inputs.AirBurst.Value
 												local AddZ = 0
 												if AirBurst ~= 0 then 

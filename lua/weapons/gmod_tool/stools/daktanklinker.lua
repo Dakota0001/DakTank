@@ -279,12 +279,18 @@ function TOOL:RightClick( trace )
 				if(Target:GetClass() == "dak_teautogun") then
 					if self.EntList[1]:GetClass() == "dak_teautoloadingmodule" then
 						self.Ent2 = Target
-						self.EntList[1].DakGun = self.Ent2
+						self.Ent2.AutoLoaders = {}
+						for i=1,#self.EntList do
+							if self.EntList[i]:GetClass() == "dak_teautoloadingmodule" then
+								self.EntList[i].DakGun = self.Ent2
+								self.Ent2.AutoLoaders[#self.Ent2.AutoLoaders+1] = self.EntList[i]
+							end
+						end
 						if (CLIENT) or (game.SinglePlayer()) then
 							self:GetOwner():EmitSound("/items/ammocrate_close.wav")
 							if self:GetClientNumber( "DakChatFeedback" ) == 1 then
 								if #self.EntList > 1 then
-									self:GetOwner():ChatPrint("Only allows one magazine, first selected linked.")
+									self:GetOwner():ChatPrint("Modules linked.")
 								else
 									self:GetOwner():ChatPrint("Module linked.")
 								end

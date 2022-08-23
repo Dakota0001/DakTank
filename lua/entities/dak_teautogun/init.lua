@@ -37,6 +37,7 @@ ENT.IsAutoLoader = 0
 ENT.DakCrew = NULL
 ENT.BasicVelocity = 29527.6
 ENT.muzzle = NULL
+ENT.AutoLoaders = {}
 
 function ENT:Initialize()
 	self.ShellLoaded = 0
@@ -75,6 +76,7 @@ function ENT:Initialize()
 	self.lastfired = 0
 	self.Refiring = false
 	self.DoubleFire = false
+	self.AutoLoaders = {}
 
 	function self:SetupDataTables()
  		self:NetworkVar("Bool",0,"Firing")
@@ -158,7 +160,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -249,7 +251,7 @@ function ENT:Think()
 				self.ShellLengthMult = (70/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*9))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -339,7 +341,7 @@ function ENT:Think()
 				self.ShellLengthMult = (40/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -429,7 +431,7 @@ function ENT:Think()
 				self.ShellLengthMult = (30/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*4))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -514,7 +516,7 @@ function ENT:Think()
 				self.ShellLengthMult = (15/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*2.75))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -851,7 +853,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -919,7 +921,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -991,7 +993,7 @@ function ENT:Think()
 				self.ShellLengthMult = (25/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1174,7 +1176,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1265,7 +1267,7 @@ function ENT:Think()
 				self.ShellLengthMult = (70/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*9))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1355,7 +1357,7 @@ function ENT:Think()
 				self.ShellLengthMult = (40/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1445,7 +1447,7 @@ function ENT:Think()
 				self.ShellLengthMult = (30/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*4))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1530,7 +1532,7 @@ function ENT:Think()
 				self.ShellLengthMult = (15/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*2.75))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1867,7 +1869,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -1935,7 +1937,7 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -2007,7 +2009,7 @@ function ENT:Think()
 				self.ShellLengthMult = (25/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass
+					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
 					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
 				end
@@ -2826,7 +2828,7 @@ end
 function ENT:DakTEAutoGunReload()
 	if self.DakShotsCounter > 1 then
 		if self.IsAutoLoader == 1 and self.HasMag == 1 then
-			self.DakReloadTime = self.DakReloadTime * (self.DakShotsCounter/self.DakMagazine) --set reload based off how full it is if autoloader
+			self.DakReloadTime = self.DakReloadTime * (self.DakShotsCounter/self.DakMagazine) * (1/#self.AutoLoaders) --set reload based off how full it is if autoloader and how many mags there are
 			WireLib.TriggerOutput(self, "ReloadTime",self.DakReloadTime)
 		end
 		self.DakIsReloading = 1
@@ -2909,6 +2911,12 @@ end
 function ENT:PreEntityCopy()
 	local info = {}
 	local entids = {}
+	info.AutoLoaderIDs = {}
+	if #self.AutoLoaders > 0 then
+		for i = 1, #self.AutoLoaders do
+			info.AutoLoaderIDs[i] = self.AutoLoaders[i]:EntIndex()
+		end
+	end
 	info.CrewID = self.DakCrew:EntIndex()
 	info.DakName = self.DakName
 	info.DakMaxHealth = self.DakMaxHealth
@@ -2937,6 +2945,13 @@ end
 
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
+		if Ent.EntityMods.DakTek.AutoLoaderIDs then
+			if #Ent.EntityMods.DakTek.AutoLoaderIDs > 0 then
+				for i = 1, #Ent.EntityMods.DakTek.AutoLoaderIDs do
+					self.AutoLoaders[#self.AutoLoaders+1] = CreatedEntities[ Ent.EntityMods.DakTek.AutoLoaderIDs[i] ] 
+				end
+			end
+		end
 		local Crew = CreatedEntities[ Ent.EntityMods.DakTek.CrewID ]
 		if Crew and IsValid(Crew) then
 			self.DakCrew = Crew
