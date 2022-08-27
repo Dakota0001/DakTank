@@ -84,6 +84,7 @@ end
 function ENT:Think()
 	self.FuzeDelay = self.Inputs.FuzeDelay.Value
 	if self.ScaleSet == true then 
+		if self.DakGunType == nil then self:Remove() end
 		if not(self:GetModel() == self.DakModel) then
 			self:SetModel(self.DakModel)
 			--self:PhysicsInit(SOLID_VPHYSICS)
