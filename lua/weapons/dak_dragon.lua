@@ -31,7 +31,7 @@ SWEP.Category = "DakTank"
 SWEP.Spawnable = true
 SWEP.AdminOnly = true
  
-SWEP.ViewModel  = "models/weapons/v_RPG.mdl"
+SWEP.ViewModel  = "models/weapons/c_rpg.mdl"
 SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
 
 SWEP.Primary.ClipSize		= 1

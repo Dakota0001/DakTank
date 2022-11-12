@@ -31,7 +31,7 @@ SWEP.Category = "DakTank"
 SWEP.Spawnable = true
 SWEP.AdminOnly = false
  
-SWEP.ViewModel  = "models/weapons/v_irifle.mdl"
+SWEP.ViewModel  = "models/weapons/c_irifle.mdl"
 SWEP.WorldModel = "models/weapons/w_irifle.mdl"
 
 SWEP.Primary.ClipSize		= -1
