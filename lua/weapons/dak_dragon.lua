@@ -2,10 +2,8 @@ AddCSLuaFile( "dak_ai_translations.lua" )
 include( "dak_ai_translations.lua" )
 SWEP.Base 			= "dak_gun_base"
 if SERVER then
- 
-	--AddCSLuaFile ("shared.lua")
- 
 
+	--AddCSLuaFile ("shared.lua")
 	SWEP.Weight = 5
 
 	SWEP.AutoSwitchTo = false
@@ -46,7 +44,7 @@ SWEP.Secondary.Ammo = "none"
  
 SWEP.UseHands = true
 
-SWEP.HoldType = "ar2"
+SWEP.HoldType = "rpg"
 SWEP.LastTime = CurTime()
 SWEP.CSMuzzleFlashes = true
 
