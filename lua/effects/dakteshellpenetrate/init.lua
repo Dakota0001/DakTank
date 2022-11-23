@@ -17,12 +17,11 @@ function EFFECT:Init( data )
 		local groundtrace = util.TraceLine(pregroundtrace)
 		if groundtrace.Hit then
 			for i = 1,math.Clamp(dustsize*2,2,1000) do
-
 				local particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(math.Rand(-dustsize*10,dustsize*10),math.Rand(-dustsize*10,dustsize*10),-25)) 
 				 
 				if particle == nil then particle = emitter:Add( "dak/smokey", groundtrace.HitPos+Vector(math.Rand(-dustsize*10,dustsize*10),math.Rand(-dustsize*10,dustsize*10),-25))  end
 				
-				if (particle) then
+				if particle then
 					particle:SetVelocity(Vector(0,0,math.Rand(5*75,5*125)))
 					particle:SetLifeTime(0) 
 					particle:SetDieTime((dustsize/5)+math.Rand(0,5))
@@ -46,7 +45,7 @@ function EFFECT:Init( data )
 		for i = 1,5 do
 			local particle = emitter:Add( "effects/fire_cloud1.vtf", Pos)
 			if particle == nil then particle = emitter:Add( "effects/fire_cloud1.vtf", Pos) end
-			if (particle) then
+			if particle then
 				particle:SetVelocity(Vector(0,0,0))
 				particle:SetLifeTime(0) 
 				particle:SetDieTime(10) 
@@ -65,13 +64,9 @@ function EFFECT:Init( data )
 				particle:SetBounce(0)
 				particle:SetNextThink( CurTime() )
 				particle:SetThinkFunction( function( pa )
-					if pa~=NULL then
-						if HitEnt~=NULL and Attach~=nil then
-							if HitEnt~=NULL and Attach~=nil then
-								pa:SetPos( HitEnt:LocalToWorld(Attach) )
-							end
-							pa:SetNextThink( CurTime() )
-						end
+					if IsValid( pa and HitEnt and Attach ) then
+						pa:SetPos( HitEnt:LocalToWorld(Attach) )
+						pa:SetNextThink( CurTime() )
 					end
 				end )
 			end
@@ -79,7 +74,7 @@ function EFFECT:Init( data )
 		for i = 1,5 do
 			local particle = emitter:Add( "effects/fire_cloud2.vtf", Pos)
 			if particle == nil then particle = emitter:Add( "effects/fire_cloud2.vtf", Pos) end
-			if (particle) then
+			if particle then
 				particle:SetVelocity(Vector(0,0,0))
 				particle:SetLifeTime(0) 
 				particle:SetDieTime(10) 
@@ -98,13 +93,9 @@ function EFFECT:Init( data )
 				particle:SetBounce(0)
 				particle:SetNextThink( CurTime() )
 				particle:SetThinkFunction( function( pa )
-					if pa~=NULL then
-						if HitEnt~=NULL and Attach~=nil then
-							if HitEnt~=NULL and Attach~=nil then
-								pa:SetPos( HitEnt:LocalToWorld(Attach) )
-							end
-							pa:SetNextThink( CurTime() )
-						end
+					if IsValid( pa and HitEnt and Attach ) then
+						pa:SetPos( HitEnt:LocalToWorld(Attach) )
+						pa:SetNextThink( CurTime() )
 					end
 				end )
 			end
@@ -112,7 +103,7 @@ function EFFECT:Init( data )
 		for i = 1,2 do
 			local particle = emitter:Add( "dak/smokey", Pos)
 			if particle == nil then particle = emitter:Add( "dak/smokey", Pos) end
-			if (particle) then
+			if particle then
 				particle:SetVelocity(Vector(0,0,0))
 				particle:SetLifeTime(0) 
 				particle:SetDieTime(15) 
@@ -131,7 +122,7 @@ function EFFECT:Init( data )
 				particle:SetBounce(0)
 				particle:SetNextThink( CurTime() )
 				particle:SetThinkFunction( function( pa )
-					if pa and HitEnt and Attach then
+					if IsValid( pa and HitEnt and Attach ) then
 						pa:SetPos( HitEnt:LocalToWorld(Attach) )
 						pa:SetNextThink( CurTime() )
 					end
@@ -148,7 +139,6 @@ function EFFECT:Init( data )
 	Sparks:SetRadius( math.Rand(2+size/10,3+size/10) )
 	util.Effect( "Sparks", Sparks )
 	emitter:Finish()
-		
 end
 
 function EFFECT:Think()		
