@@ -2548,7 +2548,7 @@ function ENT:Think()
 									if CurrentRes:GetParent():IsValid() then
 										--CurrentRes:SetMoveType(MOVETYPE_NONE)
 									end
-									if CurrentRes:GetClass()=="prop_physics" and CurrentRes:GetPhysicsObject():GetMass()<=1 then
+									if CurrentRes:GetClass()=="prop_physics" and CurrentRes:GetPhysicsObject():GetMass()<=1 and CurrentRes.EntityMods.CompositeType == nil then
 										if table.Count(CurrentRes:GetChildren()) == 0 and CurrentRes:GetParent():IsValid() then
 											self.DETAIL[#self.DETAIL+1]=CurrentRes
 										else
@@ -3172,6 +3172,7 @@ function ENT:Think()
 												if self.ERA[i].DakName ~= "ERA" then self.ERA[i].DakName = "ERA" end
 												if self.ERA[i].IsERA ~= 1 then self.ERA[i].IsERA = 1 end
 												if self.ColdWar ~= 1 then self.ColdWar = 1 end
+												if self.ERA[i].DakHealth == nil then self.ERA[i].DakHealth = 5 end
 												if self.ERA[i].DakHealth <= 0 then
 													effectdata = EffectData()
 													effectdata:SetOrigin(self.ERA[i]:GetPos())
