@@ -1450,7 +1450,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetAttachment(1)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakCaliber*0.25)
-					if HitEnt:GetClass()~="dak_gamemode_bot" and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) then
+					if HitEnt:GetClass()~="dak_gamemode_bot2" and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) then
 						util.Effect("dakteshellpenetrate", effectdata, true, true)
 					else
 						util.Decal( "Blood", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*500), Shell.DakGun)
@@ -1575,7 +1575,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 						Shell.Filter[#Shell.Filter+1] = HitEnt
 						if Shell.DakDamage >= 0 then
 							util.Decal( "Impact.Glass", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*5), Shell.DakGun)
-							if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
+							if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot2" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
 								util.Decal( "Blood", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*500), Shell.DakGun)
 							end
 							local Bounce = 0
@@ -1768,7 +1768,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 					effectdata:SetAttachment(1)
 					effectdata:SetMagnitude(.5)
 					effectdata:SetScale(Shell.DakCaliber*0.25)
-					if HitEnt:GetClass()~="dak_gamemode_bot" and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) then
+					if HitEnt:GetClass()~="dak_gamemode_bot2" and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) then
 						util.Effect("dakteshellpenetrate", effectdata, true, true) --bloodeffectneeded
 					else
 						local blooddata = EffectData()
@@ -1824,7 +1824,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 							--util.Effect("dakteshellimpact", effectdata, true, true) --bloodeffectneeded
 						end
 						util.Decal( "Impact.Concrete", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*5), Shell.DakGun)
-						if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
+						if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot2" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
 							util.Decal( "Blood", HitPos-((HitPos-Start):GetNormalized()*5), HitPos+((HitPos-Start):GetNormalized()*500), Shell.DakGun)
 						end
 						local ExpSounds = {}
@@ -2276,7 +2276,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						effectdata:SetAttachment(1)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(Shell.DakCaliber*0.25)
-						if HitEnt:GetClass()~="dak_gamemode_bot" and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) then
+						if HitEnt:GetClass()~="dak_gamemode_bot2" and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) then
 							util.Effect("dakteshellpenetrate", effectdata, true, true)
 						else
 							util.Decal( "Blood", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*500), Shell.DakGun)
@@ -2401,7 +2401,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 							Shell.Filter[#Shell.Filter+1] = HitEnt
 							if Shell.DakDamage >= 0 then
 								util.Decal( "Impact.Glass", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*5), Shell.DakGun)
-								if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
+								if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot2" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
 									util.Decal( "Blood", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*500), Shell.DakGun)
 								end
 								local Bounce = 0
@@ -2586,7 +2586,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 						effectdata:SetAttachment(1)
 						effectdata:SetMagnitude(.5)
 						effectdata:SetScale(Shell.DakCaliber*0.25)
-						if HitEnt:GetClass()~="dak_gamemode_bot" and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) then
+						if HitEnt:GetClass()~="dak_gamemode_bot2" and not(HitEnt:IsPlayer()) and not(HitEnt:IsNPC()) then
 							util.Effect("dakteshellpenetrate", effectdata, true, true) --bloodeffectneeded
 						else
 							util.Decal( "Blood", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*500), Shell.DakGun)
@@ -2624,7 +2624,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 								util.Effect("dakteshellimpact", effectdata, true, true) --bloodeffectneeded
 							end
 							util.Decal( "Impact.Concrete", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*5), Shell.DakGun)
-							if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
+							if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot2" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
 								util.Decal( "Blood", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*500), Shell.DakGun)
 							end
 							local ExpSounds = {}
@@ -2756,7 +2756,7 @@ function DTShellContinue(Start,End,Shell,Normal,HitNonHitable)
 								util.Effect("dakteshellimpact", effectdata, true, true)
 							end
 							util.Decal( "Impact.Concrete", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*5), Shell.DakGun)
-							if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
+							if HitEnt:GetClass()=="dak_crew" or HitEnt:GetClass()=="dak_gamemode_bot2" or HitEnt:IsPlayer() or HitEnt:IsNPC() then
 								util.Decal( "Blood", ContShellTrace.HitPos-((ContShellTrace.HitPos-Start):GetNormalized()*5), ContShellTrace.HitPos+((ContShellTrace.HitPos-Start):GetNormalized()*500), Shell.DakGun)
 							end
 							local ExpSounds = {}
@@ -2818,7 +2818,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 				ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
 			end
 			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
-				if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+				if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 				end
 				if (DTCheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
@@ -2877,7 +2877,7 @@ function DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					end
 					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 						util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
-						if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+						if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 							util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 							util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
 						end
@@ -2994,7 +2994,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 				ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
 			end
 			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
-				if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+				if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 				end
 				if (DTCheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
@@ -3053,7 +3053,7 @@ function DTAPHE(Pos,Damage,Radius,Caliber,Pen,Owner,Shell,HitEnt)
 					end
 					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 						util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
-						if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+						if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 							util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 							util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
 						end
@@ -3167,7 +3167,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 			ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
 		end
 		if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
-			if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+			if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 				util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), IgnoreEnt)
 			end
 			if (DTCheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
@@ -3227,7 +3227,7 @@ function ContEXP(Filter,IgnoreEnt,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,
 				end
 				if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 					util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), IgnoreEnt)
-					if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+					if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 						util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), IgnoreEnt)
 						util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
 					end
@@ -3381,7 +3381,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 					ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
 				end
 				if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
-					if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+					if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 						util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 					end
 					if (DTCheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
@@ -3441,7 +3441,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 						end
 						if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 							util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
-							if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+							if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 								util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 								util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
 							end
@@ -3551,7 +3551,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 					DakTekTankEditionSetupNewEnt(Targets[i])
 				end
 				if not(Targets[i].DakHealth == nil) then
-					if (Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1) and not(Targets[i]:IsPlayer() or Targets[i]:IsNPC() or Targets[i]:GetClass() == "dak_bot" or Targets[i]:GetClass() == "dak_gamemode_bot") then
+					if (Targets[i].DakHealth <= 0 or Targets[i]:GetClass() == "dak_salvage" or Targets[i]:GetClass() == "dak_tesalvage" or Targets[i].DakIsTread==1) and not(Targets[i]:IsPlayer() or Targets[i]:IsNPC() or Targets[i]:GetClass() == "dak_bot" or Targets[i]:GetClass() == "dak_gamemode_bot2") then
 						if IsValid(Targets[i]:GetPhysicsObject()) then
 							if Targets[i]:GetPhysicsObject():GetMass()<=1 then
 								Shell.IgnoreList[#Shell.IgnoreList+1] = Targets[i]
@@ -3636,7 +3636,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 								ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
 							end
 							if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
-								if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+								if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 									util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 								end
 								if (DTCheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
@@ -3696,7 +3696,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 									end
 									if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 										util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
-										if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+										if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 											util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 											util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
 										end
@@ -3790,7 +3790,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 				end
 			end
 
-			if Class == "dak_bot" or Class == "dak_crew" or Class == "dak_gamemode_bot" or CurShockwaveTarget:IsPlayer() or CurShockwaveTarget:IsNPC() then
+			if Class == "dak_bot" or Class == "dak_crew" or Class == "dak_gamemode_bot2" or CurShockwaveTarget:IsPlayer() or CurShockwaveTarget:IsNPC() then
 				if CurShockwaveTarget:IsValid() then
 					local trace = {}
 					trace.start = Pos
@@ -3808,7 +3808,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 									end
 									Shell.DakDamageList[#Shell.DakDamageList+1] = ExpTrace.Entity[i]
 									--table.insert(Shell.DakDamageList,ExpTrace.Entity)
-									if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+									if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 										util.Decal( "Blood", ExpTrace.HitPos-(ExpTrace.Normal*5), ExpTrace.HitPos+(ExpTrace.Normal*500), Shell.IgnoreList)
 										util.Decal( "Blood", ExpTrace.HitPos-(ExpTrace.Normal*5), ExpTrace.HitPos+(ExpTrace.Normal*500), ExpTrace.Entity)
 									end
@@ -4054,7 +4054,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 					ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction,Shell)
 				end
 				if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
-					if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+					if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 						util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 					end
 					if (DTCheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
@@ -4114,7 +4114,7 @@ function DTShockwave(Pos,Damage,Radius,Pen,Owner,Shell,HitEnt,nocheck)
 						end
 						if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 							util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), Shell.DakGun)
-							if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+							if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 								util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), HitEnt)
 								util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
 							end
@@ -4380,7 +4380,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 						--util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
 						--util.Decal( "Impact.Concrete", SpallTrace.HitPos+(Direction*5), Pos, {Shell.DakGun})
 
-						if SpallTrace.Entity:GetClass()=="dak_crew" or SpallTrace.Entity:GetClass()=="dak_gamemode_bot" or SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() then
+						if SpallTrace.Entity:GetClass()=="dak_crew" or SpallTrace.Entity:GetClass()=="dak_gamemode_bot2" or SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() then
 							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
 							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), SpallTrace.Entity)
 						end
@@ -4390,7 +4390,7 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 					else
 						--decals don't like using the adjusted by normal Pos
 						--util.Decal( "Impact.Glass", Pos, Pos+(Direction*1000), {Shell.DakGun,HitEnt})
-						if SpallTrace.Entity:GetClass()=="dak_crew" or SpallTrace.Entity:GetClass()=="dak_gamemode_bot" or SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() then
+						if SpallTrace.Entity:GetClass()=="dak_crew" or SpallTrace.Entity:GetClass()=="dak_gamemode_bot2" or SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() then
 							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
 						end
 						--SpallBounceHere
@@ -4573,7 +4573,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 						--util.Decal( "Impact.Concrete", Pos, Pos+(Direction*1000), {Shell.DakGun})
 						--util.Decal( "Impact.Concrete", SpallTrace.HitPos+(Direction*5), Pos, {Shell.DakGun})
 
-						if SpallTrace.Entity:GetClass()=="dak_crew" or SpallTrace.Entity:GetClass()=="dak_gamemode_bot" or SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() then
+						if SpallTrace.Entity:GetClass()=="dak_crew" or SpallTrace.Entity:GetClass()=="dak_gamemode_bot2" or SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() then
 							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
 							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), SpallTrace.Entity)
 						end
@@ -4583,7 +4583,7 @@ function ContSpall(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Energy)
 					else
 						--decals don't like using the adjusted by normal Pos
 						--util.Decal( "Impact.Glass", Pos, Pos+(Direction*1000), {Shell.DakGun,HitEnt})
-						if SpallTrace.Entity:GetClass()=="dak_crew" or SpallTrace.Entity:GetClass()=="dak_gamemode_bot" or SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() then
+						if SpallTrace.Entity:GetClass()=="dak_crew" or SpallTrace.Entity:GetClass()=="dak_gamemode_bot2" or SpallTrace.Entity:IsPlayer() or SpallTrace.Entity:IsNPC() then
 							util.Decal( "Blood", SpallTrace.HitPos-(Direction*5), SpallTrace.HitPos+(Direction*500), Shell.DakGun)
 						end
 						--SpallBounceHere
@@ -4790,7 +4790,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						--decals don't like using the adjusted by normal Pos
 						util.Decal( "Impact.Concrete", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun})
 						util.Decal( "Impact.Concrete", HEATTrace.HitPos+(Direction*5), HEATTrace.HitPos-(Direction*5), {Shell.DakGun})
-						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
+						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot2" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), HEATTrace.Entity)
 						end
@@ -4799,7 +4799,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					else
 						--decals don't like using the adjusted by normal Pos
 						util.Decal( "Impact.Glass", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun,HitEnt})
-						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
+						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot2" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
 						end
 					end
@@ -4990,7 +4990,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 						--decals don't like using the adjusted by normal Pos
 						util.Decal( "Impact.Concrete", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun})
 						util.Decal( "Impact.Concrete", HEATTrace.HitPos+(Direction*5), HEATTrace.HitPos-(Direction*5), {Shell.DakGun})
-						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
+						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot2" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), HEATTrace.Entity)
 						end
@@ -4999,7 +4999,7 @@ function DTHEAT(Pos,HitEnt,Caliber,Pen,Damage,Owner,Shell)
 					else
 						--decals don't like using the adjusted by normal Pos
 						util.Decal( "Impact.Glass", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun,HitEnt})
-						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
+						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot2" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
 						end
 					end
@@ -5205,7 +5205,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 						--decals don't like using the adjusted by normal Pos
 						util.Decal( "Impact.Concrete", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun})
 						util.Decal( "Impact.Concrete", HEATTrace.HitPos+(Direction*5), HEATTrace.HitPos-(Direction*5), {Shell.DakGun})
-						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
+						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot2" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), HEATTrace.Entity)
 						end
@@ -5216,7 +5216,7 @@ function ContHEAT(Filter,IgnoreEnt,Pos,Damage,Pen,Owner,Direction,Shell,Triggere
 					else
 						--decals don't like using the adjusted by normal Pos
 						util.Decal( "Impact.Glass", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*5), {Shell.DakGun, HitEnt})
-						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
+						if HEATTrace.Entity:GetClass()=="dak_crew" or HEATTrace.Entity:GetClass()=="dak_gamemode_bot2" or HEATTrace.Entity:IsPlayer() or HEATTrace.Entity:IsNPC() then
 							util.Decal( "Blood", HEATTrace.HitPos-(Direction*5), HEATTrace.HitPos+(Direction*500), Shell.DakGun)
 						end
 					end
@@ -5300,7 +5300,7 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 				self:ContEXP(Filter,ExpTrace.Entity,Pos,Damage,Radius,Caliber,Pen,Owner,Direction)
 			end
 			if (ExpTrace.Entity:IsValid() and not(ExpTrace.Entity:IsPlayer()) and not(ExpTrace.Entity:IsNPC()) and not(ExpTrace.Entity.Base == "base_nextbot") and (ExpTrace.Entity.DakHealth~=nil and not(ExpTrace.Entity.DakHealth <= 0))) or (ExpTrace.Entity.DakName=="Damaged Component") then
-				if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+				if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 					util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), self)
 				end
 				if (DTCheckClip(ExpTrace.Entity,ExpTrace.HitPos)) or (ExpTrace.Entity:GetPhysicsObject():GetMass()<=1 or (ExpTrace.Entity.DakIsTread==1) and not(ExpTrace.Entity:IsVehicle()) and not(ExpTrace.Entity.IsDakTekFutureTech==1)) then
@@ -5363,7 +5363,7 @@ function entity:DTExplosion(Pos,Damage,Radius,Caliber,Pen,Owner)
 					end
 					if EffArmor < Pen and ExpTrace.Entity.IsDakTekFutureTech == nil then
 						--util.Decal( "Impact.Concrete", ExpTrace.HitPos+(Direction*5), ExpTrace.HitPos-(Direction*5), self)
-						if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
+						if ExpTrace.Entity:GetClass()=="dak_crew" or ExpTrace.Entity:GetClass()=="dak_gamemode_bot2" or ExpTrace.Entity:IsPlayer() or ExpTrace.Entity:IsNPC() then
 							util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), self)
 							util.Decal( "Blood", ExpTrace.HitPos-(Direction*5), ExpTrace.HitPos+(Direction*500), ExpTrace.Entity)
 						end
