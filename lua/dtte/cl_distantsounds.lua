@@ -28,18 +28,28 @@ net.Receive( "daktankshotfired", function()
 	local Vol = math.Clamp(math.pow( 0.5,PlayerPos:Distance(GunPos)/(Caliber*250) ),0,1)
 	if Vol > 0.01 then
 		timer.Simple(Dist/13503.9, function()
-			sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+			--sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+			EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch, 0 )
+			EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch*0.8, 0 )
 			if Caliber >= 75 then
-				sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+				--sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+				EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch, 0 )
+				EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch*0.8, 0 )
 			end
 			if Caliber >= 100 then
-				sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+				--sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+				EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch, 0 )
+				EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch*0.8, 0 )
 			end
 			if Caliber >= 150 then
-				sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+				--sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+				EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch, 0 )
+				EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch*0.8, 0 )
 			end
 			if Caliber >= 250 then
-				sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+				--sound.Play( GunSound, Dir, 100, 100*pitch, Vol )
+				EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch, 0 )
+				EmitSound( GunSound, Dir, -1, CHAN_STATIC, Vol, 100, 0, 100*pitch*0.8, 0 )
 			end
 			if LocalPlayer():GetMoveType()~=MOVETYPE_NOCLIP then
 				util.ScreenShake( GunPos, math.Clamp(math.pow( 0.5,LocalPlayer():GetPos():Distance(GunPos)/(50*Caliber) ),0,1) * 2.5, 2.5, Caliber/100, 5000000 )

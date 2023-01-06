@@ -3656,6 +3656,7 @@ function ENT:Think()
 												end
 											end
 										end
+										self.Base:GetPhysicsObject():EnableGravity(true)
 										self.Dead=1
 										hook.Run("DakTank_TankKilled",self,self.LastDamagedBy)
 										self.DeathTime=CurTime()
