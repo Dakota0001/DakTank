@@ -4212,18 +4212,19 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 	--local SpallMass = (SpallVolume*0.0078125) * 0.1
 	local SpallPen = Armor * 0.1
 	local SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*(Armor*0.1)*0.001
-	local Ang = 45*(Armor/Pen)
+	local Ang = 90*(Armor/Pen)
 	if (Shell.DakShellType == "HESH" or Shell.DakShellType == "HE") and Shell.HeatPen == true then
 		Ang = 30 * math.Clamp((Pen/Armor),1,3)
 	end
 	if Shell.DakShellType == "HE" then
 		Ang = Ang*2
 	end
+	Ang = math.Clamp(Ang,25,90)
 	--if Ang < math.Clamp(Caliber*0.5,10,22.5) then Ang = math.Clamp(Caliber*0.5,10,22.5) end
 	local traces = (Ang*Ang*0.04)
 	if (Shell.DakShellType == "HESH" or Shell.DakShellType == "HE") and Shell.HeatPen == true then
 		--SpallMass = (SpallVolume*0.0078125) * 0.05
-		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*5*0.005
+		SpallDamage = math.pi*((Caliber*0.05)*(Caliber*0.05))*2.5*0.005
 		SpallPen = Caliber * 0.2
 		traces = traces*2
 		--traces = 20 * math.Clamp((Pen/Armor),1,3)
@@ -4248,7 +4249,8 @@ function DTSpall(Pos,Armor,HitEnt,Caliber,Pen,Owner,Shell,Dir)
 		SpallDamage = math.Round(SpallDamage * HitEnt.EntityMods.Ductility,2)
 		SpallPen = math.Round(SpallPen * HitEnt.EntityMods.Ductility,2)
 	end
-
+	--print(SpallDamage)
+	--print("Angle: "..Ang, "traces: "..traces, "armor: "..Armor, "pen: "..Pen, "damage: "..SpallDamage)
 	if SpallDamage < 0.01 then traces = 0 end
 
 	--print(traces)

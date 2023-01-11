@@ -490,6 +490,7 @@ local NameTable1 = {
 	"Intense ",
 	"Intensified ",
 	"Brave ",
+	"Soulless ",
 	"",
 }
 local NameTable2 = {
@@ -721,6 +722,7 @@ local NameTable2 = {
 	"Behemoth",
 	"Fool",
 	"Coward",
+	"Devastator",
 }
 local NameTable3 = {
 	"",
