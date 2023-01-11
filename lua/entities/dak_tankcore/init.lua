@@ -2548,7 +2548,7 @@ function ENT:Think()
 									if CurrentRes:GetParent():IsValid() then
 										--CurrentRes:SetMoveType(MOVETYPE_NONE)
 									end
-									if CurrentRes:GetClass()=="prop_physics" and CurrentRes:GetPhysicsObject():GetMass()<=1 and CurrentRes.EntityMods.CompositeType == nil then
+									if CurrentRes:GetClass()=="prop_physics" and CurrentRes:GetPhysicsObject():GetMass()<=1 and CurrentRes.EntityMods and CurrentRes.EntityMods.CompositeType == nil then
 										if table.Count(CurrentRes:GetChildren()) == 0 and CurrentRes:GetParent():IsValid() then
 											self.DETAIL[#self.DETAIL+1]=CurrentRes
 										else

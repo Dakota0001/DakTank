@@ -1120,7 +1120,7 @@ function ENT:Think()
 					CurTraceDist = math.max((CurTrace.StartPos-(CurTraceHitPos)):Length(),80)
 					lastchange = (CurTraceDist-self.RightChanges[i])/engine.TickInterval()
 					self.RightChanges[i] = CurTraceDist
-					lastvel = CurTraceHitPos - self.RightPosChanges[i]
+					lastvel = (CurTraceHitPos - self.RightPosChanges[i])/self.TimeMult
 					localfriction, _ = WorldToLocal( ForwardEntPos+lastvel, Angle(0,0,0), ForwardEntPos, ForwardEntAng)
 					localfriction = localfriction * rightbraking
 					worldfriction, _ = LocalToWorld(localfriction, Angle(0,0,0), ForwardEntPos, ForwardEntAng)
@@ -1205,7 +1205,7 @@ function ENT:Think()
 					CurTraceDist = math.max((CurTrace.StartPos-(CurTraceHitPos)):Length(),80)
 					lastchange = (CurTraceDist-self.LeftChanges[i])/engine.TickInterval()
 					self.LeftChanges[i] = CurTraceDist
-					lastvel = CurTraceHitPos - self.LeftPosChanges[i]
+					lastvel = (CurTraceHitPos - self.LeftPosChanges[i])/self.TimeMult
 					localfriction, _ = WorldToLocal( ForwardEntPos+lastvel, Angle(0,0,0), ForwardEntPos, ForwardEntAng)
 					localfriction = localfriction * leftbraking
 					worldfriction, _ = LocalToWorld(localfriction, Angle(0,0,0), ForwardEntPos, ForwardEntAng)

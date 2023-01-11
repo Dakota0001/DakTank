@@ -29,7 +29,7 @@ do -- DTTE.SpawnFire
 	local function fireBurn(fire)
 		for _, target in ipairs(ents.FindInSphere(fire.pos, fireRadius)) do
 			if not target:IsOnFire() then
-				if (target:IsPlayer() or target:IsNPC() or target.Base == "base_nextbot") and not(target:InVehicle()) then -- TODO: Ensure nextbots have InVehicle
+				if (target:IsPlayer() or target:IsNPC() or target.Base == "base_nextbot" or target:GetClass()=="dak_gamemode_bot2") and not(target:IsPlayer() and target:InVehicle()) then -- TODO: Ensure nextbots have InVehicle
 					target:TakeDamageInfo(fire.dmgInfo)
 					target:Ignite(target:GetPos():Distance(fire.pos) / fireRadius * fireIgniteTimeMult)
 				elseif target:GetClass() == "dak_tegearbox" or target:GetClass() == "dak_tegearboxnew" and target.Controller.ColdWar ~= 1 and target.Controller.Modern ~= 1 then
@@ -105,8 +105,8 @@ do -- DTTE.SpawnFire
 			fire:playSound()
 		end)
 
-		debugoverlay.Cross(fire.pos, fireRadius, fireDuration, Color(255, 100, 0), true)
-		debugoverlay.Sphere(fire.pos, fireRadius, fireDuration, Color(255, 100, 0, 1), true)
+		--debugoverlay.Cross(fire.pos, fireRadius, fireDuration, Color(255, 100, 0), true)
+		--debugoverlay.Sphere(fire.pos, fireRadius, fireDuration, Color(255, 100, 0, 1), true)
 	end
 end
 
@@ -267,6 +267,7 @@ function DTGetArmor(Ent, ShellType, Caliber)
 end
 
 function DTDealDamage(Ent,Damage,Dealer,entbased)
+	if Ent:GetClass() == "daktank_cap" then return end
 	Ent.DakHealth = Ent.DakHealth - Damage
 	if entbased==true then
 		if Dealer.LastDamagedBy == nil or Dealer.LastDamagedBy == NULL then
@@ -274,14 +275,12 @@ function DTDealDamage(Ent,Damage,Dealer,entbased)
 		else
 			Ent.LastDamagedBy = Dealer.LastDamagedBy
 		end
-
 	else
 		if Dealer.DakOwner == nil or Dealer.DakOwner == NULL then
 			Ent.LastDamagedBy = game.GetWorld()
 		else
 			Ent.LastDamagedBy = Dealer.DakOwner
 		end
-
 	end
 end
 
