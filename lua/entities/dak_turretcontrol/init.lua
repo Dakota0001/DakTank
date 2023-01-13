@@ -354,7 +354,7 @@ function ENT:Think()
 							self.RotationSpeed = 0
 						else
 							self.DakCrew.Job = 1
-							if self.DakCrew.DakDead == true then
+							if self.DakCrew.DakDead == true or self.DakCrew.Busy == true then
 								self.RotationSpeed = 0
 							end
 							if not(self.Controller.ColdWar == 1 or self.Controller.Modern == 1) then

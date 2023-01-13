@@ -149,7 +149,15 @@ function TOOL:RightClick( trace )
 						self.Ent2 = Target
 						if table.Count(self.EntList)>0 then
 							for i = 1, table.Count(self.EntList) do
-								self.EntList[i].DakEntity = self.Ent2
+								if self.EntList[i].DakEntity == nil then
+									self.EntList[i].DakEntity = self.Ent2
+								else
+									if self.EntList[i].DakEntity:GetClass() == "dak_turretcontrol" then
+										self.EntList[i].DakEntity2 = self.Ent2
+									else
+										self.EntList[i].DakEntity = self.Ent2
+									end
+								end
 								self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
 								if self.EntList[self.Key]:IsValid() then
 									self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
@@ -183,7 +191,15 @@ function TOOL:RightClick( trace )
 							self.Ent2 = Target
 							if table.Count(self.EntList)>0 then
 								for i = 1, table.Count(self.EntList) do
-									self.EntList[i].DakEntity = self.Ent2
+									if self.EntList[i].DakEntity == nil then
+										self.EntList[i].DakEntity = self.Ent2
+									else
+										if self.EntList[i].DakEntity:GetClass() == "dak_turretcontrol" then
+											self.EntList[i].DakEntity2 = self.Ent2
+										else
+											self.EntList[i].DakEntity = self.Ent2
+										end
+									end
 									self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
 									if self.EntList[self.Key]:IsValid() then
 										self.EntList[self.Key]:SetColor(self.ColorList[self.Key])

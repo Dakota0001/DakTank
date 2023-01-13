@@ -701,31 +701,48 @@ function ENT:Think()
 
 			--if not(self.BaseDakShellDamage==nil) then self.DakShellSplashDamage = self.BaseDakShellDamage/2 end
 			self.Loaders = 0
+			self.Crew = {}
 			if self.DakTankCore and self.TurretController then
 				if self.DakTankCore.Crew then
 					if #self.DakTankCore.Crew>0 then
 						for i=1, #self.DakTankCore.Crew do
-							if self.DakTankCore.Crew[i].DakEntity == self and self.DakTankCore.Crew[i].DakDead ~= true then
+							if (self.DakTankCore.Crew[i].DakEntity == self or self.DakTankCore.Crew[i].DakEntity2 == self) and self.DakTankCore.Crew[i].DakDead ~= true then
 								if IsValid(self.TurretController.TurretBase) and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
 									if self.DakTankCore.Crew[i]:IsValid() then
 										if self.DakTankCore.Crew[i]:GetParent():IsValid() then
 											if self.DakTankCore.Crew[i]:GetParent():GetParent():IsValid() then
 												if self.DakTankCore.Crew[i]:GetParent():GetParent() == self.TurretController.TurretBase or self.DakTankCore.Crew[i]:GetParent():GetParent() == self:GetParent():GetParent() then
 													self.Loaders = self.Loaders + 1	
-													self.DakTankCore.Crew[i].Job = 3
+													if self.DakTankCore.Crew[i].Job == nil then self.DakTankCore.Crew[i].Job = 3 end
+													self.Crew[#self.Crew+1] = self.DakTankCore.Crew[i]
 												end
 											end
 										end
 									end
 								else
 									self.Loaders = self.Loaders + 1	
-									self.DakTankCore.Crew[i].Job = 3
+									if self.DakTankCore.Crew[i].Job == nil then self.DakTankCore.Crew[i].Job = 3 end
+									self.Crew[#self.Crew+1] = self.DakTankCore.Crew[i]
 								end
 							end
 						end
 					end
 					if self.Loaders < math.Max(math.Round( self.BaseDakShellMass/25 ) , 1) then
 						self.DakCooldown = self.DakCooldown / (1/(math.Max(math.Round( self.BaseDakShellMass/25 ) , 1)+1))
+					end
+				end
+			end
+
+			if self.ShellLoaded ~= 1 and (self.ReadyRounds ~= 2 or (self.ReadyRounds == 2 and self.ShellLoaded2 ~= 1)) then
+				if #self.Crew>0 then
+					for i=1, #self.Crew do
+						self.Crew[i].Busy = true
+					end
+				end
+			else
+				if #self.Crew>0 then
+					for i=1, #self.Crew do
+						self.Crew[i].Busy = false
 					end
 				end
 			end
@@ -1780,22 +1797,22 @@ function ENT:DakTEFire()
 					if(self:IsValid()) then
 						if(self.DakTankCore:GetParent():IsValid()) then
 							if(self.DakTankCore:GetParent():GetParent():IsValid()) then
-								self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( 0.01*self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass()*((-self:GetForward()*((0.5*self.BaseDakShellMass)*((self.DakShellVelocity*0.0254)^2)))/self.DakTankCore.TotalMass) , self:GetPos() )
+								self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( 0.1*self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass()*((-self:GetForward()*((self.BaseDakShellMass)*((self.DakShellVelocity*0.0254))))/self.DakTankCore.TotalMass) , self:GetPos() )
 							end
 						end
 						if not(self.DakTankCore:GetParent():IsValid()) then
-							self:GetPhysicsObject():ApplyForceCenter( 0.01*self:GetPhysicsObject():GetMass()*((-self:GetForward()*((0.5*self.BaseDakShellMass)*((self.DakShellVelocity*0.0254)^2)))/self.DakTankCore.TotalMass) )
+							self:GetPhysicsObject():ApplyForceCenter( 0.1*self:GetPhysicsObject():GetMass()*((-self:GetForward()*((self.BaseDakShellMass)*((self.DakShellVelocity*0.0254))))/self.DakTankCore.TotalMass) )
 						end
 					end
 				else
 					if (self:IsValid()) then
 						if(self.DakTankCore:GetParent():IsValid()) then
 							if(self.DakTankCore:GetParent():GetParent():IsValid()) then
-								self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( 0.1*self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass()*((-self:GetForward()*((0.5*self.BaseDakShellMass)*((self.DakShellVelocity*0.0254)^2)))/self.DakTankCore.TotalMass) , self:GetPos() )
+								self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass()*((-self:GetForward()*((self.BaseDakShellMass)*((self.DakShellVelocity*0.0254))))/self.DakTankCore.TotalMass) , self:GetPos() )
 							end
 						end
 						if not(self.DakTankCore:GetParent():IsValid()) then
-							self:GetPhysicsObject():ApplyForceCenter( 0.1*self:GetPhysicsObject():GetMass()*((-self:GetForward()*((0.5*self.BaseDakShellMass)*((self.DakShellVelocity*0.0254)^2)))/self.DakTankCore.TotalMass) )
+							self:GetPhysicsObject():ApplyForceCenter( self:GetPhysicsObject():GetMass()*((-self:GetForward()*((self.BaseDakShellMass)*((self.DakShellVelocity*0.0254))))/self.DakTankCore.TotalMass) )
 						end
 					end
 				end

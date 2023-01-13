@@ -301,7 +301,8 @@ function ENT:PreEntityCopy()
 	local info = {}
 	local entids = {}
 
-	info.DakEntityID = self.DakEntity:EntIndex()
+	if IsValid(self.DakEntity) then info.DakEntityID = self.DakEntity:EntIndex() end
+	if IsValid(self.DakEntity2) then info.DakEntity2ID = self.DakEntity2:EntIndex() end
 	info.DakName = self.DakName
 	info.DakMass = self.DakMass
 	info.DakModel = self.DakModel
@@ -319,8 +320,12 @@ end
 function ENT:PostEntityPaste( Player, Ent, CreatedEntities )
 	if (Ent.EntityMods) and (Ent.EntityMods.DakTek) then
 		local Job = CreatedEntities[ Ent.EntityMods.DakTek.DakEntityID ]
+		local Job2 = CreatedEntities[ Ent.EntityMods.DakTek.DakEntity2ID ]
 		if Job and IsValid(Job) then
 			self.DakEntity = Job
+		end
+		if Job2 and IsValid(Job2) then
+			self.DakEntity2 = Job2
 		end
 		self.DakName = Ent.EntityMods.DakTek.DakName
 		self.DakMass = Ent.EntityMods.DakTek.DakMass
@@ -366,5 +371,8 @@ function ENT:OnRemove()
 	]]--
 	if IsValid(self.DakEntity) then
 	    self.DakEntity.DakCrew = NULL
+    end
+    if IsValid(self.DakEntity2) then
+	    self.DakEntity2.DakCrew = NULL
     end
 end

@@ -1810,7 +1810,11 @@ function TOOL:RightClick( trace )
 				end
 				if Target:GetClass() == "dak_crew" then
 					if Target.DakEntity.DakName ~= nil then
-						ply:ChatPrint("Crew for "..Target.DakEntity.DakName.." #"..Target.DakEntity:EntIndex())
+						if Target.DakEntity2 ~= nil and Target.DakEntity2.DakName ~= nil then
+							ply:ChatPrint("Crew for "..Target.DakEntity.DakName.." #"..Target.DakEntity:EntIndex().." and "..Target.DakEntity2.DakName.." #"..Target.DakEntity2:EntIndex())
+						else
+							ply:ChatPrint("Crew for "..Target.DakEntity.DakName.." #"..Target.DakEntity:EntIndex())
+						end
 					else
 						ply:ChatPrint("Crew idle")
 					end

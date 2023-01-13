@@ -617,11 +617,11 @@ function ENT:DakTEFire()
 				if (self:IsValid()) then
 					if(self.DakTankCore:GetParent():IsValid()) then
 						if(self.DakTankCore:GetParent():GetParent():IsValid()) then
-							self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( 0.1*self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass()*((-self:GetForward()*((0.5*self.BaseDakShellMass)*((self.DakShellVelocity*0.0254)^2)))/self.DakTankCore.TotalMass) , self:GetPos() )
+							self.DakTankCore:GetParent():GetParent():GetPhysicsObject():ApplyForceOffset( self.DakTankCore:GetParent():GetParent():GetPhysicsObject():GetMass()*((-self:GetForward()*((self.BaseDakShellMass)*((self.DakShellVelocity*0.0254))))/self.DakTankCore.TotalMass) , self:GetPos() )
 						end
 					end
 					if not(self.DakTankCore:GetParent():IsValid()) then
-						self:GetPhysicsObject():ApplyForceCenter( 0.1*self:GetPhysicsObject():GetMass()*((-self:GetForward()*((0.5*self.BaseDakShellMass)*((self.DakShellVelocity*0.0254)^2)))/self.DakTankCore.TotalMass) )
+						self:GetPhysicsObject():ApplyForceCenter( self:GetPhysicsObject():GetMass()*((-self:GetForward()*((self.BaseDakShellMass)*((self.DakShellVelocity*0.0254))))/self.DakTankCore.TotalMass) )
 					end
 				end
 			end
