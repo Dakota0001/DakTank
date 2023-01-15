@@ -491,6 +491,7 @@ local NameTable1 = {
 	"Intensified ",
 	"Brave ",
 	"Soulless ",
+	"Sneaking ",
 	"",
 }
 local NameTable2 = {
@@ -723,6 +724,7 @@ local NameTable2 = {
 	"Fool",
 	"Coward",
 	"Devastator",
+	"Dagger",
 }
 local NameTable3 = {
 	"",
@@ -2129,8 +2131,8 @@ function ENT:Think()
 							armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(((self.ArmorSideMult+self.ArmorSideMult+self.ArmorRearMult)/3)*(1+(0.25*((self.SideSpallLinerCoverage+self.SideSpallLinerCoverage+self.RearSpallLinerCoverage)/3))))
 							self.ArmorMult = math.Round(math.max(0.01,armormult),3)
 							self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
-							local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.75*(self.NERAWeight/self.TotalArmorWeight))+(1.0*(self.StillbrewWeight/self.TotalArmorWeight))+(1.5*(self.TextoliteWeight/self.TotalArmorWeight))+(0.05*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
-							self.ArmorMult = self.ArmorMult * ArmorTypeMult
+							local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.0*(self.NERAWeight/self.TotalArmorWeight))+(1.1*(self.StillbrewWeight/self.TotalArmorWeight))+(0.9*(self.TextoliteWeight/self.TotalArmorWeight))+(0.25*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
+							self.ArmorMult = self.ArmorMult * math.max(ArmorTypeMult,0.5)
 						end
 
 						do --Calculate flanking multiplier

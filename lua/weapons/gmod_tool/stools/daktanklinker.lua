@@ -411,15 +411,15 @@ function TOOL.BuildCPanel( panel )
 	ArmorTypeSelect.OnSelect = function( self, index, value )
 		local ArmorDesc = self:GetParent():Find( "ArmorDesc" )
 		if value == "NERA" then
-			ArmorDesc:SetText( "Non-Explosive Reactive Armor\n\nComposite of ceramic plates in a steel and rubber lattice designed to shatter incoming projectiles, it is especially effective at breaking up HEAT jets.\n\nDensity: 2.0g/cm3\nKE Protection: 9.2mm/in\nCE Protection: 18.4mm/in\nCost: 1.75xKG\nEra: Modern" )
+			ArmorDesc:SetText( "Non-Explosive Reactive Armor\n\nComposite of ceramic plates in a steel and rubber lattice designed to shatter incoming projectiles, it is especially effective at breaking up HEAT jets.\n\nDensity: 2.0g/cm3\nKE Protection: 9.2mm/in\nCE Protection: 18.4mm/in\nCost: 1.0xKG\nEra: Modern" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "NERA" )
 		end
 		if value == "Stillbrew" then
-			ArmorDesc:SetText( "Stillbrew Crew Protection Package\n\nHeavy composite of CHA, RHA, rubber, and air designed to provide good protection against both KE and CE.\n\nDensity: 5.75g/cm3\nKE Protection: 23mm/in\nCE Protection: 27.6mm/in\nCost: 1.0xKG\nEra: Modern" )
+			ArmorDesc:SetText( "Stillbrew Crew Protection Package\n\nHeavy composite of CHA, RHA, rubber, and air designed to provide good protection against both KE and CE.\n\nDensity: 5.75g/cm3\nKE Protection: 23mm/in\nCE Protection: 27.6mm/in\nCost: 1.1xKG\nEra: Modern" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "Stillbrew" )
 		end
 		if value == "Textolite" then
-			ArmorDesc:SetText( "Glass-Textolite\n\nFiber glass and resin mix, it is lighter than RHA for a given protection value but takes up more space.\n\nDensity: 1.85g/cm3\nKE Protection: 10.4mm/in\nCE Protection: 14mm/in\nCost: 1.5xKG\nEra: Cold War" )
+			ArmorDesc:SetText( "Glass-Textolite\n\nFiber glass and resin mix, it is lighter than RHA for a given protection value but takes up more space.\n\nDensity: 1.85g/cm3\nKE Protection: 10.4mm/in\nCE Protection: 14mm/in\nCost: 0.9xKG\nEra: Cold War" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "Textolite" )
 		end
 		if value == "ERA" then
@@ -427,7 +427,7 @@ function TOOL.BuildCPanel( panel )
 			RunConsoleCommand( "daktanklinker_ArmorType", "ERA" )
 		end
 		if value == "Concrete" then
-			ArmorDesc:SetText( "Concrete 1:3:5\n\nCement, sand, and gravel: a cheap option to add some extra protection for those with tonnage to spare.\n\nDensity: 2.4g/cm3\nKE Protection: 2.6mm/in\nCE Protection: 2.6mm/in\nCost: 0.05xKG\nEra: WWII" )
+			ArmorDesc:SetText( "Concrete 1:3:5\n\nCement, sand, and gravel: a cheap option to add some extra protection for those with tonnage to spare.\n\nDensity: 2.4g/cm3\nKE Protection: 2.6mm/in\nCE Protection: 2.6mm/in\nCost: 0.25xKG\nEra: WWII" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "Concrete" )
 		end
 	end
