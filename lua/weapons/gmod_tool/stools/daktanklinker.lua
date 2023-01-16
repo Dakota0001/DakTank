@@ -120,78 +120,37 @@ function TOOL:RightClick( trace )
 		local Target = trace.Entity
 		if IsValid(self.EntList[1]) then
 			if self.EntList[1]:GetClass() == "dak_crew" then
-				if(Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" or Target:GetClass() == "dak_turretcontrol" or Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun") then
-					if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" or Target:GetClass() == "dak_turretcontrol" then
-						self.Ent2 = Target
-						self.EntList[1].DakEntity = self.Ent2
-						if (CLIENT) or (game.SinglePlayer()) then
-							self:GetOwner():EmitSound("/items/ammocrate_close.wav")
-							if self:GetClientNumber( "DakChatFeedback" ) == 1 then
-								if #self.EntList > 1 then
-									self:GetOwner():ChatPrint("Only allows one crew, first selected linked.")
-								else
-									self:GetOwner():ChatPrint("Crew linked.")
-								end
-							end
-						end
-						if table.Count(self.EntList)>0 then
-							for i = 1, table.Count(self.EntList) do
-								self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
-								if self.EntList[self.Key]:IsValid() then
-									self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
-								end
-							end
-						end
-						self.EntList = {}
-						self.ColorList = {}
-					end
-					if Target:GetClass() == "dak_tegun" then
-						self.Ent2 = Target
-						if table.Count(self.EntList)>0 then
-							for i = 1, table.Count(self.EntList) do
-								if self.EntList[i].DakEntity == nil then
-									self.EntList[i].DakEntity = self.Ent2
-								else
-									if self.EntList[i].DakEntity:GetClass() == "dak_turretcontrol" then
-										self.EntList[i].DakEntity2 = self.Ent2
+				if IsValid(Target) then
+					if(Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" or Target:GetClass() == "dak_turretcontrol" or Target:GetClass() == "dak_tegun" or Target:GetClass() == "dak_teautogun") then
+						if Target:GetClass() == "dak_tegearbox" or Target:GetClass() == "dak_tegearboxnew" or Target:GetClass() == "dak_turretcontrol" then
+							self.Ent2 = Target
+							self.EntList[1].DakEntity = self.Ent2
+							if (CLIENT) or (game.SinglePlayer()) then
+								self:GetOwner():EmitSound("/items/ammocrate_close.wav")
+								if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+									if #self.EntList > 1 then
+										self:GetOwner():ChatPrint("Only allows one crew, first selected linked.")
 									else
-										self.EntList[i].DakEntity = self.Ent2
+										self:GetOwner():ChatPrint("Crew linked.")
 									end
 								end
-								self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
-								if self.EntList[self.Key]:IsValid() then
-									self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
+							end
+							if table.Count(self.EntList)>0 then
+								for i = 1, table.Count(self.EntList) do
+									self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
+									if self.EntList[self.Key]:IsValid() then
+										self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
+									end
 								end
 							end
+							self.EntList = {}
+							self.ColorList = {}
 						end
-						if (CLIENT) or (game.SinglePlayer()) then
-							self:GetOwner():EmitSound("/items/ammocrate_close.wav")
-							if self:GetClientNumber( "DakChatFeedback" ) == 1 then
-								self:GetOwner():ChatPrint("Crew linked.")
-							end
-						end
-						if table.Count(self.EntList)>0 then
-							for i = 1, table.Count(self.EntList) do
-								self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
-								if self.EntList[self.Key]:IsValid() then
-									self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
-								end
-							end
-						end
-						self.EntList = {}
-						self.ColorList = {}
-					end
-					if(Target:GetClass() == "dak_teautogun") then
-						if Target.IsAutoLoader == 1 then
-							self:GetOwner():EmitSound("items/medshotno1.wav")
-							if self:GetClientNumber( "DakChatFeedback" ) == 1 then
-								self:GetOwner():ChatPrint("This is not a valid link.")
-							end
-						else
+						if Target:GetClass() == "dak_tegun" then
 							self.Ent2 = Target
 							if table.Count(self.EntList)>0 then
 								for i = 1, table.Count(self.EntList) do
-									if self.EntList[i].DakEntity == nil then
+									if not(IsValid(self.EntList[i].DakEntity)) then
 										self.EntList[i].DakEntity = self.Ent2
 									else
 										if self.EntList[i].DakEntity:GetClass() == "dak_turretcontrol" then
@@ -223,11 +182,71 @@ function TOOL:RightClick( trace )
 							self.EntList = {}
 							self.ColorList = {}
 						end
+						if(Target:GetClass() == "dak_teautogun") then
+							if Target.IsAutoLoader == 1 then
+								self:GetOwner():EmitSound("items/medshotno1.wav")
+								if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+									self:GetOwner():ChatPrint("This is not a valid link.")
+								end
+							else
+								self.Ent2 = Target
+								if table.Count(self.EntList)>0 then
+									for i = 1, table.Count(self.EntList) do
+										if not(IsValid(self.EntList[i].DakEntity)) then
+											self.EntList[i].DakEntity = self.Ent2
+										else
+											if self.EntList[i].DakEntity:GetClass() == "dak_turretcontrol" then
+												self.EntList[i].DakEntity2 = self.Ent2
+											else
+												self.EntList[i].DakEntity = self.Ent2
+											end
+										end
+										self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
+										if self.EntList[self.Key]:IsValid() then
+											self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
+										end
+									end
+								end
+								if (CLIENT) or (game.SinglePlayer()) then
+									self:GetOwner():EmitSound("/items/ammocrate_close.wav")
+									if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+										self:GetOwner():ChatPrint("Crew linked.")
+									end
+								end
+								if table.Count(self.EntList)>0 then
+									for i = 1, table.Count(self.EntList) do
+										self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
+										if self.EntList[self.Key]:IsValid() then
+											self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
+										end
+									end
+								end
+								self.EntList = {}
+								self.ColorList = {}
+							end
+						end
+					else
+						self:GetOwner():EmitSound("items/medshotno1.wav")
+						if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+							self:GetOwner():ChatPrint("This is not a valid link.")
+						end
 					end
 				else
-					self:GetOwner():EmitSound("items/medshotno1.wav")
-					if self:GetClientNumber( "DakChatFeedback" ) == 1 then
-						self:GetOwner():ChatPrint("This is not a valid link.")
+					if table.Count(self.EntList)>0 then
+						for i = 1, table.Count(self.EntList) do
+							self.EntList[i].DakEntity = nil
+							self.EntList[i].DakEntity2 = nil
+							self.Key = table.KeyFromValue( self.EntList, self.EntList[i] )
+							if self.EntList[self.Key]:IsValid() then
+								self.EntList[self.Key]:SetColor(self.ColorList[self.Key])
+							end
+						end
+					end
+					if (CLIENT) or (game.SinglePlayer()) then
+						self:GetOwner():EmitSound("/items/ammocrate_close.wav")
+						if self:GetClientNumber( "DakChatFeedback" ) == 1 then
+							self:GetOwner():ChatPrint("Crew unlinked.")
+						end
 					end
 				end
 			else	

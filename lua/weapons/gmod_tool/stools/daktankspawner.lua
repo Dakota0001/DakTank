@@ -1809,7 +1809,7 @@ function TOOL:RightClick( trace )
 					end
 				end
 				if Target:GetClass() == "dak_crew" then
-					if Target.DakEntity.DakName ~= nil then
+					if IsValid(Target.DakEntity) and Target.DakEntity.DakName ~= nil then
 						if Target.DakEntity2 ~= nil and Target.DakEntity2.DakName ~= nil then
 							ply:ChatPrint("Crew for "..Target.DakEntity.DakName.." #"..Target.DakEntity:EntIndex().." and "..Target.DakEntity2.DakName.." #"..Target.DakEntity2:EntIndex())
 						else
