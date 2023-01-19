@@ -342,7 +342,8 @@ function ENT:Think()
 							end
 						end
 					end
-					self.RotationSpeed = math.min(RotMult * (15000/self.GunMass) * (66/(1/engine.TickInterval())) * RotationMult,5)
+					self.RotationSpeed = math.min(RotMult * (15000/self.GunMass) * RotationMult,5)
+					local TimeScale = (66/(1/engine.TickInterval()))
 					if self.DakCrew == NULL then
 						self.RotationSpeed = 0
 						if self.GunnerErrorMessageSent1 == nil then
@@ -678,12 +679,12 @@ function ENT:Think()
 									    		Depression = math.Clamp(self:GetRearDepression(),0,90)
 									    	end
 									    end
-									    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+self.Shake), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
+									    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+self.Shake), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed*TimeScale, self.RotationSpeed*TimeScale)
 										if IsValid(DakTurret) then
 											--turn both turret and gun
 										    local TurDir = normalizedVector(self.CamTrace.HitPos - self.CamTrace.StartPos+(self.CamTrace.StartPos-self.turretaimer:GetPos()))
 									    	local TurClamp = self:LocalToWorldAngles(angClamp(self:WorldToLocalAngles(TurDir:Angle()), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)))
-									    	local TurAng = angNumClamp(self.turretaimer:WorldToLocalAngles(TurClamp), -self.RotationSpeed, self.RotationSpeed)
+									    	local TurAng = angNumClamp(self.turretaimer:WorldToLocalAngles(TurClamp), -self.RotationSpeed*TimeScale, self.RotationSpeed*TimeScale)
 										    if self.Off == true then
 										    	self.OffTicks = self.OffTicks + 1
 										    	if self.OffTicks > 70 then
@@ -714,10 +715,10 @@ function ENT:Think()
 					        	end
 					        	--reposition to forward facing
 					        	local GunDir = self:GetForward()
-							    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+Angle(-self:GetIdleElevation(),self:GetIdleYaw(),0)), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
+							    local Ang = angNumClamp(angClamp(self:WorldToLocalAngles(GunDir:Angle()+Angle(-self:GetIdleElevation(),self:GetIdleYaw(),0)), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.DakGun:GetAngles()), -self.RotationSpeed*TimeScale, self.RotationSpeed*TimeScale)
 								if IsValid(DakTurret) and IsValid(self.turretaimer) then
 									local TurDir = self:GetForward()
-									local TurAng = angNumClamp(angClamp(self:WorldToLocalAngles(TurDir:Angle()+Angle(0,math.Clamp(self:GetIdleYaw(),-179.99,179.99),0)), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.turretaimer:GetAngles()), -self.RotationSpeed, self.RotationSpeed)
+									local TurAng = angNumClamp(angClamp(self:WorldToLocalAngles(TurDir:Angle()+Angle(0,math.Clamp(self:GetIdleYaw(),-179.99,179.99),0)), Angle(-Elevation, -YawMin, -1), Angle(Depression, YawMax, 1)) - self:WorldToLocalAngles(self.turretaimer:GetAngles()), -self.RotationSpeed*TimeScale, self.RotationSpeed*TimeScale)
 									self.turretaimer:SetAngles(self:LocalToWorldAngles(Angle(0,self:WorldToLocalAngles(self.turretaimer:GetAngles()).yaw,0)) + Angle(0,TurAng.yaw,0) )
 									self.DakGun:SetAngles(self.turretaimer:LocalToWorldAngles(Angle(self:WorldToLocalAngles(self.DakGun:GetAngles()).pitch,0,0)) + Angle(Ang.pitch,0,0) )
 								else

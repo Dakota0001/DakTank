@@ -1686,7 +1686,7 @@ function ENT:DakTEFire()
  				local Shell = {}
  				Shell.Pos = shootOrigin + ( self:GetForward() * 1 )
 				Shell.DakTrail = self.DakShellTrail
-				Shell.DakVelocity = ((self.DakShellVelocity * math.Rand( 0.95, 1.05 ) * Propellant) * (shootAngles + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))):Forward()) + initvel
+				Shell.DakVelocity = ((self.DakShellVelocity * math.Rand( 0.99, 1.01 ) * Propellant) * (shootAngles + Angle(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))):Forward()) + initvel
 				Shell.DakBaseVelocity = self.DakShellVelocity * Propellant
 				Shell.Propellant = Propellant
 				Shell.DakDamage = self.DakShellDamage * math.Rand( 0.99, 1.01 )

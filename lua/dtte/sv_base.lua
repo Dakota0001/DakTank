@@ -287,7 +287,6 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 					end
 
 					local difference = ShellList[i].DakVelocity:GetNormalized() - (indicator.HitPos-ShellList[i].SimPos):GetNormalized()
-					
 					local _, LocalAng = WorldToLocal( indicator.HitPos, (indicator.HitPos-ShellList[i].SimPos):GetNormalized():Angle(), ShellList[i].SimPos, ShellList[i].DakVelocity:GetNormalized():Angle() )
 					local pitch = 0
 					local yaw = 0
@@ -296,9 +295,8 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 						pitch = math.Clamp(LocalAng.pitch,-10,10)
 						yaw = math.Clamp(LocalAng.yaw,-10,10)
 						if math.abs(LocalAng.yaw)>90 then yaw = -math.Clamp(LocalAng.yaw,-10,10) end
-						roll = 0--math.Clamp(LocalAng.roll,-10,10)
+						roll = math.Clamp(LocalAng.roll,-10,10)
 					end
-
 					if ShellList[i].Propellant~= nil then
 						ShellList[i].DakVelocity = (ShellList[i].DakVelocity:GetNormalized():Angle() + Angle(pitch,yaw,roll)):Forward() * ShellList[i].Propellant*math.Clamp((12600/2*ShellList[i].LifeTime) - (7875/20*ShellList[i].LifeTime), 4725, 12600)
 					else
