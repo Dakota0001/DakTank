@@ -854,9 +854,9 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
+					self.DakCooldown = 2*0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
-					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
+					self.DakCooldown = 2*0.225*self.BaseDakShellMass + 1.1
 				end
 				self.DakShellSplashDamage = self.DakCaliber*5
 				self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
@@ -922,9 +922,9 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
+					self.DakCooldown = 2*0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
-					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
+					self.DakCooldown = 2*0.225*self.BaseDakShellMass + 1.1
 				end
 				self.DakCooldown = self.DakCooldown*2
 				self.DakShellSplashDamage = self.DakCaliber*5
@@ -1062,7 +1062,7 @@ function ENT:Think()
 							if (self.DakTankCore.Crew[i].DakEntity == self or self.DakTankCore.Crew[i].DakEntity2 == self) and self.DakTankCore.Crew[i].DakDead ~= true then
 								if IsValid(self.TurretController.TurretBase) and (self.TurretController:GetYawMin()+self.TurretController:GetYawMax()>90) then
 									if self.DakTankCore.Crew[i]:GetParent():GetParent() == self.TurretController.TurretBase or self.DakTankCore.Crew[i]:GetParent():GetParent() == self:GetParent():GetParent() then
-										self.Loaders = self.Loaders + 1
+										if self.DakTankCore.Crew[i].BusyEnt == nil or (IsValid(self.DakTankCore.Crew[i].BusyEnt) and self.DakTankCore.Crew[i].BusyEnt == self) then self.Loaders = self.Loaders + 1	end
 										if self.DakTankCore.Crew[i].Job == nil then self.DakTankCore.Crew[i].Job = 3 end
 										self.Crew[#self.Crew+1] = self.DakTankCore.Crew[i]
 									end
@@ -1114,12 +1114,14 @@ function ENT:Think()
 					if #self.Crew>0 then
 						for i=1, #self.Crew do
 							self.Crew[i].Busy = false
+							self.Crew[i].BusyEnt = nil
 						end
 					end
 				else
 					if #self.Crew>0 then
 						for i=1, #self.Crew do
 							self.Crew[i].Busy = true
+							self.Crew[i].BusyEnt = self
 						end
 					end
 				end
@@ -1886,9 +1888,9 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
+					self.DakCooldown = 2*0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
-					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
+					self.DakCooldown = 2*0.225*self.BaseDakShellMass + 1.1
 				end
 				self.DakShellSplashDamage = self.DakCaliber*5
 				self.BaseDakShellPenetration = (self.DakCaliber*2)*self.ShellLengthMult
@@ -1954,9 +1956,9 @@ function ENT:Think()
 				self.ShellLengthMult = (50/50)
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*4300
 				if self.HasMag == 1 then
-					self.DakCooldown = 0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
+					self.DakCooldown = 2*0.15*self.BaseDakShellMass*(1/#self.AutoLoaders)
 				else
-					self.DakCooldown = 0.225*self.BaseDakShellMass + 1.1
+					self.DakCooldown = 2*0.225*self.BaseDakShellMass + 1.1
 				end
 				self.DakCooldown = self.DakCooldown*2
 				self.DakShellSplashDamage = self.DakCaliber*5

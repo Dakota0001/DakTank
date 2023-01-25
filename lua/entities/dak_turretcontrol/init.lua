@@ -600,9 +600,12 @@ function ENT:Think()
 												end
 												--print(SelfVel)
 												--print(TravelTime)
+												if Ang~=Ang then Ang = -45 end
+												local yaw = Diff:Angle().yaw
+												if yaw~=yaw then yaw = (TarPos0-GunPos):Angle().yaw end
 												local traceFCS2 = {}
 													traceFCS2.start = GunPos
-													traceFCS2.endpos = GunPos + Angle(Ang,Diff:Angle().yaw,0):Forward()*100000000
+													traceFCS2.endpos = GunPos + Angle(Ang,yaw,0):Forward()*100000000
 													traceFCS2.filter = self.DakContraption
 												self.CamTrace = util.TraceLine( traceFCS2 )
 											else

@@ -453,7 +453,6 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 										DTShellHit(ShellTrace.StartPos,ShellTrace.HitPos,ShellTrace.Entity,ShellList[i],ShellTrace.HitNormal)
 									end
 								end
-								
 							end
 						else
 							if ShellList[i].FuzeDelay~=nil and ShellList[i].LifeTime >= ShellList[i].FuzeDelay-DakTankBulletThinkDelay and ShellList[i].FuzeDelay > 0 then

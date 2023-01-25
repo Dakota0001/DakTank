@@ -584,7 +584,7 @@ function ENT:Think()
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*self.CooldownWeightMod
 				--print((math.pi*((75*0.001*0.5)^2)*(75*0.001*6.5))*7700)
 				--print((math.pi*((200*0.001*0.5)^2)*(200*0.001*6.5))*7700)
-				self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier*2
+				self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
 				self.ShellLengthMult = (50/50)
 				self.ShellLengthExact = 6.5
 				self.DakShellSplashDamage = self.DakCaliber*5
@@ -696,6 +696,9 @@ function ENT:Think()
 				if self.DakCaliber ~= nil then
 					self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*self.CooldownWeightMod
 					self.DakCooldown = 0.75*self.BaseDakShellMass*self.CooldownDistanceModifier
+					if self.DakGunType == "Dual ATGM Launcher" or self.DakGunType == "ATGM Launcher" then
+						self.DakCooldown = self.DakCooldown*2
+					end
 				end
 			end
 
@@ -712,7 +715,7 @@ function ENT:Think()
 										if self.DakTankCore.Crew[i]:GetParent():IsValid() then
 											if self.DakTankCore.Crew[i]:GetParent():GetParent():IsValid() then
 												if self.DakTankCore.Crew[i]:GetParent():GetParent() == self.TurretController.TurretBase or self.DakTankCore.Crew[i]:GetParent():GetParent() == self:GetParent():GetParent() then
-													self.Loaders = self.Loaders + 1	
+													if self.DakTankCore.Crew[i].BusyEnt == nil or (IsValid(self.DakTankCore.Crew[i].BusyEnt) and self.DakTankCore.Crew[i].BusyEnt == self) then self.Loaders = self.Loaders + 1	end
 													if self.DakTankCore.Crew[i].Job == nil then self.DakTankCore.Crew[i].Job = 3 end
 													self.Crew[#self.Crew+1] = self.DakTankCore.Crew[i]
 												end
@@ -720,7 +723,7 @@ function ENT:Think()
 										end
 									end
 								else
-									self.Loaders = self.Loaders + 1	
+									if self.DakTankCore.Crew[i].BusyEnt == nil or (IsValid(self.DakTankCore.Crew[i].BusyEnt) and self.DakTankCore.Crew[i].BusyEnt == self) then self.Loaders = self.Loaders + 1	end
 									if self.DakTankCore.Crew[i].Job == nil then self.DakTankCore.Crew[i].Job = 3 end
 									self.Crew[#self.Crew+1] = self.DakTankCore.Crew[i]
 								end
@@ -737,12 +740,14 @@ function ENT:Think()
 				if #self.Crew>0 then
 					for i=1, #self.Crew do
 						self.Crew[i].Busy = true
+						self.Crew[i].BusyEnt = self
 					end
 				end
 			else
 				if #self.Crew>0 then
 					for i=1, #self.Crew do
 						self.Crew[i].Busy = false
+						self.Crew[i].BusyEnt = nil
 					end
 				end
 			end
@@ -1269,7 +1274,7 @@ function ENT:Think()
 				self.BaseDakShellMass = (math.pi*((self.DakCaliber*0.001*0.5)^2)*(self.DakCaliber*0.001*6.5))*self.CooldownWeightMod
 				--print((math.pi*((75*0.001*0.5)^2)*(75*0.001*6.5))*7700)
 				--print((math.pi*((200*0.001*0.5)^2)*(200*0.001*6.5))*7700)
-				self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier*2
+				self.DakCooldown = (0.2484886*self.BaseDakShellMass+1.279318)*self.CooldownDistanceModifier
 				self.ShellLengthMult = (50/50)
 				self.ShellLengthExact = 6.5
 				self.DakShellSplashDamage = self.DakCaliber*5

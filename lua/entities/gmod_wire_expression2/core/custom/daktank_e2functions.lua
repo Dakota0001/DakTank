@@ -88,6 +88,8 @@ e2function string entity:daktankGetAmmoType()
 		else
 			if this.DakName == "Flamethrower" then
 				return "Fuel"
+			elseif this.DakGunType == "Smoke Launcher" then
+				return "SM"
 			else
 				if this.CurrentAmmoType == 1 then
 					return "AP"
@@ -244,6 +246,7 @@ e2function number entity:daktankGetShellDamage()
 	return 0
 end
 
+--[[
 e2function number entity:daktankGetAPPenetration()
 	if not IsValid(this) then return 0 end
 
@@ -442,6 +445,7 @@ e2function number entity:daktankGetHESHVelocity()
 	end
 	return 0
 end
+]]--
 
 e2function number entity:daktankGetMaxCooldown()
 	if not IsValid(this) then return 0 end
@@ -452,6 +456,17 @@ e2function number entity:daktankGetMaxCooldown()
 		else
 			return this.DakCooldown
 		end
+	end
+	return 0
+end
+
+e2function number entity:daktankGetGunLoaded()
+	if not IsValid(this) then return 0 end
+	if this:GetClass() == "dak_tegun" or this:GetClass() == "dak_teautogun" then
+		if this.ShellLoaded == 1 or this.ShellLoaded2 == 1 then return 1 end
+	end
+	if this:GetClass() == "dak_temachinegun" then
+		if CurTime() > (this.timer + this.DakCooldown) then return 1 end
 	end
 	return 0
 end

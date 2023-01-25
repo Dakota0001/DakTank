@@ -359,7 +359,7 @@ function ENT:Think()
 		        	if #self.DakTankCore.Motors>0 then
 						for i=1, #self.DakTankCore.Motors do
 							if IsValid(self.DakTankCore.Motors[i]) then
-								self.DakTankCore.Motors[i].Sound:ChangeVolume( 1, 1 )
+								self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.25, 1 )
 							end
 						end
 					end
@@ -603,8 +603,8 @@ function ENT:Think()
 										if #self.DakTankCore.Motors>0 then
 											for i=1, #self.DakTankCore.Motors do
 												if IsValid(self.DakTankCore.Motors[i]) then
-													self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.5 , 0 )
-													self.DakTankCore.Motors[i].Sound:ChangeVolume( 1 , 0.15 )
+													self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.125 , 0 )
+													self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.25 , 0.15 )
 													self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
 												end
 											end

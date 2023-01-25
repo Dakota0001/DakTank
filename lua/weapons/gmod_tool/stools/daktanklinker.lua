@@ -153,7 +153,8 @@ function TOOL:RightClick( trace )
 									if not(IsValid(self.EntList[i].DakEntity)) then
 										self.EntList[i].DakEntity = self.Ent2
 									else
-										if self.EntList[i].DakEntity:GetClass() == "dak_turretcontrol" then
+										local EntClass = self.EntList[i].DakEntity:GetClass()
+										if EntClass == "dak_turretcontrol" or EntClass == "dak_tegun" or EntClass == "dak_teautogun" then
 											self.EntList[i].DakEntity2 = self.Ent2
 										else
 											self.EntList[i].DakEntity = self.Ent2
@@ -195,7 +196,8 @@ function TOOL:RightClick( trace )
 										if not(IsValid(self.EntList[i].DakEntity)) then
 											self.EntList[i].DakEntity = self.Ent2
 										else
-											if self.EntList[i].DakEntity:GetClass() == "dak_turretcontrol" then
+											local EntClass = self.EntList[i].DakEntity:GetClass()
+											if EntClass == "dak_turretcontrol" or EntClass == "dak_tegun" or EntClass == "dak_teautogun" then
 												self.EntList[i].DakEntity2 = self.Ent2
 											else
 												self.EntList[i].DakEntity = self.Ent2

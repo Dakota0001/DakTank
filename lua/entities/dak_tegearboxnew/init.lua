@@ -2,6 +2,10 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 
 include("shared.lua")
+--get suspension force multiplier working again
+--remove suspension give value
+--improve default forces since they affect different weights somewhat differently
+
 
 --make a check to see if the trace for determining speed going up or down a hill started underground, if so then just cut the speed as the hill is so steep it is beyond the limits and ends up giving a speed boost
 
@@ -146,12 +150,44 @@ function ENT:GetRideHeight()
 	return self:GetWheelOffsetZ()
 end
 
+local m_to_in = 100 / 2.54 -- meters to inches
+local in_to_m = 1 / m_to_in
+local PhysObj = FindMetaTable("PhysObj")
+function PhysObj:ApplyImpulseOffsetF(impulse, position)
+	self:ApplyForceCenter(impulse)
+	local offset = position - self:LocalToWorld(self:GetMassCenter())
+	local angimp = offset:Cross(impulse) * in_to_m * in_to_m * 180 / math.pi
+	self:ApplyTorqueCenter(angimp)
+end
+
 function ENT:PID(goal, height, lastheight, lastintegral)
+	--goal is ride height
+	--height is current suspension extension
+	local P = 1.125*math.Clamp(self:GetSuspensionForceMult(),0,2)
+	local I = 1
+	local D = 1.25*(100/math.Clamp(self:GetRideLimit(),50,200))
+	local Time = (1/self.RealInt) * 3 --3s to full power
+
+	--proportional
+	local Err = (goal - height)/self.TimeMult
+	local Correction = Err*P
+
+	--integral
+	local Integral = ((lastintegral*(Time-1) + Err)/Time)
+
+	--derivative
+	local LastErr = (goal - lastheight)/self.TimeMult
+	local Derivative = (Err-LastErr)*D
+
+	return Correction + (Integral*I) + Derivative, Integral
+end
+
+function ENT:AngPID(goal, height, lastheight, lastintegral)
 	--goal is ride height
 	--height is current suspension extension
 	local P = 1
 	local I = 1
-	local D = 1
+	local D = 100
 	local Time = (1/self.RealInt) * 3 --3s to full power
 
 	--proportional
@@ -443,8 +479,8 @@ function ENT:Think()
 			if self.InertiaSet == nil then
 				if self:GetParent():GetParent():GetPhysicsObject():IsMotionEnabled() == true then
 					local oldinertia = self:GetParent():GetParent():GetPhysicsObject():GetInertia()
-					local multiplier = 1--(self.TotalMass/6000)
-					self:GetParent():GetParent():GetPhysicsObject():SetInertia(Vector(oldinertia.x*multiplier, oldinertia.y*multiplier, oldinertia.z))
+					local multiplier = 2--(self.TotalMass/self.PhysicalMass)--1--(self.TotalMass/6000)
+					self:GetParent():GetParent():GetPhysicsObject():SetInertia(Vector(oldinertia.x*multiplier, oldinertia.y*multiplier, oldinertia.z*multiplier))
 					self:GetParent():GetParent():GetPhysicsObject():SetMass(self:GetParent():GetParent():GetPhysicsObject():GetMass())
 					self:GetParent():GetParent():GetPhysicsObject():EnableGravity( false )
 					self.InertiaSet = 1
@@ -498,7 +534,7 @@ function ENT:Think()
 					if #self.DakTankCore.Motors>0 then
 						for i=1, #self.DakTankCore.Motors do
 							if IsValid(self.DakTankCore.Motors[i]) then
-								self.DakTankCore.Motors[i].Sound:ChangeVolume( 1, 1 )
+								self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.25, 1 )
 							end
 						end
 					end
@@ -694,8 +730,8 @@ function ENT:Think()
 										if #self.DakTankCore.Motors>0 then
 											for i=1, #self.DakTankCore.Motors do
 												if IsValid(self.DakTankCore.Motors[i]) then
-													self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.5 , 0 )
-													self.DakTankCore.Motors[i].Sound:ChangeVolume( 1 , 0.15 )
+													self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.125 , 0 )
+													self.DakTankCore.Motors[i].Sound:ChangeVolume( 0.25 , 0.15 )
 													self.DakTankCore.Motors[i].Sound:ChangePitch( 50 , 0.1 )
 												end
 											end
@@ -1032,7 +1068,7 @@ function ENT:Think()
 				self:SetNWFloat("HydraSide",hydrabiasside)
 				self.lasthydrabiasside = hydrabiasside
 				local SuspensionBias = self.SuspensionBias
-				local wheelweightforce = Vector(0,0,((self.AddonMass)/(WheelsPerSide*2))*-9.8*(self.RealInt/self.TimeMult))
+				local wheelweightforce = Vector(0,0,((self.AddonMass)/(WheelsPerSide*2))*-9.8*(self.RealInt/self.TimeMult))*(self.PhysicalMass/self.TotalMass)
 
 				if self.LastWheelsPerSide ~= WheelsPerSide then
 					for i=1, WheelsPerSide do
@@ -1126,6 +1162,7 @@ function ENT:Think()
 				local leftbraking = Vector(math.max(self.LeftBrake*brakestiffness,TerrainBraking),1,0)*2
 				local WheelYaw = self.WheelYaw
 				local ShockForce = 10*self.PhysicalMass
+				local InAir = true 
 				--Right side
 				for i=1, WheelsPerSide do
 					RideHeight = self.RideHeight
@@ -1200,13 +1237,13 @@ function ENT:Think()
 						multval = multval-SuspensionBias
 					end
 
-					--local CurHeight = RideHeight+CurTraceDist-100
-					--local Force, LastInt = self:PID(RideHeight, CurHeight, self.RightLastHeights[i], self.RightInts[i])
-					--self.RightLastHeights[i] = CurHeight
-					--self.RightInts[i] = LastInt
-					--if CurHeight > RideHeight then Force = 0 end
-					--Vector(0,0,(self.PhysicalMass*0.5)*Force*multval)--
-					SuspensionForce = wheelweightforce+(Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i]))))))
+					local CurHeight = RideHeight+CurTraceDist-100
+					local Force, LastInt = self:PID(RideHeight, CurHeight, self.RightLastHeights[i], self.RightInts[i])
+					self.RightLastHeights[i] = CurHeight
+					self.RightInts[i] = LastInt
+					if CurHeight >= RideHeight then Force = 0 else InAir = false end
+					SuspensionForce = wheelweightforce+Vector(0,0,(self.PhysicalMass*1.2)*(math.Min(Force,10)/WheelsPerSide)*multval)
+					--SuspensionForce = wheelweightforce+(Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.RightRidePosChanges[i]))))))
 					--if i == 2 then print((RidePos+(RidePos - self.RightRidePosChanges[i]))) end
 					AbsorbForceFinal = (-Vector(0,0,math.Clamp( self.PhysicalMass*lastchange/(WheelsPerSide*2),-ShockForce,ShockForce)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)/self.TimeMult
 					lastvelnorm = lastvel:GetNormalized()--*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.RightBrake
@@ -1215,7 +1252,7 @@ function ENT:Think()
 					self.RightRidePosChanges[i] = RidePos
 					--print(FrictionForceFinal) ----------FIX ISSUE WHERE THIS SPERGS OUT AND GETS BIG FOR NO RAISIN
 					--print(SuspensionForce)
-					self.phy:ApplyForceOffset( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.RightForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,ForcePos)
+					self.phy:ApplyImpulseOffsetF( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.RightForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,2*AbsorbForceFinal.z))) ,ForcePos)
 				end
 
 				--Left side
@@ -1293,23 +1330,42 @@ function ENT:Think()
 						multval = multval-SuspensionBias
 					end
 
-					--local CurHeight = RideHeight+CurTraceDist-100
-					--local Force, LastInt = self:PID(RideHeight, CurHeight, self.LeftLastHeights[i], self.LeftInts[i])
-					--self.LeftLastHeights[i] = CurHeight
-					--self.LeftInts[i] = LastInt
-					--if CurHeight > RideHeight then Force = 0 end
-					--Vector(0,0,(self.PhysicalMass*0.5)*Force*multval)--
-					SuspensionForce = wheelweightforce+(Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i]))))))
+					local CurHeight = RideHeight+CurTraceDist-100
+					local Force, LastInt = self:PID(RideHeight, CurHeight, self.LeftLastHeights[i], self.LeftInts[i])
+					self.LeftLastHeights[i] = CurHeight
+					self.LeftInts[i] = LastInt
+					if CurHeight >= RideHeight then Force = 0 else InAir = false end
+					SuspensionForce = wheelweightforce+Vector(0,0,(self.PhysicalMass*1.2)*(math.Min(Force,10)/WheelsPerSide)*multval)
+					--SuspensionForce = wheelweightforce+(Vector(0,0,1)*(self.PhysicalMass/3000)*SuspensionForceMult*multval*(((500*(100/(RideLimit)))*math.abs(RidePos+(RidePos + math.abs(self.LeftRidePosChanges[i]))))))
 					AbsorbForceFinal = (-Vector(0,0, math.Clamp(self.PhysicalMass*lastchange/(WheelsPerSide*2),-ShockForce,ShockForce)) * AbsorbForce)*math.Clamp(self:GetSuspensionForceMult(),0,2)/self.TimeMult
 					lastvelnorm = lastvel:GetNormalized() --*(Vector(1-forward.x,1-forward.y,1-forward.z)) + forward*self.LeftBrake
 
 					FrictionForceFinal = -Vector(clamp(lastvel.x,-abs(lastvelnorm.x),abs(lastvelnorm.x)),clamp(lastvel.y,-abs(lastvelnorm.y),abs(lastvelnorm.y)),0)*FrictionForce
 					self.LeftRidePosChanges[i] = RidePos
-					self.phy:ApplyForceOffset( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.LeftForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,AbsorbForceFinal.z))) ,ForcePos)
+					self.phy:ApplyImpulseOffsetF( self.TimeMult*((rotatedforward*Vector(1,1,0))*4*(TerrainMultiplier*self.LeftForce)/WheelsPerSide+SuspensionForce+Vector(FrictionForceFinal.x,FrictionForceFinal.y,max(0,2*AbsorbForceFinal.z))) ,ForcePos)
 				end
 
 				self.LastWheelsPerSide = WheelsPerSide
+				--mid air stabilization to lower flip rates when going over stuff
+				if InAir then
+					if self.LastRoll == nil then self.LastRoll = self.ForwardEnt:GetAngles().roll end
+					if self.LastRollInt == nil then self.LastRollInt = 0 end
+					local rollforce, rollint = self:AngPID(0, self.ForwardEnt:GetAngles().roll, self.LastRoll, self.LastRollInt)
+					rollforce = math.Clamp(rollforce,-25,25)
+					self.phy:ApplyImpulseOffsetF( -rollforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.ForwardEnt:GetRight()*100)
+					self.phy:ApplyImpulseOffsetF( rollforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.ForwardEnt:GetRight()*-100)
+					self.LastRoll = self.ForwardEnt:GetAngles().roll
+					self.LastRollInt = rollint
 
+					if self.LastPitch == nil then self.LastPitch = self.ForwardEnt:GetAngles().pitch end
+					if self.LastPitchInt == nil then self.LastPitchInt = 0 end
+					local pitchforce, pitchint = self:AngPID(0, self.ForwardEnt:GetAngles().pitch, self.LastPitch, self.LastPitchInt)
+					pitchforce = math.Clamp(pitchforce,-25,25)
+					self.phy:ApplyImpulseOffsetF( -pitchforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.ForwardEnt:GetForward()*100)
+					self.phy:ApplyImpulseOffsetF( pitchforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.ForwardEnt:GetForward()*-100)
+					self.LastPitch = self.ForwardEnt:GetAngles().pitch
+					self.LastPitchInt = pitchint
+				end
 				self.phy:ApplyForceCenter(self.RealInt*self.PhysicalMass*physenv.GetGravity())
 						
 				self.Speed = Vector(0,0,0):Distance(self.phy:GetVelocity())*(0.277778*0.254)

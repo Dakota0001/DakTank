@@ -2200,7 +2200,11 @@ function ENT:Think()
 										end
 									end
 									if self.Guns[g]:GetClass() == "dak_tegun" then
-										ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
+										if self.Guns[g].DakGunType == "ATGM Launcher" or self.Guns[g].DakGunType == "Dual ATGM Launcher" then
+											ShotsPerSecond = 1/(2*0.75*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*6.5)*3550))
+										else
+											ShotsPerSecond = 1/(0.2484886*(math.pi*((self.Guns[g].DakCaliber*0.001*0.5)^2)*(self.Guns[g].DakCaliber*0.001*self.Guns[g].ShellLengthExact)*5150)+1.279318)
+										end
 										DPS = ShellDamage*ShotsPerSecond
 										if self.Guns[g].ReadyRounds == 2 then 
 											DPS = DPS*2 
@@ -3458,7 +3462,7 @@ function ENT:Think()
 								if self.LastVel == nil then
 									self.LastVel = curvel
 								end
-								if curvel:Distance(self.LastVel) > 1000 then
+								if math.abs(curvel:Length()-self.LastVel:Length()) > 1000 then
 									for i=1, #self.Crew do
 										self.Crew[i].DakHealth = self.Crew[i].DakHealth - ((curvel:Distance(self.LastVel)-1000)/100)
 
