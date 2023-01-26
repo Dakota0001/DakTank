@@ -86,7 +86,7 @@ end)
 net.Receive( "daktankcoredetailremove", function()
 	local core = net.ReadFloat()
 	if core~=nil then
-		if LocalPlayer()[tostring( core )].Detail ~= nil then
+		if LocalPlayer()[tostring( core )] ~= nil and LocalPlayer()[tostring( core )].Detail ~= nil then
 			if #LocalPlayer()[tostring( core )].Detail > 0 then
 				for i=1, #LocalPlayer()[tostring( core )].Detail do
 					if LocalPlayer()[tostring( core )].Detail[i]:IsValid() then LocalPlayer()[tostring( core )].Detail[i]:Remove() end
