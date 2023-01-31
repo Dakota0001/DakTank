@@ -254,7 +254,21 @@ function EFFECT:Init( data )
 			particle:SetAirResistance(math.random(0.9,1.1)*200)  
 			particle:SetCollide(false)
 			particle:SetBounce(100)
-			particle:SetNextThink( 0 ) -- Makes sure the think hook is used on all particles of the particle emitter
+			--[[
+			particle:SetNextThink( CurTime() ) -- Makes sure the think hook is used on all particles of the particle emitter
+			particle.RandDepth = math.random(-size*10,size*10)
+			particle.RandWidth = math.random(-size*10,size*10)
+			particle.RandHeight = math.random(-size*10,size*10)
+			particle:SetThinkFunction( function( pa )
+				if pa then
+					local dir = (LocalPlayer():GetPos() - Pos):GetNormalized()
+					local lifepercent = (pa:GetLifeTime()/pa:GetDieTime())
+					local sizeval = (pa:GetEndSize() - pa:GetStartSize())*math.Min((lifepercent*2),1)
+					pa:SetPos(Pos + (dir*(math.Min(sizeval*1.5,Pos:Distance(LocalPlayer():GetPos()))+pa.RandDepth)) + (dir:Angle():Right()*pa.RandWidth*0.01*sizeval) + (dir:Angle():Up()*pa.RandHeight*0.0025*sizeval) )
+					pa:SetNextThink( CurTime() )
+				end
+			end )
+			]]
 		end
 	end
 	for i = 1,3.75*size do
@@ -282,7 +296,6 @@ function EFFECT:Init( data )
 		end
 	end
 	for i=1, size*2.5 do
-	
 		local Debris = emitter:Add( "effects/fleck_tile"..math.random(1,2), Pos )
 		if (Debris) then
 			Debris:SetVelocity (size*Vector(math.random(-250,250),math.random(-250,250),math.random(-250,250)))
