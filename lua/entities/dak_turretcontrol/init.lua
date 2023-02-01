@@ -343,6 +343,11 @@ function ENT:Think()
 						end
 					end
 					self.RotationSpeed = math.min(RotMult * (15000/self.GunMass) * RotationMult,5)
+					--if self.Controller.ColdWar == 1 then
+					--	self.RotationSpeed = self.RotationSpeed * 1.5
+					--elseif self.Controller.Modern == 1 then
+					--	self.RotationSpeed = self.RotationSpeed * 2
+					--end
 					local TimeScale = (66/(1/engine.TickInterval()))
 					if self.DakCrew == NULL then
 						self.RotationSpeed = 0

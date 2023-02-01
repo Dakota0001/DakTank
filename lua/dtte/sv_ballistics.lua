@@ -1219,7 +1219,7 @@ function DTShellHit(Start,End,HitEnt,Shell,Normal)
 		print("ERROR: Shell Recurse Loop")
 	return end
 	Shell.Hits = 1
-	local Step = (Shell.DakVelocity * 0.1) - (-physenv.GetGravity()*((Shell.LifeTime-0.1)^2)/2)
+	local Step = (Shell.DakVelocity * 0.1)-- - (-physenv.GetGravity()*((Shell.LifeTime-0.1)^2)/2)
 	if Shell.FinishedBouncing == 1 and Shell.LifeTime == 0.1 then --figure out if this really is at lifetime 0.1 or 0 after trace fix
 		Start = End
 		Shell.FinishedBouncing = 0

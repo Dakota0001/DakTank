@@ -2279,7 +2279,6 @@ function ENT:Think()
 												--local RotationSpeed = math.Round((self.TurretControls[i].RotationSpeed/(1/66.6)),2)
 												--print(RotationSpeed)
 												--print(WeaponMass)
-
 												local TurretCost = math.log(RotationSpeed*100,100)--(RotationSpeed/20)
 												if self.TurretControls[i].RemoteWeapon == true then
 													self.TurretControls[i].CoreRemoteMult = math.Min((100/WeaponMass),1)
@@ -2287,34 +2286,26 @@ function ENT:Think()
 												end
 												if self.TurretControls[i]:GetFCS() == true then
 													self.ColdWar = 1
-													TurretCost = TurretCost * 1.5
+													TurretCost = TurretCost * 1.2
 												end
 												if self.TurretControls[i]:GetStabilizer() == true then
 													self.ColdWar = 1
-													TurretCost = TurretCost * 1.25
+													TurretCost = TurretCost * 1.0
 												elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
-													TurretCost = TurretCost * 1
+													TurretCost = TurretCost * 0.8
 												else
-													TurretCost = TurretCost * 0.75
+													TurretCost = TurretCost * 0.6
 												end
 												if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
 													TurretCost = TurretCost * 0.5
 												end
-												--ATGM gun handling mult should be 0.9, so factor that into the turret's cost
-												GunHandlingMult = GunHandlingMult + (((Total-ATGMs)/Total)*(math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)) + (ATGMs/Total)*0.9)
-											else
-												GunHandlingMult = 0.9 --most likely used on atgm carriers, given cost of full stab, FCS, limited rotation turret, which would be 0.9375 mult, but i'll round down to 0.9 to not be petty
+												GunHandlingMult = GunHandlingMult + math.max(TurretCost,0.1)*(self.TurretControls[i].GunMass/TotalTurretMass)
 											end
 										end
 									end
 									for i=1, #self.Guns do
-										if self.Guns[i].TurretController == nil and self.Guns[i].HasATGM == true then
-											--ATGM parented to vehicle somewhere not controlled by a turret controller, set min gun handling higher
-											if TotalTurretMass > 500 then
-												MinHandling = math.max((GunHandlingMult + 0.9)*0.5,GunHandlingMult) --if there's a relevant turret then split the difference
-											else
-												MinHandling = 0.9
-											end
+										if self.Guns[i].HasATGM == true then
+											MinHandling = 0.9 --ATGM gun handling mult should be 0.9, so set that as minimum if has atgm
 										end
 									end
 								end

@@ -65,13 +65,11 @@ function EFFECT:Init( data )
 				particle:SetBounce(0)
 				particle:SetNextThink( CurTime() )
 				particle:SetThinkFunction( function( pa )
-					if pa~=NULL then
-						if HitEnt~=NULL and Attach~=nil then
-							if HitEnt~=NULL and Attach~=nil then
-								pa:SetPos( HitEnt:LocalToWorld(Attach) )
-							end
-							pa:SetNextThink( CurTime() )
-						end
+					if pa and IsValid(HitEnt) and Attach~=nil then
+						pa:SetPos( HitEnt:LocalToWorld(Attach) )
+						pa:SetNextThink( CurTime() )
+					else
+						pa:SetLifeTime(pa:GetDieTime())
 					end
 				end )
 			end
@@ -98,13 +96,11 @@ function EFFECT:Init( data )
 				particle:SetBounce(0)
 				particle:SetNextThink( CurTime() )
 				particle:SetThinkFunction( function( pa )
-					if pa~=NULL then
-						if HitEnt~=NULL and Attach~=nil then
-							if HitEnt~=NULL and Attach~=nil then
-								pa:SetPos( HitEnt:LocalToWorld(Attach) )
-							end
-							pa:SetNextThink( CurTime() )
-						end
+					if pa and IsValid(HitEnt) and Attach~=nil then
+						pa:SetPos( HitEnt:LocalToWorld(Attach) )
+						pa:SetNextThink( CurTime() )
+					else
+						pa:SetLifeTime(pa:GetDieTime())
 					end
 				end )
 			end
@@ -131,9 +127,11 @@ function EFFECT:Init( data )
 				particle:SetBounce(0)
 				particle:SetNextThink( CurTime() )
 				particle:SetThinkFunction( function( pa )
-					if pa and HitEnt and Attach then
+					if pa and IsValid(HitEnt) and Attach~=nil then
 						pa:SetPos( HitEnt:LocalToWorld(Attach) )
 						pa:SetNextThink( CurTime() )
+					else
+						pa:SetLifeTime(pa:GetDieTime())
 					end
 				end )
 			end
