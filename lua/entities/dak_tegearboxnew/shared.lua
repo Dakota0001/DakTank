@@ -92,6 +92,9 @@ function ENT:_DakVar_SETUP()
 	self:_DakVar_REGISTER({type = "Float", name = "DakFriction", min = 1, max = 2, default = 1},
 		{category = category, title = "Friction"})
 
+	self:_DakVar_REGISTER({type = "Float", name = "DakInertia", min = 0, max = 10, default = 1},
+		{category = category, title = "Inertia"})
+
 	----------------------------------------------------------------
 	category = "Track Appearance"
 	hidepanel = {VehicleMode = {wheeled = true}}

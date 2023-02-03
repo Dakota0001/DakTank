@@ -2139,6 +2139,7 @@ function ENT:Think()
 							local speedmult = 1
 							if IsValid(self.Gearbox) then
 								if self.Gearbox.DakHP ~= nil and self.Gearbox.MaxHP ~= nil and self.Gearbox.TotalMass ~= nil and self.Gearbox.HPperTon ~= nil then
+									--print(math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 ))
 									if self.Gearbox:GetClass() == "dak_tegearboxnew" then
 										local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
 										local t = (self.Gearbox.TotalMass+self.Gearbox:GetPhysicsObject():GetMass())/1000
