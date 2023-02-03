@@ -251,11 +251,14 @@ hook.Add( "OnEntityCreated", "AddCollisionBoomFunction", function( ent )
 end )
 ]]--
 
-local DakTankBulletThinkDelay = 0.1
 hook.Add( "Think", "DakTankShellTableFunction", function()
 	local ShellList = DakTankShellList
 	local RemoveList = {}
 	for i = 1, #ShellList do
+		local DakTankBulletThinkDelay = 0.1
+		if ShellList[i].IsGuided then
+			DakTankBulletThinkDelay = 0.03
+		end
 		if ShellList[i].ShellThinkTime == nil then
 			ShellList[i].ShellThinkTime = 0
 		end
@@ -291,11 +294,12 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 					local pitch = 0
 					local yaw = 0
 					local roll = 0
-					if ShellList[i].LifeTime>0.2 then
-						pitch = math.Clamp(LocalAng.pitch,-10,10)
-						yaw = math.Clamp(LocalAng.yaw,-10,10)
-						if math.abs(LocalAng.yaw)>90 then yaw = -math.Clamp(LocalAng.yaw,-10,10) end
-						roll = math.Clamp(LocalAng.roll,-10,10)
+					if ShellList[i].LifeTime>DakTankBulletThinkDelay*2 then
+						local clamp = 10 * (DakTankBulletThinkDelay/0.1)
+						pitch = math.Clamp(LocalAng.pitch,-clamp,clamp)
+						yaw = math.Clamp(LocalAng.yaw,-clamp,clamp)
+						if math.abs(LocalAng.yaw)>90 then yaw = -math.Clamp(LocalAng.yaw,-clamp,clamp) end
+						roll = math.Clamp(LocalAng.roll,-clamp,clamp)
 					end
 					if ShellList[i].Propellant~= nil then
 						ShellList[i].DakVelocity = (ShellList[i].DakVelocity:GetNormalized():Angle() + Angle(pitch,yaw,roll)):Forward() * ShellList[i].Propellant*math.Clamp((12600/2*ShellList[i].LifeTime) - (7875/20*ShellList[i].LifeTime), 4725, 12600)
