@@ -376,6 +376,7 @@ hook.Add( "Think", "DakTankShellTableFunction", function()
 							effectdata:SetStart(ShellTrace.StartPos)
 							effectdata:SetOrigin(ShellTrace.HitPos)
 							effectdata:SetScale((ShellList[i].DakCaliber*0.0393701))
+							effectdata:SetMagnitude(DakTankBulletThinkDelay*100)
 							if ShellTrace.Hit then
 								util.Effect(ShellList[i].DakTrail, effectdata, true, true)
 							else

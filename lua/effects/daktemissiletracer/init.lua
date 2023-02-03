@@ -1,10 +1,10 @@
 EFFECT.Mat = Material( "trails/smoke" )
 
 function EFFECT:Init( data )
-
 	self.StartPos = data:GetStart()
 	self.EndPos = data:GetOrigin()
 	self.Caliber = data:GetScale()*1
+	self.Magnitude = math.Round(data:GetMagnitude(),0)*0.1
 
 	self.Dir = (self.EndPos-self.StartPos):GetNormalized()
 	self.Dist = self.EndPos:Distance(self.StartPos)
@@ -17,7 +17,8 @@ function EFFECT:Init( data )
 
 	local emitter = ParticleEmitter( self.StartPos )
 
-	for i = 1,10 do
+	for i = 1,10*self.Magnitude do
+
 		local frontmult = math.Rand(0,self.Dist)
 		local particle = emitter:Add( "sprites/light_glow02_add.vmt", self.StartPos + self.Dir*frontmult) 
 		 
@@ -42,7 +43,7 @@ function EFFECT:Init( data )
 			particle:SetBounce(0)
 		end
 	end
-	for i = 1, math.Clamp(math.Round(self.Caliber,0),1,20) do
+	for i = 1, math.Clamp(math.Round(self.Caliber,0),1,20)*self.Magnitude do
 		local particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) 
 		 
 		if particle == nil then particle = emitter:Add( "dak/smokey", self.StartPos + self.Dir*math.Rand(0,self.Dist) ) end
@@ -77,10 +78,10 @@ function EFFECT:Think()
 end
 
 function EFFECT:Render( )
-	if CurTime()-self.Started < 0.1 then
+	if CurTime()-self.Started < 0.1*self.Magnitude then
 		local model = {}
 			model.model = "models/daktanks/test/lrmrocket.mdl"
-			model.pos = self.StartPos + ((self.Dir*self.Dist)*((CurTime()-self.Started)/0.1)) + ((self.Dir*self.Dist)*0.5)
+			model.pos = self.StartPos + ((self.Dir*self.Dist)*((CurTime()-self.Started)/(0.1*self.Magnitude))) + ((self.Dir*self.Dist)*0.5)
 			model.angle = self.Dir:Angle()
 		render.Model( model )
 	end
