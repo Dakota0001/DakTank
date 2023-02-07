@@ -212,6 +212,7 @@ function ENT:AngPID(goal, height, lastheight, lastintegral)
 end
 
 function ENT:Think()
+	CheckSpherical(self)
 	self.RealInt = CurTime()-self.LastThink
 	self.TimeMult = self.RealInt / (1/66)
 	local self = self

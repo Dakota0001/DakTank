@@ -492,6 +492,7 @@ local NameTable1 = {
 	"Brave ",
 	"Soulless ",
 	"Sneaking ",
+	"Awful ",
 	"",
 }
 local NameTable2 = {
@@ -725,6 +726,7 @@ local NameTable2 = {
 	"Coward",
 	"Devastator",
 	"Dagger",
+	"Construct"
 }
 local NameTable3 = {
 	"",
@@ -3582,7 +3584,7 @@ function ENT:Think()
 
 										for i=1, #self.Contraption do
 											if IsValid(self.Contraption[i]) then
-												if self.Contraption[i]:GetModel() == "models/daktanks/machinegun100mm.mdl" then
+												if self.Contraption[i]:GetModel() == "models/daktanks/machinegun100mm.mdl" or self.Contraption[i]:GetClass() == "sent_prop2mesh" then
 													self.Contraption[i]:Remove()
 												else
 													if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then

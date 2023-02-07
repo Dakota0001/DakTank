@@ -69,6 +69,7 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
+	CheckSpherical(self)
 	self.DakMaxHealth = 5
 	self.DakArmor = 2.5
 	self.DakMass = 75

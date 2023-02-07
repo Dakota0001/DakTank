@@ -33,6 +33,7 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
+	CheckSpherical(self)
 	if CurTime()>=self.SparkTime+0.33 then
 		if self.DakHealth<=(self.DakMaxHealth*0.80) and self.DakHealth>(self.DakMaxHealth*0.60) then
 			local effectdata = EffectData()

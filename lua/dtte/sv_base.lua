@@ -9,6 +9,23 @@ local math = math
 local bmax = 16384
 local bmin = -bmax
 
+function CheckSpherical(ent)
+	local PhysObj = ent:GetPhysicsObject()
+	if not PhysObj:GetMesh() then
+		if ent.SentSphereMessage == nil then
+			if IsValid(ent.DakOwner) then 
+				ent.DakOwner:ChatPrint(ent.DakName.." is made spherical and will be removed if unfrozen.")
+				ent.SentSphereMessage = true
+			end
+		end
+		if PhysObj:IsMotionEnabled() == true then
+			ent:Remove()
+		end
+	else
+		ent.SentSphereMessage = nil
+	end
+end
+
 -- modifies original vector, returns false if it was clamped... not sure about the efficiency of this
 function Dak_clampVector(vec)
 
