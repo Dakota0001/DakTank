@@ -3549,6 +3549,9 @@ function ENT:Think()
 																			self.TurretControls[j].Turret[l]:Ignite(25,1)
 																		end
 																	end
+																	if self.TurretControls[j].Turret[l]:GetClass() == "sent_prop2mesh" then
+																		self.TurretControls[j].Turret[l]:Remove()
+																	end
 																end
 															end
 														end
