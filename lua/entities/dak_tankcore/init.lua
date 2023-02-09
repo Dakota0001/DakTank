@@ -2316,8 +2316,8 @@ function ENT:Think()
 							end
 
 							do --Get firepower costs
-								local firepowermult = self.MaxPen/1680
-								local altfirepowermult = 0.005*self.TotalDPS^1
+								local firepowermult = self.MaxPen/840
+								local altfirepowermult = 0.0025*self.TotalDPS^1
 								math.max(0.1,firepowermult)
 								self.PenMult = firepowermult*0.5
 								self.DPSMult = altfirepowermult*0.5
