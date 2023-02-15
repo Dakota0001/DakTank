@@ -2109,7 +2109,8 @@ function ENT:Think()
 							--print("Armor Box Size: "..tostring(self.RealMaxs-self.RealMins))
 							self.DakVolume = math.Round(XAve*YAve*ZAve*0.005,2) --0.03125 is just an arbitrary balance number, was 0.005 but new averaging system called for new number
 						end
-
+						local armormult
+						local armormultfrontal
 						do --Calculate armor multipliers
 							table.sort( self.RawFrontalTable )
 							table.sort( self.RawSideTable )
@@ -2131,6 +2132,7 @@ function ENT:Think()
 							local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
 							self.BestAveArmor = Total
 							armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(((self.ArmorSideMult+self.ArmorSideMult+self.ArmorRearMult)/3)*(1+(0.25*((self.SideSpallLinerCoverage+self.SideSpallLinerCoverage+self.RearSpallLinerCoverage)/3))))
+							armormultfrontal = Total/420
 							self.ArmorMult = math.Round(math.max(0.01,armormult),3)
 							self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
 							local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.0*(self.NERAWeight/self.TotalArmorWeight))+(1.1*(self.StillbrewWeight/self.TotalArmorWeight))+(0.9*(self.TextoliteWeight/self.TotalArmorWeight))+(0.5*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
@@ -2142,16 +2144,18 @@ function ENT:Think()
 							if IsValid(self.Gearbox) then
 								if self.Gearbox.DakHP ~= nil and self.Gearbox.MaxHP ~= nil and self.Gearbox.TotalMass ~= nil and self.Gearbox.HPperTon ~= nil then
 									--print(math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 ))
+									--print(armormult, math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 )))
+									--print(armormultfrontal, math.Max(0.01,-0.75+math.log( (armormultfrontal + 1)*2 , 2 )))
 									if self.Gearbox:GetClass() == "dak_tegearboxnew" then
 										local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
 										local t = (self.Gearbox.TotalMass+self.Gearbox:GetPhysicsObject():GetMass())/1000
 										local hpt = hp/t
-										speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 ))
+										speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormultfrontal + 1)*2 , 2 ))
 									else
 										local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
 										local t = self.Gearbox.TotalMass/1000
 										local hpt = hp/t
-										speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,math.log( armormult + 1 , 2 ))
+										speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormultfrontal + 1)*2 , 2 ))
 									end
 									for i=1, #self.Crew do
 										if self.Crew[i].Job == 2 then
