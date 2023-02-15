@@ -524,3 +524,16 @@ e2function number entity:daktankGetCrewCount()
 	end
 	return 0
 end
+
+e2function number entity:daktankGetAPSShots()
+	if not IsValid(this) then return 0 end
+
+	if this:GetClass() == "dak_tankcore" then
+		if this.APSShots == nil then
+			return 0
+		else
+			return this.APSShots
+		end
+	end
+	return 0
+end

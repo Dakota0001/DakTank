@@ -989,6 +989,7 @@ function TOOL:LeftClick( trace )
 					trace.Entity.DakAmmoType = self.DakAmmoType
 					trace.Entity.DakOwner = self:GetOwner()
 					trace.Entity.DakIsHE = self.DakIsHE
+					trace.Entity.DakAmmo = 0
 					self:GetOwner():ChatPrint("Ammo updated.")
 				else
 					self.spawnedent.DakName = self.DakAmmoType
@@ -996,6 +997,7 @@ function TOOL:LeftClick( trace )
 					self.spawnedent.DakAmmoType = self.DakAmmoType
 					self.spawnedent.DakOwner = self:GetOwner()
 					self.spawnedent.DakIsHE = self.DakIsHE
+					self.spawnedent.DakAmmo = 0
 					if first == "6" and second == "6" and third1 == "3" then
 						self.spawnedent:SetModel( "models/daktanks/ammo7.mdl" )
 					end

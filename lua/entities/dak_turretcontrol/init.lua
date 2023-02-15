@@ -343,6 +343,11 @@ function ENT:Think()
 						end
 					end
 					self.RotationSpeed = math.min(RotMult * (15000/self.GunMass) * RotationMult,5)
+					--if self.Controller.ColdWar == 1 then
+					--	self.RotationSpeed = self.RotationSpeed * 1.5
+					--elseif self.Controller.Modern == 1 then
+					--	self.RotationSpeed = self.RotationSpeed * 2
+					--end
 					local TimeScale = (66/(1/engine.TickInterval()))
 					if self.DakCrew == NULL then
 						self.RotationSpeed = 0
@@ -696,7 +701,26 @@ function ENT:Think()
 											else
 												if self.Locked == 0 then
 													self.turretaimer:SetAngles(self:LocalToWorldAngles(Angle(0,self:WorldToLocalAngles(self.turretaimer:GetAngles()).yaw,0)) + Angle(0,TurAng.yaw,0) )
-													self.DakGun:SetAngles(self.turretaimer:LocalToWorldAngles(Angle(self:WorldToLocalAngles(self.DakGun:GetAngles()).pitch,0,0)) + Angle(Ang.pitch,0,0) )
+													local yawdiff = math.abs(self.turretaimer:WorldToLocalAngles(TurClamp).yaw)
+													local pitch = Ang.pitch
+													local Limit = 180
+													local max = 0.5
+													if self.Controller.Modern == 1 then
+														Limit = 90
+														max = 1
+													elseif self.Controller.ColdWar == 1 then
+														Limit = 45
+														max = 0.5
+													else
+														Limit = 25
+														max = 0.25
+													end
+													if yawdiff > Limit then 
+														pitch = 0 
+													else
+														pitch = pitch*math.min((Limit-yawdiff)/Limit,max)
+													end
+													self.DakGun:SetAngles(self.turretaimer:LocalToWorldAngles(Angle(self:WorldToLocalAngles(self.DakGun:GetAngles()).pitch,0,0)) + Angle(pitch,0,0) )
 												end
 											end
 										else

@@ -492,6 +492,7 @@ local NameTable1 = {
 	"Brave ",
 	"Soulless ",
 	"Sneaking ",
+	"Awful ",
 	"",
 }
 local NameTable2 = {
@@ -725,6 +726,7 @@ local NameTable2 = {
 	"Coward",
 	"Devastator",
 	"Dagger",
+	"Construct"
 }
 local NameTable3 = {
 	"",
@@ -2107,7 +2109,8 @@ function ENT:Think()
 							--print("Armor Box Size: "..tostring(self.RealMaxs-self.RealMins))
 							self.DakVolume = math.Round(XAve*YAve*ZAve*0.005,2) --0.03125 is just an arbitrary balance number, was 0.005 but new averaging system called for new number
 						end
-
+						local armormult
+						local armormultfrontal
 						do --Calculate armor multipliers
 							table.sort( self.RawFrontalTable )
 							table.sort( self.RawSideTable )
@@ -2129,9 +2132,10 @@ function ENT:Think()
 							local Total = math.max(self.FrontalArmor,self.SideArmor,self.RearArmor)
 							self.BestAveArmor = Total
 							armormult = ((Total/420)*(1+(0.25*self.FrontalSpallLinerCoverage)))*(((self.ArmorSideMult+self.ArmorSideMult+self.ArmorRearMult)/3)*(1+(0.25*((self.SideSpallLinerCoverage+self.SideSpallLinerCoverage+self.RearSpallLinerCoverage)/3))))
+							armormultfrontal = Total/420
 							self.ArmorMult = math.Round(math.max(0.01,armormult),3)
 							self.TotalArmorWeight = self.RHAWeight+self.CHAWeight+self.HHAWeight+self.NERAWeight+self.StillbrewWeight+self.TextoliteWeight+self.ConcreteWeight+self.ERAWeight
-							local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.0*(self.NERAWeight/self.TotalArmorWeight))+(1.1*(self.StillbrewWeight/self.TotalArmorWeight))+(0.9*(self.TextoliteWeight/self.TotalArmorWeight))+(0.25*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
+							local ArmorTypeMult = (((1*(self.RHAWeight/self.TotalArmorWeight))+(0.75*(self.CHAWeight/self.TotalArmorWeight))+(1.25*(self.HHAWeight/self.TotalArmorWeight))+(1.0*(self.NERAWeight/self.TotalArmorWeight))+(1.1*(self.StillbrewWeight/self.TotalArmorWeight))+(0.9*(self.TextoliteWeight/self.TotalArmorWeight))+(0.5*(self.ConcreteWeight/self.TotalArmorWeight))+(1.25*(self.ERAWeight/self.TotalArmorWeight))))
 							self.ArmorMult = self.ArmorMult * math.max(ArmorTypeMult,0.5)
 						end
 
@@ -2139,16 +2143,19 @@ function ENT:Think()
 							local speedmult = 1
 							if IsValid(self.Gearbox) then
 								if self.Gearbox.DakHP ~= nil and self.Gearbox.MaxHP ~= nil and self.Gearbox.TotalMass ~= nil and self.Gearbox.HPperTon ~= nil then
+									--print(math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 ))
+									--print(armormult, math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 )))
+									--print(armormultfrontal, math.Max(0.01,-0.75+math.log( (armormultfrontal + 1)*2 , 2 )))
 									if self.Gearbox:GetClass() == "dak_tegearboxnew" then
 										local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
 										local t = (self.Gearbox.TotalMass+self.Gearbox:GetPhysicsObject():GetMass())/1000
 										local hpt = hp/t
-										speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormult + 1)*2 , 2 ))
+										speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormultfrontal + 1)*2 , 2 ))
 									else
 										local hp = math.Clamp(self.Gearbox.DakHP,0,self.Gearbox.MaxHP)
 										local t = self.Gearbox.TotalMass/1000
 										local hpt = hp/t
-										speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,math.log( armormult + 1 , 2 ))
+										speedmult = math.Max(math.Round(hpt/30,2),0.125) * math.Max(0.01,-0.75+math.log( (armormultfrontal + 1)*2 , 2 ))
 									end
 									for i=1, #self.Crew do
 										if self.Crew[i].Job == 2 then
@@ -2279,7 +2286,6 @@ function ENT:Think()
 												--local RotationSpeed = math.Round((self.TurretControls[i].RotationSpeed/(1/66.6)),2)
 												--print(RotationSpeed)
 												--print(WeaponMass)
-
 												local TurretCost = math.log(RotationSpeed*100,100)--(RotationSpeed/20)
 												if self.TurretControls[i].RemoteWeapon == true then
 													self.TurretControls[i].CoreRemoteMult = math.Min((100/WeaponMass),1)
@@ -2287,34 +2293,26 @@ function ENT:Think()
 												end
 												if self.TurretControls[i]:GetFCS() == true then
 													self.ColdWar = 1
-													TurretCost = TurretCost * 1.5
+													TurretCost = TurretCost * 1.2
 												end
 												if self.TurretControls[i]:GetStabilizer() == true then
 													self.ColdWar = 1
-													TurretCost = TurretCost * 1.25
+													TurretCost = TurretCost * 1.0
 												elseif self.TurretControls[i]:GetShortStopStabilizer() == true then
-													TurretCost = TurretCost * 1
+													TurretCost = TurretCost * 0.8
 												else
-													TurretCost = TurretCost * 0.75
+													TurretCost = TurretCost * 0.6
 												end
 												if self.TurretControls[i]:GetYawMin() + self.TurretControls[i]:GetYawMax() <= 90 then
 													TurretCost = TurretCost * 0.5
 												end
-												--ATGM gun handling mult should be 0.9, so factor that into the turret's cost
-												GunHandlingMult = GunHandlingMult + (((Total-ATGMs)/Total)*(math.max(TurretCost,0)*(self.TurretControls[i].GunMass/TotalTurretMass)) + (ATGMs/Total)*0.9)
-											else
-												GunHandlingMult = 0.9 --most likely used on atgm carriers, given cost of full stab, FCS, limited rotation turret, which would be 0.9375 mult, but i'll round down to 0.9 to not be petty
+												GunHandlingMult = GunHandlingMult + math.max(TurretCost,0.1)*(self.TurretControls[i].GunMass/TotalTurretMass)
 											end
 										end
 									end
 									for i=1, #self.Guns do
-										if self.Guns[i].TurretController == nil and self.Guns[i].HasATGM == true then
-											--ATGM parented to vehicle somewhere not controlled by a turret controller, set min gun handling higher
-											if TotalTurretMass > 500 then
-												MinHandling = math.max((GunHandlingMult + 0.9)*0.5,GunHandlingMult) --if there's a relevant turret then split the difference
-											else
-												MinHandling = 0.9
-											end
+										if self.Guns[i].HasATGM == true then
+											MinHandling = 0.9 --ATGM gun handling mult should be 0.9, so set that as minimum if has atgm
 										end
 									end
 								end
@@ -2322,8 +2320,8 @@ function ENT:Think()
 							end
 
 							do --Get firepower costs
-								local firepowermult = self.MaxPen/1680
-								local altfirepowermult = 0.005*self.TotalDPS^1
+								local firepowermult = self.MaxPen/840
+								local altfirepowermult = 0.0025*self.TotalDPS^1
 								math.max(0.1,firepowermult)
 								self.PenMult = firepowermult*0.5
 								self.DPSMult = altfirepowermult*0.5
@@ -3555,6 +3553,9 @@ function ENT:Think()
 																			self.TurretControls[j].Turret[l]:Ignite(25,1)
 																		end
 																	end
+																	if self.TurretControls[j].Turret[l]:GetClass() == "sent_prop2mesh" then
+																		self.TurretControls[j].Turret[l]:Remove()
+																	end
 																end
 															end
 														end
@@ -3590,7 +3591,7 @@ function ENT:Think()
 
 										for i=1, #self.Contraption do
 											if IsValid(self.Contraption[i]) then
-												if self.Contraption[i]:GetModel() == "models/daktanks/machinegun100mm.mdl" then
+												if self.Contraption[i]:GetModel() == "models/daktanks/machinegun100mm.mdl" or self.Contraption[i]:GetClass() == "sent_prop2mesh" then
 													self.Contraption[i]:Remove()
 												else
 													if self.Contraption[i].DakPooled == 0 or self.Contraption[i]:GetParent()==self:GetParent() or self.Contraption[i].Controller == self then

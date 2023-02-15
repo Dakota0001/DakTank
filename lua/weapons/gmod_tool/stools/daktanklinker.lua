@@ -448,7 +448,7 @@ function TOOL.BuildCPanel( panel )
 			RunConsoleCommand( "daktanklinker_ArmorType", "ERA" )
 		end
 		if value == "Concrete" then
-			ArmorDesc:SetText( "Concrete 1:3:5\n\nCement, sand, and gravel: a cheap option to add some extra protection for those with tonnage to spare.\n\nDensity: 2.4g/cm3\nKE Protection: 2.6mm/in\nCE Protection: 2.6mm/in\nCost: 0.25xKG\nEra: WWII" )
+			ArmorDesc:SetText( "Concrete 1:3:5\n\nCement, sand, and gravel: a cheap option to add some extra protection for those with tonnage to spare.\n\nDensity: 2.4g/cm3\nKE Protection: 2.6mm/in\nCE Protection: 2.6mm/in\nCost: 0.5xKG\nEra: WWII" )
 			RunConsoleCommand( "daktanklinker_ArmorType", "Concrete" )
 		end
 	end

@@ -18,3 +18,4 @@ E2Helper.Descriptions["daktankRecurseArmor"] = "Recursively checks armor in a gi
 E2Helper.Descriptions["daktankGetSpeed"] = "Returns current speed of tank when linked to gearbox, otherwise returns 0"
 E2Helper.Descriptions["daktankGetTopSpeed"] = "Returns top speed of tank when linked to gearbox, otherwise returns 0"
 E2Helper.Descriptions["daktankGetCrewCount"] = "Returns current crew count of tank when linked to tank core, otherwise returns 0"
+E2Helper.Descriptions["daktankGetAPSShots"] = "Returns current APS shots of tank when linked to tank core, otherwise returns 0"

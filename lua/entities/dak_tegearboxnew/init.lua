@@ -160,6 +160,13 @@ function PhysObj:ApplyImpulseOffsetF(impulse, position)
 	self:ApplyTorqueCenter(angimp)
 end
 
+function PhysObj:ApplyImpulseOffsetFTorqueOnly(impulse, position)
+	--self:ApplyForceCenter(impulse)
+	local offset = position - self:LocalToWorld(self:GetMassCenter())
+	local angimp = offset:Cross(impulse) * in_to_m * in_to_m * 180 / math.pi
+	self:ApplyTorqueCenter(angimp)
+end
+
 function ENT:PID(goal, height, lastheight, lastintegral)
 	--goal is ride height
 	--height is current suspension extension
@@ -205,6 +212,7 @@ function ENT:AngPID(goal, height, lastheight, lastintegral)
 end
 
 function ENT:Think()
+	CheckSpherical(self)
 	self.RealInt = CurTime()-self.LastThink
 	self.TimeMult = self.RealInt / (1/66)
 	local self = self
@@ -1352,8 +1360,8 @@ function ENT:Think()
 					if self.LastRollInt == nil then self.LastRollInt = 0 end
 					local rollforce, rollint = self:AngPID(0, self.ForwardEnt:GetAngles().roll, self.LastRoll, self.LastRollInt)
 					rollforce = math.Clamp(rollforce,-25,25)
-					self.phy:ApplyImpulseOffsetF( -rollforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.ForwardEnt:GetRight()*100)
-					self.phy:ApplyImpulseOffsetF( rollforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.ForwardEnt:GetRight()*-100)
+					self.phy:ApplyImpulseOffsetF( -rollforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.base:GetPos()+self.ForwardEnt:GetRight()*100)
+					self.phy:ApplyImpulseOffsetF( rollforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.base:GetPos()+self.ForwardEnt:GetRight()*-100)
 					self.LastRoll = self.ForwardEnt:GetAngles().roll
 					self.LastRollInt = rollint
 
@@ -1361,14 +1369,18 @@ function ENT:Think()
 					if self.LastPitchInt == nil then self.LastPitchInt = 0 end
 					local pitchforce, pitchint = self:AngPID(0, self.ForwardEnt:GetAngles().pitch, self.LastPitch, self.LastPitchInt)
 					pitchforce = math.Clamp(pitchforce,-25,25)
-					self.phy:ApplyImpulseOffsetF( -pitchforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.ForwardEnt:GetForward()*100)
-					self.phy:ApplyImpulseOffsetF( pitchforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.ForwardEnt:GetForward()*-100)
+					self.phy:ApplyImpulseOffsetF( -pitchforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.base:GetPos()+self.ForwardEnt:GetForward()*100)
+					self.phy:ApplyImpulseOffsetF( pitchforce*self.ForwardEnt:GetUp()*self.PhysicalMass*0.01*self.TimeMult,self.base:GetPos()+self.ForwardEnt:GetForward()*-100)
 					self.LastPitch = self.ForwardEnt:GetAngles().pitch
 					self.LastPitchInt = pitchint
 				end
 				self.phy:ApplyForceCenter(self.RealInt*self.PhysicalMass*physenv.GetGravity())
-						
+				
+				if self.LastSpeed == nil then self.LastSpeed = Vector(0,0,0):Distance(self.phy:GetVelocity())*(0.277778*0.254) end
 				self.Speed = Vector(0,0,0):Distance(self.phy:GetVelocity())*(0.277778*0.254)
+				local accel = self.Speed-self.LastSpeed
+				self.phy:ApplyImpulseOffsetFTorqueOnly(self.phy:GetMass()*self.phy:GetVelocity():GetNormalized()*-accel*math.Clamp(self:GetDakInertia(),0,10),self.base:GetPos()+self.ForwardEnt:GetUp()*100)
+				self.LastSpeed = self.Speed
 			end
 
 		else
