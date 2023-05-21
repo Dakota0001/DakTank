@@ -514,7 +514,7 @@ function ENT:Think()
 					self.Lastbase = self.base
 				end
 				if self.DakDead ~= true then
-					self.HPperTon = self.DakHP/(self.TotalMass/1000)
+					self.HPperTon = self.DakHP/(self.TotalMass/1000) * math.Clamp(self.MaxHP/self.DakHP,0,1)
 				else
 					self.HPperTon = 0
 				end
